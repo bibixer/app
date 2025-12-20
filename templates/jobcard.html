@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Billing System</title>
+
+    <style>
+      /* Improved UI Variables */
+      :root {
+        --primary: #4f46e5;
+        --primary-hover: #4338ca;
+        --border: #e2e8f0;
+        --bg: #f8fafc;
+        --text-main: #1e293b;
+        --text-muted: #64748b;
+        --white: #ffffff;
+      }
+
+      body {
+        font-family: "Inter", system-ui, -apple-system, sans-serif;
+        background: var(--bg);
+        color: var(--text-main);
+        margin: 0;
+
+        /* Center .bill-card */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh; /* full viewport height */
+      }
+
+      .bill-card {
+        max-width: 1000px;
+        width: 100%;
+        background: var(--white);
+        padding: 32px;
+        border-radius: 16px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 10px 15px -3px rgba(0, 0, 0, 0.05);
+      }
+
+      h2 {
+        margin-top: 0;
+        margin-bottom: 24px;
+        font-size: 1.5rem;
+        font-weight: 700;
+        letter-spacing: -0.025em;
+      }
+
+      /* Header Grid */
+      .form-header {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 20px;
+        margin-bottom: 32px;
+      }
+
+      .input-group {
+        position: relative;
+      }
+
+      label {
+        font-size: 0.875rem;
+        font-weight: 600;
+        margin-bottom: 6px;
+        color: var(--text-muted);
+      }
+
+      input {
+        width: 100%;
+        padding: 10px 14px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        font-size: 14px;
+        color: var(--text-main);
+        box-sizing: border-box;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        background: #fff;
+      }
+
+      input:focus {
+        border-color: var(--primary);
+        outline: none;
+        box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+      }
+
+      /* Dropdown/Suggestions Menu */
+      .suggestions {
+        position: absolute;
+        top: calc(100% + 6px);
+        left: 0;
+        right: 0;
+        background: var(--white);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        max-height: 220px;
+        overflow-y: auto;
+        z-index: 10000; /* increase z-index */
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1),
+          0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        padding: 4px;
+        pointer-events: auto; /* ensure it receives clicks */
+      }
+
+      .suggestions div {
+        padding: 10px 12px;
+        cursor: pointer;
+        border-radius: 6px;
+        font-size: 14px;
+        transition: background 0.15s;
+      }
+
+      .suggestions div:hover,
+      .suggestions div.active {
+        background: #f1f5f9;
+        color: var(--primary);
+      }
+
+      /* Table Area */
+      .table-wrapper {
+        margin-top: 24px;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        overflow: visible; /* Clips the table corners to the border-radius */
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 750px;
+      }
+
+      th {
+        background: #f8fafc;
+        padding: 12px 16px;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-muted);
+        border-bottom: 1px solid var(--border);
+        text-align: left;
+      }
+
+      td {
+        padding: 10px 16px;
+        border-bottom: 1px solid #f1f5f9;
+        background: #fff;
+      }
+
+      input[readonly] {
+        background: #f8fafc;
+        border-color: transparent;
+        color: var(--text-muted);
+      }
+
+      /* Delete Button */
+      .btn-remove {
+        border: none;
+        background: #fee2e2;
+        color: #ef4444;
+        width: 28px;
+        height: 28px;
+        border-radius: 6px;
+        font-size: 18px;
+        line-height: 1;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+      }
+
+      .btn-remove:hover {
+        background: #fecaca;
+        color: #dc2626;
+      }
+
+      /* Action Button */
+      button[onclick="submitData()"] {
+        margin-top: 32px;
+        padding: 14px;
+        width: 100%;
+        background: var(--primary);
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
+      }
+
+      button[onclick="submitData()"]:hover {
+        background: var(--primary-hover);
+        transform: translateY(-1px);
+      }
+
+      /* Debug Console */
+      pre {
+        background: #0f172a;
+        color: #38bdf8;
+        padding: 16px;
+        border-radius: 10px;
+        margin-top: 20px;
+        font-family: "Fira Code", "Courier New", monospace;
+        font-size: 13px;
+        border: 1px solid #1e293b;
+      }
+      body {
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      body {
+        margin: auto;
+        font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+        overflow: auto;
+        background: linear-gradient(
+          315deg,
+          rgba(101, 0, 94, 1) 3%,
+          rgba(60, 132, 206, 1) 38%,
+          rgba(48, 238, 226, 1) 68%,
+          rgba(255, 25, 25, 1) 98%
+        );
+        animation: gradient 15s ease infinite;
+        background-size: 400% 400%;
+        background-attachment: fixed;
+      }
+
+      @keyframes gradient {
+        0% {
+          background-position: 0% 0%;
+        }
+        50% {
+          background-position: 100% 100%;
+        }
+        100% {
+          background-position: 0% 0%;
+        }
+      }
+
+      .wave {
+        background: rgb(255 255 255 / 25%);
+        border-radius: 1000% 1000% 0 0;
+        position: fixed;
+        width: 200%;
+        height: 12em;
+        animation: wave 10s -3s linear infinite;
+        transform: translate3d(0, 0, 0);
+        opacity: 0.8;
+        bottom: 0;
+        left: 0;
+        z-index: -1;
+      }
+
+      .wave:nth-of-type(2) {
+        bottom: -1.25em;
+        animation: wave 18s linear reverse infinite;
+        opacity: 0.8;
+      }
+
+      .wave:nth-of-type(3) {
+        bottom: -2.5em;
+        animation: wave 20s -1s reverse infinite;
+        opacity: 0.9;
+      }
+
+      @keyframes wave {
+        2% {
+          transform: translateX(1);
+        }
+
+        25% {
+          transform: translateX(-25%);
+        }
+
+        50% {
+          transform: translateX(-50%);
+        }
+
+        75% {
+          transform: translateX(-25%);
+        }
+
+        100% {
+          transform: translateX(1);
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div>
+      <div class="wave"></div>
+      <div class="wave"></div>
+      <div class="wave"></div>
+    </div>
+
+    <div class="bill-card">
+      <h2>Job Card Entry</h2>
+
+      <div class="form-header">
+        <div class="input-group">
+          <label>Master Search</label>
+          <input id="custInput" autocomplete="off" placeholder="ID or Name" />
+          <div id="custSug" class="suggestions" hidden></div>
+        </div>
+        <div class="input-group">
+          <label>Billing Date</label>
+          <input type="date" id="billDate" / readonly>
+        </div>
+      </div>
+
+      <div class="table-wrapper">
+        <table id="billTable">
+          <thead>
+            <tr>
+              <th width="30%">Item ID / Search</th>
+              <th width="30%">Item Name</th>
+              <th width="20%">Colour</th>
+              <th width="15%">pics</th>
+              <th width="5%"></th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <button onclick="submitData()">Submit Bill</button>
+      <pre id="output">// JSON Response will appear here</pre>
+    </div>
+    <script>
+      /* ================= DATA ================= */
+      const customers = [
+        { id: 101, name: "Ramesh" },
+        { id: 102, name: "Suresh" },
+        { id: 103, name: "Anita" },
+      ];
+
+      const inventory = [
+        { id: 125, name: "Vimal", colour: "Red", pics: 25 },
+        { id: 126, name: "Raymond", colour: "Blue", pics: 25 },
+        { id: 127, name: "Cotton", colour: "White", pics: 25 },
+      ];
+
+      /* ================= DOM ================= */
+      const custInput = document.getElementById("custInput");
+      const custSug = document.getElementById("custSug");
+      const tbody = document.querySelector("#billTable tbody");
+      const billDate = document.getElementById("billDate");
+      const output = document.getElementById("output");
+
+      /* ================= HELPER ================= */
+      function focusField(el) {
+        if (!el) return;
+        el.focus({ preventScroll: true });
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+        if (el.type === "text" || el.type === "number") {
+          const len = el.value.length;
+          setTimeout(() => el.setSelectionRange(len, len), 0);
+        }
+      }
+
+      function makeSuggestionsInteractive(input, suggestions, items, onSelect) {
+        let activeIndex = -1;
+
+        function render() {
+          suggestions.innerHTML = "";
+          items.forEach((item, i) => {
+            const div = document.createElement("div");
+            div.textContent = item;
+            if (i === activeIndex) div.classList.add("active");
+            div.addEventListener("pointerdown", (e) => {
+              e.preventDefault();
+              onSelect(item);
+              suggestions.hidden = true;
+            });
+            suggestions.appendChild(div);
+          });
+          suggestions.hidden = items.length === 0;
+        }
+
+        input.addEventListener("keydown", (e) => {
+          const max = items.length - 1;
+          if (e.key === "ArrowDown") {
+            e.preventDefault();
+            activeIndex = activeIndex < max ? activeIndex + 1 : 0;
+            render();
+          } else if (e.key === "ArrowUp") {
+            e.preventDefault();
+            activeIndex = activeIndex > 0 ? activeIndex - 1 : max;
+            render();
+          } else if (e.key === "Enter") {
+            if (activeIndex >= 0 && items[activeIndex]) {
+              e.preventDefault();
+              onSelect(items[activeIndex]);
+              suggestions.hidden = true;
+              activeIndex = -1;
+            }
+          }
+        });
+
+        render();
+      }
+
+      /* ================= CUSTOMER AUTOCOMPLETE ================= */
+      custInput.addEventListener("input", () => {
+        const v = custInput.value.trim().toLowerCase();
+        if (!v) return (custSug.hidden = true);
+
+        const filtered = customers
+          .filter(
+            (c) => String(c.id).includes(v) || c.name.toLowerCase().includes(v)
+          )
+          .map((c) => `${c.id} - ${c.name}`);
+
+        makeSuggestionsInteractive(custInput, custSug, filtered, (val) => {
+          custInput.value = val;
+          focusField(tbody.querySelector(".item-id"));
+        });
+      });
+
+      custInput.addEventListener("blur", () =>
+        setTimeout(() => (custSug.hidden = true), 120)
+      );
+
+      /* ================= TABLE ROW ================= */
+      function addRow() {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+    <td>
+      <div class="input-group">
+        <input class="item-id" autocomplete="off" placeholder="Item ID / Name">
+        <div class="suggestions" hidden></div>
+      </div>
+    </td>
+    <td><input class="item-name" readonly></td>
+    <td><input class="item-colour" readonly></td>
+    <td><input type="number" min="1" class="item-qty" readonly></td>
+    <td><button type="button" class="btn-remove">×</button></td>
+  `;
+
+        const idInput = tr.querySelector(".item-id");
+        const sug = tr.querySelector(".suggestions");
+
+        idInput.addEventListener("input", () => {
+          const v = idInput.value.trim().toLowerCase();
+          if (!v) return (sug.hidden = true);
+
+          const usedIds = [...tbody.querySelectorAll(".item-id")]
+            .map((i) => i.value)
+            .filter((val) => val && val !== idInput.value);
+
+          const filtered = inventory
+            .filter(
+              (i) =>
+                !usedIds.includes(String(i.id)) &&
+                (String(i.id).includes(v) || i.name.toLowerCase().includes(v))
+            )
+            .map((i) => `${i.id} - ${i.name}`);
+
+          makeSuggestionsInteractive(idInput, sug, filtered, (val) => {
+            const [idStr] = val.split(" - ");
+
+            // Prevent duplicate items
+            const alreadyExists = [...tbody.querySelectorAll(".item-id")].some(
+              (input) => input.value === idStr
+            );
+
+            // if (alreadyExists) {
+            //   alert("This item is already added.");
+            //   sug.hidden = true;
+            //   return;
+            // }
+
+            const item = inventory.find((it) => String(it.id) === idStr);
+            if (!item) return;
+
+            idInput.value = item.id;
+            tr.querySelector(".item-name").value = item.name;
+            tr.querySelector(".item-colour").value = item.colour;
+            tr.querySelector(".item-qty").value = item.pics;
+            sug.hidden = true;
+
+            if (tr === tbody.lastElementChild) addRow();
+          });
+        });
+
+        idInput.addEventListener("blur", () =>
+          setTimeout(() => (sug.hidden = true), 120)
+        );
+
+        tr.querySelector(".btn-remove").addEventListener("click", () => {
+          if (tbody.rows.length > 1) tr.remove();
+          else tr.querySelectorAll("input").forEach((i) => (i.value = ""));
+        });
+
+        tbody.appendChild(tr);
+      }
+
+      /* ================= INIT ================= */
+      addRow();
+      billDate.valueAsDate = new Date();
+
+      // Auto-focus customer input on page load
+      requestAnimationFrame(() => {
+        focusField(custInput);
+      });
+
+      /* ================= SUBMIT ================= */
+      async function submitData() {
+        if (!custInput.value) return alert("Select customer");
+
+        const items = [...tbody.querySelectorAll("tr")]
+          .map((r) => ({
+            item_id: r.querySelector(".item-id").value,
+            qty: Number(r.querySelector(".item-qty").value),
+          }))
+          .filter((i) => i.item_id && i.qty > 0);
+
+        if (!items.length) return alert("Add at least one item");
+
+        const payload = {
+          customer: custInput.value,
+          date: billDate.value,
+          items,
+        };
+
+        try {
+          const res = await fetch("/submit-bill", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+          const data = await res.json();
+          output.textContent = JSON.stringify(data, null, 2);
+          alert("Bill submitted");
+        } catch (err) {
+          output.textContent = JSON.stringify(payload, null, 2);
+          alert("Saved locally (no backend)");
+        }
+      }
+
+      /* ================= ENTER NAVIGATION ================= */
+      document.addEventListener("keydown", (e) => {
+        const el = document.activeElement;
+
+        // Skip if suggestion dropdown is open
+        const sug = el.closest(".input-group")?.querySelector(".suggestions");
+        if (sug && !sug.hidden) return;
+
+        if (e.key === "Enter") {
+          if (el.id === "custInput" && el.value.trim()) {
+            e.preventDefault();
+            focusField(tbody.querySelector(".item-id"));
+          } else if (el.classList.contains("item-id") && el.value.trim()) {
+            e.preventDefault();
+            const row = el.closest("tr");
+            const nextRow = row.nextElementSibling;
+            if (nextRow) {
+              focusField(nextRow.querySelector(".item-id"));
+            } else {
+              addRow();
+              focusField(tbody.lastElementChild.querySelector(".item-id"));
+            }
+          }
+        }
+
+        if (e.key === "Backspace") {
+          if (el.classList.contains("item-id") && !el.value) {
+            e.preventDefault();
+            const row = el.closest("tr");
+            const prevRow = row.previousElementSibling;
+            if (prevRow) focusField(prevRow.querySelector(".item-id"));
+            else focusField(custInput); // go back to customer input if first row
+          }
+        }
+      });
+    </script>
+
+    <style>
+      .suggestions div.active {
+        background: #e0e7ff;
+        color: #4338ca;
+      }
+    </style>
+  </body>
+</html>

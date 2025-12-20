@@ -1,0 +1,106 @@
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const isPC = !('ontouchstart' in window || navigator.maxTouchPoints > 0);
+    if (!isPC) return;
+
+    const forms = document.querySelectorAll("form.form");
+
+    forms.forEach(form => {
+      const inputs = Array.from(form.querySelectorAll("input, textarea, select")).filter(el =>
+        el.type !== "submit" &&
+        !el.disabled &&
+        !el.readOnly &&
+        el.offsetParent !== null
+      );
+
+      const isEmpty = (el) => {
+        if (el.tagName === "SELECT") return false;
+        return !el.value || el.value.trim() === "";
+      };
+
+      const focusAndMoveCursorToEnd = (el) => {
+        // Remove highlight from all fields
+        inputs.forEach(i => i.classList.remove('focused-field'));
+
+        // Highlight current field
+        el.classList.add('focused-field');
+
+        // Focus and scroll
+        el.focus();
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+        // For text/number fields, move cursor to end
+        if (el.tagName === "SELECT") return;
+
+        if (el.type === "number") {
+          const val = el.value;
+          el.blur();
+          el.focus();
+          el.value = '';
+          el.value = val;
+        } else if (typeof el.setSelectionRange === 'function') {
+          const len = el.value.length;
+          setTimeout(() => {
+            el.setSelectionRange(len, len);
+          }, 0);
+        }
+      };
+
+      let focusField = inputs.find(el => isEmpty(el));
+      if (!focusField && inputs.length > 0) focusField = inputs[0];
+
+      if (focusField) {
+        requestAnimationFrame(() => {
+          focusAndMoveCursorToEnd(focusField);
+        });
+      }
+
+      inputs.forEach((input, index) => {
+        input.addEventListener("keydown", function (e) {
+          if (e.key === "Enter") {
+            e.preventDefault();
+
+            if (isEmpty(input)) return;
+
+            const next = inputs[index + 1];
+            if (next) {
+              focusAndMoveCursorToEnd(next);
+            } else {
+              const allFilled = inputs.every(el => {
+                if (el.tagName === "SELECT") return true;
+                return !isEmpty(el);
+              });
+              if (allFilled) {
+                const btn = form.querySelector("button[type=submit], input[type=submit]");
+                if (btn) btn.click();
+              } else {
+                alert("Please fill all fields before submitting.");
+              }
+            }
+
+          } else if (e.key === "Backspace") {
+            if (input.tagName === "SELECT" || isEmpty(input)) {
+              e.preventDefault();
+              if (index > 0) {
+                focusAndMoveCursorToEnd(inputs[index - 1]);
+              }
+            }
+          }
+        });
+
+        // Highlight any field when manually focused
+        input.addEventListener("focus", () => {
+          inputs.forEach(i => i.classList.remove('focused-field'));
+          input.classList.add('focused-field');
+        });
+      });
+    });
+  });
+</script>
+
+<style>
+    .focused-field {
+  outline: 2px solid #0d6efd;
+  background-color: #eef5ff;
+}
+</style>
