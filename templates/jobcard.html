@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
+ {% include "menu_bar.html" %}
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Billing System</title>
+    <title>new job creation</title>
 
     <style>
       /* Improved UI Variables */
@@ -320,15 +321,27 @@
         <table id="billTable">
           <thead>
             <tr>
-              <th width="30%">Item ID / Search</th>
-              <th width="30%">Item Name</th>
-              <th width="20%">Colour</th>
-              <th width="15%">pics</th>
-              <th width="5%"></th>
+              <th width="25%">Item ID / Search</th>
+              <th width="25%">Item Name</th>
+              <th width="15%">Colour</th>
+              <th width="10%">Pics</th>
+              <th width="13%">KG</th>
+              <th width="2%"></th>
             </tr>
           </thead>
           <tbody></tbody>
         </table>
+      </div>
+      <div
+        style="
+          margin-top: 12px;
+          text-align: right;
+          font-weight: 600;
+          color: var(--text-main);
+        "
+      >
+        Total Weight:
+        <span id="totalKg">0.00</span> KG
       </div>
 
       <button onclick="submitData()">Submit Bill</button>
@@ -343,9 +356,9 @@
       ];
 
       const inventory = [
-        { id: 125, name: "Vimal", colour: "Red", pics: 25 },
-        { id: 126, name: "Raymond", colour: "Blue", pics: 25 },
-        { id: 127, name: "Cotton", colour: "White", pics: 25 },
+        { id: 125, name: "Vimal", colour: "Red", pics: 25, kg: 12.75 },
+        { id: 126, name: "Raymond", colour: "Blue", pics: 25, kg: 12.5 },
+        { id: 127, name: "Cotton", colour: "White", pics: 25, kg: 12.5 },
       ];
 
       /* ================= DOM ================= */
@@ -442,6 +455,16 @@
     <td><input class="item-name" readonly></td>
     <td><input class="item-colour" readonly></td>
     <td><input type="number" min="1" class="item-qty" readonly></td>
+<td>
+  <input
+    type="number"
+    min="0"
+    step="0.01"
+    class="item-kg"
+    placeholder="0.00"
+    readonly>
+
+</td>
     <td><button type="button" class="btn-remove">×</button></td>
   `;
 
@@ -485,6 +508,8 @@
             tr.querySelector(".item-name").value = item.name;
             tr.querySelector(".item-colour").value = item.colour;
             tr.querySelector(".item-qty").value = item.pics;
+            tr.querySelector(".item-kg").value = item.kg;
+            updateTotalKg();
             sug.hidden = true;
 
             if (tr === tbody.lastElementChild) addRow();
@@ -520,6 +545,7 @@
           .map((r) => ({
             item_id: r.querySelector(".item-id").value,
             qty: Number(r.querySelector(".item-qty").value),
+            kg: Number(r.querySelector(".item-kg").value) || 0,
           }))
           .filter((i) => i.item_id && i.qty > 0);
 
@@ -581,6 +607,13 @@
           }
         }
       });
+      function updateTotalKg() {
+        let total = 0;
+        document.querySelectorAll(".item-kg").forEach((i) => {
+          total += Number(i.value) || 0;
+        });
+        document.getElementById("totalKg").innerText = total.toFixed(2);
+      }
     </script>
 
     <style>

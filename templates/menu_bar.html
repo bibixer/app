@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <link href="https://fonts.googleapis.com/css2?family=Oswald&display=swap" rel="stylesheet" />
+  <style>
+
+    input[type="checkbox"] {
+      display: none;
+    }
+
+    .uni-wrapper {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 100%;
+      background: #000;
+      clip-path: circle(25px at calc(100% - 45px) 45px);
+      transition: all 0.3s ease-in-out;
+      z-index: 5;
+      overflow: auto;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 0;
+    }
+
+    #menu:checked ~ .uni-wrapper {
+      clip-path: circle(75%);
+    }
+
+    .cross-dot {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      width: 60px;
+      height: 60px;
+      background-color: #111;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 15;
+    }
+
+    .cross-dot label {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      width: 30px;
+      height: 22px;
+      cursor: pointer;
+    }
+
+    .cross-dot label span {
+      height: 4px;
+      border-radius: 4px;
+      background-color: #fff;
+      transition: 0.4s ease;
+    }
+
+    #menu:checked + .cross-dot label span:nth-child(1) {
+      transform: translateY(9px) rotate(45deg);
+    }
+
+    #menu:checked + .cross-dot label span:nth-child(2) {
+      opacity: 0;
+    }
+
+    #menu:checked + .cross-dot label span:nth-child(3) {
+      transform: translateY(-9px) rotate(-45deg);
+    }
+
+    .uni-nav-list {
+      list-style: none;
+      text-align: center;
+      padding: 0;
+      margin: 0;
+      max-width: 400px;
+    }
+
+    .uni-nav-item {
+      margin: 15px 0;
+    }
+
+    .uni-nav-link {
+      text-decoration: none;
+      font-size: 30px;
+      font-weight: 500;
+      padding: 5px 30px;
+      color: #fff;
+      border-radius: 50px;
+      background: #000;
+      position: relative;
+      line-height: 50px;
+      transition: all 0.3s ease;
+      display: inline-block;
+      user-select: none;
+    }
+
+    .uni-nav-link:after {
+      position: absolute;
+      content: "";
+      background: linear-gradient(#14ffe9, #ffeb3b, #ff00e0);
+      width: 104%;
+      height: 110%;
+      left: -2%;
+      top: -5%;
+      border-radius: 50px;
+      transform: scaleY(0);
+      z-index: -1;
+      animation: uni-rotate 1.5s linear infinite;
+      transition: transform 0.3s ease;
+    }
+
+    .uni-nav-link:hover:after {
+      transform: scaleY(1);
+    }
+
+    .uni-nav-link:hover {
+      color: #fff;
+    }
+
+    @keyframes uni-rotate {
+      0% { filter: hue-rotate(0deg); }
+      100% { filter: hue-rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Menu Checkbox -->
+  <input type="checkbox" id="menu" autocomplete="off" />
+
+  <!-- Toggle Button (Animated X icon) -->
+  <div class="cross-dot">
+    <label for="menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </label>
+  </div>
+
+  <!-- Fullscreen Navigation -->
+  <div class="uni-wrapper">
+    <ul class="uni-nav-list">
+      <li class="uni-nav-item"><a href="/lumpentry" class="uni-nav-link">bundle entery</a></li>
+      <li class="uni-nav-item"><a href="/add_outworver" class="uni-nav-link">add outwoker</a></li>
+            <li class="uni-nav-item"><a href="/add_items" class="uni-nav-link">add products</a></li>
+            <li class="uni-nav-item"><a href="/add_cutter" class="uni-nav-link">add cutter</a></li>
+      <li class="uni-nav-item"><a href="/" class="uni-nav-link">job card</a></li>
+      <li class="uni-nav-item"><a href="/job_retun" class="uni-nav-link">job retun</a></li>
+    </ul>
+  </div>
+
+  <!-- Reset menu on back/refresh -->
+  <script>
+    window.addEventListener('pageshow', () => {
+      document.getElementById('menu').checked = false;
+    });
+
+    document.addEventListener("visibilitychange", function () {
+      if (document.visibilityState === 'visible') {
+        document.getElementById('menu').checked = false;
+      }
+    });
+  </script>
+
+</body>
+</html>

@@ -1,6 +1,7 @@
 from flask import flash, render_template, redirect, url_for,request,session
-from form import Lump_data,bundle_invadata
-from data_entry import add_data_lump
+from form import Lump_data,bundle_invadata,Item_data,Outworker_form,Cutter_form
+
+from data_entry import add_data_lump,add_cutter,add_items,add_outworker_db
 
 def reset_session():
     for key in list(session.keys()):
@@ -9,7 +10,7 @@ def reset_session():
 
 def register_routes(app):
 
-    @app.route("/", methods=["GET", "POST"])
+    @app.route("/lumpentry", methods=["GET", "POST"])
     def lump_home():
         
         form_name = "lump entry"
@@ -83,3 +84,71 @@ def register_routes(app):
             form_name=form_name,
             current_form=current_form
         )
+    @app.route("/", methods=["GET", "POST"])
+    def job_card():
+        return render_template("jobcard.html")
+    @app.route("/add_items", methods=["GET", "POST"])
+    def add_item():
+        form_name = "add new produdcts"
+        current_form = Item_data()
+
+        if current_form.validate_on_submit():
+            data = current_form.data.copy()
+            items = add_items(data)
+            if items == 101 :
+                flash(f"You have successfully added  {data['name']} .", "success")
+                return redirect(url_for("add_item"))
+            elif  items == False :
+                flash("call  badx")
+                return redirect(url_for("add_item"))
+
+        return render_template(
+            "user.html",
+            form_name=form_name,
+            current_form=current_form
+        )
+
+    @app.route("/add_outworver", methods=["GET", "POST"])
+    def add_outworker():
+        form_name = "new outworver"
+        current_form = Outworker_form()
+
+        if current_form.validate_on_submit():
+            data = current_form.data.copy()
+            outworker = add_outworker_db(data)
+            if outworker == 101 :
+                flash(f"You have successfully added  {data['name']} .", "success")
+                return redirect(url_for("add_outworker"))
+            elif outworker == False :
+                flash("call  badx")
+                return redirect(url_for("add_outworker"))
+
+        return render_template(
+            "user.html",
+            form_name=form_name,
+            current_form=current_form
+        )
+
+    @app.route("/add_cutter", methods=["GET", "POST"])
+    def add_cuter():
+        form_name = "new cutter"
+        current_form = Cutter_form()
+
+        if current_form.validate_on_submit():
+            data = current_form.data.copy()
+            add_cu = add_cutter(data)
+            if add_cu == 101 :
+                flash(f"You have successfully added  {data['name']} cutter.", "success")
+                return redirect(url_for("add_cuter"))
+            elif  add_cu == False :
+                flash("call  badx")
+
+                return redirect(url_for("add_cuter"))
+        return render_template(
+            "user.html",
+            form_name=form_name,
+            current_form=current_form
+        )
+    @app.route("/job_retun", methods=["GET", "POST"])
+    def job_retun():
+        return render_template("job_retun.html")

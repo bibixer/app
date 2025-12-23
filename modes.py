@@ -45,3 +45,21 @@ class Lump(db.Model):
     meters = db.Column(db.Float, nullable=False)
     color = db.Column(db.String(100))
     number_of_bundlie = db.Column(db.Integer, nullable=False)
+class Cuter(db.Model):
+    __tablename__ = "CutData"
+    id = db.Column(db.Integer, primary_key=True)
+    name =  db.Column(db.String(50), nullable=False)
+
+class Outworker(db.Model):
+    __tablename__ = "OutworkData"
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), nullable=False)
+    adders = db.Column(db.String(50), nullable=False)
+    number = db.Column(db.Integer, nullable=False)
+class Item_data(db.Model):
+    __tablename__ = "ItemData"
+    id = db.Column(db.Integer, primary_key=True)
+    name =  db.Column(db.String(50), nullable=False)
+    meters = db.Column(db.Float, nullable=False)
+    size = db.Column(db.Float(50), nullable=False)
+

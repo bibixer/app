@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+ {% include "menu_bar.html" %}
+  <head>
+    <meta charset="UTF-8" />
+    <title>Job  Return entry </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+    />
+
+    <style>
+      :root {
+        --primary: #4f46e5;
+        --primary-hover: #4338ca;
+        --bg: #f8fafc;
+        --card-bg: #ffffff;
+        --text-main: #1e293b;
+        --text-muted: #64748b;
+        --border: #e2e8f0;
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: var(--bg);
+        color: var(--text-main);
+        margin: 0;
+        padding: 40px 20px;
+      }
+
+      .card {
+        width: 90%; /* make it wider */
+        max-width: 1200px; /* limit max width */
+        margin: auto;
+        background: var(--card-bg);
+        border-radius: 12px;
+        box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1),
+          0 2px 4px -2px rgb(0 0 0 / 0.1);
+        overflow: hidden;
+        border: 1px solid var(--border);
+      }
+
+      .card-header {
+        padding: 24px 32px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      h2 {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--text-main);
+      }
+
+      /* Top Stats Bar */
+      .job-info-bar {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        background: #f1f5f9;
+        padding: 16px 32px;
+        gap: 24px;
+      }
+      .info-group label {
+        display: block;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-muted);
+        margin-bottom: 4px;
+        font-weight: 600;
+      }
+      .info-group span {
+        font-size: 15px;
+        font-weight: 500;
+        color: var(--text-main);
+      }
+
+      /* Table Styling */
+      .table-container {
+        padding: 0 16px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+      }
+
+      th {
+        text-align: left;
+        padding: 16px 12px;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text-muted);
+        border-bottom: 2px solid var(--border);
+      }
+
+      td {
+        padding: 16px 12px;
+        vertical-align: middle;
+        border-bottom: 1px solid var(--border);
+      }
+
+      /* Inputs & Badges */
+      .id-badge {
+        font-family: monospace;
+        color: var(--primary);
+        font-weight: 600;
+      }
+
+      .remaining-badge {
+        background: #dcfce7;
+        color: #166534;
+        padding: 4px 10px;
+        border-radius: 99px;
+        font-size: 13px;
+        font-weight: 600;
+      }
+      .remaining-badge.low {
+        background: #fee2e2;
+        color: #991b1b;
+      }
+
+      input[type="number"] {
+        width: 80px;
+        padding: 8px 12px;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        font-size: 14px;
+        transition: border-color 0.2s;
+      }
+      input[type="number"]:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+      }
+
+      /* History Styling */
+      .history-toggle {
+        cursor: pointer;
+        color: var(--primary);
+        font-size: 13px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        margin-top: 4px;
+      }
+      .history-content {
+        display: none;
+        background: #f8fafc;
+        margin: 8px 0;
+        padding: 12px;
+        border-radius: 8px;
+        font-size: 13px;
+        border-left: 3px solid var(--primary);
+      }
+      .history-item {
+        padding: 4px 0;
+        color: var(--text-muted);
+      }
+      .history-item b {
+        color: var(--text-main);
+      }
+
+      /* Footer */
+      .card-footer {
+        padding: 24px 32px;
+        background: #ffffff;
+        text-align: right;
+      }
+      .btn-submit {
+        background: var(--primary);
+        color: white;
+        padding: 12px 32px;
+        border-radius: 8px;
+        border: none;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      .btn-submit:hover {
+        background: var(--primary-hover);
+      }
+
+      .chevron {
+        transition: transform 0.2s;
+        display: inline-block;
+      }
+      .chevron.open {
+        transform: rotate(90deg);
+      }
+      body {
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+        background: linear-gradient(
+          315deg,
+          rgba(101, 0, 94, 1) 3%,
+          rgba(60, 132, 206, 1) 38%,
+          rgba(48, 238, 226, 1) 68%,
+          rgba(255, 25, 25, 1) 98%
+        );
+        animation: gradient 15s ease infinite;
+        background-size: 400% 400%;
+        background-attachment: fixed;
+
+        /* Center card */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh; /* full viewport height */
+        padding: 20px; /* space on small screens */
+      }
+
+      @keyframes gradient {
+        0% {
+          background-position: 0% 0%;
+        }
+        50% {
+          background-position: 100% 100%;
+        }
+        100% {
+          background-position: 0% 0%;
+        }
+      }
+
+      .wave {
+        background: rgb(255 255 255 / 25%);
+        border-radius: 1000% 1000% 0 0;
+        position: fixed;
+        width: 200%;
+        height: 12em;
+        animation: wave 10s -3s linear infinite;
+        transform: translate3d(0, 0, 0);
+        opacity: 0.8;
+        bottom: 0;
+        left: 0;
+        z-index: -1;
+      }
+
+      .wave:nth-of-type(2) {
+        bottom: -1.25em;
+        animation: wave 18s linear reverse infinite;
+        opacity: 0.8;
+      }
+
+      .wave:nth-of-type(3) {
+        bottom: -2.5em;
+        animation: wave 20s -1s reverse infinite;
+        opacity: 0.9;
+      }
+
+      @keyframes wave {
+        2% {
+          transform: translateX(1);
+        }
+
+        25% {
+          transform: translateX(-25%);
+        }
+
+        50% {
+          transform: translateX(-50%);
+        }
+
+        75% {
+          transform: translateX(-25%);
+        }
+
+        100% {
+          transform: translateX(1);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div>
+      <div class="wave"></div>
+      <div class="wave"></div>
+      <div class="wave"></div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <h2>Job Card Return</h2>
+      </div>
+
+      <div class="job-info-bar">
+        <div class="info-group">
+          <label>ID</label>
+          <span id="jobId"></span>
+        </div>
+        <div class="info-group">
+          <label>Master Name</label>
+          <span id="jobName"></span>
+        </div>
+        <div class="info-group">
+          <label>Date</label>
+          <span id="jobDate"></span>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table id="returnTable">
+          <thead>
+            <tr>
+              <th>Item ID</th>
+              <th>product Name</th>
+              <th>Colour</th>
+              <th>Balance</th>
+              <th>Return</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div class="card-footer">
+        <button onclick="submitReturn()" class="btn-submit">
+          Confirm Return
+        </button>
+      </div>
+    </div>
+
+    <script>
+      // 1. Data and Initialization
+      const JOB_CARD = {
+        id: "JC-9001",
+        name: "Stitching – Winter Jackets",
+        date: "Dec 21, 2025",
+        items: [
+          {
+            item_id: 201,
+            name: "Vimal Fabric",
+            colour: "Red",
+            issued: 25,
+            history: [{ date: "2025-05-01", returned: 5 }],
+          },
+          {
+            item_id: 202,
+            name: "Raymond Suit",
+            colour: "Blue",
+            issued: 40,
+            history: [
+              { date: "2025-05-03", returned: 10 },
+              { date: "2025-05-03", returned: 10 },
+              { date: "2025-05-03", returned: 10 },
+            ],
+          },
+          {
+            item_id: 203,
+            name: "Premium Cotton",
+            colour: "White",
+            issued: 18,
+            history: [],
+          },
+        ],
+      };
+
+      function fillJobInfo() {
+        document.getElementById("jobId").innerText = JOB_CARD.id;
+        document.getElementById("jobName").innerText = JOB_CARD.name;
+        document.getElementById("jobDate").innerText = JOB_CARD.date;
+      }
+
+      // 2. Render Table with correct classes for JS targeting
+      function renderTable(items) {
+        const tbody = document.querySelector("#returnTable tbody");
+        tbody.innerHTML = items
+          .map((item, index) => {
+            const returnedTotal = item.history.reduce(
+              (sum, h) => sum + h.returned,
+              0
+            );
+            const remaining = item.issued - returnedTotal;
+            const historyHtml =
+              item.history
+                .map(
+                  (h) =>
+                    `<div class="history-item">📅 ${h.date} — Returned <b>${h.returned}</b> pcs</div>`
+                )
+                .join("") ||
+              '<div class="history-item">No previous returns</div>';
+
+            return `
+      <tr>
+        <td><span class="id-badge">#${item.item_id}</span></td>
+        <td>
+          <div style="font-weight:600">${item.name}</div>
+          <div class="history-toggle" onclick="toggleHistory(${index})">
+            <span class="chevron" id="chevron-${index}">▶</span> View History
+          </div>
+          <div class="history-content" id="history-${index}">${historyHtml}</div>
+        </td>
+        <td>${item.colour}</td>
+        <td><span class="remaining-badge ${
+          remaining < 10 ? "low" : ""
+        }">${remaining} pcs</span></td>
+        <td>
+          <input type="number" class="return-input"
+                 min="0" max="${remaining}"
+                 placeholder="0"
+                 data-remaining="${remaining}">
+        </td>
+      </tr>
+    `;
+          })
+          .join("");
+      }
+
+      // 3. Helper for smooth keyboard navigation
+      function focusAtEnd(input) {
+        if (!input) return;
+        input.focus();
+        // For number inputs, setSelectionRange isn't supported,
+        // but focusing is usually enough.
+      }
+
+      // 4. Main Event Listener
+      document.addEventListener("DOMContentLoaded", () => {
+        fillJobInfo();
+        renderTable(JOB_CARD.items);
+
+        const getInputs = () =>
+          Array.from(document.querySelectorAll(".return-input"));
+
+        // Auto-focus first input
+        const first = getInputs()[0];
+        if (first) focusAtEnd(first);
+
+        // Keyboard Navigation Logic
+        document.addEventListener("keydown", (e) => {
+          const el = document.activeElement;
+          if (!el || !el.classList.contains("return-input")) return;
+
+          const inputs = getInputs();
+          const index = inputs.indexOf(el);
+
+          // ENTER: Move to next row
+          if (e.key === "Enter") {
+            e.preventDefault();
+            if (index < inputs.length - 1) {
+              focusAtEnd(inputs[index + 1]);
+            } else {
+              document.querySelector(".btn-submit")?.focus();
+            }
+          }
+
+          // BACKSPACE: Move to previous row if current is empty
+          if (e.key === "Backspace" && el.value === "") {
+            if (index > 0) {
+              e.preventDefault();
+              focusAtEnd(inputs[index - 1]);
+            }
+          }
+        });
+      });
+
+      // Toggle History Function
+      function toggleHistory(index) {
+        const content = document.getElementById(`history-${index}`);
+        const chevron = document.getElementById(`chevron-${index}`);
+        const isVisible = content.style.display === "block";
+        content.style.display = isVisible ? "none" : "block";
+        chevron.classList.toggle("open", !isVisible);
+      }
+      function submitReturn() {
+        // 1. Target all the rows in the table body
+        const rows = document.querySelectorAll("#returnTable tbody tr");
+        const items = [];
+
+        // 2. Loop through rows (skip history content rows if they exist separately)
+        rows.forEach((row) => {
+          // Check if this is a main data row (it should have a return-input)
+          const input = row.querySelector(".return-input");
+          if (!input) return;
+
+          // Find the Item ID and Remaining count from the text/attributes
+          const itemId = row
+            .querySelector(".id-badge")
+            .innerText.replace("#", "");
+          const remaining = Number(input.getAttribute("data-remaining"));
+          const returnedValue = Number(input.value) || 0;
+
+          items.push({
+            item_id: itemId,
+            returned: returnedValue,
+            remaining: remaining,
+          });
+        });
+
+        // 3. Validation Logic
+        for (const item of items) {
+          if (item.returned < 0) {
+            alert(`Item #${item.item_id}: Returned amount cannot be negative.`);
+            return;
+          }
+          if (item.returned > item.remaining) {
+            alert(
+              `Item #${item.item_id}: Returned pieces (${item.returned}) cannot exceed remaining pieces (${item.remaining}).`
+            );
+            return;
+          }
+        }
+
+        // 4. Construct Payload
+        const payload = {
+          job_card_id: JOB_CARD.id,
+          items: items
+            .filter((i) => i.returned > 0) // Optional: only send items that actually have a return value
+            .map((i) => ({
+              item_id: i.item_id,
+              returned: i.returned,
+            })),
+        };
+
+        // 5. Output
+        if (payload.items.length === 0) {
+          alert("Please enter at least one return quantity.");
+          return;
+        }
+
+        console.log("FINAL PAYLOAD:", payload);
+        alert("Return submitted successfully! Check console for data.");
+      }
+    </script>
+  </body>
+</html>
