@@ -46,7 +46,7 @@ def error_hendle(func):
         try:
             return func(*args, **kwargs)
         except Exception as e:
-            return False
+            return {"or":False,"exception":e}
     return eror
 
 

@@ -10,7 +10,7 @@ class Lump_data(FlaskForm):
         validators=[DataRequired()],
         render_kw={
             "placeholder": "Enter cutter name",
-             
+             "id":"cuter_name",
         }
     )
 
@@ -19,7 +19,7 @@ class Lump_data(FlaskForm):
         validators=[DataRequired()],
         render_kw={
             "placeholder": "Enter product name",
-             
+             'id':"product_name",
         }
     )
 

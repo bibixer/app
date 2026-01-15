@@ -495,11 +495,11 @@
               (input) => input.value === idStr
             );
 
-            // if (alreadyExists) {
-            //   alert("This item is already added.");
-            //   sug.hidden = true;
-            //   return;
-            // }
+            if (alreadyExists) {
+               alert("This item is already added.");
+               sug.hidden = true;
+               return;
+             }
 
             const item = inventory.find((it) => String(it.id) === idStr);
             if (!item) return;

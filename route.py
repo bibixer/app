@@ -1,7 +1,8 @@
-from flask import flash, render_template, redirect, url_for,request,session
+from flask import flash, render_template, redirect, url_for,session
 from form import Lump_data,bundle_invadata,Item_data,Outworker_form,Cutter_form
 
 from data_entry import add_data_lump,add_cutter,add_items,add_outworker_db
+from data_Process import get_serch_data
 
 def reset_session():
     for key in list(session.keys()):
@@ -15,7 +16,8 @@ def register_routes(app):
         
         form_name = "lump entry"
         current_form = Lump_data()
-
+        # data to auto fill
+        data_autofill = get_serch_data()
         if current_form.validate_on_submit():
             data = current_form.data.copy()
             data.pop("csrf_token", None)
@@ -32,11 +34,12 @@ def register_routes(app):
             session["bundles"] = {}
 
             return redirect(url_for("bundle_entery"))
-
+        print(data_autofill)
         return render_template(
             "user.html",
             form_name=form_name,
-            current_form=current_form
+            current_form=current_form,
+            data=data_autofill
         )
 
     @app.route("/bundle_entery", methods=["GET", "POST"])
@@ -98,8 +101,8 @@ def register_routes(app):
             if items == 101 :
                 flash(f"You have successfully added  {data['name']} .", "success")
                 return redirect(url_for("add_item"))
-            elif  items == False :
-                flash("call  badx")
+            elif  items["or"] == False :
+                flash(f"call  badx {items['exception']}")
                 return redirect(url_for("add_item"))
 
         return render_template(
@@ -119,8 +122,8 @@ def register_routes(app):
             if outworker == 101 :
                 flash(f"You have successfully added  {data['name']} .", "success")
                 return redirect(url_for("add_outworker"))
-            elif outworker == False :
-                flash("call  badx")
+            elif outworker['or'] == False :
+                flash(f"call  badx{outworker['exception']}")
                 return redirect(url_for("add_outworker"))
 
         return render_template(
@@ -140,8 +143,8 @@ def register_routes(app):
             if add_cu == 101 :
                 flash(f"You have successfully added  {data['name']} cutter.", "success")
                 return redirect(url_for("add_cuter"))
-            elif  add_cu == False :
-                flash("call  badx")
+            elif  add_cu["or"] == False :
+                flash(f"call  badx{add_cu["exception"]}")
 
                 return redirect(url_for("add_cuter"))
         return render_template(
