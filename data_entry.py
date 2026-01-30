@@ -18,7 +18,7 @@ def add_data_lump(data,current_user):
             bundle_type = lump_data['bundle_type'],
             product = lump_data['product_name'],
             meters = lump_data['meters'],
-            color = lump_data['numbers_of_bundles'],
+            color = lump_data['colors'],
             number_of_bundlie = lump_data['numbers_of_bundles']
 
         )
@@ -35,6 +35,8 @@ def add_bundle(data,lump_id):
             lump_id = lump_id,
             pieces = b['no_of_pics'],
             kg= b['kg_of_bundle'],
+            product = data["main"]['product_name'],
+            color = data["main"]['colors'],
         )
         db.session.add(bundle)
         db.session.commit()

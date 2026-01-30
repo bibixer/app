@@ -349,18 +349,15 @@
     </div>
     <script>
       /* ================= DATA ================= */
-      const customers = [
-        { id: 101, name: "Ramesh" },
-        { id: 102, name: "Suresh" },
-        { id: 103, name: "Anita" },
-      ];
+      {% if data %}
+      const outworker = {{data["outworker"] | tojson }};
 
       const inventory = [
         { id: 125, name: "Vimal", colour: "Red", pics: 25, kg: 12.75 },
         { id: 126, name: "Raymond", colour: "Blue", pics: 25, kg: 12.5 },
         { id: 127, name: "Cotton", colour: "White", pics: 25, kg: 12.5 },
       ];
-
+      {% endif %}
       /* ================= DOM ================= */
       const custInput = document.getElementById("custInput");
       const custSug = document.getElementById("custSug");
@@ -426,11 +423,11 @@
         const v = custInput.value.trim().toLowerCase();
         if (!v) return (custSug.hidden = true);
 
-        const filtered = customers
+        const filtered = outworker
           .filter(
             (c) => String(c.id).includes(v) || c.name.toLowerCase().includes(v)
           )
-          .map((c) => `${c.id} - ${c.name}`);
+          .map((c) => `${c.id} - ${c.name} - ${c.adders}`);
 
         makeSuggestionsInteractive(custInput, custSug, filtered, (val) => {
           custInput.value = val;
