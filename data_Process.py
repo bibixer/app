@@ -47,4 +47,19 @@ def outworker_name():
 def get_product():
     product_bunle =  Bundle.query.all()
     product_list = []
-    # for product in product_bunle:
+    for product in product_bunle:
+        if product.status.upper()  == "READY":
+            product_list.append({"id":product.id,
+                             "name":product.product,
+                             "colour":product.color,
+                             "pics":product.pieces,
+                             "kg":product.kg})
+    return product_list
+
+
+
+def get_job_card_data_creation():
+    return {
+        "outworker":outworker_name(),
+        "product":get_product(),
+    }

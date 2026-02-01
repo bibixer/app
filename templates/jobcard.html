@@ -352,11 +352,7 @@
       {% if data %}
       const outworker = {{data["outworker"] | tojson }};
 
-      const inventory = [
-        { id: 125, name: "Vimal", colour: "Red", pics: 25, kg: 12.75 },
-        { id: 126, name: "Raymond", colour: "Blue", pics: 25, kg: 12.5 },
-        { id: 127, name: "Cotton", colour: "White", pics: 25, kg: 12.5 },
-      ];
+      const inventory = {{data["product"] | tojson}};
       {% endif %}
       /* ================= DOM ================= */
       const custInput = document.getElementById("custInput");
@@ -472,25 +468,30 @@
           const v = idInput.value.trim().toLowerCase();
           if (!v) return (sug.hidden = true);
 
-          const usedIds = [...tbody.querySelectorAll(".item-id")]
-            .map((i) => i.value)
-            .filter((val) => val && val !== idInput.value);
+          const usedIds = new Set(
+  [...tbody.querySelectorAll(".item-id")]
+    .filter(input => input !== idInput)   // 🔑 exclude current row
+    .map(input => input.value.trim())
+    .filter(Boolean)
+);
 
-          const filtered = inventory
-            .filter(
-              (i) =>
-                !usedIds.includes(String(i.id)) &&
-                (String(i.id).includes(v) || i.name.toLowerCase().includes(v))
-            )
-            .map((i) => `${i.id} - ${i.name}`);
+         const filtered = inventory
+  .filter(i => {
+    const idStr = String(i.id);
+    return (
+      !usedIds.has(idStr) &&
+      (idStr.includes(v) || i.name.toLowerCase().includes(v))
+    );
+  })
+  .map(i => `${i.id} - ${i.name} - ${i.colour} - ${i.pics}`);
+
 
           makeSuggestionsInteractive(idInput, sug, filtered, (val) => {
             const [idStr] = val.split(" - ");
 
             // Prevent duplicate items
-            const alreadyExists = [...tbody.querySelectorAll(".item-id")].some(
-              (input) => input.value === idStr
-            );
+            const alreadyExists = usedIds.has(idStr);
+
 
             if (alreadyExists) {
                alert("This item is already added.");
@@ -575,6 +576,8 @@
 
         // Skip if suggestion dropdown is open
         const sug = el.closest(".input-group")?.querySelector(".suggestions");
+         if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "a") {
+         submitData()}
         if (sug && !sug.hidden) return;
 
         if (e.key === "Enter") {

@@ -2,7 +2,7 @@ from flask import flash, render_template, redirect, url_for,session
 from form import Lump_data,bundle_invadata,Item_data,Outworker_form,Cutter_form
 
 from data_entry import add_data_lump,add_cutter,add_items,add_outworker_db
-from data_Process import get_serch_data,outworker_name
+from data_Process import get_serch_data,get_job_card_data_creation
 
 def reset_session():
     for key in list(session.keys()):
@@ -89,8 +89,8 @@ def register_routes(app):
         )
     @app.route("/", methods=["GET", "POST"])
     def job_card():
-        outworker = outworker_name()
-        return render_template("jobcard.html",data = {"outworker":outworker})
+        job_card_data_c = get_job_card_data_creation()
+        return render_template("jobcard.html",data = job_card_data_c)
     @app.route("/add_items", methods=["GET", "POST"])
     def add_item():
         form_name = "add new produdcts"
