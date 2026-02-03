@@ -662,7 +662,10 @@ async function submitData() {
         document.getElementById("totalpic").innerText = total_pic.toFixed(2);
       }
       if (inventory.length == 0 ) {
-      consle
+      console.log("no items")
+      output.removeAttribute("hidden")
+      output.textContent = "no item to give"
+    }
     </script>
 
     <style>
