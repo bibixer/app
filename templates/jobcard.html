@@ -307,7 +307,7 @@
 
       <div class="form-header">
         <div class="input-group">
-          <label>Master Search</label>
+          <label>Master Nama</label>
           <input id="custInput" autocomplete="off" placeholder="ID or Name" />
           <div id="custSug" class="suggestions" hidden></div>
         </div>
@@ -332,6 +332,17 @@
           <tbody></tbody>
         </table>
       </div>
+       <div
+        style="
+          margin-top: 12px;
+          text-align: right;
+          font-weight: 600;
+          color: var(--text-main);
+        "
+      >
+        Total pics:
+        <span id="totalpic">0</span> pics
+      </div>
       <div
         style="
           margin-top: 12px;
@@ -345,7 +356,7 @@
       </div>
 
       <button onclick="submitData()">Submit Bill</button>
-      <pre id="output">// JSON Response will appear here</pre>
+      <pre id="output" hidden="hidden">// JSON Response will appear here</pre>
     </div>
     <script>
       /* ================= DATA ================= */
@@ -508,6 +519,7 @@
             tr.querySelector(".item-qty").value = item.pics;
             tr.querySelector(".item-kg").value = item.kg;
             updateTotalKg();
+            updadateTotalPics()
             sug.hidden = true;
 
             if (tr === tbody.lastElementChild) addRow();
@@ -536,39 +548,64 @@
       });
 
       /* ================= SUBMIT ================= */
-      async function submitData() {
-        if (!custInput.value) return alert("Select customer");
+async function submitData() {
+  if (!custInput.value) return alert("Select customer");
 
-        const items = [...tbody.querySelectorAll("tr")]
-          .map((r) => ({
-            item_id: r.querySelector(".item-id").value,
-            qty: Number(r.querySelector(".item-qty").value),
-            kg: Number(r.querySelector(".item-kg").value) || 0,
-          }))
-          .filter((i) => i.item_id && i.qty > 0);
+  const items = [...tbody.querySelectorAll("tr")]
+    .map((r) => ({
+      item_id: r.querySelector(".item-id").value,
+      name_of_prduct :  r.querySelector(".item-name").value,
+      qty: Number(r.querySelector(".item-qty").value),
+      kg: Number(r.querySelector(".item-kg").value) || 0,
+    }))
+    .filter((i) => i.item_id && i.qty > 0);
 
-        if (!items.length) return alert("Add at least one item");
+  if (!items.length) return alert("Add at least one item");
 
-        const payload = {
-          customer: custInput.value,
-          date: billDate.value,
-          items,
-        };
+  const payload = {
+    customer: custInput.value,
+    items,
+  };
 
-        try {
-          const res = await fetch("/submit-bill", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload),
-          });
-          const data = await res.json();
-          output.textContent = JSON.stringify(data, null, 2);
-          alert("Bill submitted");
-        } catch (err) {
-          output.textContent = JSON.stringify(payload, null, 2);
-          alert("Saved locally (no backend)");
-        }
-      }
+  try {
+    const res = await fetch("/submit-jobcard", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) throw new Error("Submit failed");
+
+    const data = await res.json();
+    alert("Bill submitted");
+
+    /* ===== CLEAR EVERYTHING AFTER SUCCESS ===== */
+
+    // 1️⃣ clear table rows
+    tbody.innerHTML = "";
+
+    // 2️⃣ clear customer & date
+    custInput.value = "";
+    billDate.value = "";
+
+    // 3️⃣ clear output/debug
+    output.textContent = "";
+
+    // 4️⃣ focus first field (fast entry UX)
+    custInput.focus();
+    addRow()
+    updateTotalKg()
+    updadateTotalPics()
+    location.reload();
+
+<!--    output.textContent = JSON.stringify(data, null, 2)-->
+
+  } catch (err) {
+    console.error(err);
+    alert("Save failed");
+  }
+}
+
 
       /* ================= ENTER NAVIGATION ================= */
       document.addEventListener("keydown", (e) => {
@@ -583,7 +620,10 @@
         if (e.key === "Enter") {
           if (el.id === "custInput" && el.value.trim()) {
             e.preventDefault();
+
             focusField(tbody.querySelector(".item-id"));
+
+
           } else if (el.classList.contains("item-id") && el.value.trim()) {
             e.preventDefault();
             const row = el.closest("tr");
@@ -614,6 +654,15 @@
         });
         document.getElementById("totalKg").innerText = total.toFixed(2);
       }
+      function updadateTotalPics(){
+      let total_pic = 0 ;
+      document.querySelectorAll(".item-qty").forEach((i) => {
+          total_pic += Number(i.value) || 0;
+        });
+        document.getElementById("totalpic").innerText = total_pic.toFixed(2);
+      }
+      if (inventory.length == 0 ) {
+      consle
     </script>
 
     <style>

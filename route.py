@@ -1,7 +1,7 @@
-from flask import flash, render_template, redirect, url_for,session
+from flask import flash, render_template, redirect, url_for,session,request, jsonify
 from form import Lump_data,bundle_invadata,Item_data,Outworker_form,Cutter_form
 
-from data_entry import add_data_lump,add_cutter,add_items,add_outworker_db
+from data_entry import add_data_lump,add_cutter,add_items,add_outworker_db,add_jobcard
 from data_Process import get_serch_data,get_job_card_data_creation
 
 def reset_session():
@@ -34,7 +34,6 @@ def register_routes(app):
             session["bundles"] = {}
 
             return redirect(url_for("bundle_entery"))
-        print(data_autofill)
         return render_template(
             "user.html",
             form_name=form_name,
@@ -58,7 +57,6 @@ def register_routes(app):
 
         # ✅ All bundles completed
         if current > total:
-            print('ok')
             all_data = {
                 "main": session["bundle_data"],
                 "bundles": session["bundles"]
@@ -156,3 +154,9 @@ def register_routes(app):
     @app.route("/job_retun", methods=["GET", "POST"])
     def job_retun():
         return render_template("job_retun.html")
+
+    @app.route("/submit-jobcard",methods=["POST"])
+    def submit_jobcard():
+        data = request.get_json()
+        add_jobcard(data)
+        return  jsonify(success=True, message="Data saved")

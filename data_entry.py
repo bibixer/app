@@ -1,6 +1,5 @@
-from modes import db, Bundle, Lump, Cuter, Item_data, Outworker
+from modes import db, Bundle, Lump, Cuter, Item_data, Outworker,Jobcard,Jobmovement
 from datetime import datetime
-
 
 
 def add_data_to_database(data):
@@ -10,7 +9,6 @@ def add_data_to_database(data):
 def add_data_lump(data,current_user):
     # try:
         lump_data = data['main']
-        print(data)
         lump = Lump(
             entry_datetime = datetime.now(),
             enter_user = current_user,
@@ -41,8 +39,6 @@ def add_bundle(data,lump_id):
         db.session.add(bundle)
         db.session.commit()
 
-
-
 def error_hendle(func):
     def eror(*args, **kwargs):
         try:
@@ -50,8 +46,6 @@ def error_hendle(func):
         except Exception as e:
             return {"or":False,"exception":e}
     return eror
-
-
 
 @error_hendle
 def add_cutter(data):
@@ -74,4 +68,40 @@ def add_outworker_db(data):
                           )
     return add_data_to_database(outworker)
 
+@error_hendle
+def add_jobcard(data):
+    job_card = Jobcard(
+    date = datetime.now(),
+    given_to = data["customer"],
+    given_by =  "badx",
+    product_list = data['items']
+    )
+    db.session.add(job_card)
+    db.session.commit()
+    add_job_movemet_out(data,job_card.id)
+    return 101
 
+def add_job_movemet_out(data,job_id):
+    for item in data['items']:
+        job_movement = Jobmovement(
+        date = datetime.now(),
+        jobcard = job_id,
+        bundle = item["item_id"],
+        outflow = item["qty"],
+        name_of_mater =  data["customer"],
+        enter_user = 1 ,
+        partculer = f'given {item["name_of_prduct"]} to '
+                    f'{data["customer"] } toatal pic {item["qty"] } '
+                    f'with job_id {job_id} '
+    )
+        db.session.add(job_movement)
+        db.session.commit()
+        update_bundle(data)
+def update_bundle(data):
+    for buindle in data['items']:
+        bunld = Bundle.query.filter_by(id=buindle['item_id']).first()
+        bunld.status = "GIVEN"
+        bunld.given_date = datetime.now()
+        bunld.given_to = data["customer"]
+        bunld.given_by = 0
+        db.session.commit()
