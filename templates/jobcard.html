@@ -1,6 +1,6 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
- {% include "menu_bar.html" %}
+  {% include "menu_bar.html" %}
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -19,7 +19,11 @@
       }
 
       body {
-        font-family: "Inter", system-ui, -apple-system, sans-serif;
+        font-family:
+          "Inter",
+          system-ui,
+          -apple-system,
+          sans-serif;
         background: var(--bg);
         color: var(--text-main);
         margin: 0;
@@ -37,7 +41,8 @@
         background: var(--white);
         padding: 32px;
         border-radius: 16px;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+        box-shadow:
+          0 4px 6px -1px rgba(0, 0, 0, 0.1),
           0 10px 15px -3px rgba(0, 0, 0, 0.05);
       }
 
@@ -98,7 +103,8 @@
         max-height: 220px;
         overflow-y: auto;
         z-index: 10000; /* increase z-index */
-        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1),
+        box-shadow:
+          0 10px 25px -5px rgba(0, 0, 0, 0.1),
           0 8px 10px -6px rgba(0, 0, 0, 0.1);
         padding: 4px;
         pointer-events: auto; /* ensure it receives clicks */
@@ -313,7 +319,7 @@
         </div>
         <div class="input-group">
           <label>Billing Date</label>
-          <input type="date" id="billDate" / readonly>
+          <input type="date" id="billDate" readonly />
         </div>
       </div>
 
@@ -332,7 +338,7 @@
           <tbody></tbody>
         </table>
       </div>
-       <div
+      <div
         style="
           margin-top: 12px;
           text-align: right;
@@ -359,313 +365,313 @@
       <pre id="output" hidden="hidden">// JSON Response will appear here</pre>
     </div>
     <script>
-      /* ================= DATA ================= */
-      {% if data %}
-      const outworker = {{data["outworker"] | tojson }};
+            /* ================= DATA ================= */
+            {% if data %}
+            const outworker = {{data["outworker"] | tojson }};
 
-      const inventory = {{data["product"] | tojson}};
-      {% endif %}
-      /* ================= DOM ================= */
-      const custInput = document.getElementById("custInput");
-      const custSug = document.getElementById("custSug");
-      const tbody = document.querySelector("#billTable tbody");
-      const billDate = document.getElementById("billDate");
-      const output = document.getElementById("output");
+            const inventory = {{data["product"] | tojson}};
+            {% endif %}
+            /* ================= DOM ================= */
+            const custInput = document.getElementById("custInput");
+            const custSug = document.getElementById("custSug");
+            const tbody = document.querySelector("#billTable tbody");
+            const billDate = document.getElementById("billDate");
+            const output = document.getElementById("output");
 
-      /* ================= HELPER ================= */
-      function focusField(el) {
-        if (!el) return;
-        el.focus({ preventScroll: true });
-        el.scrollIntoView({ behavior: "smooth", block: "center" });
-        if (el.type === "text" || el.type === "number") {
-          const len = el.value.length;
-          setTimeout(() => el.setSelectionRange(len, len), 0);
-        }
-      }
-
-      function makeSuggestionsInteractive(input, suggestions, items, onSelect) {
-        let activeIndex = -1;
-
-        function render() {
-          suggestions.innerHTML = "";
-          items.forEach((item, i) => {
-            const div = document.createElement("div");
-            div.textContent = item;
-            if (i === activeIndex) div.classList.add("active");
-            div.addEventListener("pointerdown", (e) => {
-              e.preventDefault();
-              onSelect(item);
-              suggestions.hidden = true;
-            });
-            suggestions.appendChild(div);
-          });
-          suggestions.hidden = items.length === 0;
-        }
-
-        input.addEventListener("keydown", (e) => {
-          const max = items.length - 1;
-          if (e.key === "ArrowDown") {
-            e.preventDefault();
-            activeIndex = activeIndex < max ? activeIndex + 1 : 0;
-            render();
-          } else if (e.key === "ArrowUp") {
-            e.preventDefault();
-            activeIndex = activeIndex > 0 ? activeIndex - 1 : max;
-            render();
-          } else if (e.key === "Enter") {
-            if (activeIndex >= 0 && items[activeIndex]) {
-              e.preventDefault();
-              onSelect(items[activeIndex]);
-              suggestions.hidden = true;
-              activeIndex = -1;
+            /* ================= HELPER ================= */
+            function focusField(el) {
+              if (!el) return;
+              el.focus({ preventScroll: true });
+              el.scrollIntoView({ behavior: "smooth", block: "center" });
+              if (el.type === "text" || el.type === "number") {
+                const len = el.value.length;
+                setTimeout(() => el.setSelectionRange(len, len), 0);
+              }
             }
-          }
-        });
 
-        render();
-      }
+            function makeSuggestionsInteractive(input, suggestions, items, onSelect) {
+              let activeIndex = -1;
 
-      /* ================= CUSTOMER AUTOCOMPLETE ================= */
-      custInput.addEventListener("input", () => {
-        const v = custInput.value.trim().toLowerCase();
-        if (!v) return (custSug.hidden = true);
+              function render() {
+                suggestions.innerHTML = "";
+                items.forEach((item, i) => {
+                  const div = document.createElement("div");
+                  div.textContent = item;
+                  if (i === activeIndex) div.classList.add("active");
+                  div.addEventListener("pointerdown", (e) => {
+                    e.preventDefault();
+                    onSelect(item);
+                    suggestions.hidden = true;
+                  });
+                  suggestions.appendChild(div);
+                });
+                suggestions.hidden = items.length === 0;
+              }
 
-        const filtered = outworker
-          .filter(
-            (c) => String(c.id).includes(v) || c.name.toLowerCase().includes(v)
-          )
-          .map((c) => `${c.id} - ${c.name} - ${c.adders}`);
+              input.addEventListener("keydown", (e) => {
+                const max = items.length - 1;
+                if (e.key === "ArrowDown") {
+                  e.preventDefault();
+                  activeIndex = activeIndex < max ? activeIndex + 1 : 0;
+                  render();
+                } else if (e.key === "ArrowUp") {
+                  e.preventDefault();
+                  activeIndex = activeIndex > 0 ? activeIndex - 1 : max;
+                  render();
+                } else if (e.key === "Enter") {
+                  if (activeIndex >= 0 && items[activeIndex]) {
+                    e.preventDefault();
+                    onSelect(items[activeIndex]);
+                    suggestions.hidden = true;
+                    activeIndex = -1;
+                  }
+                }
+              });
 
-        makeSuggestionsInteractive(custInput, custSug, filtered, (val) => {
-          custInput.value = val;
-          focusField(tbody.querySelector(".item-id"));
-        });
-      });
+              render();
+            }
 
-      custInput.addEventListener("blur", () =>
-        setTimeout(() => (custSug.hidden = true), 120)
+            /* ================= CUSTOMER AUTOCOMPLETE ================= */
+            custInput.addEventListener("input", () => {
+              const v = custInput.value.trim().toLowerCase();
+              if (!v) return (custSug.hidden = true);
+
+              const filtered = outworker
+                .filter(
+                  (c) => String(c.id).includes(v) || c.name.toLowerCase().includes(v)
+                )
+                .map((c) => `${c.id} - ${c.name} - ${c.adders}`);
+
+              makeSuggestionsInteractive(custInput, custSug, filtered, (val) => {
+                custInput.value = val;
+                focusField(tbody.querySelector(".item-id"));
+              });
+            });
+
+            custInput.addEventListener("blur", () =>
+              setTimeout(() => (custSug.hidden = true), 120)
+            );
+
+            /* ================= TABLE ROW ================= */
+            function addRow() {
+              const tr = document.createElement("tr");
+              tr.innerHTML = `
+          <td>
+            <div class="input-group">
+              <input class="item-id" autocomplete="off" placeholder="Item ID / Name">
+              <div class="suggestions" hidden></div>
+            </div>
+          </td>
+          <td><input class="item-name" readonly></td>
+          <td><input class="item-colour" readonly></td>
+          <td><input type="number" min="1" class="item-qty" readonly></td>
+      <td>
+        <input
+          type="number"
+          min="0"
+          step="0.01"
+          class="item-kg"
+          placeholder="0.00"
+          readonly>
+
+      </td>
+          <td><button type="button" class="btn-remove">×</button></td>
+        `;
+
+              const idInput = tr.querySelector(".item-id");
+              const sug = tr.querySelector(".suggestions");
+
+              idInput.addEventListener("input", () => {
+                const v = idInput.value.trim().toLowerCase();
+                if (!v) return (sug.hidden = true);
+
+                const usedIds = new Set(
+        [...tbody.querySelectorAll(".item-id")]
+          .filter(input => input !== idInput)   // 🔑 exclude current row
+          .map(input => input.value.trim())
+          .filter(Boolean)
       );
 
-      /* ================= TABLE ROW ================= */
-      function addRow() {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-    <td>
-      <div class="input-group">
-        <input class="item-id" autocomplete="off" placeholder="Item ID / Name">
-        <div class="suggestions" hidden></div>
-      </div>
-    </td>
-    <td><input class="item-name" readonly></td>
-    <td><input class="item-colour" readonly></td>
-    <td><input type="number" min="1" class="item-qty" readonly></td>
-<td>
-  <input
-    type="number"
-    min="0"
-    step="0.01"
-    class="item-kg"
-    placeholder="0.00"
-    readonly>
-
-</td>
-    <td><button type="button" class="btn-remove">×</button></td>
-  `;
-
-        const idInput = tr.querySelector(".item-id");
-        const sug = tr.querySelector(".suggestions");
-
-        idInput.addEventListener("input", () => {
-          const v = idInput.value.trim().toLowerCase();
-          if (!v) return (sug.hidden = true);
-
-          const usedIds = new Set(
-  [...tbody.querySelectorAll(".item-id")]
-    .filter(input => input !== idInput)   // 🔑 exclude current row
-    .map(input => input.value.trim())
-    .filter(Boolean)
-);
-
-         const filtered = inventory
-  .filter(i => {
-    const idStr = String(i.id);
-    return (
-      !usedIds.has(idStr) &&
-      (idStr.includes(v) || i.name.toLowerCase().includes(v))
-    );
-  })
-  .map(i => `${i.id} - ${i.name} - ${i.colour} - ${i.pics}`);
+               const filtered = inventory
+        .filter(i => {
+          const idStr = String(i.id);
+          return (
+            !usedIds.has(idStr) &&
+            (idStr.includes(v) || i.name.toLowerCase().includes(v))
+          );
+        })
+        .map(i => `${i.id} - ${i.name} - ${i.colour} - ${i.pics}`);
 
 
-          makeSuggestionsInteractive(idInput, sug, filtered, (val) => {
-            const [idStr] = val.split(" - ");
+                makeSuggestionsInteractive(idInput, sug, filtered, (val) => {
+                  const [idStr] = val.split(" - ");
 
-            // Prevent duplicate items
-            const alreadyExists = usedIds.has(idStr);
-
-
-            if (alreadyExists) {
-               alert("This item is already added.");
-               sug.hidden = true;
-               return;
-             }
-
-            const item = inventory.find((it) => String(it.id) === idStr);
-            if (!item) return;
-
-            idInput.value = item.id;
-            tr.querySelector(".item-name").value = item.name;
-            tr.querySelector(".item-colour").value = item.colour;
-            tr.querySelector(".item-qty").value = item.pics;
-            tr.querySelector(".item-kg").value = item.kg;
-            updateTotalKg();
-            updadateTotalPics()
-            sug.hidden = true;
-
-            if (tr === tbody.lastElementChild) addRow();
-          });
-        });
-
-        idInput.addEventListener("blur", () =>
-          setTimeout(() => (sug.hidden = true), 120)
-        );
-
-        tr.querySelector(".btn-remove").addEventListener("click", () => {
-          if (tbody.rows.length > 1) tr.remove();
-          else tr.querySelectorAll("input").forEach((i) => (i.value = ""));
-        });
-
-        tbody.appendChild(tr);
-      }
-
-      /* ================= INIT ================= */
-      addRow();
-      billDate.valueAsDate = new Date();
-
-      // Auto-focus customer input on page load
-      requestAnimationFrame(() => {
-        focusField(custInput);
-      });
-
-      /* ================= SUBMIT ================= */
-async function submitData() {
-  if (!custInput.value) return alert("Select customer");
-
-  const items = [...tbody.querySelectorAll("tr")]
-    .map((r) => ({
-      item_id: r.querySelector(".item-id").value,
-      name_of_prduct :  r.querySelector(".item-name").value,
-      qty: Number(r.querySelector(".item-qty").value),
-      kg: Number(r.querySelector(".item-kg").value) || 0,
-    }))
-    .filter((i) => i.item_id && i.qty > 0);
-
-  if (!items.length) return alert("Add at least one item");
-
-  const payload = {
-    customer: custInput.value,
-    items,
-  };
-
-  try {
-    const res = await fetch("/submit-jobcard", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-
-    if (!res.ok) throw new Error("Submit failed");
-
-    const data = await res.json();
-    alert("Bill submitted");
-
-    /* ===== CLEAR EVERYTHING AFTER SUCCESS ===== */
-
-    // 1️⃣ clear table rows
-    tbody.innerHTML = "";
-
-    // 2️⃣ clear customer & date
-    custInput.value = "";
-    billDate.value = "";
-
-    // 3️⃣ clear output/debug
-    output.textContent = "";
-
-    // 4️⃣ focus first field (fast entry UX)
-    custInput.focus();
-    addRow()
-    updateTotalKg()
-    updadateTotalPics()
-    location.reload();
-
-<!--    output.textContent = JSON.stringify(data, null, 2)-->
-
-  } catch (err) {
-    console.error(err);
-    alert("Save failed");
-  }
-}
+                  // Prevent duplicate items
+                  const alreadyExists = usedIds.has(idStr);
 
 
-      /* ================= ENTER NAVIGATION ================= */
-      document.addEventListener("keydown", (e) => {
-        const el = document.activeElement;
+                  if (alreadyExists) {
+                     alert("This item is already added.");
+                     sug.hidden = true;
+                     return;
+                   }
 
-        // Skip if suggestion dropdown is open
-        const sug = el.closest(".input-group")?.querySelector(".suggestions");
-         if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "a") {
-         submitData()}
-        if (sug && !sug.hidden) return;
+                  const item = inventory.find((it) => String(it.id) === idStr);
+                  if (!item) return;
 
-        if (e.key === "Enter") {
-          if (el.id === "custInput" && el.value.trim()) {
-            e.preventDefault();
+                  idInput.value = item.id;
+                  tr.querySelector(".item-name").value = item.name;
+                  tr.querySelector(".item-colour").value = item.colour;
+                  tr.querySelector(".item-qty").value = item.pics;
+                  tr.querySelector(".item-kg").value = item.kg;
+                  updateTotalKg();
+                  updadateTotalPics()
+                  sug.hidden = true;
 
-            focusField(tbody.querySelector(".item-id"));
+                  if (tr === tbody.lastElementChild) addRow();
+                });
+              });
 
+              idInput.addEventListener("blur", () =>
+                setTimeout(() => (sug.hidden = true), 120)
+              );
 
-          } else if (el.classList.contains("item-id") && el.value.trim()) {
-            e.preventDefault();
-            const row = el.closest("tr");
-            const nextRow = row.nextElementSibling;
-            if (nextRow) {
-              focusField(nextRow.querySelector(".item-id"));
-            } else {
-              addRow();
-              focusField(tbody.lastElementChild.querySelector(".item-id"));
+              tr.querySelector(".btn-remove").addEventListener("click", () => {
+                if (tbody.rows.length > 1) tr.remove();
+                else tr.querySelectorAll("input").forEach((i) => (i.value = ""));
+              });
+
+              tbody.appendChild(tr);
             }
-          }
-        }
 
-        if (e.key === "Backspace") {
-          if (el.classList.contains("item-id") && !el.value) {
-            e.preventDefault();
-            const row = el.closest("tr");
-            const prevRow = row.previousElementSibling;
-            if (prevRow) focusField(prevRow.querySelector(".item-id"));
-            else focusField(custInput); // go back to customer input if first row
-          }
+            /* ================= INIT ================= */
+            addRow();
+            billDate.valueAsDate = new Date();
+
+            // Auto-focus customer input on page load
+            requestAnimationFrame(() => {
+              focusField(custInput);
+            });
+
+            /* ================= SUBMIT ================= */
+      async function submitData() {
+        if (!custInput.value) return alert("Select customer");
+
+        const items = [...tbody.querySelectorAll("tr")]
+          .map((r) => ({
+            item_id: r.querySelector(".item-id").value,
+            name_of_prduct :  r.querySelector(".item-name").value,
+            qty: Number(r.querySelector(".item-qty").value),
+            kg: Number(r.querySelector(".item-kg").value) || 0,
+          }))
+          .filter((i) => i.item_id && i.qty > 0);
+
+        if (!items.length) return alert("Add at least one item");
+
+        const payload = {
+          customer: custInput.value,
+          items,
+        };
+
+        try {
+          const res = await fetch("/submit-jobcard", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+
+          if (!res.ok) throw new Error("Submit failed");
+
+          const data = await res.json();
+          alert("Bill submitted");
+
+          /* ===== CLEAR EVERYTHING AFTER SUCCESS ===== */
+
+          // 1️⃣ clear table rows
+          tbody.innerHTML = "";
+
+          // 2️⃣ clear customer & date
+          custInput.value = "";
+          billDate.value = "";
+
+          // 3️⃣ clear output/debug
+          output.textContent = "";
+
+          // 4️⃣ focus first field (fast entry UX)
+          custInput.focus();
+          addRow()
+          updateTotalKg()
+          updadateTotalPics()
+          location.reload();
+
+      <!--    output.textContent = JSON.stringify(data, null, 2)-->
+
+        } catch (err) {
+          console.error(err);
+          alert("Save failed");
         }
-      });
-      function updateTotalKg() {
-        let total = 0;
-        document.querySelectorAll(".item-kg").forEach((i) => {
-          total += Number(i.value) || 0;
-        });
-        document.getElementById("totalKg").innerText = total.toFixed(2);
       }
-      function updadateTotalPics(){
-      let total_pic = 0 ;
-      document.querySelectorAll(".item-qty").forEach((i) => {
-          total_pic += Number(i.value) || 0;
-        });
-        document.getElementById("totalpic").innerText = total_pic.toFixed(2);
-      }
-      if (inventory.length == 0 ) {
-      console.log("no items")
-      output.removeAttribute("hidden")
-      output.textContent = "no item to give"
-    }
+
+
+            /* ================= ENTER NAVIGATION ================= */
+            document.addEventListener("keydown", (e) => {
+              const el = document.activeElement;
+
+              // Skip if suggestion dropdown is open
+              const sug = el.closest(".input-group")?.querySelector(".suggestions");
+               if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "a") {
+               submitData()}
+              if (sug && !sug.hidden) return;
+
+              if (e.key === "Enter") {
+                if (el.id === "custInput" && el.value.trim()) {
+                  e.preventDefault();
+
+                  focusField(tbody.querySelector(".item-id"));
+
+
+                } else if (el.classList.contains("item-id") && el.value.trim()) {
+                  e.preventDefault();
+                  const row = el.closest("tr");
+                  const nextRow = row.nextElementSibling;
+                  if (nextRow) {
+                    focusField(nextRow.querySelector(".item-id"));
+                  } else {
+                    addRow();
+                    focusField(tbody.lastElementChild.querySelector(".item-id"));
+                  }
+                }
+              }
+
+              if (e.key === "Backspace") {
+                if (el.classList.contains("item-id") && !el.value) {
+                  e.preventDefault();
+                  const row = el.closest("tr");
+                  const prevRow = row.previousElementSibling;
+                  if (prevRow) focusField(prevRow.querySelector(".item-id"));
+                  else focusField(custInput); // go back to customer input if first row
+                }
+              }
+            });
+            function updateTotalKg() {
+              let total = 0;
+              document.querySelectorAll(".item-kg").forEach((i) => {
+                total += Number(i.value) || 0;
+              });
+              document.getElementById("totalKg").innerText = total.toFixed(2);
+            }
+            function updadateTotalPics(){
+            let total_pic = 0 ;
+            document.querySelectorAll(".item-qty").forEach((i) => {
+                total_pic += Number(i.value) || 0;
+              });
+              document.getElementById("totalpic").innerText = total_pic.toFixed(2);
+            }
+            if (inventory.length == 0 ) {
+            console.log("no items")
+            output.removeAttribute("hidden")
+            output.textContent = "no item to give"
+          }
     </script>
 
     <style>

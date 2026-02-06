@@ -127,3 +127,14 @@ class Cutter_form(FlaskForm):
             "class": "button"
         }
     )
+class Return_form(FlaskForm):
+    name = StringField(
+        "Name or Jobid",
+        render_kw={"placeholder": "Enter name or Job_id"
+                   ,"id":"job_id"}
+    )
+    submit = SubmitField(
+        "Submit",
+        render_kw={
+            "class": "button"
+        })

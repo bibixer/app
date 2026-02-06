@@ -1,5 +1,5 @@
 from flask import flash, render_template, redirect, url_for,session,request, jsonify
-from form import Lump_data,bundle_invadata,Item_data,Outworker_form,Cutter_form
+from form import Lump_data,bundle_invadata,Item_data,Outworker_form,Cutter_form,Return_form
 
 from data_entry import add_data_lump,add_cutter,add_items,add_outworker_db,add_jobcard
 from data_Process import get_serch_data,get_job_card_data_creation
@@ -160,3 +160,11 @@ def register_routes(app):
         data = request.get_json()
         add_jobcard(data)
         return  jsonify(success=True, message="Data saved")
+
+    @app.route("/retune_product", methods=["GET", "POST"])
+    def retune_product():
+        form_name = "retune"
+        current_form =  Return_form()
+        return render_template("user.html",
+                               form_name=form_name,
+                               current_form=current_form)
