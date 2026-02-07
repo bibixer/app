@@ -2,7 +2,7 @@ from flask import flash, render_template, redirect, url_for,session,request, jso
 from form import Lump_data,bundle_invadata,Item_data,Outworker_form,Cutter_form,Return_form
 
 from data_entry import add_data_lump,add_cutter,add_items,add_outworker_db,add_jobcard
-from data_Process import get_serch_data,get_job_card_data_creation
+from data_Process import get_serch_data,get_job_card_data_creation,get_retun_card_data
 
 def reset_session():
     for key in list(session.keys()):
@@ -165,6 +165,8 @@ def register_routes(app):
     def retune_product():
         form_name = "retune"
         current_form =  Return_form()
+        data_r =  get_retun_card_data()
+        print(data_r)
         return render_template("user.html",
                                form_name=form_name,
-                               current_form=current_form)
+                               current_form=current_form,data_r=data_r)

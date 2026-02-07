@@ -68,7 +68,7 @@ def add_outworker_db(data):
                           )
     return add_data_to_database(outworker)
 
-@error_hendle
+# @error_hendle
 def add_jobcard(data):
     job_card = Jobcard(
     date = datetime.now(),
@@ -93,6 +93,7 @@ def add_job_movemet_out(data,job_id):
         partculer = f'given {item["name_of_prduct"]} to '
                     f'{data["customer"] } toatal pic {item["qty"] } '
                     f'with job_id {job_id} '
+        ,product_name = item["name_of_prduct"],
     )
         db.session.add(job_movement)
         db.session.commit()

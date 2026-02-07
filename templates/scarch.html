@@ -1,72 +1,73 @@
 <html>
-<head>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.js">
-    </script>
+  <head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.js"></script>
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.js">
-    </script>
-</head>
-<style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.js"></script>
+  </head>
+  <style>
     /* Wrapper for the dropdown */
-.ui-autocomplete {
-  background-color: #ffffff;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.1);
-  padding: 4px 0;
-  max-height: 250px;
-  overflow-y: auto;
-  font-family: 'Segoe UI', Roboto, sans-serif;
-  font-size: 15px;
-  z-index: 9999 !important;
-}
+    .ui-autocomplete {
+      background-color: #ffffff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.1);
+      padding: 4px 0;
+      max-height: 250px;
+      overflow-y: auto;
+      font-family: "Segoe UI", Roboto, sans-serif;
+      font-size: 15px;
+      z-index: 9999 !important;
+    }
 
-/* Each dropdown item */
-.ui-menu-item-wrapper {
-  padding: 12px 20px;
-  color: #333;
-  transition: background 0.25s ease;
-  border-bottom: 1px solid #eee;
-}
+    /* Each dropdown item */
+    .ui-menu-item-wrapper {
+      padding: 12px 20px;
+      color: #333;
+      transition: background 0.25s ease;
+      border-bottom: 1px solid #eee;
+    }
 
-/* Remove bottom border from last item */
-.ui-menu-item:last-child .ui-menu-item-wrapper {
-  border-bottom: none;
-}
+    /* Remove bottom border from last item */
+    .ui-menu-item:last-child .ui-menu-item-wrapper {
+      border-bottom: none;
+    }
 
-/* Hover and active styles */
-.ui-menu-item-wrapper:hover,
-.ui-state-active {
-  background-color: #e9f0ff;
-  color: #000;
-  font-weight: 500;
-  cursor: pointer;
-}
-
-</style>
-<body>
-{% if data %}
-
+    /* Hover and active styles */
+    .ui-menu-item-wrapper:hover,
+    .ui-state-active {
+      background-color: #e9f0ff;
+      color: #000;
+      font-weight: 500;
+      cursor: pointer;
+    }
+  </style>
+  <body>
+    {% if data %}
 
     <script>
-  $( function() {
+      $( function() {
 
 
-    $( "#cuter_name" ).autocomplete({
-      source: {{ data["cuter_data"] | tojson}}
-    });
-    $( "#product_name" ).autocomplete({
-      source: {{ data["product_data"] | tojson}}
-    });
-  } );
+        $( "#cuter_name" ).autocomplete({
+          source: {{ data["cuter_data"] | tojson}}
+        });
+        $( "#product_name" ).autocomplete({
+          source: {{ data["product_data"] | tojson}}
+        });
+      } );
+    </script>
 
-  </script>
-
-
-
-
-{% endif %}
-</body>
+    {% endif %} {%if data_r%}
+    <script>
+      let data = {{data_r | tojson}}
+      console.log(data);
+    </script>
+    {% endif %}
+  </body>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
-<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+  <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+  <link
+    rel="stylesheet"
+    href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css"
+  />
+</html>

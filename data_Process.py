@@ -1,4 +1,4 @@
-from modes import Cuter,Item_data,Outworker,Bundle
+from modes import Cuter,Item_data,Outworker,Bundle,Jobcard
 
 # fist for lump data
 # get cuter dta
@@ -37,7 +37,7 @@ def outworker_name():
     for o in name:
         if o.name != '':
             if (str(o.name)).upper() not in Outworker_list:
-                Outworker_list.append({"id":o.id, "name":o.name,"adders":o.adders})
+                Outworker_list.append({"id":o.id, "name":o.name,"adders":o.adders ,"type":"outworker"})
     return  Outworker_list
 
 ## get prodrdut id
@@ -56,10 +56,27 @@ def get_product():
                              "kg":product.kg})
     return product_list
 
-
-
 def get_job_card_data_creation():
     return {
         "outworker":outworker_name(),
         "product":get_product(),
     }
+
+
+def get_job_card_id():
+    job_card = Jobcard.query.all()
+    job_card_list = []
+    for job_card in job_card:
+        job_card_list.append({
+            "id":job_card.id,"type":"jobcard",
+        })
+    return job_card_list
+
+def get_retun_card_data():
+    return {
+        "outworker":outworker_name(),
+        "jobcard":get_job_card_id(),
+    }
+
+
+

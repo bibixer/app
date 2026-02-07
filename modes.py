@@ -78,9 +78,10 @@ class Jobmovement(db.Model):
     __tablename__ = "JobmovementData"
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.DateTime, nullable=False)
-    jobcard = db.Column(db.String(50), nullable=False)
-    bundle = db.Column(db.String(50), nullable=False)
+    jobcard = db.Column(db.String(50))
+    bundle = db.Column(db.String(50))
     partculer = db.Column(db.String(50), nullable=False)
+    product_name = db.Column(db.String(50), nullable=False)
     name_of_mater =  db.Column(db.String(50), nullable=False)
     enter_user = db.Column(db.Integer, nullable=False)
     outflow = db.Column(db.Integer, default=0)
