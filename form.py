@@ -129,9 +129,9 @@ class Cutter_form(FlaskForm):
     )
 class Return_form(FlaskForm):
     name = StringField(
-        "Name or Jobid",
-        render_kw={"placeholder": "Enter name or Job_id"
-                   ,"id":"job_id"}
+        "Name",
+        render_kw={"placeholder": "Enter name of outworker"
+                   ,"id":"job_name"}
     )
     submit = SubmitField(
         "Submit",

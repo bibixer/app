@@ -20,6 +20,12 @@ def register_routes(app):
         data_autofill = get_serch_data()
         if current_form.validate_on_submit():
             data = current_form.data.copy()
+            if current_form.cuter_name.data not in data_autofill["cuter_data"]:
+                flash("select cutter name from blow","warning")
+                return redirect(url_for("lump_home"))
+            if current_form.product_name.data not in data_autofill["product_data"]:
+                flash("select product name from blow","warning")
+                return redirect(url_for("lump_home"))
             data.pop("csrf_token", None)
             if data['numbers_of_bundles'] > 6:
                 flash("you can not enter more then 6")
@@ -151,10 +157,6 @@ def register_routes(app):
             form_name=form_name,
             current_form=current_form
         )
-    @app.route("/job_retun", methods=["GET", "POST"])
-    def job_retun():
-        return render_template("job_retun.html")
-
     @app.route("/submit-jobcard",methods=["POST"])
     def submit_jobcard():
         data = request.get_json()
@@ -166,7 +168,17 @@ def register_routes(app):
         form_name = "retune"
         current_form =  Return_form()
         data_r =  get_retun_card_data()
-        print(data_r)
+        if current_form.validate_on_submit():
+            if str(current_form.name.data) in data_r["outworker"] :
+                return redirect(url_for("job_retun"))
+
+            else:
+                flash("Select for the blow ")
+                return redirect(url_for("retune_product"))
         return render_template("user.html",
                                form_name=form_name,
                                current_form=current_form,data_r=data_r)
+
+    @app.route("/job_retun", methods=["GET", "POST"])
+    def job_retun():
+        return render_template("job_retun.html")

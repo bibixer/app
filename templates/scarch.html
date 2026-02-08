@@ -59,8 +59,15 @@
 
     {% endif %} {%if data_r%}
     <script>
-      let data = {{data_r | tojson}}
-      console.log(data);
+
+
+      $( function() {
+
+
+       $( "#job_name" ).autocomplete({
+         source: {{ data_r["outworker"] | tojson}}
+       });
+       } );
     </script>
     {% endif %}
   </body>

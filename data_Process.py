@@ -37,7 +37,7 @@ def outworker_name():
     for o in name:
         if o.name != '':
             if (str(o.name)).upper() not in Outworker_list:
-                Outworker_list.append({"id":o.id, "name":o.name,"adders":o.adders ,"type":"outworker"})
+                Outworker_list.append({"id":o.id, "name":o.name,"adders":o.adders ,"full":f"{o.id}***{o.name}--{o.adders}/-"})
     return  Outworker_list
 
 ## get prodrdut id
@@ -73,9 +73,13 @@ def get_job_card_id():
     return job_card_list
 
 def get_retun_card_data():
+    outworker_na= outworker_name()
+    name_list  =[]
+    for outworker in outworker_na:
+        name_list.append(outworker['full'])
     return {
-        "outworker":outworker_name(),
-        "jobcard":get_job_card_id(),
+        "outworker": name_list,
+        'fulldata':outworker_na,
     }
 
 

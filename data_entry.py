@@ -89,6 +89,7 @@ def add_job_movemet_out(data,job_id):
         bundle = item["item_id"],
         outflow = item["qty"],
         name_of_mater =  data["customer"],
+            id_mater
         enter_user = 1 ,
         partculer = f'given {item["name_of_prduct"]} to '
                     f'{data["customer"] } toatal pic {item["qty"] } '
