@@ -440,7 +440,7 @@
                 .filter(
                   (c) => String(c.id).includes(v) || c.name.toLowerCase().includes(v)
                 )
-                .map((c) => `${c.id} - ${c.name} - ${c.adders}`);
+                .map((c) => c.full);
 
               makeSuggestionsInteractive(custInput, custSug, filtered, (val) => {
                 custInput.value = val;
