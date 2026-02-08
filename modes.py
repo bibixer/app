@@ -82,7 +82,7 @@ class Jobmovement(db.Model):
     bundle = db.Column(db.String(50))
     partculer = db.Column(db.String(50), nullable=False)
     product_name = db.Column(db.String(50), nullable=False)
-    name_of_mater =  db.Column(db.String(50), nullable=False)
+    name_of_mater =  db.Column(db.String(50), nullable=False),
     id_mater = db.Column(db.Integer, nullable=False)
     enter_user = db.Column(db.Integer, nullable=False)
     outflow = db.Column(db.Integer, default=0)
