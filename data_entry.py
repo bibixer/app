@@ -107,3 +107,23 @@ def update_bundle(data):
         bunld.given_to = data["customer"]
         bunld.given_by = 0
         db.session.commit()
+def in_move_entery(data):
+    try:
+        for item in data['items']:
+            job_movement = Jobmovement(
+                date=datetime.now(),
+                partculer = f"taken {item["name_of_product"]} from {data['name']} by {"badx"}",
+                product_name = item["name_of_product"],
+                name_of_mater = data['name'],
+                enter_user = 1,
+                flow_type = "IN",
+                inflow =item["returned"],
+            )
+
+            db.session.add(job_movement)
+            db.session.commit()
+        return 101
+    except:
+        return 404
+
+

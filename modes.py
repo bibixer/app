@@ -82,10 +82,25 @@ class Jobmovement(db.Model):
     bundle = db.Column(db.String(50))
     partculer = db.Column(db.String(50), nullable=False)
     product_name = db.Column(db.String(50), nullable=False)
-    name_of_mater =  db.Column(db.String(50), nullable=False)
+    name_of_mater = db.Column(db.String(50), nullable=False)
     enter_user = db.Column(db.Integer, nullable=False)
     # IN
-    #OUT
+    # OUT
     flow_type = db.Column(db.String(50), nullable=False)
     outflow = db.Column(db.Integer, default=0)
     inflow = db.Column(db.Integer, default=0)
+    def to_dict(self):
+        return {
+            "id":self.id,
+            "date":self.date,
+            "jobcard":self.jobcard,
+            "bundle":self.bundle,
+            "partculer":self.partculer,
+            "product_name":self.product_name,
+            "name_of_mater":self.name_of_mater,
+            "enter_user":self.enter_user,
+            "flow_type":self.flow_type,
+            "outflow":self.outflow,
+            "inflow":self.inflow
+
+        }

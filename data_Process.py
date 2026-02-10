@@ -1,5 +1,6 @@
 from modes import Cuter,Item_data,Outworker,Bundle,Jobcard,Jobmovement
-from flask import flash
+from datetime import datetime
+from collections import defaultdict
 # fist for lump data
 # get cuter dta
 # get product data
@@ -89,35 +90,46 @@ def get_retun_card_data():
 #404 for not find job entery
 # get all data of that outworker
 def get_movemet_data(master_name):
-    job_data = Jobmovement.query.filter_by(name_of_mater=master_name).all()
-    if job_data == []:
+    # 1️⃣ Fetch all data in ONE query
+    job_data = (
+        Jobmovement.query
+        .filter_by(name_of_mater=master_name)
+        .all()
+    )
+
+    if not job_data:
         return 404
-    all_product_name_list = get_all_product_name(job_data)
-    all_flow_type_list = get_all_flow_type(job_data)
 
+    # 2️⃣ Build product → IN/OUT structure
+    product_flow = defaultdict(lambda: {"IN": [], "OUT": []})
 
-def get_all_product_name(job_data):
-    all_product_name_list = []
-    for job_i in job_data:
-        if job_i.product_name not in all_product_name_list:
-            all_product_name_list.append(job_i.product_name)
-    return all_product_name_list
-def get_all_flow_type(job_data):
-    all_flow_type_list = []
-    for job_i in job_data:
-        if job_i.flow_type not in all_flow_type_list:
-            all_flow_type_list.append(job_i.flow_type)
-    return all_flow_type_list
+    for job in job_data:
+        product_flow[job.product_name][job.flow_type].append(
+            job.to_dict()
+        )
 
-def get_product_flow(all_product_name_list,master_name,all_flow_type_list):
-    product_flow = {}
-    for flow in all_flow_type_list:
-        for product in all_product_name_list:
-            data_f_p = Jobmovement.query.filter_by(name_of_mater=master_name,product_name=product,flow_type= flow).all()
-        product_flow_and[f'{product}-{flow}'] = {
-            "product":product,
-            "flow":flow,
-            "data":data_f_p,
-        }
-    return product_flow
+    # 3️⃣ Format final job-card output
+    result = {
+        "name": master_name,
+        "date": datetime.now().strftime("%d %b, %Y"),
+        "items": []
+    }
 
+    item_id = 0
+    for product, flows in product_flow.items():
+        item_id += 1
+
+        total_in = sum(i.get("inflow", 0) for i in flows["IN"])
+        total_out = sum(i.get("outflow", 0) for i in flows["OUT"])
+        balance =  total_out - total_in
+
+        if balance != 0 :
+            result["items"].append({
+                "item_id": item_id,
+                "name": product,
+                "colour": "mix",
+                "issued": balance,
+                'history': []
+            }
+            )
+    return result
