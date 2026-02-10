@@ -2,7 +2,7 @@ from flask import flash, render_template, redirect, url_for,session,request, jso
 from form import Lump_data,bundle_invadata,Item_data,Outworker_form,Cutter_form,Return_form
 
 from data_entry import add_data_lump,add_cutter,add_items,add_outworker_db,add_jobcard
-from data_Process import get_serch_data,get_job_card_data_creation,get_retun_card_data
+from data_Process import get_serch_data,get_job_card_data_creation,get_retun_card_data,get_movemet_data
 
 def reset_session():
     for key in list(session.keys()):
@@ -165,12 +165,12 @@ def register_routes(app):
 
     @app.route("/retune_product", methods=["GET", "POST"])
     def retune_product():
-        form_name = "retune"
+        form_name = "retune product"
         current_form =  Return_form()
         data_r =  get_retun_card_data()
         if current_form.validate_on_submit():
             if str(current_form.name.data) in data_r["outworker"] :
-                return redirect(url_for("job_retun"))
+                return redirect(url_for("job_retun",name_master=current_form.name.data))
 
             else:
                 flash("Select for the blow ")
@@ -181,4 +181,12 @@ def register_routes(app):
 
     @app.route("/job_retun", methods=["GET", "POST"])
     def job_retun():
+        name_of_master =  request.args.get("name_master",type=str)
+        if not name_of_master:
+            flash("need_master_name")
+            return redirect(url_for("retune_product"))
+        data = get_movemet_data(name_of_master)
+        if data == 404:
+            flash(f"{name_of_master} not exist in job movement")
+            return redirect(url_for("retune_product"))
         return render_template("job_retun.html")

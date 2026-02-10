@@ -25,8 +25,8 @@ class Bundle(db.Model):
     # READY → Bundle is in shop → Can send
     # GIVEN → Bundle is outside → Cannot use
     status =  db.Column(db.String(50), nullable=False,default='READY')
-    # status
-    complete = db.Column(db.Boolean, default=False)
+    # # status
+    # complete = db.Column(db.Boolean, default=False)
 class Lump(db.Model):
     __tablename__ = "LumpData"
     id = db.Column(db.Integer, primary_key=True)
@@ -82,8 +82,10 @@ class Jobmovement(db.Model):
     bundle = db.Column(db.String(50))
     partculer = db.Column(db.String(50), nullable=False)
     product_name = db.Column(db.String(50), nullable=False)
-    name_of_mater =  db.Column(db.String(50), nullable=False),
-    id_mater = db.Column(db.Integer, nullable=False)
+    name_of_mater =  db.Column(db.String(50), nullable=False)
     enter_user = db.Column(db.Integer, nullable=False)
+    # IN
+    #OUT
+    flow_type = db.Column(db.String(50), nullable=False)
     outflow = db.Column(db.Integer, default=0)
     inflow = db.Column(db.Integer, default=0)

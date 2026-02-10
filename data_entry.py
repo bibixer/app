@@ -1,6 +1,6 @@
 from modes import db, Bundle, Lump, Cuter, Item_data, Outworker,Jobcard,Jobmovement
 from datetime import datetime
-
+import re
 
 def add_data_to_database(data):
     db.session.add(data)
@@ -94,6 +94,7 @@ def add_job_movemet_out(data,job_id):
                     f'{data["customer"] } toatal pic {item["qty"] } '
                     f'with job_id {job_id} '
         ,product_name = item["name_of_prduct"],
+        flow_type = "OUT"
     )
         db.session.add(job_movement)
         db.session.commit()

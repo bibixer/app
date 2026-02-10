@@ -296,10 +296,10 @@
       </div>
 
       <div class="job-info-bar">
-        <div class="info-group">
-          <label>ID</label>
-          <span id="jobId"></span>
-        </div>
+<!--        <div class="info-group">-->
+<!--          <label>ID</label>-->
+<!--          <span id="jobId"></span>-->
+<!--        </div>-->
         <div class="info-group">
           <label>Master Name</label>
           <span id="jobName"></span>
@@ -314,7 +314,7 @@
         <table id="returnTable">
           <thead>
             <tr>
-              <th>Item ID</th>
+              <th>S.NO</th>
               <th>product Name</th>
               <th>Colour</th>
               <th>Balance</th>
@@ -335,7 +335,7 @@
     <script>
       // 1. Data and Initialization
       const JOB_CARD = {
-        id: "JC-9001",
+<!--        id: "JC-9001",-->
         name: "Stitching – Winter Jackets",
         date: "Dec 21, 2025",
         items: [
@@ -368,7 +368,7 @@
       };
 
       function fillJobInfo() {
-        document.getElementById("jobId").innerText = JOB_CARD.id;
+<!--        document.getElementById("jobId").innerText = JOB_CARD.id;-->
         document.getElementById("jobName").innerText = JOB_CARD.name;
         document.getElementById("jobDate").innerText = JOB_CARD.date;
       }
