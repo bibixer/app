@@ -10,13 +10,17 @@ def create_app():
     app.config['SECRET_KEY'] = '8BYkEfBA6O6donzWlSihBXox7C0sKR6b'
     app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///cloth.db"
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config['SQLALCHEMY_BINDS'] = {
+        'users': 'sqlite:///users.db'
+    }
 
     db.init_app(app)
     Bootstrap5(app)
-    register_routes(app)
     with app.app_context():
         db.create_all()
+    register_routes(app,db)
     return app
+
 
 
 

@@ -1,7 +1,6 @@
 from modes import db, Bundle, Lump, Cuter, Item_data, Outworker,Jobcard,Jobmovement
 from datetime import datetime
 from data_Process import outworker_name,get_movemet_data
-# import re
 
 def add_data_to_database(data):
     db.session.add(data)
@@ -24,7 +23,6 @@ def add_data_lump(data,current_user):
         db.session.add(lump)
         db.session.commit()
         add_bundle(data,lump.id)
-    # except:
 def add_bundle(data,lump_id):
     bundle_data = data['bundles']
     for key in bundle_data.keys():
@@ -80,7 +78,6 @@ def check_name_master(data):
 
 # 101 ok 401 name 403 falt on itetem
 
-
 def check_product(data):
     item_ids = [item["item_id"] for item in data["items"]]
 
@@ -105,7 +102,6 @@ def check_product(data):
             return False
 
     return True
-
 
 def validate_payload_structure(data):
     if not isinstance(data, dict):
@@ -140,11 +136,6 @@ def validate_payload_structure(data):
             return False
 
     return True
-
-
-
-
-
 
 def add_jobcard(data):
     if not validate_payload_structure(data):

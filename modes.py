@@ -1,4 +1,6 @@
 from  flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import UserMixin
 
 db =  SQLAlchemy()
 
@@ -104,3 +106,20 @@ class Jobmovement(db.Model):
             "inflow":self.inflow
 
         }
+
+class User(UserMixin, db.Model):
+    __bind_key__ = 'users'
+    __tablename__ = 'users'
+
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(100), unique=True, nullable=False)
+    password = db.Column(db.String(128), nullable=False)
+    role = db.Column(db.Integer, nullable=False, default=1)  # 'userT' userP userB or 'admin'
+    def __init__(self,username,password,role):
+        self.username =  username
+        self.password =  generate_password_hash(password)
+        self.role =  role
+    def check_password(self,password):
+        return check_password_hash(self.password,password)
+
+

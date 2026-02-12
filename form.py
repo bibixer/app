@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, IntegerField, SubmitField, SelectField,FloatField
+from wtforms import StringField, IntegerField, SubmitField, SelectField, FloatField, PasswordField
 from wtforms.validators import DataRequired
 
 
@@ -138,3 +138,22 @@ class Return_form(FlaskForm):
         render_kw={
             "class": "button"
         })
+
+class Login_form(FlaskForm):
+        user_name = StringField(
+            'User Name',
+            validators=[DataRequired()],
+            render_kw={
+                'placeholder': 'Enter User Name',
+
+            })
+
+        password = PasswordField(
+            'Password',
+            validators=[DataRequired()],
+            render_kw={
+                'placeholder': 'Enter Password'
+            })
+        submit = SubmitField(
+            'Login',
+            render_kw={"class": "button"})

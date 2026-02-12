@@ -1,15 +1,22 @@
 from flask import flash, render_template, redirect, url_for,session,request, jsonify
-from form import Lump_data,bundle_invadata,Item_data,Outworker_form,Cutter_form,Return_form
-
+from form import Lump_data,bundle_invadata,Item_data,Outworker_form,Cutter_form,Return_form,Login_form
+from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from data_entry import add_data_lump,add_cutter,add_items,add_outworker_db,add_jobcard,in_move_entery
 from data_Process import get_serch_data,get_job_card_data_creation,get_retun_card_data,get_movemet_data
-
+from modes import User
 def reset_session():
     for key in list(session.keys()):
         if key != 'csrf_token':
             session.pop(key)
 
-def register_routes(app):
+def register_routes(app,db):
+    login_manager = LoginManager(app)
+    login_manager.login_view = 'login'
+
+    @login_manager.user_loader
+    def load_user(user_id):
+        return db.session.get(User, int(user_id))
+
     @app.route("/lumpentry", methods=["GET", "POST"])
     def lump_home():
         
@@ -89,7 +96,7 @@ def register_routes(app):
             form_name=form_name,
             current_form=current_form
         )
-    @app.route("/", methods=["GET", "POST"])
+    @app.route("/jobcard", methods=["GET", "POST"])
     def job_card():
         job_card_data_c = get_job_card_data_creation()
         return render_template("jobcard.html",data = job_card_data_c)
@@ -227,3 +234,32 @@ def register_routes(app):
             return jsonify(success=False, message="item do not macha base ")
         elif res == 405:
             return jsonify(success=False, message="send data not right ")
+
+    @app.route("/")
+    @login_required
+    def home():
+        if current_user.role == 4:
+            return redirect("/admin_dashord")
+        elif current_user.role == 2:
+            return redirect("/lumpentry")
+
+    @app.route("/login", methods=['GET', 'POST'])
+    def login():
+        name_from = Login_form()
+        if name_from.validate_on_submit():
+            user = User.query.filter_by(username=name_from.user_name.data).first()
+            if user and user.check_password(name_from.password.data):
+                login_user(user)
+                return redirect("/")
+            else:
+                flash("Invalid credentials")
+
+        return render_template('user.html', form_name="Login",
+            current_form=name_from)
+
+    @app.route('/logout')
+    @login_required
+    def logout():
+        logout_user()
+        return redirect(url_for('login'))
+    # laber print done
