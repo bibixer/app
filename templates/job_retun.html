@@ -5,11 +5,11 @@
     <meta charset="UTF-8" />
     <title>Job Return entry</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<!--    <link rel="preconnect" href="https://fonts.googleapis.com" />-->
-<!--    <link-->
-<!--      rel="stylesheet"-->
-<!--      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"-->
-<!--    />-->
+    <!--    <link rel="preconnect" href="https://fonts.googleapis.com" />-->
+    <!--    <link-->
+    <!--      rel="stylesheet"-->
+    <!--      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"-->
+    <!--    />-->
 
     <style>
       :root {
@@ -325,13 +325,14 @@
           <tbody></tbody>
         </table>
       </div>
-
+      <!-- <h2 id="error-message" hidden>erroe</h2> -->
       <div class="card-footer">
         <button onclick="submitReturn()" class="btn-submit">
           Confirm Return
         </button>
       </div>
     </div>
+    <!-- <h2 id="error-message" hidden>erroe</h2> -->
 
     <script>
                    // 1. Data and Initialization
@@ -515,10 +516,14 @@
                  body: JSON.stringify(payload)
                });
 
-               const result = await response.json();
-               if (result.success){
+               const data_R = await response.json();
+               if (data_R.success){
                 window.location.replace("/retune_product?ok=101")
                }
+               if (!data_R.success){
+                window.location.replace("/retune_product?ok=401")
+                                        }
+
 
                    }
 

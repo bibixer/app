@@ -32,13 +32,17 @@ def get_serch_data():
 
 ## get outerworker name and id
 
-def outworker_name():
+def outworker_name(**kwargs):
+    oly_full_name = kwargs.get("oly_full_name")
     name = Outworker.query.all()
     Outworker_list = []
     for o in name:
         if o.name != '':
             if (str(o.name)).upper() not in Outworker_list:
-                Outworker_list.append({"id":o.id, "name":o.name,"adders":o.adders ,"full":f"{o.id}***{o.name}--{o.adders}/-"})
+                if oly_full_name:
+                    Outworker_list.append(f"{o.id}***{o.name}--{o.adders}/-")
+                else:
+                    Outworker_list.append({"id":o.id, "name":o.name,"adders":o.adders ,"full":f"{o.id}***{o.name}--{o.adders}/-"})
     return  Outworker_list
 
 ## get prodrdut id

@@ -1,6 +1,7 @@
 from modes import db, Bundle, Lump, Cuter, Item_data, Outworker,Jobcard,Jobmovement
 from datetime import datetime
-import re
+from data_Process import outworker_name,get_movemet_data
+# import re
 
 def add_data_to_database(data):
     db.session.add(data)
@@ -69,7 +70,89 @@ def add_outworker_db(data):
     return add_data_to_database(outworker)
 
 # @error_hendle
+
+def check_name_master(data):
+    all_data = outworker_name(oly_full_name=True)
+    if data["customer"] in all_data:
+        return True
+    else:
+        return False
+
+# 101 ok 401 name 403 falt on itetem
+
+
+def check_product(data):
+    item_ids = [item["item_id"] for item in data["items"]]
+
+    bundles = Bundle.query.filter(Bundle.id.in_(item_ids)).all()
+    bundle_map = {b.id: b for b in bundles}
+
+    for item in data["items"]:
+        bundle = bundle_map.get(item["item_id"])
+        if not bundle:
+            return False
+
+        if bundle.product != item["name_of_product"]:
+            return False
+
+        if bundle.pieces != int(item["qty"]):
+            return False
+
+        if abs(bundle.kg - float(item["kg"])) > 0.0001:
+            return False
+
+        if bundle.status != "READY":
+            return False
+
+    return True
+
+
+def validate_payload_structure(data):
+    if not isinstance(data, dict):
+        return False
+
+    # customer check
+    if "customer" not in data or not isinstance(data["customer"], str) or not data["customer"].strip():
+        return False
+    # items check
+    if "items" not in data or not isinstance(data["items"], list) or len(data["items"]) == 0:
+        return False
+
+    for item in data["items"]:
+        if not isinstance(item, dict):
+            return False
+
+        required_fields = ["item_id", "name_of_prduct", "qty", "kg"]
+        for field in required_fields:
+            if field not in item:
+                return False
+
+        if not isinstance(item["item_id"], str):
+            return False,
+
+        if not isinstance(item["name_of_prduct"], str):
+            return False,
+
+        if not isinstance(item["qty"], (int, float)):
+            return False,
+
+        if not isinstance(item["kg"], (int, float)):
+            return False
+
+    return True
+
+
+
+
+
+
 def add_jobcard(data):
+    if not validate_payload_structure(data):
+        return 405
+    if not check_name_master(data["customer"]):
+        return 401
+    if not check_product(data):
+        return 403
     job_card = Jobcard(
     date = datetime.now(),
     given_to = data["customer"],
@@ -107,8 +190,52 @@ def update_bundle(data):
         bunld.given_to = data["customer"]
         bunld.given_by = 0
         db.session.commit()
+
+def check_return_item(data):
+    db_data = get_movemet_data(data["name"])
+
+    if db_data == 404:
+        return False
+
+    # Map by item_id
+    db_items = {
+        int(item["item_id"]): item
+        for item in db_data["items"]
+    }
+
+    for item in data["items"]:
+        item_id = int(item["item_id"])
+        returned_qty = int(item["returned"])
+        token_name = item["name_of_product"]
+
+        # 1️⃣ Check ID exists
+        if item_id not in db_items:
+            return False
+
+        db_item = db_items[item_id]
+
+        # 2️⃣ Check name matches for same ID
+        if db_item["name"] != token_name:
+            return False
+
+        # 3️⃣ Check quantity rule
+        if returned_qty > db_item["issued"]:
+            return False
+
+    return True,
 def in_move_entery(data):
+    # if validate_return_structure_(data):
+    #     return 405
+
     try:
+        data_r = {"customer": data['name']
+
+                  }
+        if not check_name_master(data_r):
+            print(data['name'])
+            return 401
+        if not check_return_item(data):
+            return 403
         for item in data['items']:
             job_movement = Jobmovement(
                 date=datetime.now(),

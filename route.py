@@ -45,7 +45,6 @@ def register_routes(app):
             current_form=current_form,
             data=data_autofill
         )
-
     @app.route("/bundle_entery", methods=["GET", "POST"])
     def bundle_entery():
 
@@ -114,7 +113,6 @@ def register_routes(app):
             form_name=form_name,
             current_form=current_form
         )
-
     @app.route("/add_outworver", methods=["GET", "POST"])
     def add_outworker():
         form_name = "new outworver"
@@ -135,7 +133,6 @@ def register_routes(app):
             form_name=form_name,
             current_form=current_form
         )
-
     @app.route("/add_cutter", methods=["GET", "POST"])
     def add_cuter():
         form_name = "new cutter"
@@ -159,9 +156,15 @@ def register_routes(app):
     @app.route("/submit-jobcard",methods=["POST"])
     def submit_jobcard():
         data = request.get_json()
-        add_jobcard(data)
-        return  jsonify(success=True, message="Data saved")
-
+        ok = add_jobcard(data)
+        if ok == 101 :
+            return  jsonify(success=True, message="Data saved")
+        elif ok ==401:
+            return jsonify(success=False, message="name of master not in data base ")
+        elif ok == 403:
+            return jsonify(success=False, message="product do not mach data base data base ")
+        elif ok == 405:
+            return jsonify(success=False, message="send data not right ")
     @app.route("/retune_product", methods=["GET", "POST"])
     def retune_product():
         form_name = "retune product"
@@ -170,6 +173,20 @@ def register_routes(app):
         ok =  request.args.get("ok",type=int)
         if ok == 101 :
             flash("ok done date save")
+            return redirect(url_for("retune_product"))
+
+        elif ok == 403:
+            flash("item do not macha base" )
+            return redirect(url_for("retune_product"))
+
+        elif ok == 405:
+            flash("send data not right")
+            return redirect(url_for("retune_product"))
+        elif ok==401:
+            flash("name of master not in data base")
+            return redirect(url_for("retune_product"))
+        elif ok == 404:
+            flash("data issue")
             return redirect(url_for("retune_product"))
         if current_form.validate_on_submit():
             if str(current_form.name.data) in data_r["outworker"] :
@@ -182,7 +199,6 @@ def register_routes(app):
         return render_template("user.html",
                                form_name=form_name,
                                current_form=current_form,data_r=data_r)
-
     @app.route("/job_retun", methods=["GET", "POST"])
     def job_retun():
         name_of_master =  request.args.get("name_master",type=str)
@@ -200,9 +216,14 @@ def register_routes(app):
     @app.route("/summit-retune", methods=["POST"])
     def summit_retune():
         data = request.get_json()
-        # print(data)
         res = in_move_entery(data)
         if res == 101 :
-             return jsonify(success=True, message="Data saved")
+         return jsonify(success=True, message="Data saved")
         elif res  == 404 :
             return jsonify(success=False, message="Data not  saved iisue")
+        elif res == 401:
+            return jsonify(success=False, message="name of master not in data base ")
+        elif res == 403:
+            return jsonify(success=False, message="item do not macha base ")
+        elif res == 405:
+            return jsonify(success=False, message="send data not right ")

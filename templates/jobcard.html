@@ -360,6 +360,7 @@
         Total Weight:
         <span id="totalKg">0.00</span> KG
       </div>
+      <h2 id="error-message" hidden>erroe</h2>
 
       <button onclick="submitData()">Submit Bill</button>
       <pre id="output" hidden="hidden">// JSON Response will appear here</pre>
@@ -625,9 +626,17 @@
                                           body: JSON.stringify(payload),
                                         });
 
+                                        const data_R = await res.json();
+                                        console.log(data_R)
                                         if (!res.ok) throw new Error("Submit failed");
 
-                                        const data = await res.json();
+                                        if (!data_R.success){
+                                         const errorEl = document.getElementById("error-message");
+                                         errorEl.textContent = data_R.message;
+                                         console.log(data_R.message)
+                                        errorEl.hidden = false;
+
+                                        }
                                         alert("Bill submitted");
 
                                         /* ===== CLEAR EVERYTHING AFTER SUCCESS ===== */
@@ -649,7 +658,7 @@
                                         updadateTotalPics()
                                         location.reload();
 
-                                    <!--    output.textContent = JSON.stringify(data, null, 2)-->
+                                    <!--    output.textContent = JSON.stringify(data_R, null, 2)-->
 
                                       } catch (err) {
                                         console.error(err);
