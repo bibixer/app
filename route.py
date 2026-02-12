@@ -10,7 +10,6 @@ def reset_session():
             session.pop(key)
 
 def register_routes(app):
-
     @app.route("/lumpentry", methods=["GET", "POST"])
     def lump_home():
         
