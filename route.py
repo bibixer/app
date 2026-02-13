@@ -1,3 +1,5 @@
+from functools import wraps
+
 from flask import flash, render_template, redirect, url_for,session,request, jsonify
 from form import Lump_data,bundle_invadata,Item_data,Outworker_form,Cutter_form,Return_form,Login_form
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
@@ -6,18 +8,39 @@ from data_Process import get_serch_data,get_job_card_data_creation,get_retun_car
 from modes import User
 def reset_session():
     for key in list(session.keys()):
-        if key != 'csrf_token':
+        if key == "bundle_data" or key ==  "current_bundle" or  key ==  "bundles":
             session.pop(key)
 
 def register_routes(app,db):
     login_manager = LoginManager(app)
     login_manager.login_view = 'login'
 
+    def oly_admin(func):
+        @wraps(func)
+        def admin_(*args, **kwargs):
+            try:
+                if not current_user.is_authenticated:
+                    flash("Login required")
+                    return redirect(url_for("login"))  # change to your login route name
+
+                if current_user.role != 1:
+                    flash("Admin access only")
+                    return redirect(url_for("home"))  # change to your home route name
+
+                return func(*args, **kwargs)
+
+            except Exception as e:
+                print("Admin decorator error:", e)
+                return redirect(url_for("home"))
+
+        return admin_
+
     @login_manager.user_loader
     def load_user(user_id):
         return db.session.get(User, int(user_id))
 
     @app.route("/lumpentry", methods=["GET", "POST"])
+    @login_required
     def lump_home():
         
         form_name = "lump entry"
@@ -50,9 +73,11 @@ def register_routes(app,db):
             "user.html",
             form_name=form_name,
             current_form=current_form,
-            data=data_autofill
+            data=data_autofill,
+            id=current_user.role
         )
     @app.route("/bundle_entery", methods=["GET", "POST"])
+    @login_required
     def bundle_entery():
 
         # 🔐 Guard: block direct access / broken session
@@ -72,7 +97,7 @@ def register_routes(app,db):
                 "main": session["bundle_data"],
                 "bundles": session["bundles"]
             }
-            add_data_lump(all_data,1)
+            add_data_lump(all_data,current_user)
 
             reset_session()
             flash("You have successfully entered the bundle.", "success")
@@ -94,20 +119,25 @@ def register_routes(app,db):
         return render_template(
             "user.html",
             form_name=form_name,
-            current_form=current_form
+            current_form=current_form,
+            id=current_user.role
         )
     @app.route("/jobcard", methods=["GET", "POST"])
+    @login_required
+    @oly_admin
     def job_card():
         job_card_data_c = get_job_card_data_creation()
-        return render_template("jobcard.html",data = job_card_data_c)
+        return render_template("jobcard.html",id=current_user.role,data = job_card_data_c)
     @app.route("/add_items", methods=["GET", "POST"])
+    @login_required
+    @oly_admin
     def add_item():
         form_name = "add new produdcts"
         current_form = Item_data()
 
         if current_form.validate_on_submit():
             data = current_form.data.copy()
-            items = add_items(data)
+            items = add_items(data,current_user)
             if items == 101 :
                 flash(f"You have successfully added  {data['name']} .", "success")
                 return redirect(url_for("add_item"))
@@ -118,16 +148,18 @@ def register_routes(app,db):
         return render_template(
             "user.html",
             form_name=form_name,
-            current_form=current_form
+            current_form=current_form,id=current_user.role
         )
     @app.route("/add_outworver", methods=["GET", "POST"])
+    @login_required
+    @oly_admin
     def add_outworker():
         form_name = "new outworver"
         current_form = Outworker_form()
 
         if current_form.validate_on_submit():
             data = current_form.data.copy()
-            outworker = add_outworker_db(data)
+            outworker = add_outworker_db(data,current_user)
             if outworker == 101 :
                 flash(f"You have successfully added  {data['name']} .", "success")
                 return redirect(url_for("add_outworker"))
@@ -138,16 +170,18 @@ def register_routes(app,db):
         return render_template(
             "user.html",
             form_name=form_name,
-            current_form=current_form
+            current_form=current_form,id=current_user.role
         )
     @app.route("/add_cutter", methods=["GET", "POST"])
+    @login_required
+    @oly_admin
     def add_cuter():
         form_name = "new cutter"
         current_form = Cutter_form()
 
         if current_form.validate_on_submit():
             data = current_form.data.copy()
-            add_cu = add_cutter(data)
+            add_cu = add_cutter(data,current_user)
             if add_cu == 101 :
                 flash(f"You have successfully added  {data['name']} cutter.", "success")
                 return redirect(url_for("add_cuter"))
@@ -158,12 +192,15 @@ def register_routes(app,db):
         return render_template(
             "user.html",
             form_name=form_name,
-            current_form=current_form
+            current_form=current_form,id=current_user.role
         )
     @app.route("/submit-jobcard",methods=["POST"])
+    @login_required
+    # @oly_admin
     def submit_jobcard():
+
         data = request.get_json()
-        ok = add_jobcard(data)
+        ok = add_jobcard(data,current_user)
         if ok == 101 :
             return  jsonify(success=True, message="Data saved")
         elif ok ==401:
@@ -173,6 +210,8 @@ def register_routes(app,db):
         elif ok == 405:
             return jsonify(success=False, message="send data not right ")
     @app.route("/retune_product", methods=["GET", "POST"])
+    @login_required
+    @oly_admin
     def retune_product():
         form_name = "retune product"
         current_form =  Return_form()
@@ -205,8 +244,10 @@ def register_routes(app,db):
 
         return render_template("user.html",
                                form_name=form_name,
-                               current_form=current_form,data_r=data_r)
+                               current_form=current_form,data_r=data_r,id=current_user.role)
     @app.route("/job_retun", methods=["GET", "POST"])
+    @login_required
+    @oly_admin
     def job_retun():
         name_of_master =  request.args.get("name_master",type=str)
         if not name_of_master:
@@ -219,11 +260,13 @@ def register_routes(app,db):
         if data['items'] == []:
             flash("no product given ")
             return redirect(url_for("retune_product"))
-        return render_template("job_retun.html",data=data)
+        return render_template("job_retun.html",data=data,id=current_user.role)
     @app.route("/summit-retune", methods=["POST"])
+    @login_required
+    @oly_admin
     def summit_retune():
         data = request.get_json()
-        res = in_move_entery(data)
+        res = in_move_entery(data,current_user)
         if res == 101 :
          return jsonify(success=True, message="Data saved")
         elif res  == 404 :
@@ -234,14 +277,22 @@ def register_routes(app,db):
             return jsonify(success=False, message="item do not macha base ")
         elif res == 405:
             return jsonify(success=False, message="send data not right ")
+    @app.route("/admin_dashord", methods=["GET", "POST"])
+    @login_required
+    @oly_admin
+    def admin_dashord():
+        return render_template("admin.html")
+
 
     @app.route("/")
     @login_required
     def home():
-        if current_user.role == 4:
+        if current_user.role == 1:
             return redirect("/admin_dashord")
         elif current_user.role == 2:
             return redirect("/lumpentry")
+        else:
+            return redirect(url_for("logout"))
 
     @app.route("/login", methods=['GET', 'POST'])
     def login():

@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 {% from "bootstrap5/form.html" import render_form %}
+{% if id %}
  {% include "menu_bar.html" %}
+{% endif%}
+
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -37,6 +40,8 @@
       </div>
     </div>
   {% include "inputjs.html" %}
+   {% if id %}
   {% include "scarch.html" %}
+  {% endif %}
   </body>
 </html>
