@@ -1,8 +1,7 @@
 from flask import Flask
 from flask_bootstrap import Bootstrap5
 from route import register_routes
-from modes import db
-
+from modes import db,User
 
 
 def create_app():
@@ -23,7 +22,24 @@ def create_app():
 
 
 
-
 if __name__ == '__main__':
     app = create_app()
     app.run(debug=True)
+    # with app.app_context():
+    #     data = []
+    #     from sqlalchemy.exc import IntegrityError
+    #
+    #     try:
+    #         for u in data:
+    #             user = User(
+    #                 username=u['usre'].strip().lower(),
+    #                 password=u['password'],
+    #                 role=u['role']
+    #             )
+    #             db.session.add(user)
+    #
+    #         db.session.commit()
+    #
+    #     except IntegrityError:
+    #         db.session.rollback()
+    #         print("Duplicate username detected")

@@ -114,7 +114,7 @@ class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(128), nullable=False)
-    role = db.Column(db.Integer, nullable=False, default=1)  # 'userT' userP userB or 'admin'
+    role = db.Column(db.Integer, nullable=False, default=2)  # 'userT' userP userB or 'admin'
     def __init__(self,username,password,role):
         self.username =  username
         self.password =  generate_password_hash(password)
