@@ -1,10 +1,11 @@
 from functools import wraps
 
 from flask import flash, render_template, redirect, url_for,session,request, jsonify
-from form import Lump_data,bundle_invadata,Item_data,Outworker_form,Cutter_form,Return_form,Login_form
+from form import Lump_data, bundle_invadata, Item_data, Outworker_form, Cutter_form, Return_form, Login_form, Date_form
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from data_entry import add_data_lump,add_cutter,add_items,add_outworker_db,add_jobcard,in_move_entery
-from data_Process import get_serch_data,get_job_card_data_creation,get_retun_card_data,get_movemet_data
+from data_Process import get_serch_data, get_job_card_data_creation, get_retun_card_data, get_movemet_data, \
+    get_current_week_range, get_outflow,get_inflow
 from modes import User
 def reset_session():
     for key in list(session.keys()):
@@ -281,7 +282,16 @@ def register_routes(app,db):
     @login_required
     @oly_admin
     def admin_dashord():
-        return render_template("admin.html")
+        range_data = get_current_week_range()
+        date_from = Date_form()
+        out_data =get_outflow()
+        in_data = get_inflow()
+        # Pre-fill form with current week range on GET
+        if not date_from.is_submitted():
+            date_from.date_from.data = range_data["from_date"].date()
+            date_from.date_to.data = range_data["to_date"].date()
+
+        return render_template("admin.html",date_from=date_from,type="DASHBORD", outflow_data=out_data,inflow_data=in_data)
 
 
     @app.route("/")

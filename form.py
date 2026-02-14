@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, IntegerField, SubmitField, SelectField, FloatField, PasswordField
+from wtforms import StringField, IntegerField, SubmitField, SelectField, FloatField, PasswordField, DateField
 from wtforms.validators import DataRequired
 
 
@@ -157,3 +157,15 @@ class Login_form(FlaskForm):
         submit = SubmitField(
             'Login',
             render_kw={"class": "button"})
+class Date_form(FlaskForm):
+    date_from = DateField(
+        label="Date from",
+        validators=[DataRequired()]
+    )
+    date_to = DateField(
+        label="Date to",
+        validators=[DataRequired()],
+    )
+    submit = SubmitField(
+        'Submit',
+        render_kw={"class": "button"})

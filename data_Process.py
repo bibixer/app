@@ -1,5 +1,5 @@
 from modes import Cuter,Item_data,Outworker,Bundle,Jobcard,Jobmovement
-from datetime import datetime
+from datetime import datetime,timedelta
 from collections import defaultdict
 # fist for lump data
 # get cuter dta
@@ -137,3 +137,41 @@ def get_movemet_data(master_name):
             }
             )
     return result
+
+
+def get_current_week_range():
+    today = datetime.now()
+
+    weekday = today.weekday()  # Monday=0, Tuesday=1, Wednesday=2, ...
+
+    if weekday == 2:  # Today is Wednesday
+        from_date = today.replace(hour=0, minute=0, second=0, microsecond=0)
+        to_date = from_date + timedelta(days=6, hours=23, minutes=59, seconds=59, microseconds=999999)
+    else:
+        days_since_wednesday = (weekday - 2) % 7
+        from_date = (today - timedelta(days=days_since_wednesday)).replace(hour=0, minute=0, second=0, microsecond=0)
+        to_date = from_date + timedelta(days=6, hours=23, minutes=59, seconds=59, microseconds=999999)
+    data = {"from_date":from_date, "to_date":
+        to_date}
+    return data
+
+def get_outflow():
+    return [
+            {
+                "name": "item",
+                "points": [
+                    {"item_name":"vimal", "quantity": 60},
+                    {"item_name": "gold", "quantity": 40}
+                ]
+            }
+        ]
+def get_inflow():
+    return [
+        {
+            "name": "item",
+            "points": [
+                {"item_name": "vimal", "quantity": 40},
+                {"item_name": "gold", "quantity": 60}
+            ]
+        }
+    ]
