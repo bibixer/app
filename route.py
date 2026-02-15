@@ -1,7 +1,7 @@
 from functools import wraps
 
 from flask import flash, render_template, redirect, url_for,session,request, jsonify
-from form import Lump_data, bundle_invadata, Item_data, Outworker_form, Cutter_form, Return_form, Login_form, Date_form
+from form import Lump_data, bundle_invadata, Item_data, Outworker_form, Cutter_form, Return_form, Login_form, Date_form, Date_form_with_name
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from data_entry import add_data_lump,add_cutter,add_items,add_outworker_db,add_jobcard,in_move_entery
 from data_Process import get_serch_data, get_job_card_data_creation, get_retun_card_data, get_movemet_data, \
@@ -292,6 +292,52 @@ def register_routes(app,db):
             date_from.date_to.data = range_data["to_date"].date()
 
         return render_template("admin.html",date_from=date_from,type="DASHBORD", outflow_data=out_data,inflow_data=in_data)
+    @app.route("/cutter_report",methods=["GET", "POST"])
+    @login_required
+    @oly_admin
+    def cutter_report():
+        name_data_form =  Date_form_with_name()
+        range_data = get_current_week_range()
+        if not name_data_form.is_submitted():
+            name_data_form.date_from.data = range_data["from_date"].date()
+            name_data_form.date_to.data = range_data["to_date"].date()
+            name_data_form.name.render_kw={
+                'placeholder': 'Enter cutter Name',
+
+            }
+        return render_template("admin.html", date_from=name_data_form, type="CUTTER_Report")
+
+    @app.route("/outworker_report", methods=["GET", "POST"])
+    @login_required
+    @oly_admin
+    def outworker_report():
+        name_data_form = Date_form_with_name()
+        range_data = get_current_week_range()
+        if not name_data_form.is_submitted():
+            name_data_form.date_from.data = range_data["from_date"].date()
+            name_data_form.date_to.data = range_data["to_date"].date()
+            name_data_form.name.render_kw = {
+                'placeholder': 'Enter outworker Name',
+
+            }
+
+        return render_template("admin.html", date_from=name_data_form, type="OUTWOKER_Report")
+
+    @app.route("/product_report", methods=["GET", "POST"])
+    @login_required
+    @oly_admin
+    def product_report():
+        name_data_form = Date_form_with_name()
+        range_data = get_current_week_range()
+        if not name_data_form.is_submitted():
+            name_data_form.date_from.data = range_data["from_date"].date()
+            name_data_form.date_to.data = range_data["to_date"].date()
+            name_data_form.name.render_kw = {
+                'placeholder': 'Enter product Name',
+
+            }
+
+        return render_template("admin.html", date_from=name_data_form, type="PRODUCT_Report")
 
 
     @app.route("/")

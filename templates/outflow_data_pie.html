@@ -1,0 +1,114 @@
+<script src="https://code.jscharting.com/latest/jscharting.js"></script>
+<script src="https://code.jscharting.com/latest/modules/toolbar.js"></script>
+<script src="https://code.jscharting.com/latest/modules/types.js"></script>
+
+<style>
+  #navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 5em;
+    height: 100vh;
+    background-color: hsl(var(--background-secondary));
+    z-index: 10;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 0;
+  }
+
+  #chartDiv {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: 80vh;
+    max-height: 600px;
+    min-height: 300px;
+    background-color: #fff;
+    margin: 0 auto;
+    padding: 10px;
+    box-sizing: border-box;
+  }
+
+  @media (max-width: 768px) {
+    #chartDiv {
+      height: 70vh;
+      padding: 5px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    #chartDiv {
+      height: 60vh;
+    }
+  }
+</style>
+
+<body>
+  <h2 style="text-align:center; padding:10px; ,id=flow_type">
+    Product Distribution
+  </h2>
+  <select id="dataSelect">
+    <option value="outflow">Outflow</option>
+    <option value="inflow">Inflow</option>
+  </select>
+
+  <div id="chartDiv"></div>
+
+  <script>
+       // Your data structure
+       const datasets = {
+       outflow: {{ outflow_data|tojson|safe }},
+       inflow: {{ inflow_data|tojson|safe }}
+     };
+
+
+       // Transform data to JSCharting format
+    function transform(data) {
+       return data.map(series => ({
+         name: series.name,
+         points: series.points.map(point => ({
+           name: point.item_name,
+           y: point.quantity
+         }))
+       }));
+     }
+
+        var chart = JSC.chart('chartDiv', {
+       legend_position: 'inside left bottom',
+       defaultSeries: { type: 'pie', pointSelection: true },
+       defaultPoint_label: {
+         text: '<b>%name</b><br>%yValue',
+         placement: 'auto',
+         autoHide: false
+       },
+         toolbar_items: {
+           Mode: {
+             margin: 10,
+             type: 'select',
+             events_change: setMode,
+             items: 'enum_placement'
+           },
+           'Auto Hide': { type: 'checkbox', events_change: setAutoHide }
+         },
+         title_label_text: 'out Flow Distribution',
+       yAxis: { label_text: 'Quantity', formatString: 'n' },
+       series: transform(datasets.outflow)
+       });
+
+       function setMode(val) {
+         chart.options({ defaultPoint: { label: { placement: val } } });
+       }
+
+       function setAutoHide(val) {
+         chart.options({ defaultPoint: { label: { autoHide: val } } });
+       }
+       document.getElementById("dataSelect").addEventListener("change", function() {
+       const selected = this.value;
+       chart.options({
+         series: transform(datasets[selected]),
+         title_label_text: `${selected}-Flow Distribution `
+
+       });
+     });
+  </script>
+</body>
