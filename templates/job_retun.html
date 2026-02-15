@@ -317,7 +317,7 @@
             <tr>
               <th>S.NO</th>
               <th>product Name</th>
-              <th>Colour</th>
+              <th>Type</th>
               <th>Balance</th>
               <th>Return</th>
             </tr>
@@ -369,7 +369,7 @@
                        </div>
                        <div class="history-content" id="history-${index}">${historyHtml}</div>
                      </td>
-                     <td>${item.colour}</td>
+                     <td class="item-colour">${item.colour}</td>
                      <td><span class="remaining-badge ${
                        remaining < 10 ? "low" : ""
                      }">${remaining} pcs</span></td>
@@ -454,7 +454,9 @@
                  const itemId = row
                    .querySelector(".id-badge")
                    .innerText.replace("#", "");
-
+                  const itemtype = row
+                   .querySelector(".item-colour")
+                   .innerText.replace("#", "");
                  const remaining = Number(input.dataset.remaining);
                  const returnedValue = Number(input.value) || 0;
 
@@ -465,6 +467,7 @@
                  items.push({
                    item_id: itemId,
                    returned: returnedValue,
+                   type_R:itemtype,
                    remaining,
                    name
                  });
@@ -495,7 +498,8 @@
 
                      item_id: item.item_id,
                      returned: item.returned,
-                     name_of_product: item.name
+                     name_of_product: item.name,
+                     type:item.type_R
                    }))
                };
 

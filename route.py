@@ -5,11 +5,11 @@ from form import Lump_data, bundle_invadata, Item_data, Outworker_form, Cutter_f
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from data_entry import add_data_lump,add_cutter,add_items,add_outworker_db,add_jobcard,in_move_entery
 from data_Process import get_serch_data, get_job_card_data_creation, get_retun_card_data, get_movemet_data, \
-    get_current_week_range, get_outflow,get_inflow
+    get_current_week_range, home_dashboard,bulk_data_lump
 from modes import User
 def reset_session():
     for key in list(session.keys()):
-        if key == "bundle_data" or key ==  "current_bundle" or  key ==  "bundles":
+        if key == "bundle_data" or key ==  "current_bundle" or  key ==  "bundles" or key=="sno":
             session.pop(key)
 
 def register_routes(app,db):
@@ -57,19 +57,33 @@ def register_routes(app,db):
                 flash("select product name from blow","warning")
                 return redirect(url_for("lump_home"))
             data.pop("csrf_token", None)
-            if data['numbers_of_bundles'] > 6:
-                flash("you can not enter more then 6")
+            if data['bundle_type'] != "goodCUT 20 picset" and data["bundle_type"] != "fent 20 picset":
+                if data['numbers_of_bundles'] > 6 :
+                    flash("you can not enter more then 6")
+                    return redirect(url_for("lump_home"))
+
+                # 🔄 reset any old flow
+                reset_session()
+
+                # 🚀 initialize bundle workflow
+                session["bundle_data"] = data
+                session["current_bundle"] = 1
+                session["bundles"] = {}
+                session["sno"]=0
+
+                return redirect(url_for("bundle_entery"))
+            elif data['bundle_type'] == "goodCUT 20 picset" or data["bundle_type"] == "fent 20 picset":
+                if data['numbers_of_bundles'] > 20 :
+                    flash("you can not enter more then 20 in bulk")
+                    return redirect(url_for("lump_home"))
+                all_data = bulk_data_lump(data)
+                add_data_lump(all_data, current_user)
+                reset_session()
+                flash("You have successfully entered the bundle.", "success")
                 return redirect(url_for("lump_home"))
 
-            # 🔄 reset any old flow
-            reset_session()
 
-            # 🚀 initialize bundle workflow
-            session["bundle_data"] = data
-            session["current_bundle"] = 1
-            session["bundles"] = {}
 
-            return redirect(url_for("bundle_entery"))
         return render_template(
             "user.html",
             form_name=form_name,
@@ -86,6 +100,7 @@ def register_routes(app,db):
                 "bundle_data" not in session
                 or "current_bundle" not in session
                 or "bundles" not in session
+                or "sno" not in session
         ):
             return redirect(url_for("lump_home"))
 
@@ -98,6 +113,8 @@ def register_routes(app,db):
                 "main": session["bundle_data"],
                 "bundles": session["bundles"]
             }
+
+            # print(all_data)
             add_data_lump(all_data,current_user)
 
             reset_session()
@@ -106,6 +123,10 @@ def register_routes(app,db):
 
         form_name = f"Bundle Entry ({current}/{total})"
         current_form = bundle_invadata()
+        if not current_form.validate_on_submit():
+            if session['sno'] != 0:
+                current_form.no_of_so.data = session['sno'] +1
+
 
         if current_form.validate_on_submit():
             data = current_form.data.copy()
@@ -114,7 +135,7 @@ def register_routes(app,db):
             # ⚠️ use string keys for session safety
             session["bundles"][str(current)] = data
             session["current_bundle"] = current + 1
-
+            session["sno"]  = current_form.no_of_so.data
             return redirect(url_for("bundle_entery"))
 
         return render_template(
@@ -264,7 +285,7 @@ def register_routes(app,db):
         return render_template("job_retun.html",data=data,id=current_user.role)
     @app.route("/summit-retune", methods=["POST"])
     @login_required
-    @oly_admin
+    # @oly_admin
     def summit_retune():
         data = request.get_json()
         res = in_move_entery(data,current_user)
@@ -280,18 +301,19 @@ def register_routes(app,db):
             return jsonify(success=False, message="send data not right ")
     @app.route("/admin_dashord", methods=["GET", "POST"])
     @login_required
-    @oly_admin
+    # @oly_admin
     def admin_dashord():
         range_data = get_current_week_range()
         date_from = Date_form()
-        out_data =get_outflow()
-        in_data = get_inflow()
         # Pre-fill form with current week range on GET
         if not date_from.is_submitted():
             date_from.date_from.data = range_data["from_date"].date()
             date_from.date_to.data = range_data["to_date"].date()
-
-        return render_template("admin.html",date_from=date_from,type="DASHBORD", outflow_data=out_data,inflow_data=in_data)
+        dash_bord_data = home_dashboard(date_from)
+        if dash_bord_data == "invalid_range":
+            flash("⚠️ 'From Date' cannot be after 'To Date'.", "danger")
+            return redirect(url_for("admin_dashord"))
+        return render_template("admin.html",date_from=date_from,type="DASHBORD", outflow_data=dash_bord_data["outflow_pie"],inflow_data=dash_bord_data["inflow_pie"],dash_bord_data=dash_bord_data)
     @app.route("/cutter_report",methods=["GET", "POST"])
     @login_required
     @oly_admin

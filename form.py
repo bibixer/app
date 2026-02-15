@@ -29,7 +29,9 @@ class Lump_data(FlaskForm):
             ("lump", "Lump"),
             ("good_cut", "Good Cut"),
             ("fent", "Fent"),
-            ("un_cut", "Un Cut")
+            ("un_cut", "Un Cut"),
+            ("fent 20 picset", "fent 20 picset"),
+            ("goodCUT 20 picset", "goodCUT 20 picset")
         ],
         validators=[DataRequired()],
         render_kw={
@@ -37,14 +39,7 @@ class Lump_data(FlaskForm):
         }
     )
 
-    meters = FloatField(
-        "Meter of Lump",
-        validators=[DataRequired()],
-        render_kw={
-            "placeholder": "Enter meter of lump",
-             
-        }
-    )
+
 
     colors = StringField(
         "Color of Lump",
@@ -54,7 +49,14 @@ class Lump_data(FlaskForm):
              
         }
     )
+    meters = FloatField(
+        "Meter of Lump",
+        validators=[DataRequired()],
+        render_kw={
+            "placeholder": "Enter meter of lump",
 
+        }
+    )
     numbers_of_bundles = IntegerField(
         "Number of Bundles",
         validators=[DataRequired()],
@@ -72,6 +74,8 @@ class Lump_data(FlaskForm):
 
 
 class bundle_invadata(FlaskForm):
+    no_of_so = IntegerField("sn.o", validators=[DataRequired()],
+                              render_kw={"placeholder": "Enter number of pics"})
     no_of_pics = IntegerField("Number of Pics", validators=[DataRequired()],render_kw={"placeholder": "Enter number of pics"})
     kg_of_bundle = FloatField("kg",validators=[DataRequired()],render_kw={"placeholder": "Enter kg"})
     submit = SubmitField(

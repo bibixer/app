@@ -17,7 +17,7 @@ class Bundle(db.Model):
     color = db.Column(db.String(50), nullable=False)
     pieces = db.Column(db.Integer, nullable=False)
     kg = db.Column(db.Float, nullable=False)
-
+    type_B = db.Column(db.String(50), nullable=False)
     # given to master
     given_to = db.Column(db.String(50), nullable=True)
     # given by
@@ -28,7 +28,21 @@ class Bundle(db.Model):
     # GIVEN → Bundle is outside → Cannot use
     status =  db.Column(db.String(50), nullable=False,default='READY')
     # # status
+    s_no = db.Column(db.Integer, nullable=False,default=10505)
     # complete = db.Column(db.Boolean, default=False)
+    def to_dict(self,cuter):
+        return {
+            "id":self.id,
+            "entry_datetime":self.entry_datetime,
+            "lump_id":self.lump_id,
+            "product":self.product,
+            "color":self.color,
+            "pieces":self.pieces,
+            "kg":self.kg,
+            'type_B':self.type_B,
+            "OR_code":f"{self.id}--{self.product}--{self.color}--{self.pieces}",
+            "cutter":cuter
+        }
 class Lump(db.Model):
     __tablename__ = "LumpData"
     id = db.Column(db.Integer, primary_key=True)
@@ -88,6 +102,7 @@ class Jobmovement(db.Model):
     product_name = db.Column(db.String(50), nullable=False)
     name_of_mater = db.Column(db.String(50), nullable=False)
     enter_user = db.Column(db.String(50), nullable=False)
+    type_B=db.Column(db.String(50), nullable=False)
     # IN
     # OUT
     flow_type = db.Column(db.String(50), nullable=False)

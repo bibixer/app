@@ -329,7 +329,8 @@
             <tr>
               <th width="25%">Item ID / Search</th>
               <th width="25%">Item Name</th>
-              <th width="15%">Colour</th>
+              <th width="10%">Colour</th>
+              <th width="5">type</th>
               <th width="10%">Pics</th>
               <th width="13%">KG</th>
               <th width="2%"></th>
@@ -465,6 +466,7 @@
                                         </td>
                                         <td><input class="item-name" readonly></td>
                                         <td><input class="item-colour" readonly></td>
+                                        <td><input class="item-type" readonly></td>
                                         <td><input type="number" min="1" class="item-qty" readonly></td>
                                     <td>
                                       <input
@@ -516,6 +518,7 @@
                                   idInput.value = item.id;
                                   tr.querySelector(".item-name").value = item.name;
                                   tr.querySelector(".item-colour").value = item.colour;
+                                  tr.querySelector(".item-type").value = item.type;
                                   tr.querySelector(".item-qty").value = item.pics;
                                   tr.querySelector(".item-kg").value = item.kg;
 
@@ -541,7 +544,7 @@
                                              const filtered = inventory
                                       .filter(i => {
                                         const idStr = String(i.id);
-                                        return (
+                                         return (
                                           !usedIds.has(idStr) &&
                                           (idStr.includes(v) || i.name.toLowerCase().includes(v))
                                         );
@@ -568,6 +571,7 @@
                                                 idInput.value = item.id;
                                                 tr.querySelector(".item-name").value = item.name;
                                                 tr.querySelector(".item-colour").value = item.colour;
+                                                tr.querySelector(".item-type").value = item.type;
                                                 tr.querySelector(".item-qty").value = item.pics;
                                                 tr.querySelector(".item-kg").value = item.kg;
                                                 updateTotalKg();
@@ -607,6 +611,7 @@
                                         .map((r) => ({
                                           item_id: r.querySelector(".item-id").value,
                                           name_of_prduct :  r.querySelector(".item-name").value,
+                                          type:r.querySelector(".item-type").value,
                                           qty: Number(r.querySelector(".item-qty").value),
                                           kg: Number(r.querySelector(".item-kg").value) || 0,
                                         }))
@@ -761,6 +766,7 @@
               tr.querySelector(".item-id").value = item.id;
               tr.querySelector(".item-name").value = item.name;
               tr.querySelector(".item-colour").value = item.colour;
+              tr.querySelector(".item-type").value = item.type;
               tr.querySelector(".item-qty").value = item.pics;
               tr.querySelector(".item-kg").value = item.kg;
 
