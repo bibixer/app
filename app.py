@@ -2,7 +2,8 @@ from flask import Flask
 from flask_bootstrap import Bootstrap5
 from route import register_routes
 from modes import db,User
-
+import logging
+from waitress import serve
 
 def create_app():
     app = Flask(__name__)
@@ -18,13 +19,16 @@ def create_app():
     with app.app_context():
         db.create_all()
     register_routes(app,db)
+
     return app
 
 
-
+logging.basicConfig(filename='flask.log', level=logging.INFO)
 if __name__ == '__main__':
     app = create_app()
-    app.run(debug=True)
+    logging.info("Flask service starting")
+    serve(app, host='127.0.0.1', port=5000, threads=8)
+
     # with app.app_context():
     #     data = []
     #     from sqlalchemy.exc import IntegrityError

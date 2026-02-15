@@ -3,7 +3,6 @@ from datetime import datetime
 from data_Process import outworker_name,get_movemet_data
 from data_print_format import outworker_qr_print,buldel_qr_print
 
-
 def add_data_to_database(data):
     db.session.add(data)
     db.session.commit()
@@ -27,7 +26,6 @@ def add_data_lump(data,current_user):
         all_bun_data = add_bundle(data,lump.id,lump_data['bundle_type'],lump_data['cuter_name'])
         db.session.commit()
         buldel_qr_print(all_bun_data)
-
 def add_bundle(data,lump_id,type,cuter):
     fulldata_list = []
     bundle_data = data['bundles']
@@ -47,7 +45,6 @@ def add_bundle(data,lump_id,type,cuter):
         db.session.flush()
         fulldata_list.append(bundle.to_dict(cuter=cuter))
     return fulldata_list
-
 def error_hendle(func):
     def eror(*args, **kwargs):
         try:
@@ -55,13 +52,11 @@ def error_hendle(func):
         except Exception as e:
             return {"or":False,"exception":e}
     return eror
-
 @error_hendle
 def add_cutter(data,current_user):
         cuuter = Cuter(name=data["name"].upper(),
                        enter_user=current_user.username)
         return add_data_to_database(cuuter)
-
 @error_hendle
 def add_items(data,current_user):
     item =  Item_data(name=data["name"].upper()
@@ -70,7 +65,6 @@ def add_items(data,current_user):
     enter_user=current_user.username
     )
     return add_data_to_database(item)
-
 @error_hendle
 def add_outworker_db(data,current_user):
     outworker = Outworker(name=data["name"].upper(),
@@ -85,22 +79,14 @@ def add_outworker_db(data,current_user):
             return 101
         else:
            return 404
-
-
-
-
-
 # @error_hendle
-
 def check_name_master(data):
     all_data = outworker_name(oly_full_name=True)
     if data in all_data:
         return True
     else:
         return False
-
 # 101 ok 401 name 403 falt on itetem
-
 def check_product(data):
     item_ids = [item["item_id"] for item in data["items"]]
 
@@ -129,7 +115,6 @@ def check_product(data):
             return False
 
     return True
-
 def validate_payload_structure(data):
     if not isinstance(data, dict):
         return False
@@ -165,7 +150,6 @@ def validate_payload_structure(data):
             return False
 
     return True
-
 def add_jobcard(data,current_user):
     if not validate_payload_structure(data):
         return 405
@@ -185,7 +169,6 @@ def add_jobcard(data,current_user):
     db.session.commit()
 
     return 101
-
 def add_job_movemet_out(data,job_id,current_user):
     for item in data['items']:
         job_movement = Jobmovement(
@@ -211,7 +194,6 @@ def update_bundle(data,current_user):
         bunld.given_date = datetime.now()
         bunld.given_to = data["customer"]
         bunld.given_by = str(current_user.username)
-
 def check_return_item(data):
     db_data = get_movemet_data(data["name"])
 
