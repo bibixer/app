@@ -218,7 +218,7 @@ def register_routes(app,db):
         )
     @app.route("/submit-jobcard",methods=["POST"])
     @login_required
-    # @oly_admin
+    @oly_admin
     def submit_jobcard():
 
         data = request.get_json()
@@ -285,7 +285,7 @@ def register_routes(app,db):
         return render_template("job_retun.html",data=data,id=current_user.role)
     @app.route("/summit-retune", methods=["POST"])
     @login_required
-    # @oly_admin
+    @oly_admin
     def summit_retune():
         data = request.get_json()
         res = in_move_entery(data,current_user)
@@ -301,7 +301,7 @@ def register_routes(app,db):
             return jsonify(success=False, message="send data not right ")
     @app.route("/admin_dashord", methods=["GET", "POST"])
     @login_required
-    # @oly_admin
+    @oly_admin
     def admin_dashord():
         range_data = get_current_week_range()
         date_from = Date_form()
