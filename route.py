@@ -223,8 +223,8 @@ def register_routes(app,db):
 
         data = request.get_json()
         ok = add_jobcard(data,current_user)
-        if ok == 101 :
-            return  jsonify(success=True, message="Data saved")
+        if ok["code"] == 101 :
+            return  jsonify(success=True, message="Data saved",jobData=ok["jobData"])
         elif ok ==401:
             return jsonify(success=False, message="name of master not in data base ")
         elif ok == 403:

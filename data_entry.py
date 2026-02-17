@@ -43,7 +43,7 @@ def add_bundle(data,lump_id,type,cuter):
         )
         db.session.add(bundle)
         db.session.flush()
-        fulldata_list.append(bundle.to_dict(cuter=cuter))
+        fulldata_list.append(bundle.to_dict(cuter=cuter,no_of_so=b['no_of_so']))
     return fulldata_list
 def error_hendle(func):
     def eror(*args, **kwargs):
@@ -168,7 +168,16 @@ def add_jobcard(data,current_user):
     add_job_movemet_out(data,job_card.id,current_user)
     db.session.commit()
 
-    return 101
+    return {
+        "code":101,
+        "jobData":{
+            "jobId": job_card.id,
+            "party": job_card.given_to,
+            "toal_p": ".",
+            "date": datetime.now().strftime("%d-%m-%Y"),
+            "items":job_card.product_list
+        }
+    }
 def add_job_movemet_out(data,job_id,current_user):
     for item in data['items']:
         job_movement = Jobmovement(

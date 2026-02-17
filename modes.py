@@ -30,7 +30,7 @@ class Bundle(db.Model):
     # # status
     s_no = db.Column(db.Integer, nullable=False,default=10505)
     # complete = db.Column(db.Boolean, default=False)
-    def to_dict(self,cuter):
+    def to_dict(self,cuter,no_of_so):
         return {
             "id":self.id,
             "entry_datetime":self.entry_datetime,
@@ -40,6 +40,7 @@ class Bundle(db.Model):
             "pieces":self.pieces,
             "kg":self.kg,
             'type_B':self.type_B,
+            'no_of_so':no_of_so,
             "OR_code":f"{self.id}--{self.product}--{self.color}--{self.pieces}",
             "cutter":cuter
         }
