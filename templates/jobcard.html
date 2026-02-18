@@ -381,737 +381,742 @@
     </div>
 
     <script>
-                                                                  /* ================= DATA ================= */
-                                                                  {% if data %}
-                                                                  const outworker = {{data["outworker"] | tojson }};
-
-                                                                  const inventory = {{data["product"] | tojson}};
-                                                                  {% endif %}
-                                                                  /* ================= DOM ================= */
-                                                                  const custInput = document.getElementById("custInput");
-                                                                  const custSug = document.getElementById("custSug");
-                                                                  const tbody = document.querySelector("#billTable tbody");
-                                                                  const billDate = document.getElementById("billDate");
-                                                                  const output = document.getElementById("output");
-
-                                                                  /* ================= HELPER ================= */
-                                                                  function focusField(el) {
-                                                                    if (!el) return;
-                                                                    el.focus({ preventScroll: true });
-                                                                    el.scrollIntoView({ behavior: "smooth", block: "center" });
-                                                                    if (el.type === "text" || el.type === "number") {
-                                                                      const len = el.value.length;
-                                                                      setTimeout(() => el.setSelectionRange(len, len), 0);
-                                                                    }
-                                                                  }
-
-                                                                  function makeSuggestionsInteractive(input, suggestions, items, onSelect) {
-                                                                    let activeIndex = -1;
-
-                                                                    function render() {
-                                                                      suggestions.innerHTML = "";
-                                                                      items.forEach((item, i) => {
-                                                                        const div = document.createElement("div");
-                                                                        div.textContent = item;
-                                                                        if (i === activeIndex) div.classList.add("active");
-                                                                        div.addEventListener("pointerdown", (e) => {
-                                                                          e.preventDefault();
-                                                                          onSelect(item);
-                                                                          suggestions.hidden = true;
-                                                                        });
-                                                                        suggestions.appendChild(div);
-                                                                      });
-                                                                      suggestions.hidden = items.length === 0;
-                                                                    }
-
-                                                                    input.addEventListener("keydown", (e) => {
-                                                                      const max = items.length - 1;
-                                                                      if (e.key === "ArrowDown") {
-                                                                        e.preventDefault();
-                                                                        activeIndex = activeIndex < max ? activeIndex + 1 : 0;
-                                                                        render();
-                                                                      } else if (e.key === "ArrowUp") {
-                                                                        e.preventDefault();
-                                                                        activeIndex = activeIndex > 0 ? activeIndex - 1 : max;
-                                                                        render();
-                                                                      } else if (e.key === "Enter") {
-                                                                        if (activeIndex >= 0 && items[activeIndex]) {
-                                                                          e.preventDefault();
-                                                                          onSelect(items[activeIndex]);
-                                                                          suggestions.hidden = true;
-                                                                          activeIndex = -1;
-                                                                        }
-                                                                      }
-                                                                    });
-
-                                                                    render();
-                                                                  }
-
-                                                                  /* ================= CUSTOMER AUTOCOMPLETE ================= */
-                                                                  custInput.addEventListener("input", () => {
-                                                                    const v = custInput.value.trim().toLowerCase();
-                                                                    if (!v) return (custSug.hidden = true);
-
-                                                                    const filtered = outworker
-                                                                      .filter(
-                                                                        (c) => String(c.id).includes(v) || c.name.toLowerCase().includes(v)
-                                                                      )
-                                                                      .map((c) => c.full);
-
-                                                                    makeSuggestionsInteractive(custInput, custSug, filtered, (val) => {
-                                                                      custInput.value = val;
-                                                                      focusField(tbody.querySelector(".item-id"));
-                                                                    });
-                                                                  });
-
-                                                                  custInput.addEventListener("blur", () =>
-                                                                    setTimeout(() => (custSug.hidden = true), 120)
-                                                                  );
-
-                                                                  /* ================= TABLE ROW ================= */
-                                                                  function addRow() {
-                                                                    const tr = document.createElement("tr");
-                                                                    tr.innerHTML = `
-                                                                <td>
-                                                                  <div class="input-group">
-                                                                    <input class="item-id" autocomplete="off" placeholder="Item ID / Name">
-                                                                    <div class="suggestions" hidden></div>
-                                                                  </div>
-                                                                </td>
-                                                                <td><input class="item-name" readonly></td>
-                                                                <td><input class="item-colour" readonly></td>
-                                                                <td><input class="item-type" readonly></td>
-                                                                <td><input type="number" min="1" class="item-qty" readonly></td>
-                                                            <td>
-                                                              <input
-                                                                type="number"
-                                                                min="0"
-                                                                step="0.01"
-                                                                class="item-kg"
-                                                                placeholder="0.00"
-                                                                readonly>
-
-                                                            </td>
-                                                                <td><button type="button" class="btn-remove">×</button></td>
-                                                              `;
-
-                                                                    const idInput = tr.querySelector(".item-id");
-                                                                    const sug = tr.querySelector(".suggestions");
-                                                                    idInput.addEventListener("input", () => {
-                                                        const raw = idInput.value.trim();
-
-                                                        // 🔥 First check QR
-                                                        if (handleQRInput(raw, tr, idInput)) return;
-
-                                                        // ---- Normal autocomplete continues below ----
-                                                        const v = raw.toLowerCase();
-                                                        if (!v) return (sug.hidden = true);
-
-                                                        const usedIds = new Set(
-                                                          [...tbody.querySelectorAll(".item-id")]
-                                                            .filter(input => input !== idInput)
-                                                            .map(input => input.value.trim())
-                                                            .filter(Boolean)
-                                                        );
-
-                                                        const filtered = inventory
-                                                          .filter(i => {
-                                                            const idStr = String(i.id);
-                                                            return (
-                                                              !usedIds.has(idStr) &&
-                                                              (idStr.includes(v) || i.name.toLowerCase().includes(v))
-                                                            );
-                                                          })
-                                                          .map(i => `${i.id}--${i.name}--${i.colour}--${i.pics}`);
-
-                                                        makeSuggestionsInteractive(idInput, sug, filtered, (val) => {
-                                                          const [idStr] = val.split("--");
-                                                          const item = inventory.find(it => String(it.id) === idStr);
-                                                          if (!item) return;
-
-                                                          idInput.value = item.id;
-                                                          tr.querySelector(".item-name").value = item.name;
-                                                          tr.querySelector(".item-colour").value = item.colour;
-                                                          tr.querySelector(".item-type").value = item.type;
-                                                          tr.querySelector(".item-qty").value = item.pics;
-                                                          tr.querySelector(".item-kg").value = item.kg;
-
-                                                          updateTotalKg();
-                                                          updadateTotalPics();
-                                                          updateSummaryTab()
-                                                          sug.hidden = true;
-
-                                                          if (tr === tbody.lastElementChild) addRow();
-                                                        });
-                                                      });
-                                                                    idInput.addEventListener("input", () => {
-                                                                      const v = idInput.value.trim().toLowerCase();
-                                                                      if (!v) return (sug.hidden = true);
-
-                                                                      const usedIds = new Set(
-                                                              [...tbody.querySelectorAll(".item-id")]
-                                                                .filter(input => input !== idInput)   // 🔑 exclude current row
-                                                                .map(input => input.value.trim())
-                                                                .filter(Boolean)
-                                                            );
-
-                                                                     const filtered = inventory
-                                                              .filter(i => {
-                                                                const idStr = String(i.id);
-                                                                 return (
-                                                                  !usedIds.has(idStr) &&
-                                                                  (idStr.includes(v) || i.name.toLowerCase().includes(v))
-                                                                );
-                                                              })
-                                                              .map(i => `${i.id}--${i.name}--${i.colour}--${i.pics}`);
-
-
-                                                                      makeSuggestionsInteractive(idInput, sug, filtered, (val) => {
-                                                                        const [idStr] = val.split(" - ");
-
-                                                                        // Prevent duplicate items
-                                                                        const alreadyExists = usedIds.has(idStr);
-
-
-                                                                        if (alreadyExists) {
-                                                                           alert("This item is already added.");
-                                                                           sug.hidden = true;
-                                                                           return;
-                                                                         }
-
-                                                                        const item = inventory.find((it) => String(it.id) === idStr);
-                                                                        if (!item) return;
-
-                                                                        idInput.value = item.id;
-                                                                        tr.querySelector(".item-name").value = item.name;
-                                                                        tr.querySelector(".item-colour").value = item.colour;
-                                                                        tr.querySelector(".item-type").value = item.type;
-                                                                        tr.querySelector(".item-qty").value = item.pics;
-                                                                        tr.querySelector(".item-kg").value = item.kg;
-                                                                        updateTotalKg();
-                                                                        updadateTotalPics()
-                                                                        updateSummaryTab();
-                                                                        sug.hidden = true;
-
-                                                                        if (tr === tbody.lastElementChild) addRow();
-                                                                      });
-                                                                    });
-
-                                                                    idInput.addEventListener("blur", () =>
-                                                                      setTimeout(() => (sug.hidden = true), 120)
-                                                                    );
-
-                                                                    tr.querySelector(".btn-remove").addEventListener("click", () => {
-                                                                      if (tbody.rows.length > 1) tr.remove();
-                                                                      else tr.querySelectorAll("input").forEach((i) => (i.value = ""));
-                                                                      updateTotalKg();
-                                                                        updadateTotalPics()
-                                                                        updateSummaryTab();
-                                                                    });
-
-                                                                    tbody.appendChild(tr);
-                                                                  }
-
-                                                                  /* ================= INIT ================= */
-                                                                  addRow();
-                                                                  billDate.valueAsDate = new Date();
-
-                                                                  // Auto-focus customer input on page load
-                                                                  requestAnimationFrame(() => {
-                                                                    focusField(custInput);
-                                                                  });
-
-                                                                  /* ================= SUBMIT ================= */
-                                                            async function submitData() {
-                                                              if (!custInput.value) return alert("Select customer");
-
-                                                              const items = [...tbody.querySelectorAll("tr")]
-                                                                .map((r) => ({
-                                                                  item_id: r.querySelector(".item-id").value,
-                                                                  name_of_prduct :  r.querySelector(".item-name").value,
-                                                                  type:r.querySelector(".item-type").value,
-                                                                  qty: Number(r.querySelector(".item-qty").value),
-                                                                  kg: Number(r.querySelector(".item-kg").value) || 0,
-                                                                }))
-                                                                .filter((i) => i.item_id && i.qty > 0);
-
-                                                              if (!items.length) return alert("Add at least one item");
-
-                                                              const payload = {
-                                                                customer: custInput.value,
-                                                                items,
-                                                              };
-
-                                                              try {
-                                                                const res = await fetch("/submit-jobcard", {
-                                                                  method: "POST",
-                                                                  headers: { "Content-Type": "application/json" },
-                                                                  body: JSON.stringify(payload),
-                                                                });
-
-                                                                const data_R = await res.json();
-                                                                console.log(data_R)
-                                                                if (!res.ok) throw new Error("Submit failed");
-
-                                                                if (!data_R.success){
-                                                                 const errorEl = document.getElementById("error-message");
-                                                                 errorEl.textContent = data_R.message;
-                                                                 console.log(data_R.message)
-                                                                errorEl.hidden = false;
-
-                                                                }
-                                                                alert("Bill submitted");
-                                                                generateAndPrintHTML(data_R.jobData);
-
-                                                                function generateAndPrintHTML(jobData) {
-
-              const fileName =
-                jobData.jobId + "_" + jobData.party.replace(/\s+/g, "_") + ".html";
-
-              const htmlContent = buildPrintHTML(jobData);
-
-              const blob = new Blob([htmlContent], { type: "text/html" });
-              const url = URL.createObjectURL(blob);
-
-              // Download file
-              const a = document.createElement("a");
-              a.href = url;
-              a.download = fileName;
-              a.click();
-
-              // Open for print
-              const printWindow = window.open(url, "_blank");
-
-              if (printWindow) {
-                printWindow.onload = () => {
-                  printWindow.print();
-                  setTimeout(() => { window.print(); }, 300);
-                };
-              }
-            }
-
-
-           function buildPrintHTML(jobData) {
-
-        const summaryMap = {};
-
-        jobData.items.forEach(item => {
-          const key = item.name_of_prduct + "||" + item.type + "||" + item.qty;
-
-          if (!summaryMap[key]) {
-            summaryMap[key] = {
-              name: item.name_of_prduct,
-              type: item.type,
-              qty: item.qty,
-              count: 0
-            };
-          }
-
-          summaryMap[key].count++;
-        });
-
-        let tableRows = "";
-        let index = 1;
-
-        Object.values(summaryMap).forEach(item => {
-          const total = item.qty * item.count;
-
-          tableRows += `
-            <tr>
-              <td>${index}</td>
-              <td>${item.name}</td>
-              <td>${item.type}</td>
-              <td><strong>${item.qty}×${item.count}</strong> = ${total}</td>
-            </tr>
-          `;
-
-          index++;
-        });
-
-        return `
-      <!doctype html>
-      <html lang="en">
-      <head>
-      <meta charset="UTF-8">
-      <title>${jobData.jobId}</title>
-
-      <style>
-      @page { size: A5 portrait; margin: 0; }
-      body { margin: 0; font-family: Arial, sans-serif; }
-
-      .a5-container {
-        width: 148mm;
-        height: 210mm;
-        padding: 8mm;
-        box-sizing: border-box;
-      }
-
-      .inner-border {
-        width: 100%;
-        height: 100%;
-        border: 2px dotted #000;
-        padding: 6mm;
-        box-sizing: border-box;
-        display: flex;
-        flex-direction: column;
-      }
-
-      .top-section {
-        height: 31.5mm;
-        border-bottom: 1px dashed #aaa;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-      }
-
-      .title {
-        text-align: center;
-        font-size: 13px;
-        font-weight: bold;
-      }
-
-      .top-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-      }
-
-      .info { width: 70%; }
-
-      .info-row {
-        font-size: 11px;
-        margin: 2mm 0;
-      }
-
-      .line {
-        display: inline-block;
-        border-bottom: 1px solid #000;
-        width: 60%;
-        margin-left: 6px;
-      }
-
-      .qr { width: 30%; text-align: right; }
-
-      #qrcode canvas {
-        width: 24mm !important;
-        height: 24mm !important;
-      }
-
-      .body-section {
-        height: calc(100% - 31.5mm);
-        position: relative;
-      }
-
-      .watermark {
-        position: absolute;
-        top: 55%;
-        left: 50%;
-        transform: translate(-50%, -50%) rotate(-20deg);
-        width: 110mm;
-        opacity: 0.05;
-        pointer-events: none;
-      }
-
-      .signature {
-        position: absolute;
-        bottom: 6mm;
-        right: 6mm;
-        font-size: 14px;
-        font-weight: bold;
-      }
-
-      .total {
-        position: absolute;
-        bottom: 6mm;
-        left: 6mm;
-        font-size: 14px;
-        font-weight: bold;
-      }
-
-      #summaryContent {
-        margin-top: 8mm;
-        font-size: 11px;
-      }
-
-      #summaryContent table th,
-      #summaryContent table td {
-        border-bottom: 1px solid #ccc;
-        padding: 2mm 1mm;
-      }
-      </style>
-
-
-
-      </head>
-      <body>
-
-      <div class="a5-container">
-        <div class="inner-border">
-
-          <div class="top-section">
-            <div class="title">|| Om Shree Satnam Sakshi ||</div>
-
-            <div class="top-row">
-              <div class="info">
-                <div class="info-row">
-                  <strong>JOB ID</strong>
-                  <span class="line">${jobData.jobId}</span>
-                </div>
-
-                <div class="info-row">
-                  <strong>Party Name</strong>
-                  <span class="line">${jobData.party}</span>
-                </div>
-
-                <div class="info-row">
-                  <strong>Date</strong>
-                  <span class="line">${jobData.date}</span>
-                </div>
-              </div>
-
-              <div class="qr">
-                <div id="qrcode"></div>
-              </div>
-            </div>
-          </div>
-
-          <div class="body-section">
-
-            <div id="summaryContent">
-              <table style="width:100%; border-collapse:collapse;">
-                <tr>
-                  <th style="text-align:left;">S.No</th>
-                  <th style="text-align:left;">Product</th>
-                  <th style="text-align:left;">Type</th>
-                  <th style="text-align:left;">Pattern</th>
-                </tr>
-                ${tableRows}
-              </table>
-            </div>
-
-
-
-            <div class="total">
-              total <span class="line">${jobData.toal_p}</span>
-            </div>
-
-            <div class="signature">Signature</div>
-
-          </div>
-        </div>
-      </div>
-
-
-      </body>
-      </html>
-      `;
-      }
-
-
-
-                                                                /* ===== CLEAR EVERYTHING AFTER SUCCESS ===== */
-
-                                                                // 1️⃣ clear table rows
-                                                                tbody.innerHTML = "";
-
-                                                                // 2️⃣ clear customer & date
-                                                                custInput.value = "";
-                                                                billDate.value = "";
-
-                                                                // 3️⃣ clear output/debug
-                                                                output.textContent = "";
-
-                                                                // 4️⃣ focus first field (fast entry UX)
-                                                                custInput.focus();
-                                                                addRow()
-                                                                updateTotalKg()
-                                                                updadateTotalPics()
-                                                                updateSummaryTab();
-                                                                location.reload();
-
-                                                            <!--    output.textContent = JSON.stringify(data_R, null, 2)-->
-
-                                                              } catch (err) {
-                                                                console.error(err);
-                                                                alert("Save failed");
-                                                              }
-                                                            }
-
-
-                                                                  /* ================= ENTER NAVIGATION ================= */
-                                                                  document.addEventListener("keydown", (e) => {
-                                                                    const el = document.activeElement;
-
-                                                                    // Skip if suggestion dropdown is open
-                                                                    const sug = el.closest(".input-group")?.querySelector(".suggestions");
-                                                                     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "a") {
-                                                                     submitData()}
-                                                                    if (sug && !sug.hidden) return;
-
-                                                                    if (e.key === "Enter") {
-                                                                      if (el.id === "custInput" && el.value.trim()) {
-                                                                        e.preventDefault();
-
-                                                                        focusField(tbody.querySelector(".item-id"));
-
-
-                                                                      } else if (el.classList.contains("item-id") && el.value.trim()) {
-                                                                        e.preventDefault();
-                                                                        const row = el.closest("tr");
-                                                                        const nextRow = row.nextElementSibling;
-                                                                        if (nextRow) {
-                                                                          focusField(nextRow.querySelector(".item-id"));
-                                                                        } else {
-                                                                          addRow();
-                                                                          focusField(tbody.lastElementChild.querySelector(".item-id"));
-                                                                        }
-                                                                      }
-                                                                    }
-
-                                                                    if (e.key === "Backspace") {
-                                                                      if (el.classList.contains("item-id") && !el.value) {
-                                                                        e.preventDefault();
-                                                                        const row = el.closest("tr");
-                                                                        const prevRow = row.previousElementSibling;
-                                                                        if (prevRow) focusField(prevRow.querySelector(".item-id"));
-                                                                        else focusField(custInput); // go back to customer input if first row
-                                                                      }
-                                                                    }
-                                                                  });
-                                                                  function updateTotalKg() {
-                                                                    let total = 0;
-                                                                    document.querySelectorAll(".item-kg").forEach((i) => {
-                                                                      total += Number(i.value) || 0;
-                                                                    });
-                                                                    document.getElementById("totalKg").innerText = total.toFixed(2);
-                                                                  }
-                                                                  function updadateTotalPics(){
-                                                                  let total_pic = 0 ;
-                                                                  document.querySelectorAll(".item-qty").forEach((i) => {
-                                                                      total_pic += Number(i.value) || 0;
-                                                                    });
-                                                                    document.getElementById("totalpic").innerText = total_pic.toFixed(2);
-                                                                  }
-                                                                  if (inventory.length == 0 ) {
-                                                                  console.log("no items")
-                                                                  output.removeAttribute("hidden")
-                                                                  output.textContent = "no item to give"
-                                                                }
-                                                  function handleQRInput(rawValue, tr, idInput) {
-
-                                      // 🔹 Clean scanner junk (CR/LF/TAB etc.)
-                                      const clean = rawValue.replace(/[\r\n\t]/g, "").trim();
-
-                                      // 🔹 Flexible QR match (ignores extra characters at end)
-                                      const match = clean.match(/^(\d+)--(.+?)--(.+?)--(\d+(\.\d+)?)/);
-                                      if (!match) return false;
-
-                                      const idStr = match[1];
-
-                                      // 🔹 Find item only once
-                                      const item = inventory.find(i => String(i.id).trim() === idStr);
-                                      if (!item) {
-                                        alert("Item not found in inventory: " + idStr);
-                                        return true;
+                                                                                          /* ================= DATA ================= */
+                                                                                          {% if data %}
+                                                                                          const outworker = {{data["outworker"] | tojson }};
+
+                                                                                          const inventory = {{data["product"] | tojson}};
+                                                                                          {% endif %}
+                                                                                          /* ================= DOM ================= */
+                                                                                          const custInput = document.getElementById("custInput");
+                                                                                          const custSug = document.getElementById("custSug");
+                                                                                          const tbody = document.querySelector("#billTable tbody");
+                                                                                          const billDate = document.getElementById("billDate");
+                                                                                          const output = document.getElementById("output");
+
+                                                                                          /* ================= HELPER ================= */
+                                                                                          function focusField(el) {
+                                                                                            if (!el) return;
+                                                                                            el.focus({ preventScroll: true });
+                                                                                            el.scrollIntoView({ behavior: "smooth", block: "center" });
+                                                                                            if (el.type === "text" || el.type === "number") {
+                                                                                              const len = el.value.length;
+                                                                                              setTimeout(() => el.setSelectionRange(len, len), 0);
+                                                                                            }
+                                                                                          }
+
+                                                                                          function makeSuggestionsInteractive(input, suggestions, items, onSelect) {
+                                                                                            let activeIndex = -1;
+
+                                                                                            function render() {
+                                                                                              suggestions.innerHTML = "";
+                                                                                              items.forEach((item, i) => {
+                                                                                                const div = document.createElement("div");
+                                                                                                div.textContent = item;
+                                                                                                if (i === activeIndex) div.classList.add("active");
+                                                                                                div.addEventListener("pointerdown", (e) => {
+                                                                                                  e.preventDefault();
+                                                                                                  onSelect(item);
+                                                                                                  suggestions.hidden = true;
+                                                                                                });
+                                                                                                suggestions.appendChild(div);
+                                                                                              });
+                                                                                              suggestions.hidden = items.length === 0;
+                                                                                            }
+
+                                                                                            input.addEventListener("keydown", (e) => {
+                                                                                              const max = items.length - 1;
+                                                                                              if (e.key === "ArrowDown") {
+                                                                                                e.preventDefault();
+                                                                                                activeIndex = activeIndex < max ? activeIndex + 1 : 0;
+                                                                                                render();
+                                                                                              } else if (e.key === "ArrowUp") {
+                                                                                                e.preventDefault();
+                                                                                                activeIndex = activeIndex > 0 ? activeIndex - 1 : max;
+                                                                                                render();
+                                                                                              } else if (e.key === "Enter") {
+                                                                                                if (activeIndex >= 0 && items[activeIndex]) {
+                                                                                                  e.preventDefault();
+                                                                                                  onSelect(items[activeIndex]);
+                                                                                                  suggestions.hidden = true;
+                                                                                                  activeIndex = -1;
+                                                                                                }
+                                                                                              }
+                                                                                            });
+
+                                                                                            render();
+                                                                                          }
+
+                                                                                          /* ================= CUSTOMER AUTOCOMPLETE ================= */
+                                                                                          custInput.addEventListener("input", () => {
+                                                                                            const v = custInput.value.trim().toLowerCase();
+                                                                                            if (!v) return (custSug.hidden = true);
+
+                                                                                            const filtered = outworker
+                                                                                              .filter(
+                                                                                                (c) => String(c.id).includes(v) || c.name.toLowerCase().includes(v)
+                                                                                              )
+                                                                                              .map((c) => c.full);
+
+                                                                                            makeSuggestionsInteractive(custInput, custSug, filtered, (val) => {
+                                                                                              custInput.value = val;
+                                                                                              focusField(tbody.querySelector(".item-id"));
+                                                                                            });
+                                                                                          });
+
+                                                                                          custInput.addEventListener("blur", () =>
+                                                                                            setTimeout(() => (custSug.hidden = true), 120)
+                                                                                          );
+
+                                                                                          /* ================= TABLE ROW ================= */
+                                                                                          function addRow() {
+                                                                                            const tr = document.createElement("tr");
+                                                                                            tr.innerHTML = `
+                                                                                        <td>
+                                                                                          <div class="input-group">
+                                                                                            <input class="item-id" autocomplete="off" placeholder="Item ID / Name">
+                                                                                            <div class="suggestions" hidden></div>
+                                                                                          </div>
+                                                                                        </td>
+                                                                                        <td><input class="item-name" readonly></td>
+                                                                                        <td><input class="item-colour" readonly></td>
+                                                                                        <td><input class="item-type" readonly></td>
+                                                                                        <td><input type="number" min="1" class="item-qty" readonly></td>
+                                                                                    <td>
+                                                                                      <input
+                                                                                        type="number"
+                                                                                        min="0"
+                                                                                        step="0.01"
+                                                                                        class="item-kg"
+                                                                                        placeholder="0.00"
+                                                                                        readonly>
+
+                                                                                    </td>
+                                                                                        <td><button type="button" class="btn-remove">×</button></td>
+                                                                                      `;
+
+                                                                                            const idInput = tr.querySelector(".item-id");
+                                                                                            const sug = tr.querySelector(".suggestions");
+                                                                                            idInput.addEventListener("input", () => {
+                                                                                const raw = idInput.value.trim();
+
+                                                                                // 🔥 First check QR
+                                                                                if (handleQRInput(raw, tr, idInput)) return;
+
+                                                                                // ---- Normal autocomplete continues below ----
+                                                                                const v = raw.toLowerCase();
+                                                                                if (!v) return (sug.hidden = true);
+
+                                                                                const usedIds = new Set(
+                                                                                  [...tbody.querySelectorAll(".item-id")]
+                                                                                    .filter(input => input !== idInput)
+                                                                                    .map(input => input.value.trim())
+                                                                                    .filter(Boolean)
+                                                                                );
+
+                                                                                const filtered = inventory
+                                                                                  .filter(i => {
+                                                                                    const idStr = String(i.id);
+                                                                                    return (
+                                                                                      !usedIds.has(idStr) &&
+                                                                                      (idStr.includes(v) || i.name.toLowerCase().includes(v))
+                                                                                    );
+                                                                                  })
+                                                                                  .map(i => `${i.id}--${i.name}--${i.colour}--${i.pics}`);
+
+                                                                                makeSuggestionsInteractive(idInput, sug, filtered, (val) => {
+                                                                                  const [idStr] = val.split("--");
+                                                                                  const item = inventory.find(it => String(it.id) === idStr);
+                                                                                  if (!item) return;
+
+                                                                                  idInput.value = item.id;
+                                                                                  tr.querySelector(".item-name").value = item.name;
+                                                                                  tr.querySelector(".item-colour").value = item.colour;
+                                                                                  tr.querySelector(".item-type").value = item.type;
+                                                                                  tr.querySelector(".item-qty").value = item.pics;
+                                                                                  tr.querySelector(".item-kg").value = item.kg;
+
+                                                                                  updateTotalKg();
+                                                                                  updadateTotalPics();
+                                                                                  updateSummaryTab()
+                                                                                  sug.hidden = true;
+
+                                                                                  if (tr === tbody.lastElementChild) addRow();
+                                                                                });
+                                                                              });
+                                                                                            idInput.addEventListener("input", () => {
+                                                                                              const v = idInput.value.trim().toLowerCase();
+                                                                                              if (!v) return (sug.hidden = true);
+
+                                                                                              const usedIds = new Set(
+                                                                                      [...tbody.querySelectorAll(".item-id")]
+                                                                                        .filter(input => input !== idInput)   // 🔑 exclude current row
+                                                                                        .map(input => input.value.trim())
+                                                                                        .filter(Boolean)
+                                                                                    );
+
+                                                                                             const filtered = inventory
+                                                                                      .filter(i => {
+                                                                                        const idStr = String(i.id);
+                                                                                         return (
+                                                                                          !usedIds.has(idStr) &&
+                                                                                          (idStr.includes(v) || i.name.toLowerCase().includes(v))
+                                                                                        );
+                                                                                      })
+                                                                                      .map(i => `${i.id}--${i.name}--${i.colour}--${i.pics}`);
+
+
+                                                                                              makeSuggestionsInteractive(idInput, sug, filtered, (val) => {
+                                                                                                const [idStr] = val.split(" - ");
+
+                                                                                                // Prevent duplicate items
+                                                                                                const alreadyExists = usedIds.has(idStr);
+
+
+                                                                                                if (alreadyExists) {
+                                                                                                   alert("This item is already added.");
+                                                                                                   sug.hidden = true;
+                                                                                                   return;
+                                                                                                 }
+
+                                                                                                const item = inventory.find((it) => String(it.id) === idStr);
+                                                                                                if (!item) return;
+
+                                                                                                idInput.value = item.id;
+                                                                                                tr.querySelector(".item-name").value = item.name;
+                                                                                                tr.querySelector(".item-colour").value = item.colour;
+                                                                                                tr.querySelector(".item-type").value = item.type;
+                                                                                                tr.querySelector(".item-qty").value = item.pics;
+                                                                                                tr.querySelector(".item-kg").value = item.kg;
+                                                                                                updateTotalKg();
+                                                                                                updadateTotalPics()
+                                                                                                updateSummaryTab();
+                                                                                                sug.hidden = true;
+
+                                                                                                if (tr === tbody.lastElementChild) addRow();
+                                                                                              });
+                                                                                            });
+
+                                                                                            idInput.addEventListener("blur", () =>
+                                                                                              setTimeout(() => (sug.hidden = true), 120)
+                                                                                            );
+
+                                                                                            tr.querySelector(".btn-remove").addEventListener("click", () => {
+                                                                                              if (tbody.rows.length > 1) tr.remove();
+                                                                                              else tr.querySelectorAll("input").forEach((i) => (i.value = ""));
+                                                                                              updateTotalKg();
+                                                                                                updadateTotalPics()
+                                                                                                updateSummaryTab();
+                                                                                            });
+
+                                                                                            tbody.appendChild(tr);
+                                                                                          }
+
+                                                                                          /* ================= INIT ================= */
+                                                                                          addRow();
+                                                                                          billDate.valueAsDate = new Date();
+
+                                                                                          // Auto-focus customer input on page load
+                                                                                          requestAnimationFrame(() => {
+                                                                                            focusField(custInput);
+                                                                                          });
+
+                                                                                          /* ================= SUBMIT ================= */
+                                                                                    async function submitData() {
+                                                                                      if (!custInput.value) return alert("Select customer");
+
+                                                                                      const items = [...tbody.querySelectorAll("tr")]
+                                                                                        .map((r) => ({
+                                                                                          item_id: r.querySelector(".item-id").value,
+                                                                                          name_of_prduct :  r.querySelector(".item-name").value,
+                                                                                          type:r.querySelector(".item-type").value,
+                                                                                          qty: Number(r.querySelector(".item-qty").value),
+                                                                                          kg: Number(r.querySelector(".item-kg").value) || 0,
+                                                                                        }))
+                                                                                        .filter((i) => i.item_id && i.qty > 0);
+
+                                                                                      if (!items.length) return alert("Add at least one item");
+
+                                                                                      const payload = {
+                                                                                        customer: custInput.value,
+                                                                                        items,
+                                                                                      };
+
+                                                                                      try {
+                                                                                        const res = await fetch("/submit-jobcard", {
+                                                                                          method: "POST",
+                                                                                          headers: { "Content-Type": "application/json" },
+                                                                                          body: JSON.stringify(payload),
+                                                                                        });
+
+                                                                                        const data_R = await res.json();
+                                                                                        console.log(data_R)
+                                                                                        if (!res.ok) throw new Error("Submit failed");
+
+                                                                                        if (!data_R.success){
+                                                                                         const errorEl = document.getElementById("error-message");
+                                                                                         errorEl.textContent = data_R.message;
+                                                                                         console.log(data_R.message)
+                                                                                        errorEl.hidden = false;
+
+                                                                                        }
+                                                                                        alert("Bill submitted");
+                                                                                        generateAndPrintHTML(data_R.jobData);
+
+                                                                                        function generateAndPrintHTML(jobData) {
+
+                                      const fileName =
+                                        jobData.jobId + "_" + jobData.party.replace(/\s+/g, "_") + ".html";
+
+                                      const htmlContent = buildPrintHTML(jobData);
+
+                                      const blob = new Blob([htmlContent], { type: "text/html" });
+                                      const url = URL.createObjectURL(blob);
+
+                                      // Download file
+                                      const a = document.createElement("a");
+                                      a.href = url;
+                                      a.download = fileName;
+                                      a.click();
+
+                                      // Open for print
+                                      const printWindow = window.open(url, "_blank");
+
+                                      if (printWindow) {
+                                        printWindow.onload = () => {
+                                          printWindow.print();
+                                          setTimeout(() => { window.print(); }, 300);
+                                        };
                                       }
+                                    }
 
-                                      // 🔹 Check duplicate
-                                      const existingRow = [...tbody.querySelectorAll("tr")]
-                                        .find(row =>
-                                          row !== tr &&
-                                          row.querySelector(".item-id").value.trim() === idStr
-                                        );
 
-                                      if (existingRow) {
-                                        alert("Item already added.");
-                                        return true;
-                                      }
+                                   function buildPrintHTML(jobData) {
 
-                                      // 🔹 Fill row (always use inventory data for consistency)
-                                      idInput.value = item.id;
-                                      tr.querySelector(".item-id").value = item.id;
-                                      tr.querySelector(".item-name").value = item.name;
-                                      tr.querySelector(".item-colour").value = item.colour;
-                                      tr.querySelector(".item-type").value = item.type;
-                                      tr.querySelector(".item-qty").value = item.pics;
-                                      tr.querySelector(".item-kg").value = item.kg;
+                                const summaryMap = {};
 
-                                      updateTotalKg(); updadateTotalPics();updateSummaryTab();
-                                      // 🔒 Lock this input so scanner cannot continue typing
-                              idInput.setAttribute("readonly", true);
+                                jobData.items.forEach(item => {
+                                  const key = item.name_of_prduct + "||" + item.type + "||" + item.qty;
 
-                              // Add next row if needed
-                              if (tr === tbody.lastElementChild) {
-                                addRow();
+                                  if (!summaryMap[key]) {
+                                    summaryMap[key] = {
+                                      name: item.name_of_prduct,
+                                      type: item.type,
+                                      qty: item.qty,
+                                      count: 0
+                                    };
+                                  }
+
+                                  summaryMap[key].count++;
+                                });
+
+                                let tableRows = "";
+                                let index = 1;
+
+                                Object.values(summaryMap).forEach(item => {
+                                  const total = item.qty * item.count;
+
+                                  tableRows += `
+                                    <tr>
+                                      <td><h3>${index}</h3></td>
+                                      <td><h2>${item.name}</h2></td>
+                                      <td><h4>${item.type}</h4></td>
+                                      <td><strong><h3>${item.qty}×${item.count}</h3></strong> = ${total}</td>
+                                    </tr>
+                                  `;
+
+                                  index++;
+                                });
+
+                                return `
+                              <!doctype html>
+                              <html lang="en">
+                              <head>
+                              <meta charset="UTF-8">
+                              <title>${jobData.jobId}</title>
+
+                              <style>
+                              @page { size: A5 portrait; margin: 0; }
+                              body { margin: 0; font-family: Arial, sans-serif; }
+
+                              .a5-container {
+                                width: 148mm;
+                                height: 210mm;
+                                padding: 8mm;
+                                box-sizing: border-box;
                               }
 
-                              // Move safely to next row
-                              setTimeout(() => {
+                              .inner-border {
+                                width: 100%;
+                                height: 100%;
+                                border: 2px dotted #000;
+                                padding: 6mm;
+                                box-sizing: border-box;
+                                display: flex;
+                                flex-direction: column;
+                              }
 
-                                // Unlock previous input after scanner fully stops
-                                idInput.removeAttribute("readonly");
+                              .top-section {
+                                height: 31.5mm;
+                                border-bottom: 1px dashed #aaa;
+                                display: flex;
+                                flex-direction: column;
+                                justify-content: space-between;
+                              }
 
-                                const nextRow = tr.nextElementSibling;
-                                if (nextRow) {
-                                  const nextInput = nextRow.querySelector(".item-id");
-                                  focusField(nextInput);
-                                }
+                              .title {
+                                text-align: center;
+                                font-size: 13px;
+                                font-weight: bold;
+                              }
 
-                              }, 80); // small delay prevents extra scanner characters
+                              .top-row {
+                                display: flex;
+                                justify-content: space-between;
+                                align-items: flex-start;
+                              }
 
-                              return true;
-                                    }
-                    function updateSummaryTab() {
-                    const container = document.getElementById("summaryContent");
-                    if (!container) return;
+                              .info { width: 70%; }
 
-                    const rows = [...tbody.querySelectorAll("tr")];
-                    const summaryMap = {};
+                              .info-row {
+                                font-size: 11px;
+                                margin: 2mm 0;
+                              }
 
-                    rows.forEach(row => {
-                      const name = row.querySelector(".item-name")?.value || "";
-                      const type = row.querySelector(".item-type")?.value || "";
-                      const qty  = Number(row.querySelector(".item-qty")?.value || 0);
+                              .line {
+                                display: inline-block;
+                                border-bottom: 1px solid #000;
+                                width: 60%;
+                                margin-left: 6px;
+                              }
 
-                      if (!name || !type || !qty) return;
+                              .qr { width: 30%; text-align: right; }
 
-                      const key = name + "||" + type + "||" + qty;
+                              #qrcode canvas {
+                                width: 24mm !important;
+                                height: 24mm !important;
+                              }
 
-                      if (!summaryMap[key]) {
-                        summaryMap[key] = { name, type, qty, count: 0 };
-                      }
+                              .body-section {
+                                height: calc(100% - 31.5mm);
+                                position: relative;
+                              }
 
-                      summaryMap[key].count++;
-                    });
+                              .watermark {
+                                position: absolute;
+                                top: 55%;
+                                left: 50%;
+                                transform: translate(-50%, -50%) rotate(-20deg);
+                                width: 110mm;
+                                opacity: 0.05;
+                                pointer-events: none;
+                              }
 
-                    if (!Object.keys(summaryMap).length) {
-                      container.innerHTML = "No data yet";
-                      return;
-                    }
+                              .signature {
+                                position: absolute;
+                                bottom: 6mm;
+                                right: 6mm;
+                                font-size: 14px;
+                                font-weight: bold;
+                              }
 
-                    let html = `
-                      <table style="width:100%; border-collapse:collapse;">
-                        <tr>
-                          <th style="text-align:left;">Product</th>
-                          <th style="text-align:left;">Type</th>
-                          <th style="text-align:left;">Pattern</th>
-                        </tr>
-                    `;
+                              .total {
+                                position: absolute;
+                                bottom: 6mm;
+                                left: 6mm;
+                                font-size: 14px;
+                                font-weight: bold;
+                              }
 
-                    Object.values(summaryMap).forEach(item => {
-                      const total = item.qty * item.count;
-                      html += `
-                        <tr>
-                          <td>${item.name}</td>
-                          <td>${item.type}</td>
-                          <td><strong>${item.qty}×${item.count}</strong> = ${total}</td>
-                        </tr>
-                      `;
-                    });
+                              #summaryContent {
+                                margin-top: 8mm;
+                                font-size: 11px;
+                              }
 
-                    html += "</table>";
-                    container.innerHTML = html;
-                  }
+                              #summaryContent table th,
+                              #summaryContent table td {
+                                border-bottom: 1px solid #ccc;
+                                padding: 2mm 1mm;
+                              }
+                              </style>
+
+
+
+                              </head>
+                              <body>
+
+                              <div class="a5-container">
+                                <div class="inner-border">
+
+                                  <div class="top-section">
+                                    <div class="title">|| Om Shree Satnam Sakshi ||</div>
+
+                                    <div class="top-row">
+                                      <div class="info">
+                                        <div class="info-row">
+                                          <strong>JOB ID</strong>
+                                          <span class="line"><strong>${jobData.jobId}<strong></span>
+                                        </div>
+
+                                        <div class="info-row">
+                                          <strong>Party Name</strong>
+                                          <span class="line"><strong>${jobData.party}</strong></span>
+                                        </div>
+
+                                        <div class="info-row">
+                                          <strong>Date</strong>
+                                          <span class="line"><strong>${jobData.date}</strong></span>
+                                        </div>
+                                      </div>
+
+                                      <div class="qr">
+                                        <div id="qrcode"></div>
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  <div class="body-section">
+
+                                    <div id="summaryContent">
+                                      <table style="width:100%; border-collapse:collapse;">
+                                        <tr>
+                                          <th style="text-align:left;">S.No</th>
+                                          <th style="text-align:left;">Product</th>
+                                          <th style="text-align:left;">Type</th>
+                                          <th style="text-align:left;">Pattern</th>
+                                        </tr>
+                                        ${tableRows}
+                                      </table>
+                                    </div>
+
+                        <svg  class="watermark" width="496" height="382" viewBox="0 0 496 382" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <mask id="path-1-outside-1_0_1" maskUnits="userSpaceOnUse" x="-26.5202" y="-55.4403" width="532.946" height="412.881" fill="black">
+      <rect fill="white" x="-26.5202" y="-55.4403" width="532.946" height="412.881"/>
+      <path d="M30.5805 274.744L9.04938 135.034L9.00142 125.91L9.30386 120.894L10.7528 115.05L13.4277 107.885L15.2906 102.614L16.2619 99.7319L21.5642 91.9772L23.5227 89.2543L26.2136 85.1301L30.051 80.1779L33.0764 77.1206L39.7003 70.5919L43.2989 67.1206L50.1776 62.1524L55.1775 59.4135L59.6837 56.595L65.1771 53.9357L70.7502 50.7828L77.9634 46.8814L84.9377 44.4609L98.966 39.1264L106.848 37.3587L114.73 35.5911L126.64 33.9667L132.803 33.4411L145.382 33.9504L156.321 35.2081L162.579 37.2302L166.863 38.9339L172.054 41.2904L174.363 42.6757L180.382 46.1787L187.149 51.3218L194.745 57.6113L198.55 62.2767L201.942 66.3689L204.347 70.3019L205.429 73.0088L206.624 81.3048L205.669 87.2283L204.713 93.1518L202.93 97.9288L200.812 101.639L199.347 104.441L196.816 107.578L192.23 110.891L198.074 112.339L207.707 115.412L213.806 118.422L220.574 123.565L227.023 130.682L233.726 139.36L237.628 146.574L215.747 18.4556L232.418 15.5731L250.491 13.4231L262.816 12.372L290.586 9.75997L297.735 9.39359L309.504 74.599L350.857 75.6969L338.594 10.4118L378.562 13.8186L423.879 18.5946L435.09 71.5551L463.086 205.724L433.23 202.428L403.294 199.626L376.4 196.809L373.056 186.14L358.915 123.084L341.733 122.846L328.995 123.324L319.377 123.292L333.503 199.007L327.34 199.532L322.739 199.803L317.643 199.994L304.905 200.472L297.675 201.332L284.284 202.718L275.001 203.753L265.638 205.282L256.355 206.317L248.632 207.098L244.221 181.063L243.217 177.863L242.612 172.194L241.593 165.952L238.997 156.924L238.854 160.952L238.631 165.474L238.074 168.93L236.466 175.761L234.205 183.5L229.396 191.334L225.718 195.299L222.04 199.264L216.149 204.391L211.483 208.197L208.044 210.681L204.111 213.086L199.843 214.423L191.149 218.086L166.771 224.79L145.514 230.985L137.552 233.246L129.59 235.507L120.625 187.467L123.825 186.464L128.586 185.206L130.306 183.964L133.013 182.881L136.866 180.97L139.653 179.393L142.519 177.323L144.971 174.68L148.076 171.129L149.127 167.753L149.684 164.298L149.095 161.671L146.945 159.298L144.381 156.352L139.939 155.636L135.003 154.84L131.054 154.203L125.879 154.888L119.637 155.907L116.516 156.417L109.811 116.338L112.518 115.255L119.891 110.367L123.314 104.841L123.855 98.3444L123.346 95.2235L120.862 91.7841L116.658 89.5868L111.228 88.7111L106.546 89.4755L103.346 90.4787L98.9193 92.8036L95.1615 97.2622L94.5247 101.211L94.063 107.214L93.9994 110.749L115.148 240.268L30.5805 274.744Z"/>
+      </mask>
+      <path d="M30.5805 274.744L9.04938 135.034L9.00142 125.91L9.30386 120.894L10.7528 115.05L13.4277 107.885L15.2906 102.614L16.2619 99.7319L21.5642 91.9772L23.5227 89.2543L26.2136 85.1301L30.051 80.1779L33.0764 77.1206L39.7003 70.5919L43.2989 67.1206L50.1776 62.1524L55.1775 59.4135L59.6837 56.595L65.1771 53.9357L70.7502 50.7828L77.9634 46.8814L84.9377 44.4609L98.966 39.1264L106.848 37.3587L114.73 35.5911L126.64 33.9667L132.803 33.4411L145.382 33.9504L156.321 35.2081L162.579 37.2302L166.863 38.9339L172.054 41.2904L174.363 42.6757L180.382 46.1787L187.149 51.3218L194.745 57.6113L198.55 62.2767L201.942 66.3689L204.347 70.3019L205.429 73.0088L206.624 81.3048L205.669 87.2283L204.713 93.1518L202.93 97.9288L200.812 101.639L199.347 104.441L196.816 107.578L192.23 110.891L198.074 112.339L207.707 115.412L213.806 118.422L220.574 123.565L227.023 130.682L233.726 139.36L237.628 146.574L215.747 18.4556L232.418 15.5731L250.491 13.4231L262.816 12.372L290.586 9.75997L297.735 9.39359L309.504 74.599L350.857 75.6969L338.594 10.4118L378.562 13.8186L423.879 18.5946L435.09 71.5551L463.086 205.724L433.23 202.428L403.294 199.626L376.4 196.809L373.056 186.14L358.915 123.084L341.733 122.846L328.995 123.324L319.377 123.292L333.503 199.007L327.34 199.532L322.739 199.803L317.643 199.994L304.905 200.472L297.675 201.332L284.284 202.718L275.001 203.753L265.638 205.282L256.355 206.317L248.632 207.098L244.221 181.063L243.217 177.863L242.612 172.194L241.593 165.952L238.997 156.924L238.854 160.952L238.631 165.474L238.074 168.93L236.466 175.761L234.205 183.5L229.396 191.334L225.718 195.299L222.04 199.264L216.149 204.391L211.483 208.197L208.044 210.681L204.111 213.086L199.843 214.423L191.149 218.086L166.771 224.79L145.514 230.985L137.552 233.246L129.59 235.507L120.625 187.467L123.825 186.464L128.586 185.206L130.306 183.964L133.013 182.881L136.866 180.97L139.653 179.393L142.519 177.323L144.971 174.68L148.076 171.129L149.127 167.753L149.684 164.298L149.095 161.671L146.945 159.298L144.381 156.352L139.939 155.636L135.003 154.84L131.054 154.203L125.879 154.888L119.637 155.907L116.516 156.417L109.811 116.338L112.518 115.255L119.891 110.367L123.314 104.841L123.855 98.3444L123.346 95.2235L120.862 91.7841L116.658 89.5868L111.228 88.7111L106.546 89.4755L103.346 90.4787L98.9193 92.8036L95.1615 97.2622L94.5247 101.211L94.063 107.214L93.9994 110.749L115.148 240.268L30.5805 274.744Z" fill="white"/>
+      <path d="M30.5805 274.744L9.04938 135.034L9.00142 125.91L9.30386 120.894L10.7528 115.05L13.4277 107.885L15.2906 102.614L16.2619 99.7319L21.5642 91.9772L23.5227 89.2543L26.2136 85.1301L30.051 80.1779L33.0764 77.1206L39.7003 70.5919L43.2989 67.1206L50.1776 62.1524L55.1775 59.4135L59.6837 56.595L65.1771 53.9357L70.7502 50.7828L77.9634 46.8814L84.9377 44.4609L98.966 39.1264L106.848 37.3587L114.73 35.5911L126.64 33.9667L132.803 33.4411L145.382 33.9504L156.321 35.2081L162.579 37.2302L166.863 38.9339L172.054 41.2904L174.363 42.6757L180.382 46.1787L187.149 51.3218L194.745 57.6113L198.55 62.2767L201.942 66.3689L204.347 70.3019L205.429 73.0088L206.624 81.3048L205.669 87.2283L204.713 93.1518L202.93 97.9288L200.812 101.639L199.347 104.441L196.816 107.578L192.23 110.891L198.074 112.339L207.707 115.412L213.806 118.422L220.574 123.565L227.023 130.682L233.726 139.36L237.628 146.574L215.747 18.4556L232.418 15.5731L250.491 13.4231L262.816 12.372L290.586 9.75997L297.735 9.39359L309.504 74.599L350.857 75.6969L338.594 10.4118L378.562 13.8186L423.879 18.5946L435.09 71.5551L463.086 205.724L433.23 202.428L403.294 199.626L376.4 196.809L373.056 186.14L358.915 123.084L341.733 122.846L328.995 123.324L319.377 123.292L333.503 199.007L327.34 199.532L322.739 199.803L317.643 199.994L304.905 200.472L297.675 201.332L284.284 202.718L275.001 203.753L265.638 205.282L256.355 206.317L248.632 207.098L244.221 181.063L243.217 177.863L242.612 172.194L241.593 165.952L238.997 156.924L238.854 160.952L238.631 165.474L238.074 168.93L236.466 175.761L234.205 183.5L229.396 191.334L225.718 195.299L222.04 199.264L216.149 204.391L211.483 208.197L208.044 210.681L204.111 213.086L199.843 214.423L191.149 218.086L166.771 224.79L145.514 230.985L137.552 233.246L129.59 235.507L120.625 187.467L123.825 186.464L128.586 185.206L130.306 183.964L133.013 182.881L136.866 180.97L139.653 179.393L142.519 177.323L144.971 174.68L148.076 171.129L149.127 167.753L149.684 164.298L149.095 161.671L146.945 159.298L144.381 156.352L139.939 155.636L135.003 154.84L131.054 154.203L125.879 154.888L119.637 155.907L116.516 156.417L109.811 116.338L112.518 115.255L119.891 110.367L123.314 104.841L123.855 98.3444L123.346 95.2235L120.862 91.7841L116.658 89.5868L111.228 88.7111L106.546 89.4755L103.346 90.4787L98.9193 92.8036L95.1615 97.2622L94.5247 101.211L94.063 107.214L93.9994 110.749L115.148 240.268L30.5805 274.744Z" stroke="black" stroke-width="18" mask="url(#path-1-outside-1_0_1)"/>
+      <path d="M84.5645 348.061C84.9216 349.948 85.1904 351.883 85.3709 353.869C85.5394 355.791 85.5133 357.717 85.2926 359.648C85.06 361.516 84.5325 363.374 83.7102 365.224C82.8759 367.01 81.5972 368.685 79.8741 370.249C79.0499 371.056 78.0192 371.805 76.782 372.495C75.5958 373.111 74.3033 373.681 72.9046 374.207C71.5807 374.783 70.233 375.233 68.8615 375.558C67.5019 375.946 66.2187 376.221 65.0121 376.385C59.3169 377.268 54.4705 376.785 50.4728 374.936C46.5261 373.013 43.2524 370.343 40.6515 366.927C38.1136 363.5 36.145 359.638 34.7456 355.344C33.3973 350.974 32.4993 346.748 32.0518 342.664C31.788 340.238 31.7086 337.583 31.8136 334.697C31.9815 331.799 32.4502 328.942 33.2197 326.126C34.0521 323.297 35.2152 320.667 36.7088 318.235C38.2652 315.791 40.2628 313.784 42.7015 312.215C44.9635 310.745 47.5169 309.61 50.3619 308.811C53.2579 307.937 56.1684 307.483 59.0933 307.451C62.0812 307.406 64.9263 307.812 67.6288 308.668C70.3941 309.512 72.7083 310.898 74.5713 312.825C75.887 314.27 77.048 316.102 78.0545 318.321C79.0609 320.541 79.5779 322.755 79.6054 324.965C79.6481 326.911 79.2379 328.356 78.3746 329.301C77.4995 330.183 76.4526 330.675 75.234 330.775C74.0035 330.813 72.7449 330.53 71.4583 329.927C70.2226 329.249 69.2911 328.285 68.6638 327.036C67.9498 325.673 67.1652 324.454 66.3102 323.378C65.4433 322.239 64.2721 321.386 62.7968 320.819C61.1091 320.161 59.4043 319.931 57.6827 320.126C56.0239 320.31 54.4561 320.802 52.9793 321.603C51.5654 322.392 50.2679 323.452 49.0868 324.783C47.9687 326.102 47.1004 327.536 46.482 329.086C45.7106 330.861 45.2205 332.745 45.0117 334.738C44.791 336.669 44.7454 338.664 44.8749 340.724C44.9924 342.721 45.2731 344.72 45.717 346.72C46.2118 348.646 46.8205 350.485 47.5431 352.237C48.8181 355.187 50.4348 357.877 52.3931 360.308C53.1495 361.207 54.0767 361.976 55.1747 362.614C56.3237 363.179 57.5432 363.599 58.8332 363.876C60.1114 364.09 61.4226 364.135 62.7669 364.01C64.1113 363.886 65.3511 363.554 66.4863 363.013C68.1008 362.252 69.3771 361.424 70.3152 360.53C71.2413 359.573 71.9236 358.531 72.3619 357.406C72.8002 356.281 73.0006 355.103 72.9631 353.873C72.9884 352.63 72.8761 351.349 72.626 350.028L72.6082 349.934C71.7907 350.089 71.0675 350.226 70.4387 350.345C69.798 350.401 69.3204 350.459 69.006 350.518C67.6226 350.78 66.223 350.785 64.8072 350.532C63.6039 350.369 62.6418 349.932 61.9211 349.222C61.1613 348.649 60.6862 347.86 60.4957 346.853C60.4243 346.476 60.3588 346.13 60.2993 345.816C60.2907 345.427 60.2822 345.037 60.2736 344.648C60.367 344.11 60.6567 343.403 61.1427 342.53C61.4604 342.144 62.0102 341.779 62.792 341.436C63.1454 341.239 63.5049 341.073 63.8703 340.938C64.2238 340.741 64.6461 340.564 65.1372 340.405C65.5026 340.271 65.9054 340.162 66.3456 340.079C66.7858 339.996 67.226 339.912 67.6661 339.829L76.2496 338.204C76.9295 338.01 77.7333 337.956 78.6613 338.04C79.6403 338.05 80.423 338.228 81.0094 338.573C81.2456 338.789 81.4819 339.005 81.7182 339.22C81.9545 339.436 82.1652 339.689 82.3505 339.98C82.733 340.624 83.0212 341.286 83.215 341.966C83.3494 342.331 83.4582 342.734 83.5415 343.174C83.6758 343.54 83.7728 343.879 83.8323 344.194L84.5645 348.061ZM152.437 351.821C152.571 352.186 152.674 352.558 152.745 352.935C152.868 353.238 152.97 353.609 153.054 354.049C153.197 354.804 153.108 355.537 152.786 356.249C152.657 356.599 152.465 356.961 152.21 357.335C151.944 357.646 151.608 357.938 151.204 358.21C149.798 359.388 148.191 360.018 146.383 360.1C145.455 360.015 144.592 359.755 143.793 359.32C143.643 359.218 143.537 359.173 143.474 359.185C143.399 359.134 143.318 359.051 143.232 358.938C143.157 358.887 143.082 358.836 143.007 358.785C142.921 358.671 142.809 358.594 142.671 358.555C142.297 358.3 141.992 358.065 141.756 357.849C141.507 357.57 141.259 357.292 141.011 357.013C140.826 356.722 140.615 356.469 140.379 356.253C140.193 355.963 139.977 355.678 139.728 355.399C139.555 355.172 139.388 354.975 139.226 354.811C139.053 354.583 138.911 354.349 138.8 354.11C138.442 353.591 138.189 353.118 138.043 352.69L135.187 348.443C130.848 349.264 126.515 350.117 122.188 351.002C117.912 351.811 113.599 352.595 109.248 353.354L108.142 358.351C108.064 358.626 108.017 358.896 108.002 359.159C108.05 359.41 108.034 359.674 107.956 359.949C107.878 360.225 107.8 360.5 107.722 360.775C107.695 360.976 107.642 361.214 107.564 361.489C107.435 361.839 107.306 362.189 107.176 362.54C107.098 362.815 106.995 363.128 106.866 363.478C106.799 363.816 106.702 364.16 106.573 364.51C106.432 364.798 106.234 365.128 105.979 365.502C105.865 365.589 105.788 365.701 105.749 365.839C105.698 365.913 105.647 365.988 105.596 366.063C105.557 366.201 105.512 366.307 105.461 366.382C105.398 366.394 105.316 366.474 105.214 366.624C104.629 367.321 103.921 367.878 103.088 368.297C101.375 368.881 99.649 368.883 97.9103 368.3C97.4344 368.194 97.0154 368.046 96.6534 367.854C96.2795 367.599 95.9684 367.332 95.7202 367.053C95.161 366.508 94.8099 365.858 94.6671 365.103C94.5837 364.663 94.5123 364.286 94.4528 363.971C94.4442 363.582 94.4357 363.193 94.4271 362.804C94.4457 362.214 94.4958 361.618 94.5773 361.017C94.6588 360.415 94.6995 360.114 94.6995 360.114L105.176 308.106L105.456 306.489C105.51 306.088 105.602 305.713 105.731 305.362C105.86 305.012 105.946 304.605 105.988 304.141C106.148 303.264 106.357 302.476 106.615 301.775C106.732 301.362 106.887 300.975 107.079 300.613C107.271 300.251 107.463 299.889 107.655 299.527C107.937 298.952 108.394 298.442 109.026 297.997C109.847 297.516 110.823 297.168 111.955 296.954C113.15 296.728 114.217 296.688 115.157 296.836C115.909 297.019 116.52 297.327 116.993 297.759C117.54 298.241 118.137 298.812 118.783 299.472C119.279 300.029 119.762 300.687 120.231 301.445C120.44 301.861 120.669 302.209 120.917 302.487C121.165 302.766 121.388 303.082 121.585 303.436L122.437 304.838L151.2 349.417C151.2 349.417 151.348 349.682 151.644 350.212C151.939 350.743 152.204 351.279 152.437 351.821ZM125.706 332.944C124.544 331.275 123.338 329.549 122.088 327.767C120.902 325.972 119.646 324.158 118.322 322.324C117.963 321.806 117.605 321.288 117.246 320.769C116.875 320.188 116.511 319.638 116.152 319.12C116.071 319.722 115.964 320.361 115.831 321.037C115.687 321.651 115.542 322.264 115.398 322.878C114.836 325.069 114.299 327.222 113.788 329.338C113.339 331.442 112.879 333.484 112.407 335.462L111.495 339.934L128.19 336.773L125.706 332.944ZM208.349 343.58C208.53 344.197 208.581 344.806 208.499 345.408C208.445 345.809 208.316 346.159 208.112 346.458C207.971 346.746 207.767 347.045 207.5 347.356C207.006 347.84 206.379 348.317 205.621 348.786C205.142 349.007 204.657 349.197 204.166 349.355C203.749 349.564 203.278 349.653 202.751 349.623C201.733 349.751 200.781 349.54 199.896 348.991C198.66 348.313 197.595 347.505 196.701 346.567C196.291 346.124 195.838 345.623 195.342 345.066C194.845 344.508 194.375 343.913 193.929 343.281L179.691 325.361C179.188 325.456 178.691 325.583 178.2 325.741C177.697 325.836 177.2 325.963 176.708 326.121C175.412 326.497 174.16 326.767 172.953 326.93C171.81 327.081 170.615 327.308 169.369 327.609L167.577 327.948L170.809 345.021C170.904 345.524 170.962 346.001 170.983 346.453C171.066 346.893 171.155 347.365 171.251 347.868C171.31 348.183 171.356 348.597 171.388 349.112C171.484 349.615 171.542 350.093 171.562 350.545C171.567 351.26 171.421 352.037 171.124 352.875C170.815 353.65 170.33 354.361 169.671 355.007C168.505 356.074 166.943 356.598 164.985 356.578C164.132 356.544 163.287 356.378 162.449 356.081C162.162 355.94 161.9 355.761 161.664 355.546C161.415 355.267 161.199 354.982 161.013 354.692C160.828 354.401 160.643 354.11 160.457 353.82C160.323 353.454 160.163 353.126 159.978 352.836C159.67 352.243 159.463 351.663 159.356 351.097L149.212 297.521C149.141 297.144 149.069 296.766 148.998 296.389C148.977 295.937 148.969 295.548 148.972 295.221C148.904 294.518 148.993 293.784 149.24 293.021C149.285 292.231 149.499 291.637 149.879 291.239C150.185 290.791 150.692 290.369 151.399 289.975C152.157 289.505 153.296 289.159 154.817 288.936C157.659 288.464 160.463 287.965 163.23 287.441C165.997 286.918 168.775 286.457 171.566 286.059C173.414 285.839 175.373 285.696 177.445 285.629C179.568 285.488 181.575 285.597 183.467 285.955C184.682 286.181 185.803 286.425 186.829 286.686C188.155 287.152 189.223 287.633 190.034 288.131C192.616 289.727 194.741 291.832 196.408 294.448C198.076 297.063 199.184 299.817 199.731 302.71C200.374 306.105 200.146 309.373 199.047 312.512C198.01 315.64 195.863 318.228 192.603 320.278C192.501 320.428 192.33 320.558 192.091 320.669C191.902 320.704 191.751 320.766 191.637 320.852L203.619 336.659L204.753 338.008C204.927 338.235 205.137 338.489 205.386 338.767C205.634 339.046 205.85 339.331 206.036 339.621C206.284 339.9 206.507 340.216 206.704 340.57C206.964 340.911 207.218 341.221 207.466 341.5C207.821 342.345 208.116 343.038 208.349 343.58ZM178.41 314.465C179.542 314.251 180.575 313.86 181.51 313.292C182.495 312.65 183.332 311.905 184.018 311.059C184.767 310.2 185.342 309.277 185.741 308.29C186.128 307.239 186.252 306.174 186.113 305.093C185.769 301.901 184.511 299.729 182.339 298.577C180.155 297.362 177.51 296.984 174.405 297.441C172.558 297.661 170.534 297.979 168.333 298.395C166.195 298.8 164.151 299.187 162.202 299.556C162.753 302.122 163.253 304.764 163.702 307.479C164.202 310.121 164.797 313.265 165.487 316.912L178.41 314.465ZM271.959 328.801C272.039 329.568 272.093 330.372 272.122 331.213C272.151 332.054 272.074 332.85 271.891 333.602C271.719 334.416 271.418 335.059 270.986 335.532C270.413 336.291 269.661 336.792 268.73 337.034C267.909 337.515 267.078 337.77 266.237 337.799C265.395 337.828 264.599 337.75 263.848 337.567C262.86 337.168 262.075 336.632 261.492 335.961C260.96 335.215 260.516 334.42 260.161 333.575C259.806 332.731 259.539 331.837 259.36 330.893C259.182 329.95 259.015 329.07 258.86 328.252L257.467 320.895L254.641 306.481C254.45 305.475 254.301 304.689 254.194 304.123C254.087 303.557 253.992 303.054 253.908 302.614C253.813 302.111 253.68 301.582 253.51 301.028C253.391 300.399 253.225 299.519 253.01 298.387C252.975 298.199 252.915 297.884 252.832 297.444C252.799 296.929 252.524 295.646 252.005 293.594C250.327 298.146 248.908 301.834 247.749 304.659C246.642 307.409 245.653 309.583 244.783 311.181C243.964 312.704 243.193 313.794 242.471 314.452C241.737 315.047 240.935 315.459 240.067 315.689C239.576 315.847 239.055 315.848 238.504 315.692C237.954 315.535 237.391 315.316 236.816 315.034C236.305 314.74 235.793 314.446 235.282 314.152C234.821 313.784 234.429 313.434 234.106 313.105C232.24 311.504 230.113 309.562 227.727 307.278C225.34 304.994 222.784 302.156 220.057 298.764C220.069 298.827 220.234 299.87 220.552 301.894C220.933 303.907 221.409 306.422 221.981 309.44C222.54 312.396 223.116 315.609 223.708 319.079C224.351 322.475 224.921 325.656 225.417 328.624C225.977 331.579 226.416 334.069 226.734 336.093C227.04 338.055 227.162 339.041 227.099 339.053C227.301 340.122 227.24 341.176 226.916 342.214C226.579 343.19 226.025 344.044 225.251 344.777C224.541 345.497 223.626 345.996 222.506 346.274C221.386 346.551 220.1 346.468 218.649 346.027C217.736 345.679 216.97 345.074 216.351 344.215C215.796 343.343 215.377 342.51 215.097 341.716C214.867 340.848 214.644 340.011 214.426 339.205C214.271 338.388 214.111 337.539 213.944 336.658L212.645 329.283L209.989 314.74L207.596 302.1C206.561 296.629 205.731 291.217 205.109 285.863C204.978 285.172 204.921 284.531 204.94 283.941C205.01 283.277 205.117 282.638 205.261 282.024C205.574 280.923 206.091 280.043 206.813 279.385C207.649 278.641 208.602 278.167 209.671 277.965C210.111 277.882 210.526 277.836 210.915 277.827C211.355 277.744 211.77 277.698 212.159 277.689C213.464 277.703 214.676 278.255 215.795 279.346C216.964 280.362 218.041 281.233 219.025 281.958C219.635 282.429 220.301 283.02 221.021 283.73C221.742 284.44 222.469 285.182 223.201 285.955C223.934 286.729 224.629 287.476 225.287 288.199C225.945 288.921 226.522 289.561 227.018 290.118C229.153 292.449 231.058 294.597 232.732 296.559C234.47 298.51 236.053 300.165 237.483 301.522C237.635 301.298 237.808 301.005 238 300.643C238.18 300.218 238.36 299.793 238.54 299.368C238.771 298.868 238.945 298.412 239.063 297.999C239.243 297.574 239.372 297.224 239.45 296.949C239.888 295.823 240.333 294.73 240.783 293.667C241.221 292.542 241.685 291.38 242.174 290.18C242.715 288.905 243.237 287.536 243.742 286.072C244.309 284.597 244.967 282.909 245.714 281.009C246.012 280.171 246.405 279.152 246.894 277.952C247.384 276.752 247.973 275.566 248.663 274.393C249.353 273.22 250.104 272.199 250.916 271.328C251.779 270.383 252.714 269.816 253.72 269.625C254.223 269.53 254.67 269.478 255.059 269.469C255.436 269.398 255.819 269.358 256.208 269.349C256.975 269.269 257.764 269.478 258.574 269.976C259.173 270.384 259.651 270.847 260.01 271.365C260.416 272.135 260.704 272.797 260.874 273.351C261.021 273.78 261.129 274.182 261.201 274.56C261.335 274.925 261.438 275.296 261.509 275.674C262.176 279.195 262.868 282.679 263.586 286.126C264.304 289.572 264.996 293.057 265.663 296.578C266.472 300.854 267.306 305.256 268.163 309.783C269.083 314.299 269.948 318.695 270.757 322.971C270.924 323.851 271.134 324.789 271.387 325.783C271.641 326.777 271.831 327.783 271.959 328.801ZM282.404 276.408L285.019 291.252L288.792 290.538C291.358 289.987 293.648 289.521 295.66 289.14C297.672 288.759 299.91 288.368 302.375 287.966L302.846 287.877C303.601 287.734 304.33 287.629 305.034 287.561C305.788 287.418 306.511 287.281 307.203 287.15C307.97 287.07 308.717 287.059 309.444 287.116C310.16 287.111 310.881 287.137 311.608 287.195C312.749 287.37 313.736 287.769 314.571 288.393C315.355 289.091 315.842 289.944 316.032 290.95C316.092 291.264 316.163 291.642 316.246 292.082C316.318 292.459 316.32 292.817 316.254 293.155C316.259 293.87 315.97 294.577 315.385 295.274C315.154 295.773 314.616 296.201 313.772 296.556C313.002 296.962 312.214 297.274 311.408 297.492C310.564 297.847 309.701 298.108 308.821 298.275L304.388 299.114L286.956 302.513L290.267 321.036L309.073 317.671L313.507 316.831C314.01 316.736 314.481 316.647 314.921 316.563C315.362 316.48 315.776 316.434 316.166 316.426C316.692 316.456 317.15 316.467 317.54 316.459C317.98 316.375 318.401 316.361 318.802 316.415C319.604 316.524 320.298 316.751 320.885 317.095C321.632 317.605 322.166 318.188 322.486 318.844C322.608 319.147 322.705 319.487 322.777 319.864C322.899 320.166 322.964 320.512 322.973 320.901C323.163 321.908 323.022 322.879 322.548 323.815C321.96 324.839 321.187 325.571 320.228 326.013C319.015 326.829 317.622 327.386 316.05 327.684C315.37 327.878 314.653 328.046 313.898 328.189C313.144 328.332 312.426 328.5 311.747 328.694L311.181 328.801C306.3 329.855 301.206 330.82 295.9 331.694C294.642 331.932 293.63 332.091 292.864 332.171C292.109 332.314 291.418 332.445 290.789 332.564C290.223 332.671 289.625 332.784 288.997 332.903C288.368 333.022 287.55 333.177 286.544 333.368C285.122 333.767 283.879 333.742 282.817 333.292C282.042 332.982 281.394 332.486 280.874 331.803C280.65 331.65 280.52 331.479 280.484 331.291C280.397 331.177 280.317 331.094 280.242 331.043C280.167 330.992 280.086 330.91 280 330.796C279.814 330.506 279.66 330.209 279.538 329.907C279.404 329.541 279.307 329.201 279.247 328.887C279.125 328.584 279.002 328.282 278.88 327.979C278.82 327.665 278.73 327.356 278.607 327.054L278.321 325.545C278.274 325.293 278.226 325.042 278.179 324.79C278.194 324.527 278.178 324.269 278.13 324.018L276.737 316.66L274.354 303.042L271.979 290.497C271.55 288.233 271.169 286.221 270.836 284.46C270.566 282.687 270.265 280.758 269.935 278.671L269.846 278.199C269.778 277.495 269.69 276.861 269.583 276.295C269.527 275.654 269.439 275.019 269.32 274.39C269.145 273.121 269.259 271.829 269.661 270.515C269.818 269.964 269.986 269.477 270.166 269.052C270.409 268.615 270.758 268.223 271.214 267.876C272.05 267.132 272.971 266.664 273.977 266.474C274.48 266.379 274.863 266.339 275.127 266.354L275.109 266.26C276.241 266.045 277.153 265.873 277.844 265.742C278.536 265.611 279.196 265.486 279.825 265.367C280.517 265.236 281.24 265.099 281.995 264.956C282.737 264.75 283.769 264.522 285.089 264.272C287.593 263.733 289.976 263.249 292.24 262.821C294.504 262.392 296.837 261.983 299.238 261.593L299.615 261.522C300.319 261.454 301.048 261.349 301.803 261.206C302.557 261.063 303.286 260.957 303.99 260.889C304.682 260.758 305.391 260.722 306.119 260.779C306.834 260.774 307.562 260.832 308.301 260.952C309.429 261.064 310.411 261.432 311.246 262.056C311.978 262.829 312.428 263.656 312.595 264.536C312.666 264.914 312.737 265.291 312.809 265.668C312.868 265.983 312.865 266.309 312.799 266.647C312.855 267.288 312.603 268.02 312.042 268.842C311.814 269.016 311.561 269.226 311.282 269.475C311.066 269.711 310.782 269.928 310.428 270.125C310.075 270.322 309.684 270.494 309.256 270.64C308.878 270.711 308.507 270.814 308.142 270.948C307.662 271.169 307.203 271.322 306.763 271.405C306.385 271.476 305.945 271.56 305.442 271.655L301.197 272.459L282.35 276.125L282.404 276.408ZM380.762 307.811C380.902 308.892 380.959 310.053 380.933 311.296C380.971 312.526 380.558 313.614 379.695 314.559C379.059 315.331 378.282 315.869 377.362 316.173C376.443 316.478 375.488 316.593 374.497 316.52C373.581 316.498 372.672 316.345 371.772 316.059C370.859 315.711 370.085 315.239 369.451 314.642C366.813 312.406 364.321 310.077 361.973 307.655C359.677 305.159 357.349 302.668 354.989 300.184L344.798 289.705C343.408 288.209 341.919 286.537 340.331 284.688C338.731 282.777 337.13 281.028 335.527 279.442L342.066 315.528L342.227 316.377C342.417 317.383 342.419 318.425 342.232 319.502C342.097 320.505 341.685 321.43 340.999 322.276C340.465 322.898 339.713 323.399 338.743 323.778C337.23 324.39 335.892 324.546 334.728 324.245C333.626 323.933 332.678 323.396 331.882 322.634C331.15 321.861 330.551 320.932 330.085 319.848C329.67 318.689 329.418 317.532 329.33 316.376L329.026 314.772L327.822 307.379L325.327 293.685C325.008 291.66 324.653 289.611 324.26 287.536C323.855 285.398 323.445 283.228 323.028 281.027C322.453 278.335 321.911 275.474 321.403 272.444C320.957 269.402 320.547 266.548 320.173 263.883C320.025 262.413 320.138 261.121 320.514 260.008C320.599 259.08 321.116 258.2 322.066 257.369C322.675 256.798 323.501 256.348 324.547 256.02C325.655 255.68 326.635 255.527 327.488 255.561C327.827 255.627 328.171 255.725 328.521 255.854C328.859 255.92 329.203 256.018 329.553 256.147C329.916 256.339 330.246 256.537 330.545 256.741C330.907 256.933 331.244 257.162 331.555 257.429C331.929 257.684 332.277 257.976 332.6 258.306C332.911 258.573 333.222 258.84 333.533 259.106C333.794 259.448 334.048 259.758 334.296 260.037C334.544 260.315 334.824 260.588 335.135 260.855L336.458 262.168L364.747 292.376L363.569 286.151C363.188 284.139 362.769 282.101 362.314 280.038C361.909 277.9 361.461 275.705 360.969 273.453C360.469 270.812 359.933 267.982 359.362 264.964C358.853 261.934 358.412 259.086 358.038 256.421C357.835 255.352 357.918 254.066 358.284 252.564C358.444 251.687 358.854 250.925 359.513 250.279C360.172 249.633 360.956 249.127 361.863 248.76C362.771 248.392 363.714 248.214 364.693 248.224C365.672 248.234 366.561 248.457 367.36 248.892C367.584 249.044 367.814 249.229 368.051 249.445C368.287 249.66 368.498 249.914 368.683 250.204C369.152 250.962 369.478 251.65 369.66 252.267C370.015 253.111 370.258 253.879 370.389 254.571C371.877 262.431 373.395 270.449 374.943 278.624C376.554 286.787 378.134 294.792 379.685 302.641C379.852 303.521 380.05 304.396 380.28 305.264C380.498 306.07 380.658 306.919 380.762 307.811ZM428.793 239.996C429.64 240.683 430.146 241.466 430.313 242.346C430.384 242.724 430.43 243.138 430.451 243.591C430.522 243.968 430.556 244.32 430.553 244.646C430.495 245.373 430.212 246.111 429.702 246.859C429.27 247.331 428.632 247.745 427.787 248.101C427.371 248.31 426.949 248.487 426.52 248.634C426.092 248.78 425.638 248.964 425.159 249.185C424.731 249.331 424.297 249.446 423.856 249.529C423.416 249.612 422.945 249.702 422.442 249.797L417.631 250.708C416.511 250.985 415.385 251.23 414.253 251.445C413.184 251.647 412.115 251.85 411.046 252.052C411.478 253.989 411.908 256.09 412.337 258.354C412.754 260.555 413.21 263.139 413.707 266.106C414.267 269.062 414.884 272.495 415.559 276.405C416.297 280.304 417.155 284.832 418.131 289.988L419.488 297.157C419.607 297.786 419.728 298.251 419.85 298.554C419.898 298.805 419.946 299.057 419.993 299.308C420.029 299.497 420.045 299.755 420.042 300.081C420.023 300.671 420.054 301.349 420.134 302.115C420.193 302.43 420.221 302.75 420.218 303.076C420.203 303.34 420.162 303.641 420.096 303.979C419.892 304.278 419.802 304.49 419.826 304.616L419.65 305.236C419.454 305.924 418.97 306.635 418.197 307.367C416.944 308.321 415.434 308.77 413.664 308.714C412.571 308.791 411.7 308.662 411.051 308.329C410.378 307.871 409.862 307.382 409.503 306.864C408.995 306.243 408.65 305.625 408.468 305.008C408.172 304.478 407.965 303.898 407.846 303.269L398.667 254.787C398.289 254.858 397.503 255.007 396.309 255.233C395.114 255.459 393.825 255.703 392.441 255.965C391.109 256.152 389.839 256.328 388.633 256.491C387.426 256.654 386.597 256.746 386.145 256.767C385.755 256.775 385.14 256.794 384.299 256.823C383.52 256.84 382.868 256.833 382.341 256.803C380.949 256.675 379.798 256.275 378.889 255.6C378.042 254.913 377.524 254.067 377.333 253.061C377.262 252.684 377.191 252.306 377.119 251.929C377.048 251.552 377.045 251.194 377.111 250.856C377.157 250.065 377.541 249.341 378.263 248.684C378.479 248.447 378.815 248.156 379.27 247.809C379.777 247.387 380.269 247.066 380.749 246.845C381.456 246.451 382.363 246.083 383.471 245.743C383.962 245.585 384.46 245.459 384.963 245.363C385.466 245.268 386 245.167 386.566 245.06C388.767 244.643 390.842 244.25 392.792 243.881C394.804 243.5 396.904 243.07 399.093 242.59C402.729 241.837 406.344 241.152 409.941 240.537C413.588 239.846 417.216 239.224 420.824 238.672C421.653 238.58 422.457 238.525 423.235 238.508C424.014 238.491 424.81 238.568 425.624 238.74C426.226 238.821 426.808 238.972 427.371 239.191C427.921 239.347 428.395 239.615 428.793 239.996ZM489.292 266.256C489.773 267.077 490.183 268.042 490.523 269.15C490.914 270.183 491.217 271.266 491.431 272.398C491.646 273.529 491.766 274.679 491.791 275.847C491.868 276.94 491.858 277.919 491.761 278.784C491.422 282.496 489.969 285.832 487.403 288.793C484.825 291.691 481.688 294.044 477.992 295.851C474.358 297.646 470.436 298.78 466.227 299.251C462.08 299.71 458.236 299.363 454.696 298.21C452.469 297.459 450.478 296.403 448.722 295.042C446.966 293.681 445.395 292.089 444.008 290.267C443.499 289.647 443.099 288.909 442.807 288.052C442.565 287.121 442.493 286.223 442.59 285.357C442.674 284.429 442.94 283.597 443.387 282.862C443.822 282.063 444.519 281.442 445.477 281C446.082 280.755 446.762 280.562 447.517 280.419C448.334 280.264 449.144 280.241 449.946 280.35C450.737 280.395 451.494 280.61 452.218 280.994C452.93 281.315 453.552 281.849 454.084 282.595C455.026 283.785 456.233 284.826 457.705 285.72C459.228 286.539 460.778 287.157 462.355 287.575C464.561 287.874 466.69 287.764 468.741 287.246C470.856 286.715 472.684 285.88 474.227 284.741C475.833 283.591 477.04 282.222 477.847 280.636C478.642 278.988 478.867 277.252 478.522 275.428C478.236 273.919 477.784 272.734 477.165 271.874C476.534 270.951 475.751 270.253 474.814 269.779C473.929 269.23 472.878 268.843 471.663 268.617C470.511 268.379 469.244 268.228 467.864 268.164C466.296 268.135 464.713 268.207 463.117 268.378C461.584 268.538 460.014 268.673 458.406 268.782C456.798 268.891 455.21 268.931 453.641 268.902C452.073 268.874 450.506 268.682 448.94 268.327C445.822 267.68 443.275 266.273 441.302 264.106C439.328 261.939 437.917 259.471 437.066 256.701C436.279 253.919 436.095 251.055 436.515 248.109C436.922 245.101 437.973 242.394 439.667 239.989C441.334 237.785 443.479 236.043 446.103 234.765C448.778 233.411 451.802 232.351 455.174 231.582C457.048 231.162 458.947 230.868 460.869 230.699C462.854 230.519 464.769 230.482 466.613 230.589C468.52 230.684 470.293 230.934 471.933 231.34C473.636 231.734 475.143 232.296 476.454 233.024C477.39 233.499 478.368 234.193 479.388 235.107C480.396 235.958 481.233 236.94 481.9 238.051C482.554 239.1 482.888 240.176 482.902 241.281C482.979 242.374 482.491 243.411 481.439 244.391C480.552 245.211 479.631 245.678 478.676 245.794C477.772 245.835 476.869 245.713 475.968 245.427C475.056 245.079 474.162 244.662 473.289 244.176C472.415 243.69 471.616 243.255 470.892 242.871C468.956 241.935 466.689 241.485 464.09 241.521C461.492 241.557 459.116 241.909 456.962 242.577C455.615 243.028 454.385 243.586 453.274 244.252C452.162 244.919 451.238 245.713 450.5 246.634C449.826 247.543 449.344 248.612 449.055 249.839C448.817 250.991 448.892 252.247 449.28 253.607C449.533 254.601 449.977 255.396 450.611 255.993C451.308 256.577 452.075 257.018 452.913 257.316C453.814 257.601 454.76 257.78 455.751 257.853C456.742 257.926 457.721 257.936 458.688 257.883C461.589 257.725 464.472 257.472 467.338 257.125C470.203 256.778 473.089 256.883 475.995 257.44C478.965 257.985 481.597 258.985 483.891 260.439C486.186 261.894 487.986 263.833 489.292 266.256Z" fill="black"/>
+      </svg>
+
+
+
+
+                                  </div>
+                                </div>
+                              </div>
+
+
+                              </body>
+                              </html>
+                              `;
+                              }
+
+
+
+                                                                                        /* ===== CLEAR EVERYTHING AFTER SUCCESS ===== */
+
+                                                                                        // 1️⃣ clear table rows
+                                                                                        tbody.innerHTML = "";
+
+                                                                                        // 2️⃣ clear customer & date
+                                                                                        custInput.value = "";
+                                                                                        billDate.value = "";
+
+                                                                                        // 3️⃣ clear output/debug
+                                                                                        output.textContent = "";
+
+                                                                                        // 4️⃣ focus first field (fast entry UX)
+                                                                                        custInput.focus();
+                                                                                        addRow()
+                                                                                        updateTotalKg()
+                                                                                        updadateTotalPics()
+                                                                                        updateSummaryTab();
+                                                                                        location.reload();
+
+                                                                                    <!--    output.textContent = JSON.stringify(data_R, null, 2)-->
+
+                                                                                      } catch (err) {
+                                                                                        console.error(err);
+                                                                                        alert("Save failed");
+                                                                                      }
+                                                                                    }
+
+
+                                                                                          /* ================= ENTER NAVIGATION ================= */
+                                                                                          document.addEventListener("keydown", (e) => {
+                                                                                            const el = document.activeElement;
+
+                                                                                            // Skip if suggestion dropdown is open
+                                                                                            const sug = el.closest(".input-group")?.querySelector(".suggestions");
+                                                                                             if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "a") {
+                                                                                             submitData()}
+                                                                                            if (sug && !sug.hidden) return;
+
+                                                                                            if (e.key === "Enter") {
+                                                                                              if (el.id === "custInput" && el.value.trim()) {
+                                                                                                e.preventDefault();
+
+                                                                                                focusField(tbody.querySelector(".item-id"));
+
+
+                                                                                              } else if (el.classList.contains("item-id") && el.value.trim()) {
+                                                                                                e.preventDefault();
+                                                                                                const row = el.closest("tr");
+                                                                                                const nextRow = row.nextElementSibling;
+                                                                                                if (nextRow) {
+                                                                                                  focusField(nextRow.querySelector(".item-id"));
+                                                                                                } else {
+                                                                                                  addRow();
+                                                                                                  focusField(tbody.lastElementChild.querySelector(".item-id"));
+                                                                                                }
+                                                                                              }
+                                                                                            }
+
+                                                                                            if (e.key === "Backspace") {
+                                                                                              if (el.classList.contains("item-id") && !el.value) {
+                                                                                                e.preventDefault();
+                                                                                                const row = el.closest("tr");
+                                                                                                const prevRow = row.previousElementSibling;
+                                                                                                if (prevRow) focusField(prevRow.querySelector(".item-id"));
+                                                                                                else focusField(custInput); // go back to customer input if first row
+                                                                                              }
+                                                                                            }
+                                                                                          });
+                                                                                          function updateTotalKg() {
+                                                                                            let total = 0;
+                                                                                            document.querySelectorAll(".item-kg").forEach((i) => {
+                                                                                              total += Number(i.value) || 0;
+                                                                                            });
+                                                                                            document.getElementById("totalKg").innerText = total.toFixed(2);
+                                                                                          }
+                                                                                          function updadateTotalPics(){
+                                                                                          let total_pic = 0 ;
+                                                                                          document.querySelectorAll(".item-qty").forEach((i) => {
+                                                                                              total_pic += Number(i.value) || 0;
+                                                                                            });
+                                                                                            document.getElementById("totalpic").innerText = total_pic.toFixed(2);
+                                                                                          }
+                                                                                          if (inventory.length == 0 ) {
+                                                                                          console.log("no items")
+                                                                                          output.removeAttribute("hidden")
+                                                                                          output.textContent = "no item to give"
+                                                                                        }
+                                                                          function handleQRInput(rawValue, tr, idInput) {
+
+                                                              // 🔹 Clean scanner junk (CR/LF/TAB etc.)
+                                                              const clean = rawValue.replace(/[\r\n\t]/g, "").trim();
+
+                                                              // 🔹 Flexible QR match (ignores extra characters at end)
+                                                              const match = clean.match(/^(\d+)--(.+?)--(.+?)--(\d+(\.\d+)?)/);
+                                                              if (!match) return false;
+
+                                                              const idStr = match[1];
+
+                                                              // 🔹 Find item only once
+                                                              const item = inventory.find(i => String(i.id).trim() === idStr);
+                                                              if (!item) {
+                                                                alert("Item not found in inventory: " + idStr);
+                                                                return true;
+                                                              }
+
+                                                              // 🔹 Check duplicate
+                                                              const existingRow = [...tbody.querySelectorAll("tr")]
+                                                                .find(row =>
+                                                                  row !== tr &&
+                                                                  row.querySelector(".item-id").value.trim() === idStr
+                                                                );
+
+                                                              if (existingRow) {
+                                                                alert("Item already added.");
+                                                                return true;
+                                                              }
+
+                                                              // 🔹 Fill row (always use inventory data for consistency)
+                                                              idInput.value = item.id;
+                                                              tr.querySelector(".item-id").value = item.id;
+                                                              tr.querySelector(".item-name").value = item.name;
+                                                              tr.querySelector(".item-colour").value = item.colour;
+                                                              tr.querySelector(".item-type").value = item.type;
+                                                              tr.querySelector(".item-qty").value = item.pics;
+                                                              tr.querySelector(".item-kg").value = item.kg;
+
+                                                              updateTotalKg(); updadateTotalPics();updateSummaryTab();
+                                                              // 🔒 Lock this input so scanner cannot continue typing
+                                                      idInput.setAttribute("readonly", true);
+
+                                                      // Add next row if needed
+                                                      if (tr === tbody.lastElementChild) {
+                                                        addRow();
+                                                      }
+
+                                                      // Move safely to next row
+                                                      setTimeout(() => {
+
+                                                        // Unlock previous input after scanner fully stops
+                                                        idInput.removeAttribute("readonly");
+
+                                                        const nextRow = tr.nextElementSibling;
+                                                        if (nextRow) {
+                                                          const nextInput = nextRow.querySelector(".item-id");
+                                                          focusField(nextInput);
+                                                        }
+
+                                                      }, 80); // small delay prevents extra scanner characters
+
+                                                      return true;
+                                                            }
+                                            function updateSummaryTab() {
+                                            const container = document.getElementById("summaryContent");
+                                            if (!container) return;
+
+                                            const rows = [...tbody.querySelectorAll("tr")];
+                                            const summaryMap = {};
+
+                                            rows.forEach(row => {
+                                              const name = row.querySelector(".item-name")?.value || "";
+                                              const type = row.querySelector(".item-type")?.value || "";
+                                              const qty  = Number(row.querySelector(".item-qty")?.value || 0);
+
+                                              if (!name || !type || !qty) return;
+
+                                              const key = name + "||" + type + "||" + qty;
+
+                                              if (!summaryMap[key]) {
+                                                summaryMap[key] = { name, type, qty, count: 0 };
+                                              }
+
+                                              summaryMap[key].count++;
+                                            });
+
+                                            if (!Object.keys(summaryMap).length) {
+                                              container.innerHTML = "No data yet";
+                                              return;
+                                            }
+
+                                            let html = `
+                                              <table style="width:100%; border-collapse:collapse;">
+                                                <tr>
+                                                  <th style="text-align:left;">Product</th>
+                                                  <th style="text-align:left;">Type</th>
+                                                  <th style="text-align:left;">Pattern</th>
+                                                </tr>
+                                            `;
+
+                                            Object.values(summaryMap).forEach(item => {
+                                              const total = item.qty * item.count;
+                                              html += `
+                                                <tr>
+                                                  <td>${item.name}</td>
+                                                  <td>${item.type}</td>
+                                                  <td><strong>${item.qty}×${item.count}</strong> = ${total}</td>
+                                                </tr>
+                                              `;
+                                            });
+
+                                            html += "</table>";
+                                            container.innerHTML = html;
+                                          }
     </script>
     <style>
       .suggestions div.active {
