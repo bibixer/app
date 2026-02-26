@@ -271,7 +271,12 @@ async function submitData() {
 
     function generateAndPrintHTML(jobData) {
       const fileName =
-        jobData.jobId + "_" + jobData.party.replace(/\s+/g, "_") + ".html";
+        jobData.jobId +
+        "_" +
+        jobData.date +
+        "_" +
+        jobData.party.replace(/\s+/g, "_") +
+        ".html";
 
       const htmlContent = buildPrintHTML(jobData);
 
@@ -338,7 +343,7 @@ async function submitData() {
                               <html lang="en">
                               <head>
                               <meta charset="UTF-8">
-                              <title>${jobData.jobId}</title>
+                              <title>${jobData.jobId + jobData.date + "_" + jobData.party.replace(/\s+/g, "_")}</title>
 
                               <style>
                               @page { size: A5 portrait; margin: 0; }
@@ -465,7 +470,7 @@ async function submitData() {
 
                                         <div class="info-row">
                                           <strong>Party Name</strong>
-                                          <span class="line"><strong>${jobData.party}</strong></span>
+                                          <span class="line"><strong>${jobData.party} given by  ${jobData.username}</strong></span>
                                         </div>
 
                                         <div class="info-row">

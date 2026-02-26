@@ -175,7 +175,8 @@ def add_jobcard(data,current_user):
             "party": job_card.given_to,
             "toal_p": ".",
             "date": datetime.now().strftime("%d-%m-%Y"),
-            "items":job_card.product_list
+            "items":job_card.product_list,
+            "username": current_user.username
         }
     }
 def add_job_movemet_out(data,job_id,current_user):
