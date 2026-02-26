@@ -290,8 +290,9 @@ def register_routes(app,db):
     def summit_retune():
         data = request.get_json()
         res = in_move_entery(data,current_user)
-        if res == 101 :
-         return jsonify(success=True, message="Data saved")
+        if res["code"] == 101 :
+         # print(res)
+         return jsonify(success=True, message="Data saved",jobData=res)
         elif res  == 404 :
             return jsonify(success=False, message="Data not  saved iisue")
         elif res == 401:

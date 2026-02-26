@@ -268,7 +268,15 @@ def in_move_entery(data,current_user):
 
             db.session.add(job_movement)
         db.session.commit()
-        return 101
+        return {
+        "code": 101,
+        "jobData": {
+            "party": data['name'],
+            "date": datetime.now().strftime("%d-%m-%Y"),
+            "items": data['items'],
+            "username":current_user.username
+        }
+    }
     except:
         return 404
 
