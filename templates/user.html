@@ -1,15 +1,13 @@
-<!DOCTYPE html>
-{% from "bootstrap5/form.html" import render_form %}
-{% if id %}
- {% include "menu_bar.html" %}
-{% endif%}
+<!doctype html>
+{% from "bootstrap5/form.html" import render_form %} {% if id %} {% include
+"menu_bar.html" %} {% endif%}
 
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{{form_name}}</title>
-    <link rel="stylesheet" type="text/css" href="static/style/user_from.css">
+    <link rel="stylesheet" type="text/css" href="static/style/user_from.css" />
   </head>
   <body>
     <div>
@@ -28,20 +26,13 @@
 
       <div class="form-container">
         <h2>{{form_name}}</h2>
-      {{ render_form(
-    current_form,
-    novalidate=True
-
-) }}
-
-        {% for message in get_flashed_messages() %}
-<div  style="text-align: center;"><h1>{{ message|safe }}</h1></div>
-{% endfor %}
+        {{ render_form( current_form, novalidate=True ) }} {% for message in
+        get_flashed_messages() %}
+        <div style="text-align: center"><h1>{{ message|safe }}</h1></div>
+        {% endfor %}
       </div>
     </div>
-  {% include "inputjs.html" %}
-   {% if id %}
-  {% include "scarch.html" %}
-  {% endif %}
+    {% include "inputjs.html" %} {% if id %} {% include "scarch.html" %} {%
+    endif %}
   </body>
 </html>
