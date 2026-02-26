@@ -278,7 +278,7 @@ async function submitReturn() {
                               }
 
                               .top-section {
-                                height: 36.5mm;
+                                height: 40.5mm;
                                 border-bottom: 1px dashed #000000f1;
                                 display: flex;
                                 flex-direction: column;
@@ -325,11 +325,11 @@ async function submitReturn() {
 
                               .watermark {
                                 position: absolute;
-                                top: 55%;
+
                                 left: 50%;
                                 transform: translate(-50%, -50%) rotate(-20deg);
                                 width: 110mm;
-                                opacity: 0.05;
+                                opacity: 0.17;
                                 pointer-events: none;
                               }
 
@@ -371,6 +371,7 @@ async function submitReturn() {
 
                                   <div class="top-section">
                                     <div class="title">|| Om Shree Satnam Sakshi ||</div>
+                                    <div class="title"> BH GARMENTS Retune slip </div>
 
                                     <div class="top-row">
                                       <div class="info">

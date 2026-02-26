@@ -343,7 +343,7 @@ async function submitData() {
                               <html lang="en">
                               <head>
                               <meta charset="UTF-8">
-                              <title>${jobData.jobId + jobData.date + "_" + jobData.party.replace(/\s+/g, "_")}</title>
+                              <title>${jobData.jobId  + jobData.party.replace}</title>
 
                               <style>
                               @page { size: A5 portrait; margin: 0; }
@@ -367,7 +367,7 @@ async function submitData() {
                               }
 
                               .top-section {
-                                height: 36.5mm;
+                                height: 40.5mm;
                                 border-bottom: 1px dashed #000000f1;
                                 display: flex;
                                 flex-direction: column;
@@ -414,14 +414,12 @@ async function submitData() {
 
                               .watermark {
                                 position: absolute;
-                                top: 55%;
                                 left: 50%;
                                 transform: translate(-50%, -50%) rotate(-20deg);
                                 width: 110mm;
-                                opacity: 0.05;
+                                opacity: 0.17;
                                 pointer-events: none;
                               }
-
                               .signature {
                                 position: absolute;
                                 bottom: 6mm;
@@ -460,7 +458,7 @@ async function submitData() {
 
                                   <div class="top-section">
                                     <div class="title">|| Om Shree Satnam Sakshi ||</div>
-
+                                    <div class="title"> BH GARMENTS job sip </div>
                                     <div class="top-row">
                                       <div class="info">
                                         <div class="info-row">

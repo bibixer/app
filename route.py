@@ -241,7 +241,7 @@ def register_routes(app,db):
         data_r =  get_retun_card_data()
         ok =  request.args.get("ok",type=int)
         if ok == 101 :
-            flash("ok done date save")
+            flash("ok done Data saved ")
             return redirect(url_for("retune_product"))
 
         elif ok == 403:
