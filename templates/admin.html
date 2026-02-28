@@ -763,8 +763,14 @@ html {
 
 {% elif type== "CUTTER_Report"%}
  <div class="responsive-form-wrapper">
+   <div style= "padding: 20px;">
    <h2> date range and cuttername </h2>
   {{ render_form(date_from, novalidate=True, extra_classes='login100-form validate-form') }}
+   {% include "scarch.html" %}
+   {% if backend_data %}
+   {% include "cutter_reportcard.html" %}
+     {% endif %}
+     </div>
  </div>
 {% for message in get_flashed_messages() %}
 <div class="input100" style="text-align: center;"><h2 style="margin:0px 0px 20px 90px;" >{{ message|safe }}</h2></div>

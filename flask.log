@@ -1,0 +1,244 @@
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:flask_wtf.csrf:The CSRF token has expired.
+INFO:flask_wtf.csrf:The CSRF token has expired.
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:flask_wtf.csrf:The CSRF token has expired.
+INFO:flask_wtf.csrf:The CSRF token has expired.
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+ERROR:app:Exception on /cutter_report [GET]
+Traceback (most recent call last):
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/home/badx/Desktop/bh manfiation/app/route.py", line 336, in cutter_report
+    return render_template("admin.html", date_from=name_data_form, type="CUTTER_Report",name=cuter_name)
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/templating.py", line 149, in render_template
+    template = app.jinja_env.get_or_select_template(template_name_or_list)
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/jinja2/environment.py", line 1087, in get_or_select_template
+    return self.get_template(template_name_or_list, parent, globals)
+           ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/jinja2/environment.py", line 1016, in get_template
+    return self._load_template(name, globals)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/jinja2/environment.py", line 975, in _load_template
+    template = self.loader.load(self, name, self.make_globals(globals))
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/jinja2/loaders.py", line 138, in load
+    code = environment.compile(source, name, filename)
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/jinja2/environment.py", line 771, in compile
+    self.handle_exception(source=source_hint)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/home/badx/Desktop/bh manfiation/app/templates/admin.html", line 770, in template
+    {% if backend_data% }
+jinja2.exceptions.TemplateSyntaxError: unexpected '}'
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+ERROR:app:Exception on /cutter_report [POST]
+Traceback (most recent call last):
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/home/badx/Desktop/bh manfiation/app/route.py", line 333, in cutter_report
+    return render_template("admin.html", date_from=name_data_form, type="CUTTER_Report",name=cuter_name,backend_data=result)
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/templating.py", line 131, in _render
+    rv = template.render(context)
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/jinja2/environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/home/badx/Desktop/bh manfiation/app/templates/admin.html", line 771, in top-level template code
+    {% include "cutter_reportcard.html" %}
+    ^^^^^^^^^^^^^^^^^^^^^^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/home/badx/Desktop/bh manfiation/app/templates/cutter_reportcard.html", line 594, in template
+    const backendResponse = {{{{ backend_data|tojson|safe }}}}
+    ^^^^^^^^^^^^^^^^^
+jinja2.exceptions.TemplateSyntaxError: expected token ':', got '}'
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+ERROR:app:Exception on /cutter_report [POST]
+Traceback (most recent call last):
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/home/badx/Desktop/bh manfiation/app/route.py", line 331, in cutter_report
+    result = get_cutter_report_data(name_data_form,current_user)
+  File "/home/badx/Desktop/bh manfiation/app/data_Process.py", line 349, in get_cutter_report_data
+    all_date = Lump.query.filter_by(cut_by=data.name.data).filter( Lump.entry_datetime.between(data.date_from.data, data.date_to.data.timedelta(days=6, hours=23, minutes=59, seconds=59, microseconds=999999))).all()
+                                                                                                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'datetime.date' object has no attribute 'timedelta'
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+ERROR:app:Exception on /cutter_report [POST]
+Traceback (most recent call last):
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/home/badx/Desktop/bh manfiation/app/route.py", line 331, in cutter_report
+    result = get_cutter_report_data(name_data_form,current_user)
+  File "/home/badx/Desktop/bh manfiation/app/data_Process.py", line 349, in get_cutter_report_data
+    all_date = Lump.query.filter_by(cut_by=data.name.data).filter( Lump.entry_datetime.between(datetime.combine(data.date_from.data, datetime.time.min),  datetime.combine(data.date_to.data, datetime.time(23, 23, 59, 999999)) )).all()
+                                                                                                                                     ^^^^^^^^^^^^^^^^^
+AttributeError: 'method_descriptor' object has no attribute 'min'
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+ERROR:app:Exception on /cutter_report [POST]
+Traceback (most recent call last):
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/home/badx/Desktop/bh manfiation/app/route.py", line 331, in cutter_report
+    result = get_cutter_report_data(name_data_form,current_user)
+  File "/home/badx/Desktop/bh manfiation/app/data_Process.py", line 349, in get_cutter_report_data
+    all_date = Lump.query.filter_by(cut_by=data.name.data).filter( Lump.entry_datetime.between(datetime.combine(data.date_from.data, time.min),  datetime.combine(data.date_to.data, datetime.time(23, 23, 59, 999999)) )).all()
+                                                                                                                                                                                     ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+TypeError: descriptor 'time' for 'datetime.datetime' objects doesn't apply to a 'int' object
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+ERROR:app:Exception on /cutter_report [POST]
+Traceback (most recent call last):
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/home/badx/Desktop/bh manfiation/app/route.py", line 331, in cutter_report
+    result = get_cutter_report_data(name_data_form,current_user)
+  File "/home/badx/Desktop/bh manfiation/app/data_Process.py", line 349, in get_cutter_report_data
+    all_date = Lump.query.filter_by(cut_by=data.name.data).filter( Lump.entry_datetime.between(datetime.combine(data.date_from.data, time.min),  datetime.combine(data.date_to.data, datetime.time(23, 23, 59, 999999)) )).all()
+                                                                                                                                                                                     ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+TypeError: descriptor 'time' for 'datetime.datetime' objects doesn't apply to a 'int' object
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000

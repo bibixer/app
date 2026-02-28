@@ -44,6 +44,23 @@ class Bundle(db.Model):
             "OR_code":f"{self.id}--{self.product}--{self.color}--{self.pieces}",
             "cutter":cuter
         }
+
+    def to_dict_2(self):
+        return {
+            "id":self.id,
+            "entry_datetime":self.entry_datetime,
+            "lump_id":self.lump_id,
+            "product":self.product,
+            "pieces":self.pieces,
+            "kg":self.kg,
+            'type_B':self.type_B,
+            'given_to': self.given_to,
+          'given_by' : self.given_by,
+          'given_date': self.given_date,
+        'status' : self.status,
+
+
+        }
 class Lump(db.Model):
     __tablename__ = "LumpData"
     id = db.Column(db.Integer, primary_key=True)

@@ -5,7 +5,7 @@ from form import Lump_data, bundle_invadata, Item_data, Outworker_form, Cutter_f
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from data_entry import add_data_lump,add_cutter,add_items,add_outworker_db,add_jobcard,in_move_entery
 from data_Process import get_serch_data, get_job_card_data_creation, get_retun_card_data, get_movemet_data, \
-    get_current_week_range, home_dashboard,bulk_data_lump
+    get_current_week_range, home_dashboard,bulk_data_lump,get_cutter_report_data
 from modes import User
 def reset_session():
     for key in list(session.keys()):
@@ -318,18 +318,22 @@ def register_routes(app,db):
         return render_template("admin.html",date_from=date_from,type="DASHBORD", outflow_data=dash_bord_data["outflow_pie"],inflow_data=dash_bord_data["inflow_pie"],dash_bord_data=dash_bord_data)
     @app.route("/cutter_report",methods=["GET", "POST"])
     @login_required
-    @oly_admin
+    # @oly_admin
     def cutter_report():
         name_data_form =  Date_form_with_name()
         range_data = get_current_week_range()
+        cuter_name = get_serch_data()["cuter_data"]
         if not name_data_form.is_submitted():
             name_data_form.date_from.data = range_data["from_date"].date()
             name_data_form.date_to.data = range_data["to_date"].date()
-            name_data_form.name.render_kw={
-                'placeholder': 'Enter cutter Name',
+            name_data_form.name.render_kw['placeholder']= 'Enter cutter Name'
+        if name_data_form.validate_on_submit():
+            result = get_cutter_report_data(name_data_form,current_user)
+            if result != 404:
+                return render_template("admin.html", date_from=name_data_form, type="CUTTER_Report",name=cuter_name,backend_data=result)
 
-            }
-        return render_template("admin.html", date_from=name_data_form, type="CUTTER_Report")
+
+        return render_template("admin.html", date_from=name_data_form, type="CUTTER_Report",name=cuter_name)
 
     @app.route("/outworker_report", methods=["GET", "POST"])
     @login_required

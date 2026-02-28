@@ -182,7 +182,7 @@ class Date_form_with_name(FlaskForm):
         label="Date to",
         validators=[DataRequired()],
     )
-    name = StringField(label="Name",validators=[DataRequired()])
+    name = StringField(label="Name",validators=[DataRequired()],render_kw={'id':'name_f'})
     submit = SubmitField(
         'Submit',
         render_kw={"class": "button"})

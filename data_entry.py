@@ -258,7 +258,7 @@ def in_move_entery(data,current_user):
         for item in data['items']:
             job_movement = Jobmovement(
                 date=datetime.now(),
-                partculer = f"taken {item["name_of_product"]} from {data['name']} by {"badx"}",
+                partculer = f"taken {item["name_of_product"]} from {data['name']} by {current_user.username}",
                 product_name = item["name_of_product"],
                 name_of_mater = data['name'],
                 enter_user = current_user.username,

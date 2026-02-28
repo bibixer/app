@@ -1,4 +1,6 @@
-from modes import Cuter,Item_data,Outworker,Bundle,Jobcard,Jobmovement
+from sqlalchemy.sql.functions import current_user
+
+from modes import Cuter,Item_data,Outworker,Bundle,Jobcard,Jobmovement,Lump
 from datetime import datetime,timedelta,time
 from collections import defaultdict
 from sqlalchemy import func
@@ -243,4 +245,123 @@ def home_dashboard(date):
         "outflow_total": total_outflow,
         "inflow_pie": [{"name": "item", "points": inflow_pie}],
         "outflow_pie": [{"name": "item", "points": outflow_pie}],
+    }
+
+# {
+#           name: "Manoj",
+#           date_from: new Date(2025, 3, 4),
+#           date_to: new Date(2025, 3, 26),
+#           tres: [
+#             {
+#               name_of_product: "vinal",
+#               pics: 20,
+#               type: "good cut",
+#               date: new Date(2025, 3, 5),
+#               id: 1,
+#             },
+#             {
+#               name_of_product: "vinal",
+#               pics: 20,
+#               type: "good cut",
+#               date: new Date(2025, 3, 6),
+#               id: 3,
+#             },
+#             {
+#               name_of_product: "vinal2",
+#               pics: 40,
+#               type: "good cut",
+#               date: new Date(2025, 3, 7),
+#               id: 4,
+#             },
+#             {
+#               name_of_product: "vinal",
+#               pics: 30,
+#               type: "Lump",
+#               date: new Date(2025, 3, 8),
+#               id: 5,
+#             },
+#             {
+#               name_of_product: "vinal2",
+#               pics: 25,
+#               type: "Fent",
+#               date: new Date(2025, 3, 9),
+#               id: 6,
+#             },
+#             {
+#               name_of_product: "ram",
+#               pics: 35,
+#               type: "Lump",
+#               date: new Date(2025, 3, 10),
+#               id: 7,
+#             },
+#             {
+#               name_of_product: "ram",
+#               pics: 15,
+#               type: "Fent",
+#               date: new Date(2025, 3, 11),
+#               id: 8,
+#             },
+#             {
+#               name_of_product: "shyam",
+#               pics: 40,
+#               type: "Lump",
+#               date: new Date(2025, 3, 12),
+#               id: 9,
+#             },
+#             {
+#               name_of_product: "shyam",
+#               pics: 20,
+#               type: "Fent",
+#               date: new Date(2025, 3, 13),
+#               id: 10,
+#             },
+#             {
+#               name_of_product: "vinal",
+#               pics: 20,
+#               type: "good cut",
+#               date: new Date(2025, 3, 14),
+#               id: 11,
+#             },
+#             {
+#               name_of_product: "vinal",
+#               pics: 20,
+#               type: "good cut",
+#               date: new Date(2025, 3, 15),
+#               id: 12,
+#             },
+#             {
+#               name_of_product: "vinal",
+#               pics: 20,
+#               type: "good cut",
+#               date: new Date(2025, 3, 16),
+#               id: 13,
+#             },
+#           ],
+#         };
+
+def get_cutter_report_data(data,current_user):
+    if current_user.is_authenticated:
+        if current_user.role != 1:
+            return 404
+    if not  current_user.is_authenticated:
+        return 404
+
+    all_date = Lump.query.filter_by(cut_by=data.name.data).filter(
+        Lump.entry_datetime.between(
+            datetime.combine(data.date_from.data, time.min),  # 00:00:00 of start date
+            datetime.combine(data.date_to.data, time.max)  # 23:59:59.999999 of end date
+        )
+    ).all()
+    all_bundle = []
+    for i in all_date:
+      all_b = (Bundle.query.filter(Bundle.lump_id == i.id).all())
+      for b in all_b:
+          all_bundle.append(b.to_dict_2())
+
+    return {
+        'name': data.name.data,
+        'date_from': data.date_from.data,
+        'date_to':data.date_to.data,
+        'tres': all_bundle,
+
     }
