@@ -1,0 +1,1110 @@
+
+  <div>
+
+
+    <!-- JSCharting libraries -->
+    <script src="https://code.jscharting.com/latest/jscharting.js"></script>
+    <script src="https://code.jscharting.com/latest/modules/toolbar.js"></script>
+    <script src="https://code.jscharting.com/latest/modules/types.js"></script>
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        font-family:
+          "Inter",
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          Roboto,
+          sans-serif;
+      }
+
+      .dashboard {
+        max-width: 1400px;
+        width: 100%;
+      }
+      .top-bar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 2rem;
+      }
+      .title-block {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+      }
+      .title-block i {
+        font-size: 2.2rem;
+        color: #1f4a81;
+        background: white;
+        padding: 0.7rem;
+        border-radius: 20px;
+        box-shadow: 0 6px 14px rgba(0, 30, 70, 0.08);
+      }
+      .title-block h1 {
+        font-weight: 650;
+        color: #092542;
+        font-size: 1.8rem;
+      }
+      .info-badge {
+        background: white;
+        border-radius: 60px;
+        padding: 0.5rem 2rem 0.5rem 1.8rem;
+        display: flex;
+        gap: 2rem;
+        flex-wrap: wrap;
+        box-shadow: 0 6px 16px rgba(0, 20, 40, 0.04);
+      }
+      .badge-item {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+      }
+      .days-chip {
+        background: #e4edfb;
+        padding: 0.2rem 1.2rem;
+        border-radius: 40px;
+        font-weight: 500;
+      }
+      .wage-card {
+        background: white;
+        border-radius: 28px;
+        padding: 1.2rem 2rem;
+        margin-bottom: 1.8rem;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: 0 10px 24px -10px rgba(0, 60, 120, 0.12);
+        border: 1px solid #e0ebf9;
+      }
+      .wage-input-group {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+      }
+      .wage-input-group label {
+        font-weight: 600;
+        color: #1d3d62;
+        font-size: 1.1rem;
+      }
+      .wage-input-group input {
+        border: 2px solid #d7e3f5;
+        border-radius: 50px;
+        padding: 0.7rem 1.5rem;
+        font-size: 1.1rem;
+        width: 140px;
+        font-weight: 600;
+        color: #10345e;
+        outline: none;
+        transition: 0.2s;
+      }
+      .wage-input-group input:focus {
+        border-color: #3b82f6;
+      }
+      .wage-display {
+        display: flex;
+        gap: 2.5rem;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      .cost-item {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+      }
+      .cost-label {
+        font-size: 0.9rem;
+        color: #526e8c;
+      }
+      .cost-value {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #1a4885;
+        line-height: 1.2;
+      }
+      .cost-per-piece {
+        background: linear-gradient(145deg, #e3efff, #c9e0fc);
+        padding: 0.4rem 2rem;
+        border-radius: 60px;
+        display: flex;
+        align-items: center;
+        gap: 1.2rem;
+        box-shadow: 0 4px 12px rgba(0, 80, 160, 0.2);
+        border: 1px solid #9bbdf0;
+      }
+      .cost-per-piece .cost-label {
+        font-weight: 600;
+        color: #03316b;
+        font-size: 1rem;
+      }
+      .cost-per-piece .cost-value {
+        font-size: 2.2rem;
+        color: #002856;
+      }
+      .grid-main {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 2rem;
+        align-items: start;
+      }
+      @media (max-width: 1000px) {
+        .grid-main {
+          grid-template-columns: 1fr;
+        }
+      }
+      .card {
+        background: white;
+        border-radius: 32px;
+        padding: 1.6rem 1.5rem 2rem 1.5rem;
+        box-shadow: 0 20px 40px -14px rgba(0, 45, 80, 0.18);
+      }
+      .card-header {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        border-bottom: 2px solid #ecf3fa;
+        padding-bottom: 1rem;
+        margin-bottom: 1.5rem;
+      }
+      .card-header i {
+        font-size: 1.7rem;
+        background: #e8f0fe;
+        padding: 0.7rem;
+        border-radius: 20px;
+        color: #1d4a89;
+      }
+      .card-header h2 {
+        font-size: 1.5rem;
+        font-weight: 570;
+        margin: 0;
+      }
+      .card-header h2 small {
+        background: #e2ecfc;
+        padding: 0.2rem 0.9rem;
+        border-radius: 30px;
+        font-size: 0.9rem;
+        margin-left: 1rem;
+        font-weight: 400;
+      }
+      .table-wrapper {
+        overflow-x: auto;
+        border-radius: 24px;
+        border: 1px solid #e2ecf5;
+        margin-bottom: 1.5rem;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.95rem;
+      }
+      th {
+        background: #f1f7fd;
+        color: #133457;
+        font-weight: 600;
+        padding: 1rem 0.5rem;
+      }
+      td {
+        padding: 0.9rem 0.5rem;
+        border-bottom: 1px solid #eaf1f9;
+        text-align: center;
+      }
+      .subtotal-row {
+        background: #f2f8ff;
+        font-weight: 550;
+      }
+      .subtotal-row td {
+        border-bottom: 1px solid #c2d8f0;
+      }
+      .details-row {
+        background: #f8fcff;
+        border-top: 2px dashed #a0c0e8;
+        border-bottom: 2px dashed #a0c0e8;
+      }
+      .details-row td {
+        padding: 1rem 0.5rem;
+        background: #f0f7ff;
+      }
+      .date-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        justify-content: center;
+      }
+      .date-chip {
+        background: white;
+        border: 1px solid #3b82f6;
+        color: #1e4a7a;
+        padding: 0.3rem 1rem;
+        border-radius: 30px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        box-shadow: 0 2px 6px rgba(0, 60, 130, 0.1);
+      }
+      .cut-badge {
+        background: #e2edfe;
+        padding: 0.2rem 1.4rem;
+        border-radius: 30px;
+        display: inline-block;
+        font-size: 0.9rem;
+      }
+      .total-production-box {
+        background: #ecf5ff;
+        border-radius: 60px;
+        padding: 0.9rem 2rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 2rem;
+        font-size: 1.2rem;
+        font-weight: 500;
+      }
+      #grandTotalValue {
+        font-weight: 700;
+        color: #1b4886;
+        font-size: 2rem;
+        margin-left: 0.4rem;
+      }
+      .chart-item {
+        background: #fbfdff;
+        border-radius: 26px;
+        padding: 1.3rem 1rem 1rem 1rem;
+        margin-bottom: 2rem;
+      }
+      .chart-title {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-weight: 550;
+        color: #1b3f64;
+        margin-bottom: 0.8rem;
+      }
+      #productChart,
+      #cutChart,
+      #dailyGroupBarChart {
+        width: 100%;
+        height: 280px;
+        background: transparent;
+      }
+      .selector-panel {
+        background: #f4fafe;
+        padding: 0.8rem 1.5rem;
+        border-radius: 60px;
+        display: flex;
+        align-items: center;
+        gap: 1.2rem;
+        flex-wrap: wrap;
+        margin: 1rem 0 1.2rem 0;
+      }
+      select {
+        background: white;
+        border: 1px solid #b4cae5;
+        padding: 0.6rem 2.4rem 0.6rem 1.4rem;
+        border-radius: 40px;
+        font-weight: 500;
+        font-size: 1rem;
+        color: #133a66;
+        appearance: none;
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="%232a508b" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>');
+        background-repeat: no-repeat;
+        background-position: right 1rem center;
+      }
+      .product-tag {
+        background: white;
+        padding: 0.3rem 1.8rem;
+        border-radius: 40px;
+        font-weight: 500;
+      }
+      hr {
+        border: 1px solid #e7f0fa;
+      }
+      .highlight-update {
+        animation: pulse 0.3s ease;
+      }
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.02);
+          background: #fff7e0;
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+      .empty-message {
+        text-align: center;
+        color: #8a9cb0;
+        padding: 2rem;
+        font-style: italic;
+      }
+      .expand-icon {
+        cursor: pointer;
+        color: #3b82f6;
+        font-size: 1.2rem;
+        margin-right: 0.5rem;
+        transition: 0.2s;
+      }
+      .expand-icon:hover {
+        color: #1e4a7a;
+      }
+      .id-chip {
+        background: #e6f0ff;
+        border-radius: 20px;
+        padding: 0.2rem 0.8rem;
+        font-size: 0.8rem;
+        display: inline-block;
+        margin: 0.2rem;
+        border: 1px solid #bacde8;
+      }
+      .kg-badge {
+        background: #dcfce7;
+        color: #166534;
+        padding: 0.2rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        margin-left: 0.5rem;
+      }
+      /* Modern pie metrics row */
+      .metrics-row {
+        display: flex;
+        gap: 15px;
+        margin-top: 20px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .metric-card {
+        background: #f8fcff;
+        border-radius: 30px;
+        padding: 15px 25px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        flex: 1 1 180px;
+        border: 1px solid #d9e8ff;
+        box-shadow: 0 4px 10px rgba(0, 30, 70, 0.04);
+      }
+      .metric-icon {
+        background: white;
+        width: 50px;
+        height: 50px;
+        border-radius: 25px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: #2c5b9c;
+        box-shadow: 0 4px 8px rgba(0, 60, 130, 0.1);
+      }
+      .metric-content {
+        display: flex;
+        flex-direction: column;
+      }
+      .metric-label {
+        font-size: 0.85rem;
+        color: #617b9b;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+      }
+      .metric-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1e3b64;
+        line-height: 1.2;
+      }
+      .metric-value small {
+        font-size: 0.9rem;
+        font-weight: 400;
+        color: #748aa8;
+        margin-left: 5px;
+      }
+      .stats-badge {
+        background: #e6f0ff;
+        padding: 6px 18px;
+        border-radius: 40px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 500;
+        color: #1e4f8a;
+        margin-left: 10px;
+      }
+    </style>
+
+    <div class="dashboard">
+      <!-- header (filled from backend) -->
+      <div class="top-bar">
+        <div class="title-block">
+          <i class="fas fa-chart-pie"></i>
+          <h1>Cutter · live backend data</h1>
+        </div>
+        <div class="info-badge" id="dateRangeBadge">
+          <!-- filled by js -->
+        </div>
+      </div>
+
+      <!-- Wage card -->
+      <div class="wage-card">
+        <div class="wage-input-group">
+          <label
+            ><i class="fas fa-rupee-sign" style="color: #2563eb"></i> Daily wage
+            (₹):</label
+          >
+          <input
+            type="number"
+            id="dailyWageInput"
+            value="500"
+            min="0"
+            max="100000"
+            step="10"
+          />
+        </div>
+        <div class="wage-display">
+          <div class="cost-item">
+            <span class="cost-label">Cost per day</span>
+            <span class="cost-value" id="perDayCost">₹500</span>
+          </div>
+          <div class="cost-item">
+            <span class="cost-label"
+              >Total <span id="workDaysDisplay">0</span> days</span
+            >
+            <span class="cost-value" id="totalWageCost">₹0</span>
+          </div>
+          <div class="cost-item">
+            <span class="cost-label">📊 Pieces/day</span>
+            <span class="cost-value" id="piecesPerDay">—</span>
+          </div>
+          <div class="cost-per-piece" id="costPerPieceBox">
+            <span class="cost-label">💰 Cost per piece</span>
+            <span class="cost-value" id="costPerPiece">—</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- main grid -->
+      <div class="grid-main">
+        <!-- LEFT: table with expandable details -->
+        <div class="card">
+          <div class="card-header">
+            <i class="fas fa-table"></i>
+            <h2>
+              Production details <small>click ▶ to see ID, kg, status</small>
+            </h2>
+          </div>
+          <div class="table-wrapper">
+            <table id="productionBreakdown">
+              <thead>
+                <tr>
+                  <th style="width: 30px"></th>
+                  <th>Product</th>
+                  <th>Cut type</th>
+                  <th>Pieces</th>
+                  <th>Count</th>
+                  <th>Total pcs</th>
+                </tr>
+              </thead>
+              <tbody id="tableBody"></tbody>
+            </table>
+          </div>
+          <div style="display: flex; justify-content: flex-end">
+            <div class="total-production-box">
+              <i class="fas fa-cubes"></i>
+              <span>Total production:</span>
+              <span id="grandTotalValue">0</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: charts -->
+        <div class="card">
+          <div class="card-header">
+            <i class="fas fa-chart-pie"></i>
+            <h2>Charts</h2>
+          </div>
+
+          <!-- Product pie (modern) -->
+          <div class="chart-item">
+            <div class="chart-title">
+              <i class="fas fa-chart-simple"></i> Product share
+              <span class="stats-badge" id="totalItemsBadge">0 items</span>
+            </div>
+            <div id="productChart"></div>
+            <div class="metrics-row" id="productMetrics"></div>
+          </div>
+
+          <hr />
+
+          <!-- selector + cut pie -->
+          <div class="selector-panel">
+            <i class="fas fa-cut"></i>
+            <span style="font-weight: 500">Product:</span>
+            <select id="productSelect"></select>
+            <span class="product-tag" id="selectedProductName">—</span>
+          </div>
+
+          <div class="chart-item">
+            <div class="chart-title">
+              <i class="fas fa-chart-pie"></i> Cut type split
+            </div>
+            <div id="cutChart"></div>
+            <div
+              id="cutChartEmptyMessage"
+              class="empty-message"
+              style="display: none"
+            >
+              No data available
+            </div>
+          </div>
+
+          <hr />
+
+          <!-- Daily grouped bar chart -->
+          <div class="chart-item">
+            <div class="chart-title">
+              <i class="fas fa-chart-bar"></i> Daily production (all products)
+            </div>
+            <div id="dailyGroupBarChart"></div>
+            <div
+              id="dailyBarEmptyMessage"
+              class="empty-message"
+              style="display: none"
+            >
+              No data available
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+     (function () {
+    // ------------------------------------------------------------------
+    // YOUR ACTUAL BACKEND DATA (copied exactly as provided)
+    // ------------------------------------------------------------------
+    const backendResponse = {{ backend_data|tojson|safe }};
+    backendResponse.date_from = new Date(backendResponse.date_from);
+    backendResponse.date_to = new Date(backendResponse.date_to);
+
+    backendResponse.tres.forEach(entry => {
+        entry.entry_datetime = new Date(entry.entry_datetime);
+        if (entry.given_date) {
+            entry.given_date = new Date(entry.given_date);
+        }
+    });
+
+    // ------------------------------------------------------------------
+    // EXTRACT DATA FROM BACKEND
+    // ------------------------------------------------------------------
+    const { name, date_from, date_to, tres } = backendResponse;
+
+    // Calculate calendar days in range (inclusive)
+    const diffTime = Math.abs(date_to - date_from);
+    const CALENDAR_DAYS = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+
+    // Calculate actual working days (unique dates with entries)
+    const uniqueWorkingDates = new Set();
+    tres.forEach(entry => {
+        const dateStr = entry.entry_datetime.toDateString(); // Use toDateString() to ignore time
+        uniqueWorkingDates.add(dateStr);
+    });
+    const WORKING_DAYS = uniqueWorkingDates.size;
+
+    const startStr = date_from.toLocaleDateString("en-IN", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+    });
+    const endStr = date_to.toLocaleDateString("en-IN", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+    });
+
+    document.getElementById("dateRangeBadge").innerHTML = `
+        <span class="badge-item"><i class="fas fa-user"></i> ${name}</span>
+        <span class="badge-item"><i class="fas fa-calendar-alt"></i> ${startStr} – ${endStr}</span>
+        <span class="days-chip"><i class="far fa-clock"></i> <span style="font-weight:700;">${WORKING_DAYS}</span> working days / ${CALENDAR_DAYS} total days</span>
+    `;
+    document.getElementById("workDaysDisplay").innerText = WORKING_DAYS;
+
+    // ------------------------------------------------------------------
+    // NESTED GROUPING using product + type_B + pieces
+    // Store all fields for details
+    // ------------------------------------------------------------------
+    const groups = {};
+
+    tres.forEach((entry) => {
+        const product = entry.product.trim();
+        const type = entry.type_B || "unknown";
+        const pieces = entry.pieces;
+        const id = entry.id;
+        const kg = entry.kg;
+        const status = entry.status;
+        const given_to = entry.given_to;
+        const entry_datetime = entry.entry_datetime;
+
+        if (!groups[product]) groups[product] = {};
+        if (!groups[product][type]) groups[product][type] = {};
+        if (!groups[product][type][pieces]) {
+            groups[product][type][pieces] = { count: 0, total: 0, entries: [] };
+        }
+
+        groups[product][type][pieces].count += 1;
+        groups[product][type][pieces].entries.push({
+            id,
+            entry_datetime,
+            pieces,
+            kg,
+            status,
+            given_to,
+        });
+    });
+
+    // Calculate totals
+    Object.keys(groups).forEach((product) => {
+        Object.keys(groups[product]).forEach((type) => {
+            Object.keys(groups[product][type]).forEach((pieces) => {
+                const group = groups[product][type][pieces];
+                group.total = group.count * parseInt(pieces);
+            });
+        });
+    });
+
+    // ------------------------------------------------------------------
+    // AGGREGATE PRODUCT TOTALS AND CUT DETAILS
+    // ------------------------------------------------------------------
+    const productTotals = {};
+    const productCutDetails = {};
+
+    Object.entries(groups).forEach(([product, typeGroups]) => {
+        productTotals[product] = 0;
+        productCutDetails[product] = {};
+
+        Object.entries(typeGroups).forEach(([type, piecesGroups]) => {
+            let typeTotal = 0;
+            Object.values(piecesGroups).forEach((group) => {
+                typeTotal += group.total;
+            });
+            productTotals[product] += typeTotal;
+            productCutDetails[product][type] = typeTotal;
+        });
+    });
+
+    // Sort products by volume
+    const sortedProducts = Object.entries(productTotals)
+        .sort((a, b) => b[1] - a[1])
+        .map((entry) => entry[0]);
+
+    // Calculate grand total
+    const GRAND_TOTAL = Object.values(productTotals).reduce((sum, val) => sum + val, 0);
+
+    // ------------------------------------------------------------------
+    // RENDER TABLE (same as before, but now using WORKING_DAYS)
+    // ------------------------------------------------------------------
+    const tbody = document.getElementById("tableBody");
+    let grandTotal = 0;
+    const rowState = {};
+
+    sortedProducts.forEach((product) => {
+        const typeGroups = groups[product];
+        let firstRow = true;
+
+        Object.entries(typeGroups).forEach(([type, piecesGroups]) => {
+            Object.entries(piecesGroups).forEach(([pieces, group]) => {
+                const { count, total, entries } = group;
+                grandTotal += total;
+                const groupKey = `${product}|${type}|${pieces}`;
+                const isExpanded = rowState[groupKey] || false;
+
+                // Main row
+                const mainRow = document.createElement("tr");
+                mainRow.setAttribute("data-group", groupKey);
+                mainRow.innerHTML = `
+                    <td>
+                        <span class="expand-icon" onclick="toggleDetails('${groupKey}')">
+                            <i class="fas ${isExpanded ? "fa-chevron-down" : "fa-chevron-right"}"></i>
+                        </span>
+                    </td>
+                    <td style="font-weight: ${firstRow ? "600" : "400"};">${firstRow ? product : ""}</td>
+                    <td><span class="cut-badge">${type}</span></td>
+                    <td>${pieces}</td>
+                    <td>${count}</td>
+                    <td><strong>${total}</strong></td>
+                `;
+                tbody.appendChild(mainRow);
+
+                // Details row with ID, kg, status, given_to
+                const detailRow = document.createElement("tr");
+                detailRow.classList.add("details-row");
+                detailRow.setAttribute("data-details", groupKey);
+                detailRow.style.display = isExpanded ? "table-row" : "none";
+
+                const entryDetails = entries
+                    .map((e) => {
+                        const dateStr = e.entry_datetime.toLocaleDateString("en-IN", {
+                            day: "numeric",
+                            month: "short",
+                        });
+                        const statusClass = e.status === "GIVEN" ? "status-badge" : "status-badge";
+                        return `<span class="id-chip">ID:${e.id} | ${dateStr} | ${e.pieces}pcs | ⚖️ ${e.kg}kg | ${e.given_to ? e.given_to.substring(0, 15) + "…" : "—"} | <span class="${statusClass}">${e.status}</span></span>`;
+                    })
+                    .join(" ");
+
+                detailRow.innerHTML = `
+                    <td></td>
+                    <td colspan="5">
+                        <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                            <span style="font-weight: 500; color: #1e4a7a;">📋 Entries (${count}):</span>
+                            <div class="date-chips" style="justify-content: flex-start;">${entryDetails}</div>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(detailRow);
+
+                firstRow = false;
+            });
+        });
+
+        // Subtotal row
+        const subRow = document.createElement("tr");
+        subRow.classList.add("subtotal-row");
+        subRow.innerHTML = `
+            <td></td>
+            <td colspan="4" style="text-align: right; font-weight: 600;">${product} subtotal →</td>
+            <td style="font-weight: 700; background: #e5efff;">${productTotals[product]}</td>
+        `;
+        tbody.appendChild(subRow);
+
+        // Spacer
+        const spacer = document.createElement("tr");
+        spacer.innerHTML = `<td colspan="6" style="border-bottom: 2px dashed #c6daf5;"></td>`;
+        tbody.appendChild(spacer);
+    });
+
+    document.getElementById("grandTotalValue").innerText = GRAND_TOTAL;
+
+    window.toggleDetails = function (groupKey) {
+        const mainRow = document.querySelector(`tr[data-group="${groupKey}"]`);
+        const detailRow = document.querySelector(`tr[data-details="${groupKey}"]`);
+        const icon = mainRow.querySelector(".expand-icon i");
+
+        if (detailRow.style.display === "none") {
+            detailRow.style.display = "table-row";
+            icon.classList.remove("fa-chevron-right");
+            icon.classList.add("fa-chevron-down");
+            rowState[groupKey] = true;
+        } else {
+            detailRow.style.display = "none";
+            icon.classList.remove("fa-chevron-down");
+            icon.classList.add("fa-chevron-right");
+            rowState[groupKey] = false;
+        }
+    };
+
+    // ------------------------------------------------------------------
+    // WAGE & PRODUCTIVITY (based on WORKING_DAYS, not calendar days)
+    // ------------------------------------------------------------------
+    const dailyWageInput = document.getElementById("dailyWageInput");
+    const perDayCostSpan = document.getElementById("perDayCost");
+    const totalWageCostSpan = document.getElementById("totalWageCost");
+    const piecesPerDaySpan = document.getElementById("piecesPerDay");
+    const costPerPieceSpan = document.getElementById("costPerPiece");
+    const costBox = document.getElementById("costPerPieceBox");
+    let lastCostPerPiece = null;
+
+    function formatIndianRupee(value, decimals = 0) {
+        return value.toLocaleString("en-IN", {
+            minimumFractionDigits: decimals,
+            maximumFractionDigits: decimals,
+        });
+    }
+
+    function updateWageAndProductivity() {
+        let dailyWage = parseFloat(dailyWageInput.value) || 0;
+        if (dailyWage < 0) dailyWage = 0;
+        if (dailyWage > 100000) dailyWage = 100000;
+
+        // Total wage cost based on ACTUAL working days only
+        const totalCost = dailyWage * WORKING_DAYS;
+
+        // Pieces per working day (productivity)
+        const piecesPerDay = WORKING_DAYS > 0 ? GRAND_TOTAL / WORKING_DAYS : 0;
+
+        // Cost per piece based on total cost and total pieces
+        let costPerPiece = 0,
+            costDisplay = "—",
+            piecesPerDayDisplay = "—";
+
+        if (GRAND_TOTAL > 0) {
+            costPerPiece = totalCost / GRAND_TOTAL;
+            costDisplay = `₹${formatIndianRupee(costPerPiece, 2)}`;
+            piecesPerDayDisplay = formatIndianRupee(piecesPerDay, 1);
+        }
+
+        perDayCostSpan.innerText = `₹${formatIndianRupee(dailyWage)}`;
+        totalWageCostSpan.innerText = `₹${formatIndianRupee(totalCost)}`;
+        piecesPerDaySpan.innerText = piecesPerDayDisplay;
+
+        if (costPerPiece !== lastCostPerPiece) {
+            costBox.classList.add("highlight-update");
+            setTimeout(() => costBox.classList.remove("highlight-update"), 300);
+            lastCostPerPiece = costPerPiece;
+        }
+        costPerPieceSpan.innerText = costDisplay;
+    }
+
+    updateWageAndProductivity();
+    dailyWageInput.addEventListener("input", updateWageAndProductivity);
+
+        // ------------------------------------------------------------------
+        // MODERN PIE CHART with metrics
+        // ------------------------------------------------------------------
+        function formatNumber(num) {
+          return num.toLocaleString("en-IN");
+        }
+
+        function updateProductMetrics(data) {
+          const points = data[0].points;
+          const total = points.reduce((sum, p) => sum + p.y, 0);
+          document.getElementById("totalItemsBadge").innerHTML =
+            `${formatNumber(total)} total pcs`;
+
+          const sorted = [...points].sort((a, b) => b.y - a.y);
+          let metricsHtml = "";
+
+          if (sorted.length > 0) {
+            metricsHtml += `
+          <div class="metric-card">
+            <div class="metric-icon"><i class="fas fa-crown"></i></div>
+            <div class="metric-content">
+              <span class="metric-label">Top product</span>
+              <span class="metric-value">${sorted[0].name} <small>${formatNumber(sorted[0].y)} pcs</small></span>
+            </div>
+          </div>
+        `;
+          }
+
+          const avg = (total / points.length).toFixed(1);
+          metricsHtml += `
+        <div class="metric-card">
+          <div class="metric-icon"><i class="fas fa-chart-line"></i></div>
+          <div class="metric-content">
+            <span class="metric-label">Average</span>
+            <span class="metric-value">${formatNumber(avg)} <small>pcs</small></span>
+          </div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-icon"><i class="fas fa-tag"></i></div>
+          <div class="metric-content">
+            <span class="metric-label">Products</span>
+            <span class="metric-value">${points.length} <small>types</small></span>
+          </div>
+        </div>
+      `;
+          document.getElementById("productMetrics").innerHTML = metricsHtml;
+        }
+
+        // Product pie
+        const productDataPoints = sortedProducts.map((name) => ({
+          name,
+          y: productTotals[name],
+        }));
+        const productSeries = [
+          {
+            name: "Products",
+            points: productDataPoints.map((p) => ({ name: p.name, y: p.y })),
+          },
+        ];
+
+        var productChart = JSC.chart("productChart", {
+          legend_position: "inside left bottom",
+          defaultSeries: { type: "pie", pointSelection: true },
+          defaultPoint_label: {
+            text: "<b>%name</b><br>%yValue pcs",
+            placement: "auto",
+            autoHide: false,
+            style: { fontSize: "12px", fontWeight: "500", color: "#1e3a6b" },
+          },
+          defaultTooltip: {
+            label_text: "<b>%name</b><br>Quantity: %yValue pcs",
+            style: { fontSize: "13px" },
+          },
+          toolbar_items: {
+            Mode: {
+              margin: 10,
+              type: "select",
+              events_change: function (val) {
+                productChart.options({
+                  defaultPoint: { label: { placement: val } },
+                });
+              },
+              items: "enum_placement",
+            },
+            "Auto Hide": {
+              type: "checkbox",
+              events_change: function (val) {
+                productChart.options({
+                  defaultPoint: { label: { autoHide: val } },
+                });
+              },
+            },
+          },
+          title_label_text: "Product Distribution",
+          yAxis: { label_text: "Quantity", formatString: "n" },
+          series: productSeries,
+        });
+
+        updateProductMetrics(productSeries);
+
+        // Populate product select
+        const select = document.getElementById("productSelect");
+        sortedProducts.forEach((prod) => {
+          const opt = document.createElement("option");
+          opt.value = prod;
+          opt.textContent = prod;
+          select.appendChild(opt);
+        });
+
+        // Cut pie (dynamic)
+        let cutChart = null;
+        const selectedSpan = document.getElementById("selectedProductName");
+        const cutChartDiv = document.getElementById("cutChart");
+        const cutEmptyMessage = document.getElementById("cutChartEmptyMessage");
+
+        function updateCutPie(productKey) {
+          const cuts = productCutDetails[productKey];
+          if (!cuts || Object.keys(cuts).length === 0) {
+            cutChartDiv.style.display = "none";
+            cutEmptyMessage.style.display = "block";
+            selectedSpan.innerText = productKey || "—";
+            return;
+          }
+          cutChartDiv.style.display = "block";
+          cutEmptyMessage.style.display = "none";
+
+          const cutData = Object.keys(cuts).map((label) => ({
+            name: label,
+            y: cuts[label],
+          }));
+
+          if (cutChart) {
+            cutChart.options({
+              series: [
+                {
+                  name: "Distribution",
+                  points: cutData.map((p) => ({ name: p.name, y: p.y })),
+                },
+              ],
+              title_label_text: `${productKey} - Cut Distribution`,
+            });
+          } else {
+            cutChart = JSC.chart("cutChart", {
+              legend_position: "inside left bottom",
+              defaultSeries: { type: "pie", pointSelection: true },
+              defaultPoint_label: {
+                text: "<b>%name</b><br>%yValue pcs",
+                placement: "auto",
+                autoHide: false,
+              },
+              toolbar_items: {
+                Mode: {
+                  margin: 10,
+                  type: "select",
+                  events_change: function (val) {
+                    cutChart.options({
+                      defaultPoint: { label: { placement: val } },
+                    });
+                  },
+                  items: "enum_placement",
+                },
+                "Auto Hide": {
+                  type: "checkbox",
+                  events_change: function (val) {
+                    cutChart.options({
+                      defaultPoint: { label: { autoHide: val } },
+                    });
+                  },
+                },
+              },
+              title_label_text: `${productKey} - Cut Distribution`,
+              yAxis: { label_text: "Quantity", formatString: "n" },
+              series: [
+                {
+                  name: "Distribution",
+                  points: cutData.map((p) => ({ name: p.name, y: p.y })),
+                },
+              ],
+            });
+          }
+          selectedSpan.innerText = productKey;
+        }
+
+        // GROUPED DAILY BAR CHART
+        function updateGroupedDailyBar() {
+          const dailyProductMap = new Map();
+          tres.forEach((entry) => {
+            const dateStr = entry.entry_datetime.toLocaleDateString("en-IN", {
+              day: "numeric",
+              month: "short",
+            });
+            const product = entry.product.trim();
+            if (!dailyProductMap.has(dateStr)) dailyProductMap.set(dateStr, {});
+            const dayData = dailyProductMap.get(dateStr);
+            dayData[product] = (dayData[product] || 0) + entry.pieces;
+          });
+
+          const allProducts = [
+            ...new Set(tres.map((e) => e.product.trim())),
+          ].sort();
+          const sortedDates = Array.from(dailyProductMap.keys()).sort((a, b) =>
+            a.localeCompare(b, undefined, { numeric: true }),
+          );
+
+          const series = allProducts.map((product) => ({
+            name: product,
+            points: sortedDates.map((date) => {
+              const dayData = dailyProductMap.get(date) || {};
+              return { name: date, y: dayData[product] || 0 };
+            }),
+          }));
+
+          if (dailyBarChart) {
+            dailyBarChart.options({ series });
+          } else {
+            dailyBarChart = JSC.chart("dailyGroupBarChart", {
+              type: "column",
+              title_label_text: "Daily production by product",
+              xAxis: { label_text: "Date" },
+              yAxis: { label_text: "Pieces" },
+              series: series,
+              toolbar_visible: false,
+              legend_visible: true,
+            });
+          }
+          document.getElementById("dailyBarEmptyMessage").style.display =
+            "none";
+        }
+
+        let dailyBarChart = null;
+        updateGroupedDailyBar();
+
+        // Initial load for cut pie
+        if (sortedProducts.length > 0) {
+          updateCutPie(sortedProducts[0]);
+          select.value = sortedProducts[0];
+        }
+
+        select.addEventListener("change", (e) => updateCutPie(e.target.value));
+      })();
+    </script>
+ </div>
