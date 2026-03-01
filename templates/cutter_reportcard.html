@@ -446,7 +446,7 @@
       <div class="top-bar">
         <div class="title-block">
           <i class="fas fa-chart-pie"></i>
-          <h1>Cutter · live backend data</h1>
+          <h1>Cutter · reports</h1>
         </div>
         <div class="info-badge" id="dateRangeBadge">
           <!-- filled by js -->
@@ -587,7 +587,7 @@
     </div>
 
     <script>
-     (function () {
+    (function () {
     // ------------------------------------------------------------------
     // YOUR ACTUAL BACKEND DATA (copied exactly as provided)
     // ------------------------------------------------------------------
@@ -611,13 +611,17 @@
     const diffTime = Math.abs(date_to - date_from);
     const CALENDAR_DAYS = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
 
-    // Calculate actual working days (unique dates with entries)
+    // Calculate actual working days from data (unique dates with entries)
     const uniqueWorkingDates = new Set();
     tres.forEach(entry => {
-        const dateStr = entry.entry_datetime.toDateString(); // Use toDateString() to ignore time
+        const dateStr = entry.entry_datetime.toDateString();
         uniqueWorkingDates.add(dateStr);
     });
-    const WORKING_DAYS = uniqueWorkingDates.size;
+    const ACTUAL_WORKING_DAYS = uniqueWorkingDates.size;
+
+    // Default to actual working days, but allow manual override
+    let WORKING_DAYS = ACTUAL_WORKING_DAYS;
+    let isManualOverride = false;
 
     const startStr = date_from.toLocaleDateString("en-IN", {
         day: "numeric",
@@ -630,16 +634,82 @@
         year: "numeric",
     });
 
+    // Add working days editor to the top bar
     document.getElementById("dateRangeBadge").innerHTML = `
         <span class="badge-item"><i class="fas fa-user"></i> ${name}</span>
         <span class="badge-item"><i class="fas fa-calendar-alt"></i> ${startStr} – ${endStr}</span>
-        <span class="days-chip"><i class="far fa-clock"></i> <span style="font-weight:700;">${WORKING_DAYS}</span> working days / ${CALENDAR_DAYS} total days</span>
+        <span class="badge-item" style="background: #f0f7ff; padding: 0.3rem 1.2rem; border-radius: 40px;">
+            <i class="fas fa-calendar-check"></i>
+            <span style="display: flex; align-items: center; gap: 8px;">
+                <span>Working days:</span>
+                <input type="number" id="workingDaysInput" value="${WORKING_DAYS}" min="1" max="${CALENDAR_DAYS}"
+                       style="width: 60px; padding: 0.2rem 0.5rem; border: 2px solid #3b82f6; border-radius: 30px;
+                              font-weight: 600; text-align: center; background: white;"
+                       onchange="handleWorkingDaysChange(this.value)">
+                <span class="days-chip" style="background: #e4edfb; padding: 0.2rem 1rem;">
+                    <i class="far fa-clock"></i> ${CALENDAR_DAYS} total
+                </span>
+                <span id="workingDaysStatus" style="font-size: 0.8rem; color: #2563eb; font-weight: 500;">
+                    (from data)
+                </span>
+            </span>
+        </span>
     `;
+
+    // Handle working days change
+    window.handleWorkingDaysChange = function(value) {
+        const newValue = parseInt(value);
+        if (newValue >= 1 && newValue <= CALENDAR_DAYS) {
+            WORKING_DAYS = newValue;
+            isManualOverride = (newValue !== ACTUAL_WORKING_DAYS);
+
+            // Update status indicator
+            const statusSpan = document.getElementById("workingDaysStatus");
+            if (isManualOverride) {
+                statusSpan.innerHTML = '(manual override)';
+                statusSpan.style.color = '#dc2626';
+            } else {
+                statusSpan.innerHTML = '(from data)';
+                statusSpan.style.color = '#2563eb';
+            }
+
+            // Recalculate all wage-based values
+            updateWageAndProductivity();
+
+            // Highlight the change
+            document.querySelector('.wage-card').classList.add('highlight-update');
+            setTimeout(() => {
+                document.querySelector('.wage-card').classList.remove('highlight-update');
+            }, 500);
+        }
+    };
+
+    // Reset button to revert to actual working days
+    const resetButton = document.createElement('button');
+    resetButton.innerHTML = '<i class="fas fa-undo"></i>';
+    resetButton.style = 'background: none; border: none; color: #2563eb; cursor: pointer; font-size: 1rem; margin-left: 5px;';
+    resetButton.title = 'Reset to actual working days';
+    resetButton.onclick = function() {
+        document.getElementById('workingDaysInput').value = ACTUAL_WORKING_DAYS;
+        WORKING_DAYS = ACTUAL_WORKING_DAYS;
+        isManualOverride = false;
+        document.getElementById("workingDaysStatus").innerHTML = '(from data)';
+        document.getElementById("workingDaysStatus").style.color = '#2563eb';
+        updateWageAndProductivity();
+    };
+
+    // Append reset button after the status span
+    setTimeout(() => {
+        const statusSpan = document.getElementById("workingDaysStatus");
+        if (statusSpan) {
+            statusSpan.parentNode.appendChild(resetButton);
+        }
+    }, 100);
+
     document.getElementById("workDaysDisplay").innerText = WORKING_DAYS;
 
     // ------------------------------------------------------------------
     // NESTED GROUPING using product + type_B + pieces
-    // Store all fields for details
     // ------------------------------------------------------------------
     const groups = {};
 
@@ -709,7 +779,7 @@
     const GRAND_TOTAL = Object.values(productTotals).reduce((sum, val) => sum + val, 0);
 
     // ------------------------------------------------------------------
-    // RENDER TABLE (same as before, but now using WORKING_DAYS)
+    // RENDER TABLE (same as before)
     // ------------------------------------------------------------------
     const tbody = document.getElementById("tableBody");
     let grandTotal = 0;
@@ -755,8 +825,7 @@
                             day: "numeric",
                             month: "short",
                         });
-                        const statusClass = e.status === "GIVEN" ? "status-badge" : "status-badge";
-                        return `<span class="id-chip">ID:${e.id} | ${dateStr} | ${e.pieces}pcs | ⚖️ ${e.kg}kg | ${e.given_to ? e.given_to.substring(0, 15) + "…" : "—"} | <span class="${statusClass}">${e.status}</span></span>`;
+                        return `<span class="id-chip">ID:${e.id} | ${dateStr} | ${e.pieces}pcs | ⚖️ ${e.kg}kg | ${e.given_to ? e.given_to.substring(0, 15) + "…" : "—"} | <span class="status-badge">${e.status}</span></span>`;
                     })
                     .join(" ");
 
@@ -812,7 +881,7 @@
     };
 
     // ------------------------------------------------------------------
-    // WAGE & PRODUCTIVITY (based on WORKING_DAYS, not calendar days)
+    // WAGE & PRODUCTIVITY (based on WORKING_DAYS, with manual override)
     // ------------------------------------------------------------------
     const dailyWageInput = document.getElementById("dailyWageInput");
     const perDayCostSpan = document.getElementById("perDayCost");
@@ -834,7 +903,7 @@
         if (dailyWage < 0) dailyWage = 0;
         if (dailyWage > 100000) dailyWage = 100000;
 
-        // Total wage cost based on ACTUAL working days only
+        // Total wage cost based on current WORKING_DAYS
         const totalCost = dailyWage * WORKING_DAYS;
 
         // Pieces per working day (productivity)
@@ -854,6 +923,9 @@
         perDayCostSpan.innerText = `₹${formatIndianRupee(dailyWage)}`;
         totalWageCostSpan.innerText = `₹${formatIndianRupee(totalCost)}`;
         piecesPerDaySpan.innerText = piecesPerDayDisplay;
+
+        // Update the work days display in the cost item
+        document.getElementById("workDaysDisplay").innerText = WORKING_DAYS;
 
         if (costPerPiece !== lastCostPerPiece) {
             costBox.classList.add("highlight-update");
