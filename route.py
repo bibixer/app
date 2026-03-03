@@ -5,7 +5,7 @@ from form import Lump_data, bundle_invadata, Item_data, Outworker_form, Cutter_f
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from data_entry import add_data_lump,add_cutter,add_items,add_outworker_db,add_jobcard,in_move_entery
 from data_Process import get_serch_data, get_job_card_data_creation, get_retun_card_data, get_movemet_data, \
-    get_current_week_range, home_dashboard,bulk_data_lump,get_cutter_report_data
+    get_current_week_range, home_dashboard,get_cutter_report_data,outworker_name,master_report_card
 from modes import User
 def reset_session():
     for key in list(session.keys()):
@@ -57,30 +57,19 @@ def register_routes(app,db):
                 flash("select product name from blow","warning")
                 return redirect(url_for("lump_home"))
             data.pop("csrf_token", None)
-            if data['bundle_type'] != "goodCUT 20 picset" and data["bundle_type"] != "fent 20 picset":
-                if data['numbers_of_bundles'] > 6 :
+            if data['numbers_of_bundles'] > 6 :
                     flash("you can not enter more then 6")
                     return redirect(url_for("lump_home"))
 
                 # 🔄 reset any old flow
-                reset_session()
+            reset_session()
 
                 # 🚀 initialize bundle workflow
-                session["bundle_data"] = data
-                session["current_bundle"] = 1
-                session["bundles"] = {}
-                session["sno"]=0
-
-                return redirect(url_for("bundle_entery"))
-            elif data['bundle_type'] == "goodCUT 20 picset" or data["bundle_type"] == "fent 20 picset":
-                if data['numbers_of_bundles'] > 20 :
-                    flash("you can not enter more then 20 in bulk")
-                    return redirect(url_for("lump_home"))
-                all_data = bulk_data_lump(data)
-                add_data_lump(all_data, current_user)
-                reset_session()
-                flash("You have successfully entered the bundle.", "success")
-                return redirect(url_for("lump_home"))
+            session["bundle_data"] = data
+            session["current_bundle"] = 1
+            session["bundles"] = {}
+            session["sno"]=0
+            return redirect(url_for("bundle_entery"))
 
 
 
@@ -328,28 +317,69 @@ def register_routes(app,db):
             name_data_form.date_to.data = range_data["to_date"].date()
             name_data_form.name.render_kw['placeholder']= 'Enter cutter Name'
         if name_data_form.validate_on_submit():
-            result = get_cutter_report_data(name_data_form,current_user)
-            if result != 404:
-                return render_template("admin.html", date_from=name_data_form, type="CUTTER_Report",name=cuter_name,backend_data=result)
+            if name_data_form.name.data in cuter_name:
+                if name_data_form.date_from.data > name_data_form.date_to.data:
+                    flash("date range is wong  data from is gater then date to", "danger")
+                    return  redirect(url_for("cutter_report"))
+
+
+                result = get_cutter_report_data(name_data_form,current_user)
+                if result == 404:
+                    flash("Cutter Report user isue", "danger")
+
+                    return redirect(url_for("cutter_report"))
+
+                return render_template("admin.html", date_from=name_data_form, type="CUTTER_Report",
+                                       name=cuter_name, backend_data=result)
+
+
+            else:
+
+                flash("Cutter name not in list", "danger")
+
+                return redirect(url_for("cutter_report"))
+
 
 
         return render_template("admin.html", date_from=name_data_form, type="CUTTER_Report",name=cuter_name)
 
     @app.route("/outworker_report", methods=["GET", "POST"])
     @login_required
-    @oly_admin
+    # @oly_admin
     def outworker_report():
         name_data_form = Date_form_with_name()
         range_data = get_current_week_range()
+        outworker_name_data =  outworker_name(oly_full_name=True)
         if not name_data_form.is_submitted():
             name_data_form.date_from.data = range_data["from_date"].date()
             name_data_form.date_to.data = range_data["to_date"].date()
             name_data_form.name.render_kw = {
-                'placeholder': 'Enter outworker Name',
-
+                'placeholder': 'Enter outworker Name',"id":"name_f"
             }
+        if name_data_form.validate_on_submit():
+            data = name_data_form.data.copy()
+            if data["name"] not in outworker_name_data:
+                flash("ented name not in list", "danger")
+                return redirect(url_for("outworker_report"))
+            if data["date_from"] >  data['date_to']:
+                flash("date range is wong  data from is gater then date to", "danger")
+                return redirect(url_for("outworker_report"))
 
-        return render_template("admin.html", date_from=name_data_form, type="OUTWOKER_Report")
+            report =  master_report_card(data,current_user)
+            if report == 404:
+                flash("user not allowed", "danger")
+
+                return redirect(url_for("outworker_report"))
+            elif report == 402:
+                flash("ented name not in databases", "danger")
+                return redirect(url_for("outworker_report"))
+            elif report == 403:
+                flash("no flow for the name", "danger")
+                return redirect(url_for("outworker_report"))
+            return render_template("admin.html", date_from=name_data_form, type="OUTWOKER_Report",
+                                   name=outworker_name_data,backend_data=report)
+
+        return render_template("admin.html", date_from=name_data_form, type="OUTWOKER_Report", name=outworker_name_data)
 
     @app.route("/product_report", methods=["GET", "POST"])
     @login_required

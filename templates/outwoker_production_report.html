@@ -1,0 +1,1553 @@
+<div>
+  <!-- JSCharting libraries -->
+  <script src="https://code.jscharting.com/latest/jscharting.js"></script>
+  <script src="https://code.jscharting.com/latest/modules/toolbar.js"></script>
+  <script src="https://code.jscharting.com/latest/modules/types.js"></script>
+  <!-- Font Awesome -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+  />
+  <style>
+    /* Add to your existing styles */
+    .type-table tr {
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .type-table tr:hover {
+      filter: brightness(0.98);
+    }
+
+    .details-row {
+      cursor: default;
+      background: #f8fafc;
+    }
+
+    .details-row:hover {
+      background: #f1f5f9 !important;
+    }
+
+    .details-row td {
+      padding: 15px !important;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .details-row[style*="table-row"] {
+      animation: slideDown 0.2s ease-out;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      font-family:
+        "Inter",
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        sans-serif;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .title-section {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .title-section i {
+      font-size: 28px;
+      color: #1e4a7a;
+      background: white;
+      padding: 12px;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .title-section h1 {
+      font-size: 24px;
+      color: #0a2647;
+      font-weight: 600;
+    }
+
+    .date-badge {
+      background: white;
+      padding: 10px 25px;
+      border-radius: 40px;
+      display: flex;
+      gap: 25px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+      flex-wrap: wrap;
+    }
+
+    .badge-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #2c3e50;
+    }
+
+    /* Flow Cards */
+    .flow-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 25px;
+    }
+
+    .flow-card {
+      background: white;
+      border-radius: 24px;
+      padding: 20px 25px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 8px 20px rgba(0, 40, 80, 0.06);
+      border: 1px solid #e2ecfc;
+    }
+
+    .inflow-card {
+      background: linear-gradient(135deg, #e8f7e8, #d4ecd4);
+      border-color: #9bc0a8;
+    }
+
+    .outflow-card {
+      background: linear-gradient(135deg, #fee7e7, #fcd9d9);
+      border-color: #f0b0b0;
+    }
+
+    .flow-icon {
+      width: 60px;
+      height: 60px;
+      background: white;
+      border-radius: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .flow-stats {
+      text-align: right;
+    }
+
+    .flow-label {
+      font-size: 14px;
+      color: #5a6e8a;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .flow-number {
+      font-size: 32px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .inflow-card .flow-number {
+      color: #0f6e3f;
+    }
+
+    .outflow-card .flow-number {
+      color: #b33c3c;
+    }
+
+    .balance-card {
+      grid-column: span 2;
+      background: #e2efff;
+      border-radius: 60px;
+      padding: 15px 25px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border: 2px dashed #3b82f6;
+      font-size: 16px;
+    }
+
+    .balance-number {
+      font-size: 28px;
+      font-weight: 700;
+      color: #1e4a7a;
+    }
+
+    /* Summary Cards */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+
+    @media (max-width: 800px) {
+      .summary-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .summary-item {
+      background: white;
+      border-radius: 20px;
+      padding: 15px;
+      text-align: center;
+      border: 1px solid #d9e8ff;
+    }
+
+    .summary-label {
+      font-size: 13px;
+      color: #6b7f9c;
+    }
+
+    .summary-value {
+      font-size: 22px;
+      font-weight: 700;
+      color: #1e3a6b;
+      margin: 5px 0 0;
+    }
+
+    .summary-small {
+      font-size: 12px;
+      color: #7a8eaa;
+    }
+
+    .days-highlight {
+      background: linear-gradient(135deg, #fff3cd, #ffe69c);
+      border-color: #ffc107;
+    }
+
+    .days-highlight .summary-value {
+      color: #856404;
+    }
+
+    /* Old Balance Panel */
+    .old-balance-panel {
+      background: white;
+      border-radius: 24px;
+      padding: 20px;
+      margin-bottom: 25px;
+      border: 2px solid #0d6efd;
+      box-shadow: 0 4px 15px rgba(13, 110, 253, 0.1);
+    }
+
+    .old-balance-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 18px;
+      font-weight: 600;
+      color: #084298;
+      margin-bottom: 15px;
+    }
+
+    .old-balance-title i {
+      font-size: 22px;
+    }
+
+    .old-balance-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 15px;
+    }
+
+    .old-balance-item {
+      background: #e7f1ff;
+      border-radius: 16px;
+      padding: 12px;
+      border: 1px solid #9ac5ff;
+    }
+
+    .old-balance-product {
+      font-weight: 700;
+      color: #084298;
+      font-size: 16px;
+    }
+
+    .old-balance-type {
+      font-size: 13px;
+      color: #495057;
+      margin: 5px 0;
+    }
+
+    .old-balance-value {
+      font-size: 20px;
+      font-weight: 700;
+      color: #0d6efd;
+    }
+
+    /* Product Cards */
+    .product-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+      margin-top: 20px;
+    }
+
+    .product-card {
+      background: white;
+      border-radius: 28px;
+      padding: 20px;
+      border: 1px solid #d9e8ff;
+      box-shadow: 0 12px 30px -10px rgba(0, 45, 80, 0.12);
+    }
+
+    .product-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 2px solid #ecf3fa;
+      padding-bottom: 15px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .product-header i {
+      font-size: 22px;
+      background: #e8f0fe;
+      padding: 10px;
+      border-radius: 16px;
+      color: #1d4a89;
+    }
+
+    .product-header h2 {
+      font-size: 24px;
+      font-weight: 700;
+      margin: 0;
+      color: #0a2647;
+    }
+
+    .product-header .product-stats {
+      margin-left: auto;
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .product-stat {
+      text-align: right;
+    }
+
+    .product-stat-label {
+      font-size: 12px;
+      color: #6b7f9c;
+    }
+
+    .product-stat-value {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    /* Type Tables */
+    .type-tables {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .type-table-container {
+      background: #f8fcff;
+      border-radius: 20px;
+      border: 1px solid #cde0fa;
+      overflow: hidden;
+    }
+
+    .type-header {
+      background: #e2edfe;
+      padding: 12px 15px;
+      font-weight: 700;
+      font-size: 18px;
+      color: #084298;
+      border-bottom: 2px solid #3b82f6;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .type-header span {
+      font-size: 14px;
+      font-weight: normal;
+      color: #495057;
+    }
+
+    .type-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    .type-table th {
+      background: #f1f7fd;
+      color: #133457;
+      font-weight: 600;
+      padding: 10px 8px;
+      text-align: center;
+    }
+
+    .type-table td {
+      padding: 8px;
+      border-bottom: 1px solid #eaf1f9;
+      text-align: center;
+    }
+
+    .inflow-row {
+      background: #e6f7e6;
+    }
+
+    .outflow-row {
+      background: #ffe6e6;
+    }
+
+    .balance-positive {
+      color: #0f6e3f;
+      font-weight: 700;
+    }
+
+    .balance-negative {
+      color: #b33c3c;
+      font-weight: 700;
+    }
+
+    .opening-badge {
+      background: #cfe2ff;
+      padding: 4px 8px;
+      border-radius: 20px;
+      font-size: 12px;
+      color: #084298;
+    }
+
+    .type-summary {
+      background: #f0f7ff;
+      font-weight: 600;
+    }
+
+    .type-summary td {
+      border-top: 2px solid #a0c0e8;
+    }
+
+    /* Filters */
+    .global-filters {
+      background: #f4fafe;
+      border-radius: 40px;
+      padding: 15px 20px;
+      margin-bottom: 25px;
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .filter-input {
+      flex: 1;
+      min-width: 200px;
+      padding: 10px 15px;
+      border: 1px solid #cde0fa;
+      border-radius: 30px;
+      font-size: 14px;
+    }
+
+    .filter-input:focus {
+      outline: none;
+      border-color: #3b82f6;
+    }
+
+    .filter-select {
+      padding: 10px 30px 10px 15px;
+      border: 1px solid #cde0fa;
+      border-radius: 30px;
+      font-size: 14px;
+      background: white;
+    }
+
+    .filter-button {
+      background: #1e4a7a;
+      color: white;
+      border: none;
+      padding: 10px 30px;
+      border-radius: 30px;
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    .filter-button:hover {
+      background: #2c5b9c;
+    }
+
+    .id-chip {
+      background: white;
+      border: 1px solid #3b82f6;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-size: 11px;
+      display: inline-block;
+    }
+
+    .empty-message {
+      text-align: center;
+      color: #8a9cb0;
+      padding: 40px;
+      font-style: italic;
+    }
+
+    /* Product Selector for Charts */
+    .chart-product-selector {
+      background: #f4fafe;
+      border-radius: 30px;
+      padding: 10px 15px;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    .chart-product-selector select {
+      padding: 8px 25px 8px 15px;
+      border: 1px solid #b4cae5;
+      border-radius: 30px;
+      font-size: 14px;
+      color: #133a66;
+      background: white;
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .chart-product-selector label {
+      font-weight: 600;
+      color: #1d3d62;
+    }
+
+    /* Charts Section */
+    .charts-section {
+      margin-top: 30px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    @media (max-width: 1000px) {
+      .charts-section {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .charts-section {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .chart-card {
+      background: white;
+      border-radius: 24px;
+      padding: 15px;
+      border: 1px solid #d9e8ff;
+      box-shadow: 0 8px 20px -8px rgba(0, 45, 80, 0.1);
+    }
+
+    .chart-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid #ecf3fa;
+      padding-bottom: 10px;
+      margin-bottom: 15px;
+    }
+
+    .chart-header i {
+      font-size: 18px;
+      background: #e8f0fe;
+      padding: 8px;
+      border-radius: 12px;
+      color: #1d4a89;
+    }
+
+    .chart-header h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin: 0;
+      color: #1d3d62;
+    }
+
+    .chart-container {
+      height: 200px;
+      width: 100%;
+    }
+
+    .legend {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin: 8px 0;
+      font-size: 11px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .legend-color {
+      width: 10px;
+      height: 10px;
+      border-radius: 5px;
+    }
+
+    .legend-in {
+      background: #22c55e;
+    }
+
+    .legend-out {
+      background: #ef4444;
+    }
+
+    .legend-premium {
+      background: #8b5cf6;
+    }
+
+    .legend-standard {
+      background: #f59e0b;
+    }
+  </style>
+
+  <div class="dashboard">
+    <!-- Header -->
+    <div class="header">
+      <div class="title-section">
+        <i class="fas fa-clipboard-list"></i>
+        <h1>Sicher · Production Dashboard</h1>
+      </div>
+      <div class="date-badge" id="dateBadge"></div>
+    </div>
+
+    <!-- Flow Cards -->
+    <div class="flow-grid">
+      <div class="flow-card inflow-card">
+        <div class="flow-icon">
+          <i class="fas fa-arrow-down" style="color: #0f6e3f"></i>
+        </div>
+        <div class="flow-stats">
+          <div class="flow-label">Total Inflow</div>
+          <div class="flow-number" id="totalInflow">0</div>
+        </div>
+      </div>
+      <div class="flow-card outflow-card">
+        <div class="flow-icon">
+          <i class="fas fa-arrow-up" style="color: #b33c3c"></i>
+        </div>
+        <div class="flow-stats">
+          <div class="flow-label">Total Outflow</div>
+          <div class="flow-number" id="totalOutflow">0</div>
+        </div>
+      </div>
+      <div class="balance-card">
+        <span
+          ><i class="fas fa-scale-balanced"></i> Net Stock (Inflow -
+          Outflow)</span
+        >
+        <span class="balance-number" id="netStock">0</span>
+      </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="summary-grid">
+      <div class="summary-item">
+        <div class="summary-label">Products</div>
+        <div class="summary-value" id="totalProducts">0</div>
+        <div class="summary-small">unique</div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-label">Types</div>
+        <div class="summary-value" id="totalTypes">0</div>
+        <div class="summary-small">variants</div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-label">Transactions</div>
+        <div class="summary-value" id="totalTransactions">0</div>
+        <div class="summary-small">total</div>
+      </div>
+      <div class="summary-item days-highlight">
+        <div class="summary-label">Total Days</div>
+        <div class="summary-value" id="totalDays">0</div>
+        <div class="summary-small">in range</div>
+      </div>
+    </div>
+
+    <!-- Old Balance Panel -->
+    <div class="old-balance-panel" id="oldBalancePanel">
+      <div class="old-balance-title">
+        <i class="fas fa-history"></i>
+        <span>Opening Balance (Carry Forward)</span>
+      </div>
+      <div class="old-balance-container" id="oldBalanceContainer">
+        <!-- Filled by JavaScript -->
+      </div>
+    </div>
+
+    <!-- Global Filters -->
+    <div class="global-filters">
+      <input
+        type="text"
+        class="filter-input"
+        id="productFilter"
+        placeholder="Filter by product..."
+      />
+      <input
+        type="text"
+        class="filter-input"
+        id="typeFilter"
+        placeholder="Filter by type..."
+      />
+      <select class="filter-select" id="flowFilter">
+        <option value="all">All transactions</option>
+        <option value="in">Inflow only</option>
+        <option value="out">Outflow only</option>
+      </select>
+      <button class="filter-button" onclick="applyFilters()">
+        Apply Filters
+      </button>
+    </div>
+
+    <!-- Product Cards with Type Tables -->
+    <div class="product-cards" id="productCards"></div>
+
+    <!-- Product Selector for Type Charts -->
+    <div class="chart-product-selector">
+      <label for="chartProductSelect"
+        >Select Product for Type Distribution:</label
+      >
+      <select id="chartProductSelect" onchange="updateTypeCharts()">
+        <option value="all">All Products</option>
+      </select>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="charts-section">
+      <!-- Chart 1: Product Inflow Distribution -->
+      <div class="chart-card">
+        <div class="chart-header">
+          <i class="fas fa-chart-pie"></i>
+          <h3>Product Inflow</h3>
+        </div>
+        <div class="chart-container">
+          <div id="productInflowChart" style="width: 100%; height: 100%"></div>
+        </div>
+      </div>
+
+      <!-- Chart 2: Product Outflow Distribution -->
+      <div class="chart-card">
+        <div class="chart-header">
+          <i class="fas fa-chart-pie"></i>
+          <h3>Product Outflow</h3>
+        </div>
+        <div class="chart-container">
+          <div id="productOutflowChart" style="width: 100%; height: 100%"></div>
+        </div>
+      </div>
+
+      <!-- Chart 3: Type Inflow Distribution (Product Specific) -->
+      <div class="chart-card">
+        <div class="chart-header">
+          <i class="fas fa-chart-pie"></i>
+          <h3>Type Inflow</h3>
+        </div>
+        <div class="legend">
+          <div class="legend-item">
+            <span class="legend-color legend-premium"></span>
+            <span>Premium</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-color legend-standard"></span>
+            <span>Standard</span>
+          </div>
+        </div>
+        <div class="chart-container">
+          <div id="typeInflowChart" style="width: 100%; height: 100%"></div>
+        </div>
+      </div>
+
+      <!-- Chart 4: Type Outflow Distribution (Product Specific) -->
+      <div class="chart-card">
+        <div class="chart-header">
+          <i class="fas fa-chart-pie"></i>
+          <h3>Type Outflow</h3>
+        </div>
+        <div class="legend">
+          <div class="legend-item">
+            <span class="legend-color legend-premium"></span>
+            <span>Premium</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-color legend-standard"></span>
+            <span>Standard</span>
+          </div>
+        </div>
+        <div class="chart-container">
+          <div id="typeOutflowChart" style="width: 100%; height: 100%"></div>
+        </div>
+      </div>
+
+      <!-- Chart 5: Daily Inflow Bar Chart -->
+      <div class="chart-card">
+        <div class="chart-header">
+          <i class="fas fa-chart-bar"></i>
+          <h3>Daily Inflow</h3>
+        </div>
+        <div class="chart-container">
+          <div id="dailyInflowChart" style="width: 100%; height: 100%"></div>
+        </div>
+      </div>
+
+      <!-- Chart 6: Daily Outflow Bar Chart -->
+      <div class="chart-card">
+        <div class="chart-header">
+          <i class="fas fa-chart-bar"></i>
+          <h3>Daily Outflow</h3>
+        </div>
+        <div class="chart-container">
+          <div id="dailyOutflowChart" style="width: 100%; height: 100%"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+        (function () {
+          // ============================================
+          // SAMPLE DATA
+          // ============================================
+          const sampleData =  {{backend_data | tojson}}
+          // Use sample data
+          const data = sampleData;
+
+          // Parse dates
+          data.date_from = new Date(data.date_from);
+          data.date_to = new Date(data.date_to);
+          data.tres.forEach((item) => {
+            item.entry_datetime = new Date(item.entry_datetime);
+          });
+
+          // ============================================
+          // PROCESS OLD BALANCE DATA
+          // ============================================
+          const oldBalanceMap = new Map(); // Key: product|type, Value: pieces
+
+          if (data.old_bal_data && Array.isArray(data.old_bal_data)) {
+            data.old_bal_data.forEach((item) => {
+              const key = `${item.product}|${item.type}`;
+              oldBalanceMap.set(key, item.pieces);
+            });
+          }
+
+          // ============================================
+          // GROUP TRANSACTIONS BY PRODUCT AND TYPE
+          // ============================================
+          const transactionsByProduct = {};
+
+          data.tres.forEach((entry) => {
+            const product = entry.product;
+            const type = entry.type_B;
+
+            if (!transactionsByProduct[product]) {
+              transactionsByProduct[product] = {};
+            }
+            if (!transactionsByProduct[product][type]) {
+              transactionsByProduct[product][type] = [];
+            }
+
+            transactionsByProduct[product][type].push({
+              id: entry.id,
+              date: entry.entry_datetime,
+              pieces: entry.pieces,
+              kg: entry.kg,
+              isIn: entry.flow && entry.flow.toLowerCase() === "in",
+              flow: entry.flow,
+            });
+          });
+
+          // Sort transactions by date for each product/type
+          Object.keys(transactionsByProduct).forEach((product) => {
+            Object.keys(transactionsByProduct[product]).forEach((type) => {
+              transactionsByProduct[product][type].sort((a, b) => a.date - b.date);
+            });
+          });
+
+          // ============================================
+          // CALCULATE TOTALS
+          // ============================================
+          let totalIn = 0,
+            totalOut = 0;
+          const productIn = {},
+            productOut = {};
+          const typeInByProduct = {},
+            typeOutByProduct = {};
+
+          data.tres.forEach((entry) => {
+            const isIn = entry.flow && entry.flow.toLowerCase() === "in";
+            if (isIn) totalIn += entry.pieces;
+            else totalOut += entry.pieces;
+
+            if (!productIn[entry.product]) productIn[entry.product] = 0;
+            if (!productOut[entry.product]) productOut[entry.product] = 0;
+
+            // Initialize product-type objects
+            if (!typeInByProduct[entry.product])
+              typeInByProduct[entry.product] = {};
+            if (!typeOutByProduct[entry.product])
+              typeOutByProduct[entry.product] = {};
+
+            if (isIn) {
+              productIn[entry.product] += entry.pieces;
+              typeInByProduct[entry.product][entry.type_B] =
+                (typeInByProduct[entry.product][entry.type_B] || 0) + entry.pieces;
+            } else {
+              productOut[entry.product] += entry.pieces;
+              typeOutByProduct[entry.product][entry.type_B] =
+                (typeOutByProduct[entry.product][entry.type_B] || 0) + entry.pieces;
+            }
+          });
+
+          const products = Object.keys(transactionsByProduct).sort();
+          const allTypes = new Set(data.tres.map((t) => t.type_B));
+
+          // Update summary stats
+          document.getElementById("totalProducts").innerText = products.length;
+          document.getElementById("totalTypes").innerText = allTypes.size;
+          document.getElementById("totalTransactions").innerText = data.tres.length;
+          document.getElementById("totalInflow").innerText = totalIn;
+          document.getElementById("totalOutflow").innerText = totalOut;
+          document.getElementById("netStock").innerText = totalIn - totalOut;
+
+          // Calculate total days
+          const oneDay = 24 * 60 * 60 * 1000;
+          const totalDays =
+            Math.round(Math.abs((data.date_to - data.date_from) / oneDay)) + 1;
+          document.getElementById("totalDays").innerText = totalDays;
+
+          // Date range display
+          const startDate = data.date_from.toLocaleDateString("en-IN", {
+            day: "numeric",
+            month: "short",
+            year: "numeric",
+          });
+          const endDate = data.date_to.toLocaleDateString("en-IN", {
+            day: "numeric",
+            month: "short",
+            year: "numeric",
+          });
+          document.getElementById("dateBadge").innerHTML = `
+            <span class="badge-item"><i class="fas fa-user"></i> ${data.name}</span>
+            <span class="badge-item"><i class="fas fa-calendar"></i> ${startDate} - ${endDate}</span>
+            <span class="badge-item"><i class="fas fa-list"></i> ${data.tres.length} transactions</span>
+          `;
+
+          // ============================================
+          // RENDER OLD BALANCE PANEL
+          // ============================================
+          function renderOldBalance() {
+            const container = document.getElementById("oldBalanceContainer");
+            container.innerHTML = "";
+
+            if (oldBalanceMap.size === 0) {
+              container.innerHTML =
+                '<div class="empty-message">No opening balance data</div>';
+              return;
+            }
+
+            const oldBalances = [];
+            oldBalanceMap.forEach((pieces, key) => {
+              const [product, type] = key.split("|");
+              oldBalances.push({ product, type, pieces });
+            });
+
+            oldBalances.sort((a, b) => {
+              if (a.product !== b.product)
+                return a.product.localeCompare(b.product);
+              return a.type.localeCompare(b.type);
+            });
+
+            oldBalances.forEach((item) => {
+              const div = document.createElement("div");
+              div.className = "old-balance-item";
+              div.innerHTML = `
+                <div class="old-balance-product">${item.product}</div>
+                <div class="old-balance-type">${item.type}</div>
+                <div class="old-balance-value">${item.pieces} pcs</div>
+              `;
+              container.appendChild(div);
+            });
+          }
+
+          renderOldBalance();
+
+          // ============================================
+          // POPULATE PRODUCT SELECTOR
+          // ============================================
+          const chartProductSelect = document.getElementById("chartProductSelect");
+          products.forEach((product) => {
+            const option = document.createElement("option");
+            option.value = product;
+            option.textContent = product;
+            chartProductSelect.appendChild(option);
+          });
+
+          // ============================================
+          // RENDER PRODUCT CARDS WITH TYPE TABLES
+          // ============================================
+          function renderProductCards(
+            filterProduct = "",
+            filterType = "",
+            filterFlow = "all",
+          ) {
+            const container = document.getElementById("productCards");
+            container.innerHTML = "";
+
+            products.forEach((product) => {
+              // Check if product matches filter
+              if (
+                filterProduct &&
+                !product.toLowerCase().includes(filterProduct.toLowerCase())
+              )
+                return;
+
+              const types = Object.keys(transactionsByProduct[product]).sort();
+              let productHasData = false;
+              let productInflow = 0,
+                productOutflow = 0;
+
+              // Create product card
+              const card = document.createElement("div");
+              card.className = "product-card";
+
+              // Product header
+              const header = document.createElement("div");
+              header.className = "product-header";
+
+              // Calculate product totals
+              types.forEach((type) => {
+                const transactions = transactionsByProduct[product][type];
+                transactions.forEach((t) => {
+                  if (t.isIn) productInflow += t.pieces;
+                  else productOutflow += t.pieces;
+                });
+              });
+
+             let totalOldBalance = 0;
+types.forEach((type) => {
+  const oldKey = `${product}|${type}`;
+  const oldBal = oldBalanceMap.get(oldKey) || 0;
+  totalOldBalance += oldBal;
+});
+
+// Then use totalOldBalance in the header
+header.innerHTML = `
+  <i class="fas fa-box"></i>
+  <h2>${product}</h2>
+  <div class="product-stats">
+    <div class="product-stat">
+      <div class="product-stat-label">Total Old Balance</div>
+      <div class="product-stat-value" style="color:#2563eb">${totalOldBalance}</div>
+    </div>
+    <div class="product-stat">
+      <div class="product-stat-label">Total Inflow</div>
+      <div class="product-stat-value" style="color:#0f6e3f">↓${productInflow}</div>
+    </div>
+    <div class="product-stat">
+      <div class="product-stat-label">Total Outflow</div>
+      <div class="product-stat-value" style="color:#b33c3c">↑${productOutflow}</div>
+    </div>
+    <div class="product-stat">
+      <div class="product-stat-label">Net Stock</div>
+      <div class="product-stat-value" style="color:${productInflow - productOutflow >= 0 ? "#0f6e3f" : "#b33c3c"}">
+        ${productInflow - productOutflow >= 0 ? "+" + (productInflow - productOutflow) : productInflow - productOutflow}
+      </div>
+    </div>
+  </div>
+`;
+
+card.appendChild(header);
+
+// Type tables container
+const tablesContainer = document.createElement("div");
+tablesContainer.className = "type-tables";
+
+// Create table for each type
+types.forEach((type) => {
+  // Check if type matches filter
+  if (
+    filterType &&
+    !type.toLowerCase().includes(filterType.toLowerCase())
+  )
+    return;
+
+  const transactions = transactionsByProduct[product][type];
+  const oldKey = `${product}|${type}`;
+  const openingBalance = oldBalanceMap.get(oldKey) || 0;
+                // Filter transactions
+                let filteredTransactions = [...transactions];
+                if (filterFlow === "in") {
+                  filteredTransactions = filteredTransactions.filter((t) => t.isIn);
+                } else if (filterFlow === "out") {
+                  filteredTransactions = filteredTransactions.filter(
+                    (t) => !t.isIn,
+                  );
+                }
+
+                if (filteredTransactions.length === 0) return;
+                productHasData = true;
+
+                // Calculate running balance
+                let runningBalance = openingBalance;
+                const transactionsWithBalance = filteredTransactions.map((t) => {
+                  if (t.isIn) {
+                    runningBalance += t.pieces;
+                  } else {
+                    runningBalance -= t.pieces;
+                  }
+                  return {
+                    ...t,
+                    balance: runningBalance,
+                  };
+                });
+
+                const typeInflow = filteredTransactions
+                  .filter((t) => t.isIn)
+                  .reduce((sum, t) => sum + t.pieces, 0);
+                const typeOutflow = filteredTransactions
+                  .filter((t) => !t.isIn)
+                  .reduce((sum, t) => sum + t.pieces, 0);
+                const typeNet = typeInflow - typeOutflow;
+                const closingBalance = openingBalance + typeNet;
+
+                // Type table container
+                const typeContainer = document.createElement("div");
+                typeContainer.className = "type-table-container";
+
+                // Type header
+                const typeHeader = document.createElement("div");
+                typeHeader.className = "type-header";
+                typeHeader.innerHTML = `
+                  ${type}
+                  <span>Opening: ${openingBalance} | In: ${typeInflow} | Out: ${typeOutflow} | Net: ${typeNet >= 0 ? "+" + typeNet : typeNet} | Closing: ${closingBalance}</span>
+                `;
+                typeContainer.appendChild(typeHeader);
+
+               // Table
+    // Table
+// Table
+                const table = document.createElement("table");
+                table.className = "type-table";
+
+                // Table header
+                const thead = document.createElement("thead");
+                thead.innerHTML = `
+                  <tr>
+                    <th>Date</th>
+                    <th>ID</th>
+                    <th>Pieces</th>
+                    <th>In/Out</th>
+                    <th>Previous</th>
+                    <th>Change</th>
+                    <th>New Balance</th>
+                    <th>Calculation</th>
+                  </tr>
+                `;
+                table.appendChild(thead);
+
+                // Table body
+                const tbody = document.createElement("tbody");
+
+                // Opening balance row
+                const openingRow = document.createElement("tr");
+                openingRow.style.background = "#e7f1ff";
+                openingRow.innerHTML = `
+                  <td colspan="4" style="text-align:left; font-weight:600"><i class="fas fa-play"></i> Opening Balance</td>
+                  <td>-</td>
+                  <td>-</td>
+                  <td class="balance-positive">${openingBalance}</td>
+                  <td><span class="opening-badge">Carry Forward</span></td>
+                `;
+                tbody.appendChild(openingRow);
+
+                // Transaction rows
+                let prevBalance = openingBalance;
+                transactionsWithBalance.forEach((t) => {
+                  const change = t.isIn ? `+${t.pieces}` : `-${t.pieces}`;
+                  const calculation = t.isIn
+                    ? `${prevBalance} + ${t.pieces} = ${t.balance}`
+                    : `${prevBalance} - ${t.pieces} = ${t.balance}`;
+                  const dateStr = t.date.toLocaleDateString("en-IN", {
+                    day: "numeric",
+                    month: "short",
+                  });
+
+                  // Main transaction row
+                  const row = document.createElement("tr");
+                  row.className = t.isIn ? "inflow-row" : "outflow-row";
+                  row.style.cursor = "pointer";
+                  row.setAttribute("data-transaction-id", t.id);
+
+                  row.innerHTML = `
+                    <td>${dateStr}</td>
+                    <td><span class="id-chip">#${t.id}</span></td>
+                    <td>${t.pieces}</td>
+                    <td>${t.isIn ? "↓ IN" : "↑ OUT"}</td>
+                    <td>${prevBalance}</td>
+                    <td style="color: ${t.isIn ? "#0f6e3f" : "#b33c3c"}; font-weight:600">${change}</td>
+                    <td class="${t.balance >= 0 ? "balance-positive" : "balance-negative"}">${t.balance}</td>
+                    <td style="font-size:12px; color:#666">${calculation}</td>
+                  `;
+
+                  // Add click handler
+                  row.onclick = function(e) {
+                    e.stopPropagation();
+                    toggleDetails(this);
+                  };
+
+                  tbody.appendChild(row);
+
+                  // Create details row
+                  const detailsRow = document.createElement("tr");
+                  detailsRow.className = "details-row";
+                  detailsRow.style.display = "none";
+
+                  // Get all available fields from the original transaction data
+                  // Find the original transaction to get all fields
+                  const originalTransaction = data.tres.find(item => item.id === t.id) || {};
+
+                  const details = [];
+                  if (originalTransaction.product) details.push({ label: 'Product', value: originalTransaction.product });
+                  if (originalTransaction.type_B) details.push({ label: 'Type', value: originalTransaction.type_B });
+                  if (originalTransaction.kg) details.push({ label: 'KG', value: originalTransaction.kg });
+                  if (originalTransaction.color) details.push({ label: 'Color', value: originalTransaction.color });
+                  if (originalTransaction.cut_by) details.push({ label: 'Cut By', value: originalTransaction.cut_by });
+                  if (originalTransaction.labe_made_by) details.push({ label: 'Label Made By', value: originalTransaction.labe_made_by });
+                  if (originalTransaction.give_by) details.push({ label: 'Given By', value: originalTransaction.give_by });
+                  if (originalTransaction.give_taken) details.push({ label: 'Give/Taken', value: originalTransaction.give_taken });
+                  if (originalTransaction.flow) details.push({ label: 'Flow', value: originalTransaction.flow });
+                  if (originalTransaction.entry_datetime) {
+                    details.push({
+                      label: 'Entry Time',
+                      value: new Date(originalTransaction.entry_datetime).toLocaleString("en-IN")
+                    });
+                  }
+
+                  // Build details HTML
+                  const detailsHTML = details.length > 0 ? details.map(d => `
+                    <div style="background: white; padding: 8px 12px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                      <strong style="color: #1e293b; min-width: 100px; display: inline-block;">${d.label}:</strong>
+                      <span style="color: #334155;">${d.value}</span>
+                    </div>
+                  `).join('') : '<div style="background: white; padding: 8px 12px; border-radius: 8px;">No additional details available</div>';
+
+                  detailsRow.innerHTML = `
+                    <td colspan="8" style="background: #f8fafc; padding: 15px;">
+                      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 10px;">
+                        ${detailsHTML}
+                      </div>
+                    </td>
+                  `;
+
+                  tbody.appendChild(detailsRow);
+
+                  prevBalance = t.balance;
+                });
+
+                // Summary row
+                const summaryRow = document.createElement("tr");
+                summaryRow.className = "type-summary";
+                summaryRow.innerHTML = `
+                  <td colspan="4" style="text-align:right; font-weight:600">${type} Summary →</td>
+                  <td>${openingBalance}</td>
+                  <td style="color: ${typeNet >= 0 ? "#0f6e3f" : "#b33c3c"}">${typeNet >= 0 ? "+" + typeNet : typeNet}</td>
+                  <td class="${closingBalance >= 0 ? "balance-positive" : "balance-negative"}">${closingBalance}</td>
+                  <td style="font-size:12px">Closing = Opening + Net</td>
+                `;
+                tbody.appendChild(summaryRow);
+
+                table.appendChild(tbody);
+                typeContainer.appendChild(table);
+                tablesContainer.appendChild(typeContainer);
+
+                // ===== IMPORTANT: Close the types.forEach loop =====
+              }); // This closes the types.forEach
+
+              if (productHasData) {
+                card.appendChild(tablesContainer);
+                container.appendChild(card);
+              }
+            }); // This closes the products.forEach
+
+            if (container.children.length === 0) {
+              container.innerHTML =
+                '<div class="empty-message">No products match your filters</div>';
+            }
+          } // This closes renderProductCards function
+
+          // Add the toggleDetails function
+          window.toggleDetails = function(clickedRow) {
+            // Get the next row which should be the details row
+            const detailsRow = clickedRow.nextElementSibling;
+
+            // Check if next row exists and has class 'details-row'
+            if (detailsRow && detailsRow.classList.contains('details-row')) {
+              // First, hide all other open details rows in the same table
+              const tbody = clickedRow.closest('tbody');
+              if (tbody) {
+                tbody.querySelectorAll('.details-row').forEach(row => {
+                  if (row !== detailsRow && row.style.display === 'table-row') {
+                    row.style.display = 'none';
+                  }
+                });
+              }
+
+              // Toggle current details row
+              if (detailsRow.style.display === 'table-row') {
+                detailsRow.style.display = 'none';
+              } else {
+                detailsRow.style.display = 'table-row';
+              }
+            }
+          };
+          // ============================================
+          // RENDER CHARTS
+          // ============================================
+          function renderProductCharts() {
+            // 1. Product Inflow Pie Chart
+            const inflowPoints = products
+              .map((p) => ({
+                name: p,
+                y: productIn[p] || 0,
+              }))
+              .filter((p) => p.y > 0);
+
+            JSC.chart("productInflowChart", {
+              type: "pie",
+              series: [
+                {
+                  points: inflowPoints,
+                  palette: ["#22c55e", "#4ade80", "#86efac", "#bbf7d0"],
+                },
+              ],
+              defaultPoint: {
+                label: { text: "<b>%name</b><br>%yValue", placement: "auto" },
+                tooltip: "%name: %yValue pcs",
+              },
+              legend: { visible: false },
+            });
+
+            // 2. Product Outflow Pie Chart
+            const outflowPoints = products
+              .map((p) => ({
+                name: p,
+                y: productOut[p] || 0,
+              }))
+              .filter((p) => p.y > 0);
+
+            JSC.chart("productOutflowChart", {
+              type: "pie",
+              series: [
+                {
+                  points: outflowPoints,
+                  palette: ["#ef4444", "#f87171", "#fca5a5", "#fecaca"],
+                },
+              ],
+              defaultPoint: {
+                label: { text: "<b>%name</b><br>%yValue", placement: "auto" },
+                tooltip: "%name: %yValue pcs",
+              },
+              legend: { visible: false },
+            });
+
+            // Prepare daily data
+            const dailyData = {};
+            data.tres.forEach((item) => {
+              const date = item.entry_datetime.toLocaleDateString("en-IN", {
+                day: "numeric",
+                month: "short",
+              });
+              if (!dailyData[date]) {
+                dailyData[date] = { in: 0, out: 0 };
+              }
+              if (item.flow === "in") {
+                dailyData[date].in += item.pieces;
+              } else {
+                dailyData[date].out += item.pieces;
+              }
+            });
+
+            const dates = Object.keys(dailyData).sort((a, b) => {
+              const [da, ma] = a.split(" ");
+              const [db, mb] = b.split(" ");
+              const months = {
+                Jan: 1,
+                Feb: 2,
+                Mar: 3,
+                Apr: 4,
+                May: 5,
+                Jun: 6,
+                Jul: 7,
+                Aug: 8,
+                Sep: 9,
+                Oct: 10,
+                Nov: 11,
+                Dec: 12,
+              };
+              if (months[ma] !== months[mb]) return months[ma] - months[mb];
+              return parseInt(da) - parseInt(db);
+            });
+
+            // 5. Daily Inflow Bar Chart
+            JSC.chart("dailyInflowChart", {
+              type: "column",
+              series: [
+                {
+                  name: "Inflow",
+                  points: dates.map((d) => ({ name: d, y: dailyData[d].in })),
+                  color: "#22c55e",
+                },
+              ],
+              xAxis: { label: { text: "" } },
+              yAxis: { label: { text: "Pieces" } },
+              legend: { visible: false },
+            });
+
+            // 6. Daily Outflow Bar Chart
+            JSC.chart("dailyOutflowChart", {
+              type: "column",
+              series: [
+                {
+                  name: "Outflow",
+                  points: dates.map((d) => ({ name: d, y: dailyData[d].out })),
+                  color: "#ef4444",
+                },
+              ],
+              xAxis: { label: { text: "" } },
+              yAxis: { label: { text: "Pieces" } },
+              legend: { visible: false },
+            });
+          }
+
+          // Function to update type charts based on selected product
+          window.updateTypeCharts = function () {
+            const selectedProduct =
+              document.getElementById("chartProductSelect").value;
+
+            let typeInflowPoints = [];
+            let typeOutflowPoints = [];
+
+            if (selectedProduct === "all") {
+              // Aggregate across all products
+              const typeInflowTotal = {};
+              const typeOutflowTotal = {};
+
+              products.forEach((product) => {
+                Object.entries(typeInByProduct[product] || {}).forEach(
+                  ([type, value]) => {
+                    typeInflowTotal[type] = (typeInflowTotal[type] || 0) + value;
+                  },
+                );
+                Object.entries(typeOutByProduct[product] || {}).forEach(
+                  ([type, value]) => {
+                    typeOutflowTotal[type] = (typeOutflowTotal[type] || 0) + value;
+                  },
+                );
+              });
+
+              typeInflowPoints = Object.keys(typeInflowTotal).map((type) => ({
+                name: type,
+                y: typeInflowTotal[type],
+              }));
+
+              typeOutflowPoints = Object.keys(typeOutflowTotal).map((type) => ({
+                name: type,
+                y: typeOutflowTotal[type],
+              }));
+            } else {
+              // Specific product
+              typeInflowPoints = Object.keys(
+                typeInByProduct[selectedProduct] || {},
+              ).map((type) => ({
+                name: type,
+                y: typeInByProduct[selectedProduct][type],
+              }));
+
+              typeOutflowPoints = Object.keys(
+                typeOutByProduct[selectedProduct] || {},
+              ).map((type) => ({
+                name: type,
+                y: typeOutByProduct[selectedProduct][type],
+              }));
+            }
+
+            // 3. Type Inflow Chart
+            JSC.chart("typeInflowChart", {
+              type: "pie",
+              series: [
+                {
+                  points: typeInflowPoints,
+                  palette: ["#8b5cf6", "#f59e0b", "#ec4899", "#14b8a6"],
+                },
+              ],
+              defaultPoint: {
+                label: { text: "<b>%name</b><br>%yValue", placement: "auto" },
+                tooltip: "%name: %yValue pcs",
+              },
+              legend: { visible: false },
+            });
+
+            // 4. Type Outflow Chart
+            JSC.chart("typeOutflowChart", {
+              type: "pie",
+              series: [
+                {
+                  points: typeOutflowPoints,
+                  palette: ["#8b5cf6", "#f59e0b", "#ec4899", "#14b8a6"],
+                },
+              ],
+              defaultPoint: {
+                label: { text: "<b>%name</b><br>%yValue", placement: "auto" },
+                tooltip: "%name: %yValue pcs",
+              },
+              legend: { visible: false },
+            });
+          };
+
+          // ============================================
+          // INITIAL RENDER
+          // ============================================
+          renderProductCards();
+          renderProductCharts();
+          updateTypeCharts(); // Initialize type charts with default selection
+
+          // Filter function
+          window.applyFilters = function () {
+            const productFilter = document.getElementById("productFilter").value;
+            const typeFilter = document.getElementById("typeFilter").value;
+            const flowFilter = document.getElementById("flowFilter").value;
+            renderProductCards(productFilter, typeFilter, flowFilter);
+          };
+        })();
+  </script>
+</div>

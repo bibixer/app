@@ -6,21 +6,7 @@ from collections import defaultdict
 from sqlalchemy import func
 from modes import db
 
-# fist for lump data
-# get cuter dta
-# get product data
 
-# demodata_{'main':
-# {'bundle_type': 'lump', 'colors': 'red', 'cuter_name': 'MANOJ', 'meters': 125.0, 'numbers_of_bundles': 2, 'product_name': 'GOLD 2MTR', 'submit': True},
-# 'bundles': {'1': {'kg_of_bundle': 25.0, 'no_of_pics': 1, 'no_of_so': 25, 'submit': True}, '2': {'kg_of_bundle': 1.0, 'no_of_pics': 25, 'no_of_so': 26, 'submit': True}}
-# }
-
-def bulk_data_lump(data):
-    main = data
-    bundles = {}
-    for i in range(1,main['numbers_of_bundles']+1):
-        bundles[i] = {'kg_of_bundle':0.001 ,'no_of_pics': 20, 'no_of_so': 10505 }
-    return {'main':main, 'bundles':bundles}
 
 def get_cuter_name():
     cuter_name = Cuter.query.all()
@@ -365,3 +351,169 @@ def get_cutter_report_data(data,current_user):
         'tres': all_bundle,
 
     }
+
+
+
+# cuuter repot_wokrk
+# {
+#         name: "Ramesh (Supervisor)",
+#         date_from: "2026-03-01",
+#         date_to: "2026-03-07",
+#         old_bal_data: [
+#           { product: "Vimal", type: "Premium", pieces: 30 },
+#           { product: "Vimal", type: "Standard", pieces: 15 },
+#           { product: "Basmati Rice", type: "Premium", pieces: 100 },
+#           { product: "Basmati Rice", type: "Standard", pieces: 50 },
+#           { product: "Organic Wheat", type: "Premium", pieces: 75 },
+#         ],
+#         tres: [
+#           // VIMAL - Premium: 3 in, 5 out | Standard: 2 in, 4 out
+#
+#           {
+#             id: 109,
+#             entry_datetime: "2026-03-02T14:00:00",
+#             product: "Organic Wheat",
+#             type_B: "Standard",
+#             pieces: 60,
+#             kg: 1500,
+#             flow: "out",
+#           },
+#           {
+#             id: 110,
+#             entry_datetime: "2026-03-03T15:30:00",
+#             product: "Organic Wheat",
+#             type_B: "Premium",
+#             pieces: 20,
+#             kg: 500,
+#             flow: "in",
+#           },
+#         ],
+#       };
+
+
+# 402 outwower name not found
+# 403 for flow not found
+
+def master_report_card(data:dict,current_user):
+    if current_user.is_authenticated:
+        if current_user.role != 1:
+            return 404
+    if not current_user.is_authenticated:
+        return 404
+    product_flow_data = []
+    old_data =[]
+    # chek name if in database  or not
+
+    all_name =  outworker_name(oly_full_name=True)
+    if data["name"]not in all_name:
+        return 402
+
+    # check for flow
+    is_flow = Jobmovement.query.filter_by(name_of_mater=data['name']).first()
+
+    if not is_flow:
+        return 403
+    # # get old date
+
+    old_flow =  (
+        Jobmovement.query.filter_by(name_of_mater=data['name']).filter(
+            Jobmovement.date<  datetime.combine(data["date_from"], time.min)  # 00:00:00 of start date
+        ).order_by(
+            Jobmovement.product_name,
+            Jobmovement.type_B
+        ).all()
+    )
+    product_flow_old = defaultdict(
+        lambda: defaultdict(lambda: {"IN": [], "OUT": []})
+    )
+
+    for job in old_flow:
+        product_flow_old[job.product_name][job.type_B][job.flow_type].append(
+            job.to_dict()
+        )
+    so = 0
+    for product, types in product_flow_old.items():
+        for type_b, flows in types.items():
+
+            total_in = sum(i.get("inflow", 0) for i in flows["IN"])
+            total_out = sum(i.get("outflow", 0) for i in flows["OUT"])
+
+            balance = total_out - total_in
+
+            if balance != 0:
+                so +=1
+                old_data.append({
+                    "so":so,
+                    "product": product,
+                    "type": type_b,
+                    "pieces": -(balance),
+
+                })
+
+    # get date of that range
+
+    # {
+    #             id: 110,
+    #             entry_datetime: "2026-03-03T15:30:00",
+    #             product: "Organic Wheat",
+    #             type_B: "Premium",
+    #             pieces: 20,
+    #             kg: 500,
+    #             flow: "in",
+    #           }
+    rag_date  =  (
+        Jobmovement.query.filter_by(name_of_mater=data['name']).filter(
+            Jobmovement.date.between(
+
+                    datetime.combine(data['date_from'], time.min),  # 00:00:00 of start date
+                    datetime.combine(data['date_to'], time.max)  # 23:59:59.999999 of end date
+                )
+            )  # 00:00:00 of start date
+        ).order_by(
+            Jobmovement.product_name,
+            Jobmovement.type_B
+        ).all()
+
+    if rag_date !=[]:
+         for date_range_data in rag_date:
+           if date_range_data.flow_type == "OUT":
+               buundle = Bundle.query.get(date_range_data.bundle)
+               lump =  Lump.query.get(buundle.lump_id)
+               product_flow_data.append({
+
+                       'id': date_range_data.id,
+                       "entry_datetime": date_range_data.date,
+                       "product": date_range_data.product_name,
+                       "type_B": date_range_data.type_B,
+                       "pieces": date_range_data.outflow,
+                       "kg": buundle.kg,
+                       "flow": "out",
+                       "color": buundle.color,
+                       "cut_by":lump.cut_by,
+                       "labe_made_by":lump.enter_user,
+                       "give_by":date_range_data.enter_user,
+               })
+
+           if date_range_data.flow_type == "IN":
+               product_flow_data.append({
+
+                       'id': date_range_data.id,
+                       "entry_datetime": date_range_data.date,
+                       "product": date_range_data.product_name,
+                       "type_B": date_range_data.type_B,
+                       "pieces": date_range_data.inflow,
+                       "kg": 0.01,
+                       "flow": "in",
+                       "give_taken":date_range_data.enter_user,
+               })
+
+    return {
+        'name': data["name"],
+        'date_from': data["date_from"],
+        'date_to': data['date_to'],
+        'old_bal_data': old_data,
+        'tres': product_flow_data,
+
+    }
+
+
