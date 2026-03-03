@@ -186,3 +186,53 @@ class Date_form_with_name(FlaskForm):
     submit = SubmitField(
         'Submit',
         render_kw={"class": "button"})
+
+
+
+
+class party_name(FlaskForm):
+    name = StringField(
+        "Name",
+        validators=[DataRequired()],render_kw={"placeholder": "Enter name of party"}
+    )
+    submit = SubmitField(
+        "Submit",
+        render_kw={
+            "class": "button"
+        }
+    )
+class bale_data_form(FlaskForm):
+    party_name = StringField("party name",validators=[DataRequired()],render_kw={"placeholder": "Enter name of party"})
+    lot_number =  IntegerField(
+        "Lot Number",
+        validators=[DataRequired()],
+    )
+    lot_count = IntegerField(
+        "Lot Count",
+        validators=[DataRequired()],
+    )
+    bale_number = IntegerField(
+        "bale number",
+        validators=[DataRequired()],
+        render_kw={"placeholder": "Enter bale number"}
+
+    )
+    packing_date = DateField('bale date')
+
+    cuter_name = StringField(
+        "Cut By",
+        validators=[DataRequired()],
+        render_kw={
+            "placeholder": "Enter cutter name",
+            "id": "cuter_name",
+        }
+    )
+
+    product_name = StringField(
+        "Product Name",
+        validators=[DataRequired()],
+        render_kw={
+            "placeholder": "Enter product name",
+            'id': "product_name",
+        }
+    )

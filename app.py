@@ -24,12 +24,54 @@ def create_app():
 
 
 logging.basicConfig(filename='flask.log', level=logging.INFO)
+
+# from sqlalchemy import inspect, text
+# def ensure_new_column(new_columns, table_names):
+#     inspector = inspect(db.engine)
+#
+#     for table in table_names:
+#         columns = [col["name"] for col in inspector.get_columns(table)]
+#
+#         for col_name, (col_type, nullable) in new_columns.items():
+#             if col_name not in columns:
+#                 # Determine SQL type
+#                 if isinstance(col_type, db.String):
+#                     sql_type = f"VARCHAR({col_type.length or 255})"
+#                     default_val = "''"
+#                 elif isinstance(col_type, db.Integer):
+#                     sql_type = "INTEGER"
+#                     default_val = "0"
+#                 else:
+#                     sql_type = "TEXT"
+#                     default_val = "''"
+#
+#                 # SQLite cannot add NOT NULL without default, so fix that
+#                 if nullable:
+#                     alter_stmt = f"ALTER TABLE {table} ADD COLUMN {col_name} {sql_type} NULL;"
+#                 else:
+#                     alter_stmt = f"ALTER TABLE {table} ADD COLUMN {col_name} {sql_type} NOT NULL DEFAULT {default_val};"
+#
+#                 print(f"🧩 Adding missing column '{col_name}' to {table}...")
+#                 with db.engine.connect() as conn:
+#                     conn.execute(text(alter_stmt))
+#                 print(f"✅ Column '{col_name}' added to {table} successfully!")
+#             else:
+#                 print(f"✅ Column '{col_name}' already exists in {table} — no change needed.")
+
 if __name__ == '__main__':
     app = create_app()
     logging.info("Flask service starting")
     serve(app, host='127.0.0.1', port=5000, threads=8)
-
     # with app.app_context():
+    #      new_columns = {
+    #              "bale_id ": (db.Integer,False),
+    #          }
+    #      ensure_new_column(new_columns, ["LumpData"])
+
+
+
+
+
     #     data = []
     #     from sqlalchemy.exc import IntegrityError
     #

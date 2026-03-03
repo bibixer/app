@@ -480,7 +480,6 @@ def master_report_card(data:dict,current_user):
                buundle = Bundle.query.get(date_range_data.bundle)
                lump =  Lump.query.get(buundle.lump_id)
                product_flow_data.append({
-
                        'id': date_range_data.id,
                        "entry_datetime": date_range_data.date,
                        "product": date_range_data.product_name,
@@ -491,6 +490,7 @@ def master_report_card(data:dict,current_user):
                        "color": buundle.color,
                        "cut_by":lump.cut_by,
                        "labe_made_by":lump.enter_user,
+                       "bindle_id":date_range_data.bundle,
                        "give_by":date_range_data.enter_user,
                })
 

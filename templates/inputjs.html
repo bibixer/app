@@ -1,106 +1,132 @@
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-    const isPC = !('ontouchstart' in window || navigator.maxTouchPoints > 0);
-    if (!isPC) return;
 
-    const forms = document.querySelectorAll("form.form");
+  // Better desktop detection (more reliable than touch check)
+  const isPC = window.matchMedia("(pointer: fine)").matches;
+  if (!isPC) return;
 
-    forms.forEach(form => {
-      const inputs = Array.from(form.querySelectorAll("input, textarea, select")).filter(el =>
-        el.type !== "submit" &&
-        !el.disabled &&
-        !el.readOnly &&
-        el.offsetParent !== null
-      );
+  const forms = document.querySelectorAll("form.form");
 
-      const isEmpty = (el) => {
-        if (el.tagName === "SELECT") return false;
-        return !el.value || el.value.trim() === "";
-      };
+  forms.forEach(form => {
 
-      const focusAndMoveCursorToEnd = (el) => {
-        // Remove highlight from all fields
-        inputs.forEach(i => i.classList.remove('focused-field'));
+    const inputs = Array.from(
+      form.querySelectorAll("input, textarea, select")
+    ).filter(el =>
+      el.type !== "submit" &&
+      !el.disabled &&
+      !el.readOnly &&
+      el.offsetParent !== null
+    );
 
-        // Highlight current field
-        el.classList.add('focused-field');
+    const isEmpty = (el) => {
+      if (el.tagName === "SELECT") return false;
+      return !el.value || el.value.trim() === "";
+    };
 
-        // Focus and scroll
-        el.focus();
-        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    const focusAndMoveCursorToEnd = (el) => {
 
-        // For text/number fields, move cursor to end
-        if (el.tagName === "SELECT") return;
+      inputs.forEach(i => i.classList.remove("focused-field"));
 
-        if (el.type === "number") {
-          const val = el.value;
-          el.blur();
-          el.focus();
-          el.value = '';
-          el.value = val;
-        } else if (typeof el.setSelectionRange === 'function') {
-          const len = el.value.length;
-          setTimeout(() => {
-            el.setSelectionRange(len, len);
-          }, 0);
-        }
-      };
+      el.classList.add("focused-field");
+      el.focus();
+      el.scrollIntoView({ behavior: "smooth", block: "center" });
 
-      let focusField = inputs.find(el => isEmpty(el));
-      if (!focusField && inputs.length > 0) focusField = inputs[0];
+      if (el.tagName === "SELECT") return;
 
-      if (focusField) {
+      const safeTextTypes = [
+        "text", "search", "tel", "url",
+        "password", "email"
+      ];
+
+      if (safeTextTypes.includes(el.type)) {
+        const len = el.value.length;
         requestAnimationFrame(() => {
-          focusAndMoveCursorToEnd(focusField);
+          try {
+            el.setSelectionRange(len, len);
+          } catch (err) {
+            // silently ignore unsupported types
+          }
         });
       }
 
-      inputs.forEach((input, index) => {
-        input.addEventListener("keydown", function (e) {
-          if (e.key === "Enter") {
-            e.preventDefault();
+      else if (el.type === "number") {
+        const val = el.value;
+        el.blur();
+        el.focus();
+        el.value = "";
+        el.value = val;
+      }
 
-            if (isEmpty(input)) return;
+      // date/time/color/etc just focus only
+    };
 
-            const next = inputs[index + 1];
-            if (next) {
-              focusAndMoveCursorToEnd(next);
+    // Initial focus logic
+    let focusField = inputs.find(el => isEmpty(el));
+    if (!focusField && inputs.length > 0) focusField = inputs[0];
+
+    if (focusField) {
+      requestAnimationFrame(() => {
+        focusAndMoveCursorToEnd(focusField);
+      });
+    }
+
+    inputs.forEach((input, index) => {
+
+      input.addEventListener("keydown", function (e) {
+
+        if (e.key === "Enter") {
+          e.preventDefault();
+
+          if (isEmpty(input)) return;
+
+          const next = inputs[index + 1];
+
+          if (next) {
+            focusAndMoveCursorToEnd(next);
+          } else {
+
+            const allFilled = inputs.every(el =>
+              el.tagName === "SELECT" || !isEmpty(el)
+            );
+
+            if (allFilled) {
+              const btn = form.querySelector(
+                "button[type=submit], input[type=submit]"
+              );
+              if (btn) btn.click();
             } else {
-              const allFilled = inputs.every(el => {
-                if (el.tagName === "SELECT") return true;
-                return !isEmpty(el);
-              });
-              if (allFilled) {
-                const btn = form.querySelector("button[type=submit], input[type=submit]");
-                if (btn) btn.click();
-              } else {
-                alert("Please fill all fields before submitting.");
-              }
-            }
-
-          } else if (e.key === "Backspace") {
-            if (input.tagName === "SELECT" || isEmpty(input)) {
-              e.preventDefault();
-              if (index > 0) {
-                focusAndMoveCursorToEnd(inputs[index - 1]);
-              }
+              alert("Please fill all fields before submitting.");
             }
           }
-        });
+        }
 
-        // Highlight any field when manually focused
-        input.addEventListener("focus", () => {
-          inputs.forEach(i => i.classList.remove('focused-field'));
-          input.classList.add('focused-field');
-        });
+        else if (e.key === "Backspace") {
+          if (input.tagName === "SELECT" || isEmpty(input)) {
+            e.preventDefault();
+            if (index > 0) {
+              focusAndMoveCursorToEnd(inputs[index - 1]);
+            }
+          }
+        }
+
       });
+
+      input.addEventListener("focus", () => {
+        inputs.forEach(i => i.classList.remove("focused-field"));
+        input.classList.add("focused-field");
+      });
+
     });
+
   });
+
+});
 </script>
 
 <style>
-    .focused-field {
+.focused-field {
   outline: 2px solid #0d6efd;
   background-color: #eef5ff;
+  transition: background-color 0.2s ease;
 }
 </style>

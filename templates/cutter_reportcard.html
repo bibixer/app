@@ -1,7 +1,9 @@
-
-  <div>
-
-
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cutter · Production + Supplier/Lot/Bale View</title>
     <!-- JSCharting libraries -->
     <script src="https://code.jscharting.com/latest/jscharting.js"></script>
     <script src="https://code.jscharting.com/latest/modules/toolbar.js"></script>
@@ -13,173 +15,146 @@
     />
     <style>
       /* Vertical details container */
-.details-vertical-container {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
+      .details-vertical-container {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .group-summary-vertical {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+        padding: 10px 15px;
+        background: white;
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+        font-size: 13px;
+      }
+      .summary-total {
+        color: #0369a1;
+        font-weight: 600;
+      }
+      .summary-pieces {
+        color: #166534;
+        font-weight: 600;
+      }
+      .summary-kg {
+        color: #6b21a8;
+        font-weight: 600;
+      }
+      .summary-avg {
+        color: #9a3412;
+        font-weight: 600;
+      }
 
-/* Group summary for vertical layout */
-.group-summary-vertical {
-    display: flex;
-    gap: 15px;
-    flex-wrap: wrap;
-    padding: 10px 15px;
-    background: white;
-    border-radius: 10px;
-    border: 1px solid #e2e8f0;
-    font-size: 13px;
-}
+      .entries-vertical-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        max-height: 300px;
+        overflow-y: auto;
+        padding: 4px;
+      }
+      .entry-item {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 10px 12px;
+        transition: all 0.2s;
+      }
+      .entry-item:hover {
+        background: #f1f5f9;
+        border-color: #94a3b8;
+      }
+      .entry-row {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        flex-wrap: wrap;
+        font-size: 13px;
+      }
+      .entry-id {
+        font-family: monospace;
+        font-weight: 600;
+        color: #2563eb;
+        background: #dbeafe;
+        padding: 3px 8px;
+        border-radius: 20px;
+        min-width: 60px;
+        text-align: center;
+      }
+      .entry-date {
+        color: #475569;
+        font-weight: 500;
+        min-width: 70px;
+      }
+      .entry-pieces {
+        color: #059669;
+        background: #d1fae5;
+        padding: 3px 10px;
+        border-radius: 20px;
+        min-width: 70px;
+        text-align: center;
+      }
+      .entry-kg {
+        color: #7c3aed;
+        background: #ede9fe;
+        padding: 3px 10px;
+        border-radius: 20px;
+        min-width: 70px;
+        text-align: center;
+      }
+      .entry-kg-per-pc {
+        color: #b45309;
+        background: #ffedd5;
+        padding: 3px 10px;
+        border-radius: 20px;
+        min-width: 80px;
+        text-align: center;
+      }
+      .entry-given {
+        color: #1e293b;
+        background: #f1f5f9;
+        padding: 3px 12px;
+        border-radius: 20px;
+        min-width: 80px;
+        text-align: center;
+      }
+      .entry-status {
+        padding: 3px 12px;
+        border-radius: 20px;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 11px;
+        min-width: 70px;
+        text-align: center;
+      }
+      .entry-status.completed {
+        background: #dcfce7;
+        color: #166534;
+      }
+      .entry-status.pending {
+        background: #fef9c3;
+        color: #854d0e;
+      }
+      .entry-status.cancelled {
+        background: #fee2e2;
+        color: #991b1b;
+      }
 
-.summary-total {
-    color: #0369a1;
-    font-weight: 600;
-}
+      /* Scrollbar */
+      .entries-vertical-list::-webkit-scrollbar {
+        width: 6px;
+      }
+      .entries-vertical-list::-webkit-scrollbar-track {
+        background: #f1f5f9;
+        border-radius: 10px;
+      }
+      .entries-vertical-list::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 10px;
+      }
 
-.summary-pieces {
-    color: #166534;
-    font-weight: 600;
-}
-
-.summary-kg {
-    color: #6b21a8;
-    font-weight: 600;
-}
-
-.summary-avg {
-    color: #9a3412;
-    font-weight: 600;
-}
-
-/* Vertical entries list */
-.entries-vertical-list {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    max-height: 300px;
-    overflow-y: auto;
-    padding: 4px;
-}
-
-/* Individual entry item */
-.entry-item {
-    background: white;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    padding: 10px 12px;
-    transition: all 0.2s;
-}
-
-.entry-item:hover {
-    background: #f1f5f9;
-    border-color: #94a3b8;
-}
-
-/* Entry row with all details */
-.entry-row {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    flex-wrap: wrap;
-    font-size: 13px;
-}
-
-.entry-id {
-    font-family: monospace;
-    font-weight: 600;
-    color: #2563eb;
-    background: #dbeafe;
-    padding: 3px 8px;
-    border-radius: 20px;
-    min-width: 60px;
-    text-align: center;
-}
-
-.entry-date {
-    color: #475569;
-    font-weight: 500;
-    min-width: 70px;
-}
-
-.entry-pieces {
-    color: #059669;
-    background: #d1fae5;
-    padding: 3px 10px;
-    border-radius: 20px;
-    min-width: 70px;
-    text-align: center;
-}
-
-.entry-kg {
-    color: #7c3aed;
-    background: #ede9fe;
-    padding: 3px 10px;
-    border-radius: 20px;
-    min-width: 70px;
-    text-align: center;
-}
-
-.entry-kg-per-pc {
-    color: #b45309;
-    background: #ffedd5;
-    padding: 3px 10px;
-    border-radius: 20px;
-    min-width: 80px;
-    text-align: center;
-}
-
-.entry-given {
-    color: #1e293b;
-    background: #f1f5f9;
-    padding: 3px 12px;
-    border-radius: 20px;
-    min-width: 80px;
-    text-align: center;
-}
-
-.entry-status {
-    padding: 3px 12px;
-    border-radius: 20px;
-    font-weight: 600;
-    text-transform: uppercase;
-    font-size: 11px;
-    min-width: 70px;
-    text-align: center;
-}
-
-.entry-status.completed {
-    background: #dcfce7;
-    color: #166534;
-}
-
-.entry-status.pending {
-    background: #fef9c3;
-    color: #854d0e;
-}
-
-.entry-status.cancelled {
-    background: #fee2e2;
-    color: #991b1b;
-}
-
-/* Scrollbar styling */
-.entries-vertical-list::-webkit-scrollbar {
-    width: 6px;
-}
-
-.entries-vertical-list::-webkit-scrollbar-track {
-    background: #f1f5f9;
-    border-radius: 10px;
-}
-
-.entries-vertical-list::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
-    border-radius: 10px;
-}
-
-.entries-vertical-list::-webkit-scrollbar-thumb:hover {
-    background: #94a3b8;
-}
       * {
         box-sizing: border-box;
         margin: 0;
@@ -319,6 +294,91 @@
         font-size: 2.2rem;
         color: #002856;
       }
+
+      /* Global meter row - product based */
+      .global-meter-row {
+        background: linear-gradient(145deg, #e3efff, #d4e7fc);
+        border-radius: 60px;
+        padding: 1.2rem 2rem;
+        margin-bottom: 2rem;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 2.5rem;
+        border: 1px solid #9bbdf0;
+      }
+      .global-product-input {
+        display: flex;
+        align-items: center;
+        gap: 1.2rem;
+      }
+      .global-product-input label {
+        font-weight: 700;
+        color: #00337a;
+        font-size: 1.1rem;
+      }
+      .global-product-input select,
+      .global-product-input input {
+        background: white;
+        border: 2px solid #3b82f6;
+        border-radius: 40px;
+        padding: 0.6rem 1.5rem;
+        font-weight: 600;
+        color: #10345e;
+        font-size: 1rem;
+        outline: none;
+      }
+      .global-product-input input {
+        width: 130px;
+        border-color: #b8d1f0;
+      }
+      .global-stats {
+        display: flex;
+        gap: 2rem;
+        margin-left: auto;
+      }
+      .stat-card {
+        background: white;
+        border-radius: 50px;
+        padding: 0.4rem 1.8rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        box-shadow: 0 4px 12px #b9d2f0;
+      }
+      .stat-label {
+        font-size: 0.8rem;
+        color: #2f4d73;
+      }
+      .stat-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #00337a;
+        line-height: 1.2;
+      }
+
+      /* View Toggle */
+      .view-toggle {
+        display: flex;
+        gap: 1rem;
+        margin: 1rem 0;
+      }
+      .toggle-btn {
+        background: white;
+        border: 2px solid #d7e3f5;
+        border-radius: 40px;
+        padding: 0.6rem 2rem;
+        font-weight: 600;
+        color: #1d3d62;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .toggle-btn.active {
+        background: #1e4a7a;
+        color: white;
+        border-color: #1e4a7a;
+      }
+
       .grid-main {
         display: grid;
         grid-template-columns: 2fr 1fr;
@@ -330,6 +390,283 @@
           grid-template-columns: 1fr;
         }
       }
+
+      /* Supplier/Lot/Bale cards styling */
+      .supplier-container {
+        background: white;
+        border-radius: 32px;
+        padding: 1.5rem;
+        box-shadow: 0 20px 40px -14px rgba(0, 45, 80, 0.18);
+      }
+      .supplier-card {
+        margin-bottom: 2rem;
+        border: 1px solid #d9e8fc;
+        border-radius: 28px;
+        padding: 1.2rem;
+        background: #f9fcff;
+      }
+      .supplier-header {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        border-bottom: 2px solid #cddff5;
+        padding-bottom: 0.8rem;
+        margin-bottom: 1rem;
+        cursor: pointer;
+      }
+      .supplier-header i {
+        font-size: 1.6rem;
+        color: #1d4a89;
+        background: #ecf3fa;
+        padding: 0.5rem;
+        border-radius: 16px;
+      }
+      .supplier-header h3 {
+        font-size: 1.4rem;
+        font-weight: 600;
+      }
+      .supplier-header .collapse-icon {
+        margin-left: auto;
+        color: #2563eb;
+      }
+
+      .lot-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+        gap: 1rem;
+      }
+      .lot-card {
+        background: white;
+        border-radius: 24px;
+        padding: 1rem;
+        border: 1px solid #b9d2f0;
+      }
+      .lot-header {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        border-bottom: 1px dashed #a0bde0;
+        padding-bottom: 0.6rem;
+        margin-bottom: 0.8rem;
+        cursor: pointer;
+      }
+      .lot-header h4 {
+        font-size: 1.1rem;
+        font-weight: 600;
+      }
+      .lot-badge {
+        background: #1e3b64;
+        color: white;
+        padding: 0.2rem 1rem;
+        border-radius: 30px;
+        font-size: 0.8rem;
+        margin-left: auto;
+      }
+      .lot-summary {
+        background: #ecf7ff;
+        border-radius: 30px;
+        padding: 0.6rem 1rem;
+        margin-bottom: 0.8rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        font-size: 0.9rem;
+      }
+      .lot-summary span {
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+      }
+      .avg-value {
+        font-weight: 700;
+        color: #00337a;
+      }
+
+      .bale-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 0.8rem;
+      }
+      .bale-card {
+        background: #f2f9fc;
+        border-radius: 20px;
+        padding: 0.8rem;
+        border-left: 4px solid #3b82f6;
+      }
+      .bale-title {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        flex-wrap: wrap;
+        border-bottom: 1px dashed #a0bde0;
+        padding-bottom: 0.4rem;
+        margin-bottom: 0.6rem;
+      }
+      .bale-no {
+        font-weight: 600;
+        background: white;
+        padding: 0.2rem 1rem;
+        border-radius: 20px;
+      }
+      .packing-date {
+        background: #d9e8fc;
+        padding: 0.2rem 1rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+      }
+      .packing-slip {
+        background: #1e3b64;
+        color: white;
+        padding: 0.2rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        margin-left: auto;
+      }
+      .bale-stats {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        background: #ecf7ff;
+        border-radius: 30px;
+        padding: 0.4rem 0.8rem;
+        margin: 0.4rem 0;
+        font-size: 0.85rem;
+      }
+      .bale-stat-item {
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+      }
+      .bale-stat-item .val {
+        font-weight: 700;
+        color: #00337a;
+      }
+      .lump-item {
+        background: white;
+        border-radius: 16px;
+        padding: 0.6rem;
+        margin: 0.6rem 0;
+        border: 1px solid #b9d2f0;
+      }
+      .lump-header {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        flex-wrap: wrap;
+      }
+      .lump-name {
+        font-weight: 600;
+        color: #00337a;
+      }
+      .lump-backend-data {
+        background: #e8f0fe;
+        border-radius: 20px;
+        padding: 0.4rem 1rem;
+        margin: 0.4rem 0;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        font-size: 0.85rem;
+        border: 1px solid #b9d2f0;
+      }
+      .backend-item {
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+      }
+      .backend-item .label {
+        color: #1e4a7a;
+        font-weight: 500;
+      }
+      .backend-item .value {
+        font-weight: 700;
+        color: #00337a;
+      }
+      .meter-row {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin: 0.4rem 0;
+        flex-wrap: wrap;
+      }
+      .meter-input-group {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .meter-input-group label {
+        font-weight: 500;
+        color: #1e3a6b;
+      }
+      .meter-input-group input {
+        border: 2px solid #b8d1f0;
+        border-radius: 30px;
+        padding: 0.3rem 0.8rem;
+        width: 80px;
+        font-weight: 600;
+        outline: none;
+      }
+      .meter-input-group input:focus {
+        border-color: #3b82f6;
+      }
+      .lump-stats {
+        display: flex;
+        gap: 0.8rem;
+        margin-left: auto;
+      }
+      .stat-pill {
+        background: #ecf3fa;
+        padding: 0.2rem 0.8rem;
+        border-radius: 30px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        font-size: 0.8rem;
+      }
+      .stat-pill .big {
+        font-weight: 700;
+        color: #00337a;
+      }
+      .bundle-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.75rem;
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        margin-top: 0.4rem;
+      }
+      .bundle-table th {
+        background: #e2edfe;
+        padding: 0.2rem;
+      }
+      .bundle-table td {
+        padding: 0.2rem;
+        border-bottom: 1px solid #d9e5f5;
+      }
+      .status-badge {
+        background: #dcfce7;
+        color: #166534;
+        padding: 0.1rem 0.4rem;
+        border-radius: 20px;
+        font-size: 0.7rem;
+      }
+      .waste-badge {
+        background: #fee2e2;
+        color: #991b1b;
+        padding: 0.1rem 0.4rem;
+        border-radius: 20px;
+        font-size: 0.7rem;
+      }
+      .hidden {
+        display: none;
+      }
+      .collapsed .lot-content,
+      .collapsed .supplier-content {
+        display: none;
+      }
+
+      /* Original table styles preserved */
       .card {
         background: white;
         border-radius: 32px;
@@ -350,19 +687,6 @@
         padding: 0.7rem;
         border-radius: 20px;
         color: #1d4a89;
-      }
-      .card-header h2 {
-        font-size: 1.5rem;
-        font-weight: 570;
-        margin: 0;
-      }
-      .card-header h2 small {
-        background: #e2ecfc;
-        padding: 0.2rem 0.9rem;
-        border-radius: 30px;
-        font-size: 0.9rem;
-        margin-left: 1rem;
-        font-weight: 400;
       }
       .table-wrapper {
         overflow-x: auto;
@@ -386,38 +710,6 @@
         border-bottom: 1px solid #eaf1f9;
         text-align: center;
       }
-      .subtotal-row {
-        background: #f2f8ff;
-        font-weight: 550;
-      }
-      .subtotal-row td {
-        border-bottom: 1px solid #c2d8f0;
-      }
-      .details-row {
-        background: #f8fcff;
-        border-top: 2px dashed #a0c0e8;
-        border-bottom: 2px dashed #a0c0e8;
-      }
-      .details-row td {
-        padding: 1rem 0.5rem;
-        background: #f0f7ff;
-      }
-      .date-chips {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.5rem;
-        justify-content: center;
-      }
-      .date-chip {
-        background: white;
-        border: 1px solid #3b82f6;
-        color: #1e4a7a;
-        padding: 0.3rem 1rem;
-        border-radius: 30px;
-        font-size: 0.85rem;
-        font-weight: 500;
-        box-shadow: 0 2px 6px rgba(0, 60, 130, 0.1);
-      }
       .cut-badge {
         background: #e2edfe;
         padding: 0.2rem 1.4rem;
@@ -435,115 +727,13 @@
         font-size: 1.2rem;
         font-weight: 500;
       }
-      #grandTotalValue {
-        font-weight: 700;
-        color: #1b4886;
-        font-size: 2rem;
-        margin-left: 0.4rem;
-      }
-      .chart-item {
-        background: #fbfdff;
-        border-radius: 26px;
-        padding: 1.3rem 1rem 1rem 1rem;
-        margin-bottom: 2rem;
-      }
-      .chart-title {
-        display: flex;
-        align-items: center;
-        gap: 0.4rem;
-        font-weight: 550;
-        color: #1b3f64;
-        margin-bottom: 0.8rem;
-      }
-      #productChart,
-      #cutChart,
-      #dailyGroupBarChart {
-        width: 100%;
-        height: 280px;
-        background: transparent;
-      }
-      .selector-panel {
-        background: #f4fafe;
-        padding: 0.8rem 1.5rem;
-        border-radius: 60px;
-        display: flex;
-        align-items: center;
-        gap: 1.2rem;
-        flex-wrap: wrap;
-        margin: 1rem 0 1.2rem 0;
-      }
-      select {
-        background: white;
-        border: 1px solid #b4cae5;
-        padding: 0.6rem 2.4rem 0.6rem 1.4rem;
-        border-radius: 40px;
-        font-weight: 500;
-        font-size: 1rem;
-        color: #133a66;
-        appearance: none;
-        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="%232a508b" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>');
-        background-repeat: no-repeat;
-        background-position: right 1rem center;
-      }
-      .product-tag {
-        background: white;
-        padding: 0.3rem 1.8rem;
-        border-radius: 40px;
-        font-weight: 500;
-      }
-      hr {
-        border: 1px solid #e7f0fa;
-      }
-      .highlight-update {
-        animation: pulse 0.3s ease;
-      }
-      @keyframes pulse {
-        0% {
-          transform: scale(1);
-        }
-        50% {
-          transform: scale(1.02);
-          background: #fff7e0;
-        }
-        100% {
-          transform: scale(1);
-        }
-      }
-      .empty-message {
-        text-align: center;
-        color: #8a9cb0;
-        padding: 2rem;
-        font-style: italic;
-      }
       .expand-icon {
         cursor: pointer;
         color: #3b82f6;
         font-size: 1.2rem;
         margin-right: 0.5rem;
-        transition: 0.2s;
       }
-      .expand-icon:hover {
-        color: #1e4a7a;
-      }
-      .id-chip {
-        background: #e6f0ff;
-        border-radius: 20px;
-        padding: 0.2rem 0.8rem;
-        font-size: 0.8rem;
-        display: inline-block;
-        margin: 0.2rem;
-        border: 1px solid #bacde8;
-      }
-      .kg-badge {
-        background: #dcfce7;
-        color: #166534;
-        padding: 0.2rem 0.8rem;
-        border-radius: 20px;
-        font-size: 0.8rem;
-        font-weight: 500;
-        margin-left: 0.5rem;
-      }
-      /* Modern pie metrics row */
+      /* ===== METRICS ROW (PIE CHART METRICS) ===== */
       .metrics-row {
         display: flex;
         gap: 15px;
@@ -551,6 +741,7 @@
         flex-wrap: wrap;
         justify-content: center;
       }
+
       .metric-card {
         background: #f8fcff;
         border-radius: 30px;
@@ -562,6 +753,7 @@
         border: 1px solid #d9e8ff;
         box-shadow: 0 4px 10px rgba(0, 30, 70, 0.04);
       }
+
       .metric-icon {
         background: white;
         width: 50px;
@@ -574,28 +766,155 @@
         color: #2c5b9c;
         box-shadow: 0 4px 8px rgba(0, 60, 130, 0.1);
       }
+
       .metric-content {
         display: flex;
         flex-direction: column;
       }
+
       .metric-label {
         font-size: 0.85rem;
         color: #617b9b;
         text-transform: uppercase;
         letter-spacing: 0.3px;
       }
+
       .metric-value {
         font-size: 1.5rem;
         font-weight: 700;
         color: #1e3b64;
         line-height: 1.2;
       }
+
       .metric-value small {
         font-size: 0.9rem;
         font-weight: 400;
         color: #748aa8;
         margin-left: 5px;
+      } /* ===== PRODUCT SELECTOR SECTION ===== */
+      .selector-panel {
+        background: #f4fafe;
+        padding: 0.8rem 1.5rem;
+        border-radius: 60px;
+        display: flex;
+        align-items: center;
+        gap: 1.2rem;
+        flex-wrap: wrap;
+        margin: 1rem 0 1.2rem 0;
       }
+
+      .selector-panel i {
+        color: #1d4a89;
+        font-size: 1.2rem;
+      }
+
+      .selector-panel span {
+        font-weight: 500;
+        color: #1e3a6b;
+      }
+
+      select {
+        background: white;
+        border: 1px solid #b4cae5;
+        padding: 0.6rem 2.4rem 0.6rem 1.4rem;
+        border-radius: 40px;
+        font-weight: 500;
+        font-size: 1rem;
+        color: #133a66;
+        appearance: none;
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="%232a508b" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>');
+        background-repeat: no-repeat;
+        background-position: right 1rem center;
+        cursor: pointer;
+        outline: none;
+        transition: border-color 0.2s;
+      }
+
+      select:hover {
+        border-color: #3b82f6;
+      }
+
+      select:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+      }
+
+      .product-tag {
+        background: white;
+        padding: 0.3rem 1.8rem;
+        border-radius: 40px;
+        font-weight: 500;
+        color: #133a66;
+        border: 1px solid #b4cae5;
+        font-size: 0.95rem;
+      }
+
+      /* ===== CUT TYPE SPLIT SECTION ===== */
+      .chart-item {
+        background: #fbfdff;
+        border-radius: 26px;
+        padding: 1.3rem 1rem 1rem 1rem;
+        margin-bottom: 2rem;
+        border: 1px solid #e2ecf5;
+      }
+
+      .chart-title {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-weight: 550;
+        color: #1b3f64;
+        margin-bottom: 0.8rem;
+        font-size: 1.1rem;
+      }
+
+      .chart-title i {
+        color: #1d4a89;
+        font-size: 1.2rem;
+      }
+
+      #cutChart {
+        width: 100%;
+        height: 280px;
+        background: transparent;
+        min-height: 280px;
+      }
+
+      #cutChartEmptyMessage {
+        text-align: center;
+        color: #8a9cb0;
+        padding: 2rem;
+        font-style: italic;
+        background: #f8fcff;
+        border-radius: 20px;
+        margin: 1rem 0;
+      }
+
+      /* ===== DAILY PRODUCTION SECTION ===== */
+      #dailyGroupBarChart {
+        width: 100%;
+        height: 280px;
+        background: transparent;
+        min-height: 280px;
+      }
+
+      #dailyBarEmptyMessage {
+        text-align: center;
+        color: #8a9cb0;
+        padding: 2rem;
+        font-style: italic;
+        background: #f8fcff;
+        border-radius: 20px;
+        margin: 1rem 0;
+      }
+
+      /* Divider between sections */
+      hr {
+        border: 1px solid #e7f0fa;
+        margin: 1.5rem 0;
+      }
+
+      /* Stats badge (optional - if used in these sections) */
       .stats-badge {
         background: #e6f0ff;
         padding: 6px 18px;
@@ -606,19 +925,46 @@
         font-weight: 500;
         color: #1e4f8a;
         margin-left: 10px;
+        font-size: 0.9rem;
+      }
+
+      /* Responsive adjustments */
+      @media (max-width: 768px) {
+        .selector-panel {
+          padding: 0.6rem 1rem;
+          gap: 0.8rem;
+        }
+
+        select {
+          padding: 0.4rem 2rem 0.4rem 1rem;
+          font-size: 0.9rem;
+        }
+
+        .product-tag {
+          padding: 0.2rem 1.2rem;
+          font-size: 0.85rem;
+        }
+
+        .chart-title {
+          font-size: 1rem;
+        }
+
+        #cutChart,
+        #dailyGroupBarChart {
+          height: 220px;
+        }
       }
     </style>
-
+  </head>
+  <body>
     <div class="dashboard">
-      <!-- header (filled from backend) -->
+      <!-- header -->
       <div class="top-bar">
         <div class="title-block">
           <i class="fas fa-chart-pie"></i>
           <h1>Cutter · reports</h1>
         </div>
-        <div class="info-badge" id="dateRangeBadge">
-          <!-- filled by js -->
-        </div>
+        <div class="info-badge" id="dateRangeBadge"></div>
       </div>
 
       <!-- Wage card -->
@@ -639,29 +985,66 @@
         </div>
         <div class="wage-display">
           <div class="cost-item">
-            <span class="cost-label">Cost per day</span>
-            <span class="cost-value" id="perDayCost">₹500</span>
+            <span class="cost-label">Cost per day</span
+            ><span class="cost-value" id="perDayCost">₹500</span>
           </div>
           <div class="cost-item">
             <span class="cost-label"
               >Total <span id="workDaysDisplay">0</span> days</span
-            >
-            <span class="cost-value" id="totalWageCost">₹0</span>
+            ><span class="cost-value" id="totalWageCost">₹0</span>
           </div>
           <div class="cost-item">
-            <span class="cost-label">📊 Pieces/day</span>
-            <span class="cost-value" id="piecesPerDay">—</span>
+            <span class="cost-label">📊 Pieces/day</span
+            ><span class="cost-value" id="piecesPerDay">—</span>
           </div>
           <div class="cost-per-piece" id="costPerPieceBox">
-            <span class="cost-label">💰 Cost per piece</span>
-            <span class="cost-value" id="costPerPiece">—</span>
+            <span class="cost-label">💰 Cost per piece</span
+            ><span class="cost-value" id="costPerPiece">—</span>
           </div>
         </div>
       </div>
 
-      <!-- main grid -->
-      <div class="grid-main">
-        <!-- LEFT: table with expandable details -->
+      <!-- Product-based Global Meter Row -->
+      <div class="global-meter-row">
+        <div class="global-product-input">
+          <label><i class="fas fa-cubes"></i> Product:</label>
+          <select id="globalProductSelect">
+            <option value="All">All Products</option>
+          </select>
+          <input
+            type="number"
+            id="globalMeterPerPiece"
+            step="0.01"
+            min="0"
+            placeholder="m/piece"
+            value="1.97"
+          />
+        </div>
+        <div class="global-stats">
+          <div class="stat-card">
+            <span class="stat-label">Avg kg/pc</span>
+            <span class="stat-value" id="globalAvgKg">0.00</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Avg wastage %</span>
+            <span class="stat-value" id="globalWastagePct">0.0</span>
+            <span class="stat-label">%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- View Toggle -->
+      <div class="view-toggle">
+        <button class="toggle-btn active" id="showProductionView">
+          Production View
+        </button>
+        <button class="toggle-btn" id="showLumpView">
+          Supplier/Lot/Bale View
+        </button>
+      </div>
+
+      <!-- Production View -->
+      <div id="productionView" class="grid-main">
         <div class="card">
           <div class="card-header">
             <i class="fas fa-table"></i>
@@ -686,21 +1069,16 @@
           </div>
           <div style="display: flex; justify-content: flex-end">
             <div class="total-production-box">
-              <i class="fas fa-cubes"></i>
-              <span>Total production:</span>
-              <span id="grandTotalValue">0</span>
+              <i class="fas fa-cubes"></i><span>Total production:</span
+              ><span id="grandTotalValue">0</span>
             </div>
           </div>
         </div>
-
-        <!-- RIGHT: charts -->
         <div class="card">
           <div class="card-header">
             <i class="fas fa-chart-pie"></i>
             <h2>Charts</h2>
           </div>
-
-          <!-- Product pie (modern) -->
           <div class="chart-item">
             <div class="chart-title">
               <i class="fas fa-chart-simple"></i> Product share
@@ -709,17 +1087,13 @@
             <div id="productChart"></div>
             <div class="metrics-row" id="productMetrics"></div>
           </div>
-
           <hr />
-
-          <!-- selector + cut pie -->
           <div class="selector-panel">
-            <i class="fas fa-cut"></i>
-            <span style="font-weight: 500">Product:</span>
+            <i class="fas fa-cut"></i
+            ><span style="font-weight: 500">Product:</span>
             <select id="productSelect"></select>
             <span class="product-tag" id="selectedProductName">—</span>
           </div>
-
           <div class="chart-item">
             <div class="chart-title">
               <i class="fas fa-chart-pie"></i> Cut type split
@@ -733,10 +1107,7 @@
               No data available
             </div>
           </div>
-
           <hr />
-
-          <!-- Daily grouped bar chart -->
           <div class="chart-item">
             <div class="chart-title">
               <i class="fas fa-chart-bar"></i> Daily production (all products)
@@ -752,442 +1123,581 @@
           </div>
         </div>
       </div>
+
+      <!-- Supplier/Lot/Bale View -->
+      <div id="lumpView" class="supplier-container hidden">
+        <div id="supplierHierarchy"></div>
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1.5rem;
+          "
+        >
+          <div class="total-production-box">
+            <i class="fas fa-chart-line"></i><span>Total cloth used:</span
+            ><span id="totalClothUsed">0</span> m
+          </div>
+          <div class="total-production-box">
+            <i class="fas fa-trash-alt"></i><span>Total waste:</span
+            ><span id="totalWaste">0</span> m
+          </div>
+        </div>
+      </div>
     </div>
 
     <script>
-    (function () {
-    // ------------------------------------------------------------------
-    // YOUR ACTUAL BACKEND DATA (copied exactly as provided)
-    // ------------------------------------------------------------------
-    const backendResponse = {{ backend_data|tojson|safe }};
-    backendResponse.date_from = new Date(backendResponse.date_from);
-    backendResponse.date_to = new Date(backendResponse.date_to);
+      (function () {
+        // ------------------------------------------------------------------
+        // BACKEND DATA - keeping original structure
+        // ------------------------------------------------------------------
+        const backendResponse = {
+          name: "Production Manager",
+          date_from: "2026-02-20",
+          date_to: "2026-03-05",
+          tres: [
+            // Original production entries (no lump data)
+            {
+              id: 1,
+              product: "Vimal",
+              type_B: "sliced",
+              pieces: 37,
+              kg: 7.915,
+              status: "completed",
+              given_to: null,
+              entry_datetime: "2026-02-26T10:00:00",
+            },
+            {
+              id: 2,
+              product: "Vimal",
+              type_B: "sliced",
+              pieces: 37,
+              kg: 7.915,
+              status: "given",
+              given_to: "ram",
+              entry_datetime: "2026-02-28T14:30:00",
+            },
+            {
+              id: 3,
+              product: "Vimal",
+              type_B: "diced",
+              pieces: 40,
+              kg: 8.2,
+              status: "completed",
+              given_to: null,
+              entry_datetime: "2026-02-26T11:00:00",
+            },
+            {
+              id: 4,
+              product: "Vimal",
+              type_B: "diced",
+              pieces: 40,
+              kg: 8.2,
+              status: "completed",
+              given_to: null,
+              entry_datetime: "2026-02-27T09:15:00",
+            },
+            {
+              id: 5,
+              product: "Vimal",
+              type_B: "julienne",
+              pieces: 35,
+              kg: 7.2,
+              status: "given",
+              given_to: "shyam",
+              entry_datetime: "2026-02-27T16:20:00",
+            },
+            {
+              id: 6,
+              product: "Vimal",
+              type_B: "batons",
+              pieces: 32,
+              kg: 6.85,
+              status: "completed",
+              given_to: null,
+              entry_datetime: "2026-02-28T13:45:00",
+            },
 
-    backendResponse.tres.forEach(entry => {
-        entry.entry_datetime = new Date(entry.entry_datetime);
-        if (entry.given_date) {
-            entry.given_date = new Date(entry.given_date);
-        }
-    });
+            // Lump data with supplier/lot/bale attributes (keeping original structure)
+            {
+              id: 101,
+              product: "Vimal",
+              type_B: "sliced",
+              pieces: 37,
+              kg: 7.915,
+              status: "completed",
+              lump_id: 1,
+              supplier: "Asisa Textiles",
+              lot_number: "406X4",
+              bale_number: 1,
+              packing_date: "2026-02-20",
+              meter: 148,
+              entry_datetime: "2026-02-26T10:00:00",
+            },
+            {
+              id: 102,
+              product: "Vimal",
+              type_B: "sliced",
+              pieces: 37,
+              kg: 7.915,
+              status: "given",
+              given_to: "ram",
+              lump_id: 1,
+              supplier: "Asisa Textiles",
+              lot_number: "406X4",
+              bale_number: 1,
+              packing_date: "2026-02-20",
+              meter: 148,
+              entry_datetime: "2026-02-28T14:30:00",
+            },
+            {
+              id: 103,
+              product: "Vimal",
+              type_B: "diced",
+              pieces: 40,
+              kg: 8.2,
+              status: "completed",
+              lump_id: 2,
+              supplier: "Asisa Textiles",
+              lot_number: "406X4",
+              bale_number: 2,
+              packing_date: "2026-02-20",
+              meter: 146,
+              entry_datetime: "2026-02-26T11:00:00",
+            },
+            {
+              id: 104,
+              product: "Vimal",
+              type_B: "diced",
+              pieces: 40,
+              kg: 8.2,
+              status: "completed",
+              lump_id: 2,
+              supplier: "Asisa Textiles",
+              lot_number: "406X4",
+              bale_number: 2,
+              packing_date: "2026-02-20",
+              meter: 146,
+              entry_datetime: "2026-02-27T09:15:00",
+            },
+            {
+              id: 105,
+              product: "Vimal",
+              type_B: "julienne",
+              pieces: 35,
+              kg: 7.2,
+              status: "given",
+              given_to: "shyam",
+              lump_id: 3,
+              supplier: "Asisa Textiles",
+              lot_number: "406X4",
+              bale_number: 3,
+              packing_date: "2026-02-21",
+              meter: 150,
+              entry_datetime: "2026-02-27T16:20:00",
+            },
+            {
+              id: 106,
+              product: "Vimal",
+              type_B: "batons",
+              pieces: 32,
+              kg: 6.85,
+              status: "completed",
+              lump_id: 4,
+              supplier: "Asisa Textiles",
+              lot_number: "406X4",
+              bale_number: 4,
+              packing_date: "2026-02-21",
+              meter: 152,
+              entry_datetime: "2026-02-28T13:45:00",
+            },
+            {
+              id: 107,
+              product: "Vimal",
+              type_B: "sliced",
+              pieces: 38,
+              kg: 8.1,
+              status: "completed",
+              lump_id: 5,
+              supplier: "Asisa Textiles",
+              lot_number: "408X2",
+              bale_number: 1,
+              packing_date: "2026-02-25",
+              meter: 140,
+              entry_datetime: "2026-02-28T10:30:00",
+            },
+            {
+              id: 108,
+              product: "Vimal",
+              type_B: "diced",
+              pieces: 42,
+              kg: 9.0,
+              status: "completed",
+              lump_id: 6,
+              supplier: "Asisa Textiles",
+              lot_number: "408X2",
+              bale_number: 2,
+              packing_date: "2026-02-25",
+              meter: 135,
+              entry_datetime: "2026-02-28T15:20:00",
+            },
+            {
+              id: 109,
+              product: "Vimal",
+              type_B: "sliced",
+              pieces: 36,
+              kg: 7.5,
+              status: "completed",
+              lump_id: 7,
+              supplier: "Ram Tex",
+              lot_number: "410X3",
+              bale_number: 1,
+              packing_date: "2026-02-22",
+              meter: 144,
+              entry_datetime: "2026-03-01T09:00:00",
+            },
+            {
+              id: 110,
+              product: "Vimal",
+              type_B: "diced",
+              pieces: 39,
+              kg: 8.0,
+              status: "given",
+              given_to: "mohan",
+              lump_id: 8,
+              supplier: "Ram Tex",
+              lot_number: "410X3",
+              bale_number: 2,
+              packing_date: "2026-02-22",
+              meter: 148,
+              entry_datetime: "2026-03-01T11:30:00",
+            },
+          ],
+        };
 
-    // ------------------------------------------------------------------
-    // EXTRACT DATA FROM BACKEND
-    // ------------------------------------------------------------------
-    const { name, date_from, date_to, tres } = backendResponse;
+        // Process dates
+        backendResponse.date_from = new Date(backendResponse.date_from);
+        backendResponse.date_to = new Date(backendResponse.date_to);
+        backendResponse.tres.forEach((entry) => {
+          entry.entry_datetime = new Date(entry.entry_datetime);
+        });
 
-    // Calculate calendar days in range (inclusive)
-    const diffTime = Math.abs(date_to - date_from);
-    const CALENDAR_DAYS = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+        const { name, date_from, date_to, tres } = backendResponse;
 
-    // Calculate actual working days from data (unique dates with entries)
-    const uniqueWorkingDates = new Set();
-    tres.forEach(entry => {
-        const dateStr = entry.entry_datetime.toDateString();
-        uniqueWorkingDates.add(dateStr);
-    });
-    const ACTUAL_WORKING_DAYS = uniqueWorkingDates.size;
+        // ------------------------------------------------------------------
+        // PRODUCTION VIEW CODE (unchanged)
+        // ------------------------------------------------------------------
+        const diffTime = Math.abs(date_to - date_from);
+        const CALENDAR_DAYS = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+        const uniqueWorkingDates = new Set(
+          tres.map((e) => e.entry_datetime.toDateString()),
+        );
+        const ACTUAL_WORKING_DAYS = uniqueWorkingDates.size;
+        let WORKING_DAYS = ACTUAL_WORKING_DAYS;
+        let isManualOverride = false;
 
-    // Default to actual working days, but allow manual override
-    let WORKING_DAYS = ACTUAL_WORKING_DAYS;
-    let isManualOverride = false;
+        const startStr = date_from.toLocaleDateString("en-IN", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+        });
+        const endStr = date_to.toLocaleDateString("en-IN", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+        });
 
-    const startStr = date_from.toLocaleDateString("en-IN", {
-        day: "numeric",
-        month: "short",
-        year: "numeric",
-    });
-    const endStr = date_to.toLocaleDateString("en-IN", {
-        day: "numeric",
-        month: "short",
-        year: "numeric",
-    });
-
-    // Add working days editor to the top bar
-    document.getElementById("dateRangeBadge").innerHTML = `
-        <span class="badge-item"><i class="fas fa-user"></i> ${name}</span>
-        <span class="badge-item"><i class="fas fa-calendar-alt"></i> ${startStr} – ${endStr}</span>
-        <span class="badge-item" style="background: #f0f7ff; padding: 0.3rem 1.2rem; border-radius: 40px;">
-            <i class="fas fa-calendar-check"></i>
-            <span style="display: flex; align-items: center; gap: 8px;">
-                <span>Working days:</span>
-                <input type="number" id="workingDaysInput" value="${WORKING_DAYS}" min="1" max="${CALENDAR_DAYS}"
-                       style="width: 60px; padding: 0.2rem 0.5rem; border: 2px solid #3b82f6; border-radius: 30px;
-                              font-weight: 600; text-align: center; background: white;"
-                       onchange="handleWorkingDaysChange(this.value)">
-                <span class="days-chip" style="background: #e4edfb; padding: 0.2rem 1rem;">
-                    <i class="far fa-clock"></i> ${CALENDAR_DAYS} total
-                </span>
-                <span id="workingDaysStatus" style="font-size: 0.8rem; color: #2563eb; font-weight: 500;">
-                    (from data)
+        document.getElementById("dateRangeBadge").innerHTML = `
+            <span class="badge-item"><i class="fas fa-user"></i> ${name}</span>
+            <span class="badge-item"><i class="fas fa-calendar-alt"></i> ${startStr} – ${endStr}</span>
+            <span class="badge-item" style="background: #f0f7ff; padding: 0.3rem 1.2rem; border-radius: 40px;">
+                <i class="fas fa-calendar-check"></i>
+                <span style="display: flex; align-items: center; gap: 8px;">
+                    <span>Working days:</span>
+                    <input type="number" id="workingDaysInput" value="${WORKING_DAYS}" min="1" max="${CALENDAR_DAYS}"
+                           style="width: 60px; padding: 0.2rem 0.5rem; border: 2px solid #3b82f6; border-radius: 30px;
+                                  font-weight: 600; text-align: center; background: white;"
+                           onchange="handleWorkingDaysChange(this.value)">
+                    <span class="days-chip" style="background: #e4edfb; padding: 0.2rem 1rem;"><i class="far fa-clock"></i> ${CALENDAR_DAYS} total</span>
+                    <span id="workingDaysStatus" style="font-size: 0.8rem; color: #2563eb; font-weight: 500;">(from data)</span>
                 </span>
             </span>
-        </span>
-    `;
+        `;
 
-    // Handle working days change
-    window.handleWorkingDaysChange = function(value) {
-        const newValue = parseInt(value);
-        if (newValue >= 1 && newValue <= CALENDAR_DAYS) {
+        window.handleWorkingDaysChange = function (value) {
+          const newValue = parseInt(value);
+          if (newValue >= 1 && newValue <= CALENDAR_DAYS) {
             WORKING_DAYS = newValue;
-            isManualOverride = (newValue !== ACTUAL_WORKING_DAYS);
-
-            // Update status indicator
+            isManualOverride = newValue !== ACTUAL_WORKING_DAYS;
             const statusSpan = document.getElementById("workingDaysStatus");
             if (isManualOverride) {
-                statusSpan.innerHTML = '(manual override)';
-                statusSpan.style.color = '#dc2626';
+              statusSpan.innerHTML = "(manual override)";
+              statusSpan.style.color = "#dc2626";
             } else {
-                statusSpan.innerHTML = '(from data)';
-                statusSpan.style.color = '#2563eb';
+              statusSpan.innerHTML = "(from data)";
+              statusSpan.style.color = "#2563eb";
             }
-
-            // Recalculate all wage-based values
             updateWageAndProductivity();
+            document
+              .querySelector(".wage-card")
+              .classList.add("highlight-update");
+            setTimeout(
+              () =>
+                document
+                  .querySelector(".wage-card")
+                  .classList.remove("highlight-update"),
+              500,
+            );
+          }
+        };
 
-            // Highlight the change
-            document.querySelector('.wage-card').classList.add('highlight-update');
-            setTimeout(() => {
-                document.querySelector('.wage-card').classList.remove('highlight-update');
-            }, 500);
-        }
-    };
+        const resetButton = document.createElement("button");
+        resetButton.innerHTML = '<i class="fas fa-undo"></i>';
+        resetButton.style =
+          "background: none; border: none; color: #2563eb; cursor: pointer; font-size: 1rem; margin-left: 5px;";
+        resetButton.title = "Reset to actual working days";
+        resetButton.onclick = function () {
+          document.getElementById("workingDaysInput").value =
+            ACTUAL_WORKING_DAYS;
+          WORKING_DAYS = ACTUAL_WORKING_DAYS;
+          isManualOverride = false;
+          document.getElementById("workingDaysStatus").innerHTML =
+            "(from data)";
+          document.getElementById("workingDaysStatus").style.color = "#2563eb";
+          updateWageAndProductivity();
+        };
+        setTimeout(() => {
+          const statusSpan = document.getElementById("workingDaysStatus");
+          if (statusSpan) statusSpan.parentNode.appendChild(resetButton);
+        }, 100);
 
-    // Reset button to revert to actual working days
-    const resetButton = document.createElement('button');
-    resetButton.innerHTML = '<i class="fas fa-undo"></i>';
-    resetButton.style = 'background: none; border: none; color: #2563eb; cursor: pointer; font-size: 1rem; margin-left: 5px;';
-    resetButton.title = 'Reset to actual working days';
-    resetButton.onclick = function() {
-        document.getElementById('workingDaysInput').value = ACTUAL_WORKING_DAYS;
-        WORKING_DAYS = ACTUAL_WORKING_DAYS;
-        isManualOverride = false;
-        document.getElementById("workingDaysStatus").innerHTML = '(from data)';
-        document.getElementById("workingDaysStatus").style.color = '#2563eb';
-        updateWageAndProductivity();
-    };
+        document.getElementById("workDaysDisplay").innerText = WORKING_DAYS;
 
-    // Append reset button after the status span
-    setTimeout(() => {
-        const statusSpan = document.getElementById("workingDaysStatus");
-        if (statusSpan) {
-            statusSpan.parentNode.appendChild(resetButton);
-        }
-    }, 100);
-
-    document.getElementById("workDaysDisplay").innerText = WORKING_DAYS;
-
-    // ------------------------------------------------------------------
-    // NESTED GROUPING using product + type_B + pieces
-    // ------------------------------------------------------------------
-    const groups = {};
-
-    tres.forEach((entry) => {
-        const product = entry.product.trim();
-        const type = entry.type_B || "unknown";
-        const pieces = entry.pieces;
-        const id = entry.id;
-        const kg = entry.kg;
-        const status = entry.status;
-        const given_to = entry.given_to;
-        const entry_datetime = entry.entry_datetime;
-
-        if (!groups[product]) groups[product] = {};
-        if (!groups[product][type]) groups[product][type] = {};
-        if (!groups[product][type][pieces]) {
-            groups[product][type][pieces] = { count: 0, total: 0, entries: [] };
-        }
-
-        groups[product][type][pieces].count += 1;
-        groups[product][type][pieces].entries.push({
-            id,
-            entry_datetime,
-            pieces,
-            kg,
-            status,
-            given_to,
+        // Group production data
+        const groups = {};
+        tres.forEach((entry) => {
+          if (!entry.lump_id) {
+            const product = entry.product.trim();
+            const type = entry.type_B || "unknown";
+            const pieces = entry.pieces;
+            if (!groups[product]) groups[product] = {};
+            if (!groups[product][type]) groups[product][type] = {};
+            if (!groups[product][type][pieces]) {
+              groups[product][type][pieces] = {
+                count: 0,
+                total: 0,
+                entries: [],
+              };
+            }
+            groups[product][type][pieces].count += 1;
+            groups[product][type][pieces].entries.push({
+              id: entry.id,
+              entry_datetime: entry.entry_datetime,
+              pieces: entry.pieces,
+              kg: entry.kg,
+              status: entry.status,
+              given_to: entry.given_to,
+            });
+          }
         });
-    });
 
-    // Calculate totals
-    Object.keys(groups).forEach((product) => {
-        Object.keys(groups[product]).forEach((type) => {
+        Object.keys(groups).forEach((product) => {
+          Object.keys(groups[product]).forEach((type) => {
             Object.keys(groups[product][type]).forEach((pieces) => {
-                const group = groups[product][type][pieces];
-                group.total = group.count * parseInt(pieces);
+              groups[product][type][pieces].total =
+                groups[product][type][pieces].count * parseInt(pieces);
             });
+          });
         });
-    });
 
-    // ------------------------------------------------------------------
-    // AGGREGATE PRODUCT TOTALS AND CUT DETAILS
-    // ------------------------------------------------------------------
-    const productTotals = {};
-    const productCutDetails = {};
-
-    Object.entries(groups).forEach(([product, typeGroups]) => {
-        productTotals[product] = 0;
-        productCutDetails[product] = {};
-
-        Object.entries(typeGroups).forEach(([type, piecesGroups]) => {
+        const productTotals = {};
+        const productCutDetails = {};
+        Object.entries(groups).forEach(([product, typeGroups]) => {
+          productTotals[product] = 0;
+          productCutDetails[product] = {};
+          Object.entries(typeGroups).forEach(([type, piecesGroups]) => {
             let typeTotal = 0;
-            Object.values(piecesGroups).forEach((group) => {
-                typeTotal += group.total;
-            });
+            Object.values(piecesGroups).forEach(
+              (group) => (typeTotal += group.total),
+            );
             productTotals[product] += typeTotal;
             productCutDetails[product][type] = typeTotal;
+          });
         });
-    });
 
-    // Sort products by volume
-    const sortedProducts = Object.entries(productTotals)
-        .sort((a, b) => b[1] - a[1])
-        .map((entry) => entry[0]);
+        const sortedProducts = Object.entries(productTotals)
+          .sort((a, b) => b[1] - a[1])
+          .map((entry) => entry[0]);
+        const GRAND_TOTAL = Object.values(productTotals).reduce(
+          (sum, val) => sum + val,
+          0,
+        );
 
-    // Calculate grand total
-    const GRAND_TOTAL = Object.values(productTotals).reduce((sum, val) => sum + val, 0);
-
-    // ------------------------------------------------------------------
-    // RENDER TABLE (same as before)
-    // ------------------------------------------------------------------
-    const tbody = document.getElementById("tableBody");
-    let grandTotal = 0;
-    const rowState = {};
-
-    sortedProducts.forEach((product) => {
-        const typeGroups = groups[product];
-        let firstRow = true;
-
-        Object.entries(typeGroups).forEach(([type, piecesGroups]) => {
+        // Render production table
+        const tbody = document.getElementById("tableBody");
+        const rowState = {};
+        sortedProducts.forEach((product) => {
+          const typeGroups = groups[product];
+          let firstRow = true;
+          Object.entries(typeGroups).forEach(([type, piecesGroups]) => {
             Object.entries(piecesGroups).forEach(([pieces, group]) => {
-                const { count, total, entries } = group;
-                grandTotal += total;
-                const groupKey = `${product}|${type}|${pieces}`;
-                const isExpanded = rowState[groupKey] || false;
+              const { count, total, entries } = group;
+              const groupKey = `${product}|${type}|${pieces}`;
+              const isExpanded = rowState[groupKey] || false;
 
-                // Main row
-                const mainRow = document.createElement("tr");
-                mainRow.setAttribute("data-group", groupKey);
-                mainRow.innerHTML = `
-                    <td>
-                        <span class="expand-icon" onclick="toggleDetails('${groupKey}')">
-                            <i class="fas ${isExpanded ? "fa-chevron-down" : "fa-chevron-right"}"></i>
-                        </span>
-                    </td>
-                    <td style="font-weight: ${firstRow ? "600" : "400"};">${firstRow ? product : ""}</td>
-                    <td><span class="cut-badge">${type}</span></td>
-                    <td>${pieces}</td>
-                    <td>${count}</td>
-                    <td><strong>${total}</strong></td>
-                `;
-                tbody.appendChild(mainRow);
+              const mainRow = document.createElement("tr");
+              mainRow.setAttribute("data-group", groupKey);
+              mainRow.innerHTML = `
+                        <td><span class="expand-icon" onclick="toggleDetails('${groupKey}')"><i class="fas ${isExpanded ? "fa-chevron-down" : "fa-chevron-right"}"></i></span></td>
+                        <td style="font-weight: ${firstRow ? "600" : "400"};">${firstRow ? product : ""}</td>
+                        <td><span class="cut-badge">${type}</span></td>
+                        <td>${pieces}</td>
+                        <td>${count}</td>
+                        <td><strong>${total}</strong></td>
+                    `;
+              tbody.appendChild(mainRow);
 
-                // Calculate average kg per piece for this group
-const totalPieces = entries.reduce((sum, e) => sum + e.pieces, 0);
-const totalKg = entries.reduce((sum, e) => sum + e.kg, 0);
-const avgKgPerPiece = totalPieces > 0 ? (totalKg / totalPieces).toFixed(2) : 0;
+              const totalPieces = entries.reduce((sum, e) => sum + e.pieces, 0);
+              const totalKg = entries.reduce((sum, e) => sum + e.kg, 0);
+              const avgKgPerPiece =
+                totalPieces > 0 ? (totalKg / totalPieces).toFixed(2) : 0;
 
-// Details row with vertical layout
-const detailRow = document.createElement("tr");
-detailRow.classList.add("details-row");
-detailRow.setAttribute("data-details", groupKey);
-detailRow.style.display = isExpanded ? "table-row" : "none";
+              const detailRow = document.createElement("tr");
+              detailRow.classList.add("details-row");
+              detailRow.setAttribute("data-details", groupKey);
+              detailRow.style.display = isExpanded ? "table-row" : "none";
 
-// Create vertical list of entries
-const entryList = entries
-    .map((e) => {
-        const dateStr = e.entry_datetime.toLocaleDateString("en-IN", {
-            day: "numeric",
-            month: "short",
-        });
+              const entryList = entries
+                .map((e) => {
+                  const dateStr = e.entry_datetime.toLocaleDateString("en-IN", {
+                    day: "numeric",
+                    month: "short",
+                  });
+                  const kgPerPiece =
+                    e.pieces > 0 ? (e.kg / e.pieces).toFixed(2) : 0;
+                  return `<div class="entry-item"><div class="entry-row">
+                            <span class="entry-id">#${e.id}</span>
+                            <span class="entry-date">${dateStr}</span>
+                            <span class="entry-pieces">📦 ${e.pieces} pcs</span>
+                            <span class="entry-kg">⚖️ ${e.kg} kg</span>
+                            <span class="entry-kg-per-pc">📊 ${kgPerPiece} kg/pc</span>
+                            <span class="entry-given">👤 ${e.given_to ? e.given_to.substring(0, 15) + "…" : "—"}</span>
+                            <span class="entry-status ${e.status?.toLowerCase() || ""}">${e.status || "—"}</span>
+                        </div></div>`;
+                })
+                .join("");
 
-        // Calculate kg per piece for this entry
-        const kgPerPiece = e.pieces > 0 ? (e.kg / e.pieces).toFixed(2) : 0;
-
-        return `
-            <div class="entry-item">
-                <div class="entry-row">
-                    <span class="entry-id">#${e.id}</span>
-                    <span class="entry-date">${dateStr}</span>
-                    <span class="entry-pieces">📦 ${e.pieces} pcs</span>
-                    <span class="entry-kg">⚖️ ${e.kg} kg</span>
-                    <span class="entry-kg-per-pc">📊 ${kgPerPiece} kg/pc</span>
-                    <span class="entry-given">👤 ${e.given_to ? e.given_to.substring(0, 15) + "…" : "—"}</span>
-                    <span class="entry-status ${e.status?.toLowerCase() || ''}">${e.status || '—'}</span>
-                </div>
-            </div>
-        `;
-    })
-    .join("");
-
-// Group summary at the top
-const groupSummary = `
-    <div class="group-summary-vertical">
-        <span class="summary-total">📋 Total: ${count} entries</span>
-        <span class="summary-pieces">📦 Pieces: ${totalPieces}</span>
-        <span class="summary-kg">⚖️ KG: ${totalKg.toFixed(2)}</span>
-        <span class="summary-avg">📊 Avg: ${avgKgPerPiece} kg/pc</span>
-    </div>
-`;
-
-detailRow.innerHTML = `
-    <td colspan="8" style="padding: 16px; background: #f8fafc;">
-        <div class="details-vertical-container">
-            ${groupSummary}
-            <div class="entries-vertical-list">
-                ${entryList}
-            </div>
-        </div>
-    </td>
-`;
-tbody.appendChild(detailRow);
-
-                firstRow = false;
+              detailRow.innerHTML = `<td colspan="8" style="padding: 16px; background: #f8fafc;"><div class="details-vertical-container">
+                        <div class="group-summary-vertical">
+                            <span class="summary-total">📋 Total: ${count} entries</span>
+                            <span class="summary-pieces">📦 Pieces: ${totalPieces}</span>
+                            <span class="summary-kg">⚖️ KG: ${totalKg.toFixed(2)}</span>
+                            <span class="summary-avg">📊 Avg: ${avgKgPerPiece} kg/pc</span>
+                        </div>
+                        <div class="entries-vertical-list">${entryList}</div>
+                    </div></td>`;
+              tbody.appendChild(detailRow);
+              firstRow = false;
             });
+          });
+
+          const subRow = document.createElement("tr");
+          subRow.classList.add("subtotal-row");
+          subRow.innerHTML = `<td></td><td colspan="4" style="text-align: right; font-weight: 600;">${product} subtotal →</td><td style="font-weight: 700; background: #e5efff;">${productTotals[product]}</td>`;
+          tbody.appendChild(subRow);
+          tbody.appendChild(document.createElement("tr")).innerHTML =
+            `<td colspan="6" style="border-bottom: 2px dashed #c6daf5;"></td>`;
         });
 
-        // Subtotal row
-        const subRow = document.createElement("tr");
-        subRow.classList.add("subtotal-row");
-        subRow.innerHTML = `
-            <td></td>
-            <td colspan="4" style="text-align: right; font-weight: 600;">${product} subtotal →</td>
-            <td style="font-weight: 700; background: #e5efff;">${productTotals[product]}</td>
-        `;
-        tbody.appendChild(subRow);
+        document.getElementById("grandTotalValue").innerText = GRAND_TOTAL;
 
-        // Spacer
-        const spacer = document.createElement("tr");
-        spacer.innerHTML = `<td colspan="6" style="border-bottom: 2px dashed #c6daf5;"></td>`;
-        tbody.appendChild(spacer);
-    });
-
-    document.getElementById("grandTotalValue").innerText = GRAND_TOTAL;
-
-    window.toggleDetails = function (groupKey) {
-        const mainRow = document.querySelector(`tr[data-group="${groupKey}"]`);
-        const detailRow = document.querySelector(`tr[data-details="${groupKey}"]`);
-        const icon = mainRow.querySelector(".expand-icon i");
-
-        if (detailRow.style.display === "none") {
+        window.toggleDetails = function (groupKey) {
+          const mainRow = document.querySelector(
+            `tr[data-group="${groupKey}"]`,
+          );
+          const detailRow = document.querySelector(
+            `tr[data-details="${groupKey}"]`,
+          );
+          const icon = mainRow.querySelector(".expand-icon i");
+          if (detailRow.style.display === "none") {
             detailRow.style.display = "table-row";
             icon.classList.remove("fa-chevron-right");
             icon.classList.add("fa-chevron-down");
             rowState[groupKey] = true;
-        } else {
+          } else {
             detailRow.style.display = "none";
             icon.classList.remove("fa-chevron-down");
             icon.classList.add("fa-chevron-right");
             rowState[groupKey] = false;
-        }
-    };
+          }
+        };
 
-    // ------------------------------------------------------------------
-    // WAGE & PRODUCTIVITY (based on WORKING_DAYS, with manual override)
-    // ------------------------------------------------------------------
-    const dailyWageInput = document.getElementById("dailyWageInput");
-    const perDayCostSpan = document.getElementById("perDayCost");
-    const totalWageCostSpan = document.getElementById("totalWageCost");
-    const piecesPerDaySpan = document.getElementById("piecesPerDay");
-    const costPerPieceSpan = document.getElementById("costPerPiece");
-    const costBox = document.getElementById("costPerPieceBox");
-    let lastCostPerPiece = null;
+        // Wage & productivity
+        const dailyWageInput = document.getElementById("dailyWageInput");
+        const perDayCostSpan = document.getElementById("perDayCost");
+        const totalWageCostSpan = document.getElementById("totalWageCost");
+        const piecesPerDaySpan = document.getElementById("piecesPerDay");
+        const costPerPieceSpan = document.getElementById("costPerPiece");
+        const costBox = document.getElementById("costPerPieceBox");
+        let lastCostPerPiece = null;
 
-    function formatIndianRupee(value, decimals = 0) {
-        return value.toLocaleString("en-IN", {
+        function formatIndianRupee(value, decimals = 0) {
+          return value.toLocaleString("en-IN", {
             minimumFractionDigits: decimals,
             maximumFractionDigits: decimals,
-        });
-    }
+          });
+        }
 
-    function updateWageAndProductivity() {
-        let dailyWage = parseFloat(dailyWageInput.value) || 0;
-        if (dailyWage < 0) dailyWage = 0;
-        if (dailyWage > 100000) dailyWage = 100000;
-
-        // Total wage cost based on current WORKING_DAYS
-        const totalCost = dailyWage * WORKING_DAYS;
-
-        // Pieces per working day (productivity)
-        const piecesPerDay = WORKING_DAYS > 0 ? GRAND_TOTAL / WORKING_DAYS : 0;
-
-        // Cost per piece based on total cost and total pieces
-        let costPerPiece = 0,
+        function updateWageAndProductivity() {
+          let dailyWage = parseFloat(dailyWageInput.value) || 0;
+          if (dailyWage < 0) dailyWage = 0;
+          if (dailyWage > 100000) dailyWage = 100000;
+          const totalCost = dailyWage * WORKING_DAYS;
+          const piecesPerDay =
+            WORKING_DAYS > 0 ? GRAND_TOTAL / WORKING_DAYS : 0;
+          let costPerPiece = 0,
             costDisplay = "—",
             piecesPerDayDisplay = "—";
-
-        if (GRAND_TOTAL > 0) {
+          if (GRAND_TOTAL > 0) {
             costPerPiece = totalCost / GRAND_TOTAL;
             costDisplay = `₹${formatIndianRupee(costPerPiece, 2)}`;
             piecesPerDayDisplay = formatIndianRupee(piecesPerDay, 1);
-        }
-
-        perDayCostSpan.innerText = `₹${formatIndianRupee(dailyWage)}`;
-        totalWageCostSpan.innerText = `₹${formatIndianRupee(totalCost)}`;
-        piecesPerDaySpan.innerText = piecesPerDayDisplay;
-
-        // Update the work days display in the cost item
-        document.getElementById("workDaysDisplay").innerText = WORKING_DAYS;
-
-        if (costPerPiece !== lastCostPerPiece) {
+          }
+          perDayCostSpan.innerText = `₹${formatIndianRupee(dailyWage)}`;
+          totalWageCostSpan.innerText = `₹${formatIndianRupee(totalCost)}`;
+          piecesPerDaySpan.innerText = piecesPerDayDisplay;
+          document.getElementById("workDaysDisplay").innerText = WORKING_DAYS;
+          if (costPerPiece !== lastCostPerPiece) {
             costBox.classList.add("highlight-update");
             setTimeout(() => costBox.classList.remove("highlight-update"), 300);
             lastCostPerPiece = costPerPiece;
+          }
+          costPerPieceSpan.innerText = costDisplay;
         }
-        costPerPieceSpan.innerText = costDisplay;
-    }
 
-    updateWageAndProductivity();
-    dailyWageInput.addEventListener("input", updateWageAndProductivity);
+        updateWageAndProductivity();
+        dailyWageInput.addEventListener("input", updateWageAndProductivity);
 
-        // ------------------------------------------------------------------
-        // MODERN PIE CHART with metrics
-        // ------------------------------------------------------------------
+        // Charts
         function formatNumber(num) {
           return num.toLocaleString("en-IN");
         }
-
         function updateProductMetrics(data) {
           const points = data[0].points;
           const total = points.reduce((sum, p) => sum + p.y, 0);
           document.getElementById("totalItemsBadge").innerHTML =
             `${formatNumber(total)} total pcs`;
-
           const sorted = [...points].sort((a, b) => b.y - a.y);
           let metricsHtml = "";
-
           if (sorted.length > 0) {
-            metricsHtml += `
-          <div class="metric-card">
-            <div class="metric-icon"><i class="fas fa-crown"></i></div>
-            <div class="metric-content">
-              <span class="metric-label">Top product</span>
-              <span class="metric-value">${sorted[0].name} <small>${formatNumber(sorted[0].y)} pcs</small></span>
-            </div>
-          </div>
-        `;
+            metricsHtml += `<div class="metric-card"><div class="metric-icon"><i class="fas fa-crown"></i></div><div class="metric-content"><span class="metric-label">Top product</span><span class="metric-value">${sorted[0].name} <small>${formatNumber(sorted[0].y)} pcs</small></span></div></div>`;
           }
-
           const avg = (total / points.length).toFixed(1);
-          metricsHtml += `
-        <div class="metric-card">
-          <div class="metric-icon"><i class="fas fa-chart-line"></i></div>
-          <div class="metric-content">
-            <span class="metric-label">Average</span>
-            <span class="metric-value">${formatNumber(avg)} <small>pcs</small></span>
-          </div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-icon"><i class="fas fa-tag"></i></div>
-          <div class="metric-content">
-            <span class="metric-label">Products</span>
-            <span class="metric-value">${points.length} <small>types</small></span>
-          </div>
-        </div>
-      `;
+          metricsHtml += `<div class="metric-card"><div class="metric-icon"><i class="fas fa-chart-line"></i></div><div class="metric-content"><span class="metric-label">Average</span><span class="metric-value">${formatNumber(avg)} <small>pcs</small></span></div></div>
+            <div class="metric-card"><div class="metric-icon"><i class="fas fa-tag"></i></div><div class="metric-content"><span class="metric-label">Products</span><span class="metric-value">${points.length} <small>types</small></span></div></div>`;
           document.getElementById("productMetrics").innerHTML = metricsHtml;
         }
 
-        // Product pie
         const productDataPoints = sortedProducts.map((name) => ({
           name,
           y: productTotals[name],
@@ -1198,7 +1708,6 @@ tbody.appendChild(detailRow);
             points: productDataPoints.map((p) => ({ name: p.name, y: p.y })),
           },
         ];
-
         var productChart = JSC.chart("productChart", {
           legend_position: "inside left bottom",
           defaultSeries: { type: "pie", pointSelection: true },
@@ -1236,10 +1745,8 @@ tbody.appendChild(detailRow);
           yAxis: { label_text: "Quantity", formatString: "n" },
           series: productSeries,
         });
-
         updateProductMetrics(productSeries);
 
-        // Populate product select
         const select = document.getElementById("productSelect");
         sortedProducts.forEach((prod) => {
           const opt = document.createElement("option");
@@ -1248,7 +1755,6 @@ tbody.appendChild(detailRow);
           select.appendChild(opt);
         });
 
-        // Cut pie (dynamic)
         let cutChart = null;
         const selectedSpan = document.getElementById("selectedProductName");
         const cutChartDiv = document.getElementById("cutChart");
@@ -1264,12 +1770,10 @@ tbody.appendChild(detailRow);
           }
           cutChartDiv.style.display = "block";
           cutEmptyMessage.style.display = "none";
-
           const cutData = Object.keys(cuts).map((label) => ({
             name: label,
             y: cuts[label],
           }));
-
           if (cutChart) {
             cutChart.options({
               series: [
@@ -1322,35 +1826,36 @@ tbody.appendChild(detailRow);
           selectedSpan.innerText = productKey;
         }
 
-        // GROUPED DAILY BAR CHART
         function updateGroupedDailyBar() {
           const dailyProductMap = new Map();
           tres.forEach((entry) => {
-            const dateStr = entry.entry_datetime.toLocaleDateString("en-IN", {
-              day: "numeric",
-              month: "short",
-            });
-            const product = entry.product.trim();
-            if (!dailyProductMap.has(dateStr)) dailyProductMap.set(dateStr, {});
-            const dayData = dailyProductMap.get(dateStr);
-            dayData[product] = (dayData[product] || 0) + entry.pieces;
+            if (!entry.lump_id) {
+              const dateStr = entry.entry_datetime.toLocaleDateString("en-IN", {
+                day: "numeric",
+                month: "short",
+              });
+              const product = entry.product.trim();
+              if (!dailyProductMap.has(dateStr))
+                dailyProductMap.set(dateStr, {});
+              const dayData = dailyProductMap.get(dateStr);
+              dayData[product] = (dayData[product] || 0) + entry.pieces;
+            }
           });
-
           const allProducts = [
-            ...new Set(tres.map((e) => e.product.trim())),
+            ...new Set(
+              tres.filter((e) => !e.lump_id).map((e) => e.product.trim()),
+            ),
           ].sort();
           const sortedDates = Array.from(dailyProductMap.keys()).sort((a, b) =>
             a.localeCompare(b, undefined, { numeric: true }),
           );
-
           const series = allProducts.map((product) => ({
             name: product,
-            points: sortedDates.map((date) => {
-              const dayData = dailyProductMap.get(date) || {};
-              return { name: date, y: dayData[product] || 0 };
-            }),
+            points: sortedDates.map((date) => ({
+              name: date,
+              y: (dailyProductMap.get(date) || {})[product] || 0,
+            })),
           }));
-
           if (dailyBarChart) {
             dailyBarChart.options({ series });
           } else {
@@ -1371,13 +1876,438 @@ tbody.appendChild(detailRow);
         let dailyBarChart = null;
         updateGroupedDailyBar();
 
-        // Initial load for cut pie
         if (sortedProducts.length > 0) {
           updateCutPie(sortedProducts[0]);
           select.value = sortedProducts[0];
         }
-
         select.addEventListener("change", (e) => updateCutPie(e.target.value));
+
+        // ------------------------------------------------------------------
+        // SUPPLIER/LOT/BALE VIEW (hierarchical with backend data display)
+        // ------------------------------------------------------------------
+        const lumpData = tres.filter((e) => e.lump_id);
+
+        // Build hierarchical data structure
+        const supplierMap = new Map();
+        lumpData.forEach((entry) => {
+          if (!supplierMap.has(entry.supplier)) {
+            supplierMap.set(entry.supplier, new Map());
+          }
+          const lotMap = supplierMap.get(entry.supplier);
+          if (!lotMap.has(entry.lot_number)) {
+            lotMap.set(entry.lot_number, new Map());
+          }
+          const baleMap = lotMap.get(entry.lot_number);
+          if (!baleMap.has(entry.bale_number)) {
+            baleMap.set(entry.bale_number, {
+              bale_number: entry.bale_number,
+              packing_date: entry.packing_date,
+              packing_slip: `SLIP-${entry.supplier.slice(0, 3)}${entry.bale_number}`,
+              lumps: new Map(),
+            });
+          }
+          const bale = baleMap.get(entry.bale_number);
+          if (!bale.lumps.has(entry.lump_id)) {
+            bale.lumps.set(entry.lump_id, {
+              lump_id: entry.lump_id,
+              product: entry.product,
+              color: entry.type_B,
+              meter: entry.meter,
+              entries: [],
+              totalPieces: 0,
+              totalKg: 0,
+              meterPerPiece: 1.97, // default
+            });
+          }
+          const lump = bale.lumps.get(entry.lump_id);
+          lump.entries.push(entry);
+          lump.totalPieces += entry.pieces;
+          lump.totalKg += entry.kg;
+        });
+
+        // Populate product select
+        const products = [...new Set(lumpData.map((e) => e.product))].sort();
+        const globalProductSelect = document.getElementById(
+          "globalProductSelect",
+        );
+        products.forEach((p) => globalProductSelect.add(new Option(p, p)));
+
+        const supplierHierarchy = document.getElementById("supplierHierarchy");
+        const supplierRowState = {};
+
+        function renderSupplierHierarchy() {
+          supplierHierarchy.innerHTML = "";
+          let totalClothAll = 0,
+            totalWasteAll = 0;
+          const selectedProduct = globalProductSelect.value;
+
+          Array.from(supplierMap.entries()).forEach(([supplier, lotMap]) => {
+            const supplierDiv = document.createElement("div");
+            supplierDiv.className = "supplier-card";
+
+            // Supplier header
+            const suppHeader = document.createElement("div");
+            suppHeader.className = "supplier-header";
+            suppHeader.innerHTML = `
+                    <i class="fas fa-building"></i>
+                    <h3>${supplier}</h3>
+                    <span class="collapse-icon"><i class="fas fa-chevron-down"></i></span>
+                `;
+            supplierDiv.appendChild(suppHeader);
+
+            const supplierContent = document.createElement("div");
+            supplierContent.className = "supplier-content";
+
+            const lotGrid = document.createElement("div");
+            lotGrid.className = "lot-grid";
+
+            Array.from(lotMap.entries()).forEach(([lotNumber, baleMap]) => {
+              const lotDiv = document.createElement("div");
+              lotDiv.className = "lot-card";
+
+              // Lot header
+              const lotHeader = document.createElement("div");
+              lotHeader.className = "lot-header";
+              lotHeader.innerHTML = `
+                        <i class="fas fa-scroll"></i>
+                        <h4>Lot ${lotNumber}</h4>
+                        <span class="lot-badge">${baleMap.size} bales</span>
+                    `;
+              lotDiv.appendChild(lotHeader);
+
+              // Lot summary (dynamic)
+              const lotSummary = document.createElement("div");
+              lotSummary.className = "lot-summary";
+
+              // Calculate lot totals
+              let lotPieces = 0,
+                lotKg = 0,
+                lotMeter = 0,
+                lotCloth = 0;
+              const packingDates = new Set();
+              const slips = [];
+
+              baleMap.forEach((bale) => {
+                packingDates.add(bale.packing_date);
+                slips.push(bale.packing_slip);
+                bale.lumps.forEach((lump) => {
+                  if (
+                    selectedProduct === "All" ||
+                    lump.product === selectedProduct
+                  ) {
+                    const cloth = lump.meterPerPiece * lump.totalPieces;
+                    const waste = Math.max(0, lump.meter - cloth);
+                    lotPieces += lump.totalPieces;
+                    lotKg += lump.totalKg;
+                    lotMeter += lump.meter;
+                    lotCloth += cloth;
+                  }
+                });
+              });
+
+              const avgCloth =
+                lotPieces > 0 ? (lotCloth / lotPieces).toFixed(2) : "0";
+              const avgWaste =
+                lotPieces > 0
+                  ? ((lotMeter - lotCloth) / lotPieces).toFixed(2)
+                  : "0";
+              const avgKg =
+                lotPieces > 0 ? (lotKg / lotPieces).toFixed(2) : "0";
+
+              lotSummary.innerHTML = `
+                        <span><i class="fas fa-boxes"></i> Bales: ${baleMap.size}</span>
+                        <span><i class="fas fa-calendar-check"></i> ${Array.from(packingDates).join(", ")}</span>
+                        <span><i class="fas fa-tag"></i> ${slips.join(", ")}</span>
+                        <span><i class="fas fa-ruler"></i> Avg cloth: <span class="avg-value">${avgCloth}</span> m</span>
+                        <span><i class="fas fa-trash-alt"></i> Avg waste: <span class="avg-value">${avgWaste}</span> m</span>
+                        <span><i class="fas fa-weight-hanging"></i> Avg kg: <span class="avg-value">${avgKg}</span></span>
+                        <span><i class="fas fa-cubes"></i> Total pcs: <span class="avg-value">${lotPieces}</span></span>
+                    `;
+              lotDiv.appendChild(lotSummary);
+
+              const lotContent = document.createElement("div");
+              lotContent.className = "lot-content";
+
+              const baleGrid = document.createElement("div");
+              baleGrid.className = "bale-grid";
+
+              baleMap.forEach((bale) => {
+                const baleDiv = document.createElement("div");
+                baleDiv.className = "bale-card";
+
+                // Bale title
+                const baleTitle = document.createElement("div");
+                baleTitle.className = "bale-title";
+                baleTitle.innerHTML = `
+                            <span class="bale-no">Bale #${bale.bale_number}</span>
+                            <span class="packing-date"><i class="far fa-calendar"></i> ${bale.packing_date}</span>
+                            <span class="packing-slip"><i class="fas fa-receipt"></i> ${bale.packing_slip}</span>
+                        `;
+                baleDiv.appendChild(baleTitle);
+
+                // Bale stats
+                let baleLumps = 0,
+                  baleBundles = 0,
+                  baleCloth = 0,
+                  baleWaste = 0;
+                bale.lumps.forEach((lump) => {
+                  if (
+                    selectedProduct === "All" ||
+                    lump.product === selectedProduct
+                  ) {
+                    baleLumps++;
+                    baleBundles += lump.entries.length;
+                    const cloth = lump.meterPerPiece * lump.totalPieces;
+                    const waste = Math.max(0, lump.meter - cloth);
+                    baleCloth += cloth;
+                    baleWaste += waste;
+                    totalClothAll += cloth;
+                    totalWasteAll += waste;
+                  }
+                });
+
+                const baleStats = document.createElement("div");
+                baleStats.className = "bale-stats";
+                baleStats.innerHTML = `
+                            <div class="bale-stat-item"><i class="fas fa-cubes"></i> Lumps: <span class="val">${baleLumps}</span></div>
+                            <div class="bale-stat-item"><i class="fas fa-cut"></i> Bundles: <span class="val">${baleBundles}</span></div>
+                            <div class="bale-stat-item"><i class="fas fa-ruler"></i> Cloth: <span class="val">${baleCloth.toFixed(2)}</span> m</div>
+                            <div class="bale-stat-item"><i class="fas fa-trash-alt"></i> Waste: <span class="val">${baleWaste.toFixed(2)}</span> m</div>
+                        `;
+                baleDiv.appendChild(baleStats);
+
+                // Lumps
+                bale.lumps.forEach((lump) => {
+                  if (
+                    selectedProduct !== "All" &&
+                    lump.product !== selectedProduct
+                  )
+                    return;
+
+                  const lumpDiv = document.createElement("div");
+                  lumpDiv.className = "lump-item";
+
+                  const lumpHeader = document.createElement("div");
+                  lumpHeader.className = "lump-header";
+                  lumpHeader.innerHTML = `
+                                <span class="lump-name"><i class="fas fa-cube"></i> Lump ${lump.lump_id} · ${lump.color}</span>
+                                <span style="font-size:0.8rem; background:#ecf3fa; padding:0.2rem 1rem; border-radius:30px;">${lump.entries[0].entry_datetime.toLocaleDateString("en-IN")}</span>
+                            `;
+                  lumpDiv.appendChild(lumpHeader);
+
+                  // Backend data display (static, never changes)
+                  const backendDataDiv = document.createElement("div");
+                  backendDataDiv.className = "lump-backend-data";
+                  backendDataDiv.innerHTML = `
+                                <div class="backend-item"><span class="label">Lumps:</span> <span class="value">1</span></div>
+                                <div class="backend-item"><span class="label">Bundles:</span> <span class="value">${lump.entries.length}</span></div>
+                                <div class="backend-item"><span class="label">Cloth (fixed):</span> <span class="value">${(lump.meterPerPiece * lump.totalPieces).toFixed(2)}</span> m</div>
+                                <div class="backend-item"><span class="label">Waste (fixed):</span> <span class="value">${Math.max(0, lump.meter - lump.meterPerPiece * lump.totalPieces).toFixed(2)}</span> m</div>
+                                <div class="backend-item"><span class="label">Original Meter:</span> <span class="value">${lump.meter}</span> m</div>
+                            `;
+                  lumpDiv.appendChild(backendDataDiv);
+
+                  const meterRow = document.createElement("div");
+                  meterRow.className = "meter-row";
+
+                  const cloth = lump.meterPerPiece * lump.totalPieces;
+                  const waste = Math.max(0, lump.meter - cloth);
+                  const avgKg =
+                    lump.totalPieces > 0
+                      ? (lump.totalKg / lump.totalPieces).toFixed(2)
+                      : 0;
+
+                  meterRow.innerHTML = `
+                                <div class="meter-input-group">
+                                    <label>m/pc:</label>
+                                    <input type="number" step="0.01" min="0" value="${lump.meterPerPiece}" class="lump-meter-input" data-supplier="${supplier}" data-lot="${lotNumber}" data-bale="${bale.bale_number}" data-lump="${lump.lump_id}">
+                                </div>
+                                <div class="lump-stats">
+                                    <div class="stat-pill"><span class="small">cloth</span><span class="big">${cloth.toFixed(2)}</span></div>
+                                    <div class="stat-pill"><span class="small">waste</span><span class="big">${waste.toFixed(2)}</span></div>
+                                    <div class="stat-pill"><span class="small">avg kg</span><span class="big">${avgKg}</span></div>
+                                </div>
+                            `;
+                  lumpDiv.appendChild(meterRow);
+
+                  // Bundle table
+                  const table = document.createElement("table");
+                  table.className = "bundle-table";
+                  table.innerHTML = `
+                                <thead><tr><th>ID</th><th>Pcs</th><th>Kg</th><th>Status</th><th>To</th></tr></thead>
+                                <tbody>
+                                    ${lump.entries
+                                      .map(
+                                        (e) => `<tr>
+                                        <td>#${e.id}</td>
+                                        <td>${e.pieces}</td>
+                                        <td>${e.kg}</td>
+                                        <td><span class="status-badge">${e.status}</span></td>
+                                        <td>${e.given_to || "—"}</td>
+                                    </tr>`,
+                                      )
+                                      .join("")}
+                                </tbody>
+                            `;
+                  lumpDiv.appendChild(table);
+                  baleDiv.appendChild(lumpDiv);
+                });
+
+                baleGrid.appendChild(baleDiv);
+              });
+
+              lotContent.appendChild(baleGrid);
+              lotDiv.appendChild(lotContent);
+              lotGrid.appendChild(lotDiv);
+
+              // Toggle lot
+              lotHeader.addEventListener("click", (e) => {
+                e.stopPropagation();
+                lotDiv.classList.toggle("collapsed");
+              });
+            });
+
+            supplierContent.appendChild(lotGrid);
+            supplierDiv.appendChild(supplierContent);
+            supplierHierarchy.appendChild(supplierDiv);
+
+            // Toggle supplier
+            suppHeader.addEventListener("click", (e) => {
+              e.stopPropagation();
+              supplierDiv.classList.toggle("collapsed");
+            });
+          });
+
+          document.getElementById("totalClothUsed").innerText =
+            totalClothAll.toFixed(2);
+          document.getElementById("totalWaste").innerText =
+            totalWasteAll.toFixed(2);
+
+          // Update global stats
+          updateGlobalStats();
+        }
+
+        function updateGlobalStats() {
+          const selectedProduct = globalProductSelect.value;
+          let totalPieces = 0,
+            totalKg = 0,
+            totalMeter = 0,
+            totalWaste = 0;
+
+          supplierMap.forEach((lotMap, supplier) => {
+            lotMap.forEach((baleMap, lot) => {
+              baleMap.forEach((bale) => {
+                bale.lumps.forEach((lump) => {
+                  if (
+                    selectedProduct === "All" ||
+                    lump.product === selectedProduct
+                  ) {
+                    totalPieces += lump.totalPieces;
+                    totalKg += lump.totalKg;
+                    totalMeter += lump.meter;
+                    const cloth = lump.meterPerPiece * lump.totalPieces;
+                    totalWaste += Math.max(0, lump.meter - cloth);
+                  }
+                });
+              });
+            });
+          });
+
+          const avgKg =
+            totalPieces > 0 ? (totalKg / totalPieces).toFixed(2) : "0.00";
+          const wastePct =
+            totalMeter > 0
+              ? ((totalWaste / totalMeter) * 100).toFixed(1)
+              : "0.0";
+
+          document.getElementById("globalAvgKg").innerText = avgKg;
+          document.getElementById("globalWastagePct").innerText = wastePct;
+        }
+
+        // Meter input listener - use event delegation to prevent page jump
+        document.addEventListener("input", function (e) {
+          if (e.target.classList.contains("lump-meter-input")) {
+            // Prevent default behavior that might cause page jump
+            e.preventDefault();
+
+            const supplier = e.target.dataset.supplier;
+            const lot = e.target.dataset.lot;
+            const baleNum = parseInt(e.target.dataset.bale);
+            const lumpId = parseInt(e.target.dataset.lump);
+            const val = parseFloat(e.target.value) || 0;
+
+            const lump = supplierMap
+              .get(supplier)
+              ?.get(lot)
+              ?.get(baleNum)
+              ?.lumps.get(lumpId);
+            if (lump) {
+              lump.meterPerPiece = val;
+              // Use requestAnimationFrame to batch updates and prevent layout thrashing
+              requestAnimationFrame(() => {
+                renderSupplierHierarchy();
+              });
+            }
+          }
+        });
+
+        // Global product meter
+        globalProductSelect.addEventListener("change", renderSupplierHierarchy);
+        document
+          .getElementById("globalMeterPerPiece")
+          .addEventListener("input", function (e) {
+            e.preventDefault();
+            const globalVal = parseFloat(e.target.value) || 0;
+            const selectedProduct = globalProductSelect.value;
+
+            supplierMap.forEach((lotMap, supplier) => {
+              lotMap.forEach((baleMap, lot) => {
+                baleMap.forEach((bale) => {
+                  bale.lumps.forEach((lump) => {
+                    if (
+                      selectedProduct === "All" ||
+                      lump.product === selectedProduct
+                    ) {
+                      lump.meterPerPiece = globalVal;
+                    }
+                  });
+                });
+              });
+            });
+
+            requestAnimationFrame(() => {
+              renderSupplierHierarchy();
+            });
+          });
+
+        // View toggle
+        document
+          .getElementById("showProductionView")
+          .addEventListener("click", function () {
+            document
+              .getElementById("productionView")
+              .classList.remove("hidden");
+            document.getElementById("lumpView").classList.add("hidden");
+            this.classList.add("active");
+            document.getElementById("showLumpView").classList.remove("active");
+          });
+
+        document
+          .getElementById("showLumpView")
+          .addEventListener("click", function () {
+            document.getElementById("productionView").classList.add("hidden");
+            document.getElementById("lumpView").classList.remove("hidden");
+            this.classList.add("active");
+            document
+              .getElementById("showProductionView")
+              .classList.remove("active");
+            renderSupplierHierarchy();
+          });
+
+        // Initial render
+        renderSupplierHierarchy();
+        updateGlobalStats();
       })();
     </script>
- </div>
+  </body>
+</html>

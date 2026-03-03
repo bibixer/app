@@ -66,7 +66,7 @@ class Lump(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     # Store both date + time
     entry_datetime = db.Column(db.DateTime, nullable=False)
-
+    bale_id = db.Column(db.Integer, nullable=False,default=0)
     # entery by
     enter_user = db.Column(db.String(50), nullable=False)
     # worker
@@ -156,5 +156,20 @@ class User(UserMixin, db.Model):
         self.role =  role
     def check_password(self,password):
         return check_password_hash(self.password,password)
+
+class Bale_date(db.Model):
+    __tablename__ = "BaleDate"
+    id = db.Column(db.Integer, primary_key=True)
+    part_name = db.Column(db.String(50), nullable=False)
+    lot_number = db.Column(db.Integer, nullable=False)
+    lot_count =db.Column(db.Integer, nullable=False)
+    bale_number = db.Column(db.Integer, nullable=False)
+    bale_date = db.Column(db.DateTime, nullable=False)
+    enter_user = db.Column(db.String(50), nullable=False)
+    # worker
+    cut_by = db.Column(db.String(50), nullable=False)
+    lump_ids = db.Column(db.JSON, nullable=False)
+
+
 
 

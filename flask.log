@@ -439,3 +439,290 @@ INFO:root:Flask service starting
 INFO:waitress:Serving on http://127.0.0.1:5000
 INFO:root:Flask service starting
 INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:flask_wtf.csrf:The CSRF token has expired.
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:flask_wtf.csrf:The CSRF token has expired.
+INFO:flask_wtf.csrf:The CSRF token has expired.
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+ERROR:app:Exception on /cutter_report [POST]
+Traceback (most recent call last):
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/sqlalchemy/engine/default.py", line 951, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.OperationalError: no such column: LumpData.bale_id
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/home/badx/Desktop/bh manfiation/app/route.py", line 326, in cutter_report
+    result = get_cutter_report_data(name_data_form,current_user)
+  File "/home/badx/Desktop/bh manfiation/app/data_Process.py", line 340, in get_cutter_report_data
+    ).all()
+      ~~~^^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/sqlalchemy/orm/query.py", line 2704, in all
+    return self._iter().all()  # type: ignore
+           ~~~~~~~~~~^^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/sqlalchemy/orm/query.py", line 2857, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ~~~~~~~~~~~~~~~~~~~~^
+        statement,
+        ^^^^^^^^^^
+        params,
+        ^^^^^^^
+        execution_options={"_sa_orm_load_options": self.load_options},
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/sqlalchemy/orm/session.py", line 2351, in execute
+    return self._execute_internal(
+           ~~~~~~~~~~~~~~~~~~~~~~^
+        statement,
+        ^^^^^^^^^^
+    ...<4 lines>...
+        _add_event=_add_event,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/sqlalchemy/orm/session.py", line 2249, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self,
+        ^^^^^
+    ...<4 lines>...
+        conn,
+        ^^^^^
+    )
+    ^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/sqlalchemy/orm/context.py", line 306, in orm_execute_statement
+    result = conn.execute(
+        statement, params or {}, execution_options=execution_options
+    )
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 1419, in execute
+    return meth(
+        self,
+        distilled_parameters,
+        execution_options or NO_OPTIONS,
+    )
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/sqlalchemy/sql/elements.py", line 526, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self, distilled_params, execution_options
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 1641, in _execute_clauseelement
+    ret = self._execute_context(
+        dialect,
+    ...<8 lines>...
+        cache_hit=cache_hit,
+    )
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 1846, in _execute_context
+    return self._exec_single_context(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        dialect, context, statement, parameters
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 1986, in _exec_single_context
+    self._handle_dbapi_exception(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        e, str_statement, effective_parameters, cursor, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 2355, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/sqlalchemy/engine/default.py", line 951, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such column: LumpData.bale_id
+[SQL: SELECT "LumpData".id AS "LumpData_id", "LumpData".entry_datetime AS "LumpData_entry_datetime", "LumpData".bale_id AS "LumpData_bale_id", "LumpData".enter_user AS "LumpData_enter_user", "LumpData".cut_by AS "LumpData_cut_by", "LumpData".bundle_type AS "LumpData_bundle_type", "LumpData".product AS "LumpData_product", "LumpData".meters AS "LumpData_meters", "LumpData".color AS "LumpData_color", "LumpData".number_of_bundlie AS "LumpData_number_of_bundlie" 
+FROM "LumpData" 
+WHERE "LumpData".cut_by = ? AND "LumpData".entry_datetime BETWEEN ? AND ?]
+[parameters: ('CHOTU', '2026-02-04 00:00:00.000000', '2026-03-10 23:59:59.999999')]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+ERROR:app:Exception on /cutter_report [POST]
+Traceback (most recent call last):
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/sqlalchemy/engine/default.py", line 951, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.OperationalError: no such column: LumpData.bale_id
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/home/badx/Desktop/bh manfiation/app/route.py", line 326, in cutter_report
+    result = get_cutter_report_data(name_data_form,current_user)
+  File "/home/badx/Desktop/bh manfiation/app/data_Process.py", line 340, in get_cutter_report_data
+    ).all()
+      ~~~^^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/sqlalchemy/orm/query.py", line 2704, in all
+    return self._iter().all()  # type: ignore
+           ~~~~~~~~~~^^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/sqlalchemy/orm/query.py", line 2857, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ~~~~~~~~~~~~~~~~~~~~^
+        statement,
+        ^^^^^^^^^^
+        params,
+        ^^^^^^^
+        execution_options={"_sa_orm_load_options": self.load_options},
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/sqlalchemy/orm/session.py", line 2351, in execute
+    return self._execute_internal(
+           ~~~~~~~~~~~~~~~~~~~~~~^
+        statement,
+        ^^^^^^^^^^
+    ...<4 lines>...
+        _add_event=_add_event,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/sqlalchemy/orm/session.py", line 2249, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self,
+        ^^^^^
+    ...<4 lines>...
+        conn,
+        ^^^^^
+    )
+    ^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/sqlalchemy/orm/context.py", line 306, in orm_execute_statement
+    result = conn.execute(
+        statement, params or {}, execution_options=execution_options
+    )
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 1419, in execute
+    return meth(
+        self,
+        distilled_parameters,
+        execution_options or NO_OPTIONS,
+    )
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/sqlalchemy/sql/elements.py", line 526, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self, distilled_params, execution_options
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 1641, in _execute_clauseelement
+    ret = self._execute_context(
+        dialect,
+    ...<8 lines>...
+        cache_hit=cache_hit,
+    )
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 1846, in _execute_context
+    return self._exec_single_context(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        dialect, context, statement, parameters
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 1986, in _exec_single_context
+    self._handle_dbapi_exception(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        e, str_statement, effective_parameters, cursor, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 2355, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/sqlalchemy/engine/default.py", line 951, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such column: LumpData.bale_id
+[SQL: SELECT "LumpData".id AS "LumpData_id", "LumpData".entry_datetime AS "LumpData_entry_datetime", "LumpData".bale_id AS "LumpData_bale_id", "LumpData".enter_user AS "LumpData_enter_user", "LumpData".cut_by AS "LumpData_cut_by", "LumpData".bundle_type AS "LumpData_bundle_type", "LumpData".product AS "LumpData_product", "LumpData".meters AS "LumpData_meters", "LumpData".color AS "LumpData_color", "LumpData".number_of_bundlie AS "LumpData_number_of_bundlie" 
+FROM "LumpData" 
+WHERE "LumpData".cut_by = ? AND "LumpData".entry_datetime BETWEEN ? AND ?]
+[parameters: ('CHOTU', '2026-02-04 00:00:00.000000', '2026-03-10 23:59:59.999999')]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000

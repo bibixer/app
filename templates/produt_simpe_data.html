@@ -1,0 +1,708 @@
+<div>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        body {
+            background: #f4f8fd;
+            padding: 2rem;
+            display: flex;
+            justify-content: center;
+        }
+        .combined-container {
+            max-width: 1600px;
+            width: 100%;
+        }
+
+        /* ----- master balance section (new) ----- */
+        .balance-section {
+            background: white;
+            border-radius: 40px;
+            padding: 2rem 2rem 2.5rem 2rem;
+            box-shadow: 0 25px 50px -12px rgba(0,50,100,0.25);
+            margin-bottom: 2.5rem;
+        }
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin-bottom: 2rem;
+        }
+        .section-title i {
+            font-size: 2rem;
+            color: #1e4a7a;
+            background: #e8f0fe;
+            padding: 0.8rem;
+            border-radius: 24px;
+        }
+        .section-title h2 {
+            font-weight: 650;
+            color: #0b2b4a;
+            font-size: 1.8rem;
+        }
+        .section-title span {
+            margin-left: auto;
+            background: #e2ecfc;
+            padding: 0.4rem 1.8rem;
+            border-radius: 60px;
+            font-weight: 500;
+            color: #16486c;
+        }
+        .master-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        .master-card {
+            background: #f9fcff;
+            border-radius: 32px;
+            padding: 1.5rem 1.5rem 1.8rem 1.5rem;
+            border: 1px solid #dae8f8;
+            box-shadow: 0 8px 20px -8px rgba(0,65,130,0.12);
+            transition: transform 0.15s;
+        }
+        .master-card:hover {
+            transform: translateY(-4px);
+            border-color: #abc2e6;
+            box-shadow: 0 15px 30px -10px #1e3f6e33;
+        }
+        .master-name {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            border-bottom: 2px dashed #c8daf5;
+            padding-bottom: 1rem;
+            margin-bottom: 1.2rem;
+        }
+        .master-name i {
+            font-size: 1.6rem;
+            color: #2b5f9e;
+            background: white;
+            padding: 0.5rem;
+            border-radius: 20px;
+            box-shadow: 0 4px 8px #c1d6f0;
+        }
+        .master-name h3 {
+            font-size: 1.5rem;
+            font-weight: 650;
+            color: #113355;
+        }
+        .badge-small {
+            background: #d2e2fc;
+            padding: 0.2rem 1rem;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #1b4886;
+        }
+        .balance-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.8rem 0.5rem;
+            border-radius: 20px;
+            background: white;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+        .balance-row .label {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            color: #2f4d73;
+            font-weight: 500;
+        }
+        .balance-row .value {
+            font-weight: 700;
+            font-size: 1.3rem;
+        }
+        .old-bal { background: #ecf3fa; }
+        .given-bal { background: #fff1e6; }
+        .taken-bal { background: #e6f7e6; }
+        .net-bal {
+            background: #e3efff;
+            margin-top: 12px;
+            padding: 1rem 0.8rem;
+            border-radius: 28px;
+            font-weight: 700;
+            border: 1px solid #a3c6f0;
+        }
+        .net-bal .label { font-size: 1.2rem; }
+        .net-bal .value { font-size: 1.8rem; color: #00337a; }
+        .positive { color: #0b6e41; }
+        .negative { color: #b12e2e; }
+        .footer-note {
+            margin-top: 2rem;
+            text-align: right;
+            color: #5f7d9e;
+            font-size: 0.95rem;
+            border-top: 1px solid #d5e5fa;
+            padding-top: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* ----- existing tables styles (copied from previous) ----- */
+        .filter-bar {
+            background: white;
+            border-radius: 40px;
+            padding: 0.8rem 1.8rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 1.5rem;
+            box-shadow: 0 6px 14px rgba(0,20,40,0.06);
+            border: 1px solid #d9e6f5;
+        }
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+        }
+        .filter-group label {
+            font-weight: 600;
+            color: #1e3a6b;
+            font-size: 0.9rem;
+        }
+        .filter-group select, .filter-group input {
+            background: white;
+            border: 2px solid #d7e3f5;
+            border-radius: 40px;
+            padding: 0.5rem 2rem 0.5rem 1.2rem;
+            font-size: 0.9rem;
+            color: #10345e;
+            font-weight: 500;
+            outline: none;
+            min-width: 150px;
+            appearance: none;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%232a508b" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>');
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+        }
+        .filter-group input {
+            background-image: none;
+            padding: 0.5rem 1.2rem;
+            min-width: 180px;
+        }
+        .clear-btn {
+            background: #e2ecfc;
+            border: none;
+            border-radius: 40px;
+            padding: 0.5rem 1.5rem;
+            font-weight: 600;
+            color: #1d4a89;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-left: auto;
+        }
+        .clear-btn:hover { background: #c9defa; }
+        .table-grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+        @media (max-width: 1200px) { .table-grid-3 { grid-template-columns: 1fr; } }
+        .table-card {
+            background: white;
+            border-radius: 32px;
+            padding: 1.4rem 1rem 1.8rem 1rem;
+            box-shadow: 0 20px 40px -14px rgba(0,45,80,0.18);
+            display: flex;
+            flex-direction: column;
+        }
+        .table-header {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            border-bottom: 2px solid #ecf3fa;
+            padding-bottom: 0.8rem;
+            margin: 0 0.5rem 1rem 0.5rem;
+        }
+        .table-header i {
+            font-size: 1.5rem;
+            background: #e8f0fe;
+            padding: 0.6rem;
+            border-radius: 18px;
+            color: #1d4a89;
+        }
+        .table-header h3 { font-weight: 600; font-size: 1.3rem; }
+        .table-header span {
+            margin-left: auto;
+            background: #e2ecfc;
+            padding: 0.2rem 1rem;
+            border-radius: 30px;
+            font-size: 0.9rem;
+        }
+        .mini-wrapper {
+            overflow-x: auto;
+            border-radius: 20px;
+            border: 1px solid #e2ecf5;
+            margin: 0 0.5rem 1rem 0.5rem;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+        th {
+            background: #f1f7fd;
+            color: #133457;
+            font-weight: 600;
+            padding: 0.8rem 0.3rem;
+            white-space: nowrap;
+        }
+        td {
+            padding: 0.7rem 0.3rem;
+            border-bottom: 1px solid #eaf1f9;
+            text-align: center;
+        }
+        .master-badge {
+            background: #e6f0ff;
+            border-radius: 30px;
+            padding: 0.2rem 1rem;
+            font-weight: 500;
+            display: inline-block;
+        }
+        .cut-badge-sm {
+            background: #e2edfe;
+            padding: 0.2rem 1rem;
+            border-radius: 30px;
+            font-size: 0.85rem;
+        }
+        .subtotal-row { background: #f2f8ff; font-weight: 550; }
+        .subtotal-row td { border-bottom: 1px solid #c2d8f0; }
+        .total-production-box {
+            background: #ecf5ff;
+            border-radius: 60px;
+            padding: 0.9rem 2rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 2rem;
+            font-size: 1.2rem;
+            font-weight: 500;
+            margin-top: 0.5rem;
+            align-self: flex-end;
+        }
+        .expand-icon {
+            cursor: pointer;
+            color: #3b82f6;
+            font-size: 1.2rem;
+            margin-right: 0.3rem;
+            transition: 0.2s;
+            display: inline-block;
+            width: 24px;
+        }
+        .expand-icon:hover { color: #1e4a7a; }
+        .details-row {
+            background: #f8fcff;
+            border-top: 2px dashed #a0c0e8;
+            border-bottom: 2px dashed #a0c0e8;
+        }
+        .details-row td { padding: 1rem 0.5rem; background: #f0f7ff; }
+        .details-vertical-container { display: flex; flex-direction: column; gap: 12px; }
+        .group-summary-vertical {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            padding: 10px 15px;
+            background: white;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            font-size: 13px;
+        }
+        .summary-total { color: #0369a1; font-weight: 600; }
+        .summary-pieces { color: #166534; font-weight: 600; }
+        .summary-kg { color: #6b21a8; font-weight: 600; }
+        .summary-avg { color: #9a3412; font-weight: 600; }
+        .entries-vertical-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 4px;
+        }
+        .entry-item {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 10px 12px;
+            transition: all 0.2s;
+        }
+        .entry-item:hover { background: #f1f5f9; border-color: #94a3b8; }
+        .entry-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            font-size: 13px;
+        }
+        .entry-id {
+            font-family: monospace;
+            font-weight: 600;
+            color: #2563eb;
+            background: #dbeafe;
+            padding: 3px 8px;
+            border-radius: 20px;
+            min-width: 60px;
+            text-align: center;
+        }
+        .entry-date { color: #475569; font-weight: 500; min-width: 70px; }
+        .entry-pieces {
+            color: #059669;
+            background: #d1fae5;
+            padding: 3px 10px;
+            border-radius: 20px;
+            min-width: 70px;
+            text-align: center;
+        }
+        .entry-kg {
+            color: #7c3aed;
+            background: #ede9fe;
+            padding: 3px 10px;
+            border-radius: 20px;
+            min-width: 70px;
+            text-align: center;
+        }
+        .entry-kg-per-pc {
+            color: #b45309;
+            background: #ffedd5;
+            padding: 3px 10px;
+            border-radius: 20px;
+            min-width: 80px;
+            text-align: center;
+        }
+        .entry-given {
+            color: #1e293b;
+            background: #f1f5f9;
+            padding: 3px 12px;
+            border-radius: 20px;
+            min-width: 80px;
+            text-align: center;
+        }
+        .entry-status {
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 11px;
+            min-width: 70px;
+            text-align: center;
+        }
+        .entry-status.completed { background: #dcfce7; color: #166534; }
+        .entry-status.pending { background: #fef9c3; color: #854d0e; }
+        .entry-status.cancelled { background: #fee2e2; color: #991b1b; }
+        .entries-vertical-list::-webkit-scrollbar { width: 6px; }
+        .entries-vertical-list::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
+        .entries-vertical-list::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .hidden { display: none; }
+    </style>
+
+
+<div class="combined-container">
+    <!-- ========== NEW MASTER BALANCE SECTION ========== -->
+    <div class="balance-section">
+        <div class="section-title">
+            <i class="fas fa-scale-balanced"></i>
+            <h2>Master balance overview</h2>
+            <span><i class="far fa-clock"></i> current period</span>
+        </div>
+        <div id="masterBalanceContainer" class="master-grid"></div>
+        <div class="footer-note">
+            <span><i class="fas fa-info-circle"></i> Old balance + Inflow (taken) - Outflow (given) = Net</span>
+            <span><i class="fas fa-arrows-spin"></i> updated from transactions</span>
+        </div>
+    </div>
+
+    <!-- ========== EXISTING TABLES SECTION (with filters) ========== -->
+    <div class="filter-bar" id="globalFilterBar">
+        <div class="filter-group">
+            <label><i class="fas fa-filter"></i> Ready filters:</label>
+            <select id="filterReadyType"><option value="all">All types</option></select>
+            <select id="filterReadyProduct"><option value="all">All products</option></select>
+        </div>
+        <div class="filter-group">
+            <label><i class="fas fa-arrow-right"></i> Outflow filters:</label>
+            <select id="filterOutflowType"><option value="all">All types</option></select>
+            <select id="filterOutflowMaster"><option value="all">All masters</option></select>
+            <select id="filterOutflowProduct"><option value="all">All products</option></select>
+        </div>
+        <div class="filter-group">
+            <label><i class="fas fa-arrow-left"></i> Inflow filters:</label>
+            <select id="filterInflowType"><option value="all">All types</option></select>
+            <select id="filterInflowMaster"><option value="all">All masters</option></select>
+            <select id="filterInflowProduct"><option value="all">All products</option></select>
+        </div>
+        <button class="clear-btn" id="clearAllFilters"><i class="fas fa-undo-alt"></i> Reset all</button>
+    </div>
+
+    <!-- THREE TABLES -->
+    <div class="table-grid-3">
+        <!-- READY TABLE -->
+        <div class="table-card">
+            <div class="table-header"><i class="fas fa-cubes"></i><h3>Ready stock</h3><span>balance</span></div>
+            <div class="mini-wrapper">
+                <table id="readyTable"><thead><tr><th style="width:30px"></th><th>Product</th><th>Cut type</th><th>Pieces</th><th>Qty</th><th>Total pcs</th></tr></thead><tbody id="readyBody"></tbody></table>
+            </div>
+            <div class="total-production-box" style="align-self:flex-end;"><i class="fas fa-check-circle"></i> Ready total: <span id="readyGrandTotal">0</span></div>
+        </div>
+        <!-- OUTFLOW TABLE -->
+        <div class="table-card">
+            <div class="table-header"><i class="fas fa-arrow-right-from-bracket" style="color:#b45309;"></i><h3>Outflow (by master)</h3><span>given to</span></div>
+            <div class="mini-wrapper">
+                <table id="outflowTable"><thead><tr><th style="width:30px"></th><th>Master</th><th>Product</th><th>Type</th><th>Pieces</th><th>Count</th><th>Total</th></tr></thead><tbody id="outflowBody"></tbody></table>
+            </div>
+            <div class="total-production-box" style="background:#fff1e6;"><i class="fas fa-arrow-up"></i> Outflow total: <span id="outflowGrandTotal">0</span></div>
+        </div>
+        <!-- INFLOW TABLE -->
+        <div class="table-card">
+            <div class="table-header"><i class="fas fa-arrow-left-to-bracket" style="color:#059669;"></i><h3>Inflow (by master)</h3><span>received from</span></div>
+            <div class="mini-wrapper">
+                <table id="inflowTable"><thead><tr><th style="width:30px"></th><th>Master</th><th>Product</th><th>Type</th><th>Pieces</th><th>Count</th><th>Total</th></tr></thead><tbody id="inflowBody"></tbody></table>
+            </div>
+            <div class="total-production-box" style="background:#e6f7e6;"><i class="fas fa-arrow-down"></i> Inflow total: <span id="inflowGrandTotal">0</span></div>
+        </div>
+    </div>
+</div>
+
+<script>
+(function() {
+    // ----------------------------------------------------------------------
+    // SAMPLE DATA (unified – used by both master balance AND tables)
+    // ----------------------------------------------------------------------
+    const productionData = {
+        tres: [
+            // READY
+            { id: 101, product: "Panel", type_B: "sliced", pieces: 5, kg: 12.5, status: "completed", given_to: null, entry_datetime: new Date("2025-03-02"), flow: "ready" },
+            { id: 102, product: "Panel", type_B: "diced", pieces: 3, kg: 4.2, status: "completed", given_to: null, entry_datetime: new Date("2025-03-03"), flow: "ready" },
+            { id: 103, product: "Strip", type_B: "julienne", pieces: 8, kg: 6.0, status: "completed", given_to: null, entry_datetime: new Date("2025-03-04"), flow: "ready" },
+            { id: 104, product: "Panel", type_B: "sliced", pieces: 7, kg: 14.0, status: "completed", given_to: null, entry_datetime: new Date("2025-03-05"), flow: "ready" },
+            { id: 105, product: "Strip", type_B: "batons", pieces: 4, kg: 3.8, status: "completed", given_to: null, entry_datetime: new Date("2025-03-06"), flow: "ready" },
+            { id: 106, product: "Dice", type_B: "small", pieces: 10, kg: 5.5, status: "completed", given_to: null, entry_datetime: new Date("2025-03-07"), flow: "ready" },
+            { id: 107, product: "Dice", type_B: "medium", pieces: 6, kg: 7.2, status: "pending", given_to: null, entry_datetime: new Date("2025-03-08"), flow: "ready" },
+            { id: 108, product: "Cube", type_B: "large", pieces: 2, kg: 4.0, status: "completed", given_to: null, entry_datetime: new Date("2025-03-09"), flow: "ready" },
+            // OUTFLOW
+            { id: 201, product: "Panel", type_B: "sliced", pieces: 4, kg: 8.0, status: "completed", given_to: "Mohan", entry_datetime: new Date("2025-03-08"), flow: "outflow" },
+            { id: 202, product: "Panel", type_B: "sliced", pieces: 3, kg: 6.0, status: "completed", given_to: "Suresh", entry_datetime: new Date("2025-03-09"), flow: "outflow" },
+            { id: 203, product: "Panel", type_B: "diced", pieces: 2, kg: 3.0, status: "pending", given_to: "Mohan", entry_datetime: new Date("2025-03-10"), flow: "outflow" },
+            { id: 204, product: "Strip", type_B: "julienne", pieces: 5, kg: 3.5, status: "completed", given_to: "Gopal", entry_datetime: new Date("2025-03-11"), flow: "outflow" },
+            { id: 205, product: "Strip", type_B: "batons", pieces: 3, kg: 2.9, status: "completed", given_to: "Suresh", entry_datetime: new Date("2025-03-12"), flow: "outflow" },
+            { id: 206, product: "Dice", type_B: "small", pieces: 4, kg: 2.2, status: "completed", given_to: "Mohan", entry_datetime: new Date("2025-03-13"), flow: "outflow" },
+            { id: 207, product: "Cube", type_B: "large", pieces: 1, kg: 2.5, status: "completed", given_to: "Gopal", entry_datetime: new Date("2025-03-14"), flow: "outflow" },
+            // INFLOW
+            { id: 301, product: "Panel", type_B: "sliced", pieces: 6, kg: 13.0, status: "completed", given_to: "Mohan", entry_datetime: new Date("2025-03-08"), flow: "inflow" },
+            { id: 302, product: "Panel", type_B: "diced", pieces: 4, kg: 6.5, status: "completed", given_to: "Mohan", entry_datetime: new Date("2025-03-09"), flow: "inflow" },
+            { id: 303, product: "Strip", type_B: "julienne", pieces: 7, kg: 5.6, status: "completed", given_to: "Suresh", entry_datetime: new Date("2025-03-10"), flow: "inflow" },
+            { id: 304, product: "Dice", type_B: "small", pieces: 5, kg: 2.5, status: "completed", given_to: "Gopal", entry_datetime: new Date("2025-03-12"), flow: "inflow" },
+            { id: 305, product: "Panel", type_B: "sliced", pieces: 3, kg: 6.2, status: "completed", given_to: "Suresh", entry_datetime: new Date("2025-03-14"), flow: "inflow" },
+            { id: 306, product: "Dice", type_B: "medium", pieces: 5, kg: 6.0, status: "pending", given_to: "Mohan", entry_datetime: new Date("2025-03-15"), flow: "inflow" },
+            { id: 307, product: "Cube", type_B: "large", pieces: 2, kg: 4.8, status: "completed", given_to: "Gopal", entry_datetime: new Date("2025-03-16"), flow: "inflow" }
+        ]
+    };
+    const tres = productionData.tres;
+
+    // --- helper for master balance ---
+    const masterOldBalances = { "Mohan": 150, "Suresh": 80, "Gopal": 45, "Ramesh": 210, "Dinesh": 30 };
+
+    // aggregate given/taken for master balance (using same tres)
+    const givenMap = new Map();
+    const takenMap = new Map();
+    tres.forEach(t => {
+        if (t.flow === 'outflow') {
+            givenMap.set(t.given_to, (givenMap.get(t.given_to) || 0) + t.pieces);
+        } else if (t.flow === 'inflow') {
+            takenMap.set(t.given_to, (takenMap.get(t.given_to) || 0) + t.pieces);
+        }
+    });
+
+    const allMasters = new Set([...Object.keys(masterOldBalances), ...givenMap.keys(), ...takenMap.keys()]);
+    const sortedMasters = Array.from(allMasters).sort();
+
+    const balanceContainer = document.getElementById('masterBalanceContainer');
+    balanceContainer.innerHTML = '';
+    sortedMasters.forEach(master => {
+        const oldBal = masterOldBalances[master] || 0;
+        const given = givenMap.get(master) || 0;
+        const taken = takenMap.get(master) || 0;
+        const net = oldBal + taken - given;
+        const netClass = net >= 0 ? 'positive' : 'negative';
+        const card = document.createElement('div'); card.className = 'master-card';
+        card.innerHTML = `
+            <div class="master-name"><i class="fas fa-user-circle"></i><h3>${master}</h3><span class="badge-small">ID: ${master.slice(0,3)}${Math.floor(Math.random()*100)}</span></div>
+            <div class="balance-row old-bal"><span class="label"><i class="fas fa-book-open"></i> Old balance</span><span class="value">${oldBal} pcs</span></div>
+            <div class="balance-row given-bal"><span class="label"><i class="fas fa-arrow-up"></i> Given (outflow)</span><span class="value">${given} pcs</span></div>
+            <div class="balance-row taken-bal"><span class="label"><i class="fas fa-arrow-down"></i> Taken (inflow)</span><span class="value">${taken} pcs</span></div>
+            <div class="balance-row net-bal"><span class="label"><i class="fas fa-equals"></i> Net balance</span><span class="value ${netClass}">${net} pcs</span></div>
+        `;
+        balanceContainer.appendChild(card);
+    });
+
+    // update footer totals
+    const totalOld = Object.values(masterOldBalances).reduce((a,b)=>a+b,0);
+    const totalGiven = Array.from(givenMap.values()).reduce((a,b)=>a+b,0);
+    const totalTaken = Array.from(takenMap.values()).reduce((a,b)=>a+b,0);
+    const totalNet = totalOld + totalTaken - totalGiven;
+    const footerSpan = document.querySelector('.footer-note span:first-child');
+    if (footerSpan) footerSpan.innerHTML = `<i class="fas fa-calculator"></i> Total old: ${totalOld} · Given: ${totalGiven} · Taken: ${totalTaken} · Net: ${totalNet}`;
+
+    // ----------------------------------------------------------------------
+    // EXISTING TABLE RENDERING CODE (copied from previous, uses same tres)
+    // ----------------------------------------------------------------------
+    function formatDate(d) { return d.toLocaleDateString("en-IN", { day:"numeric", month:"short", year:"numeric" }); }
+    const rowState = {};
+    window.toggleDetails = function(groupKey) {
+        const detailRow = document.querySelector(`tr.details-row[data-details="${groupKey}"]`);
+        const mainRow = document.querySelector(`tr[data-group="${groupKey}"]`);
+        if (!detailRow || !mainRow) return;
+        const icon = mainRow.querySelector(".expand-icon i");
+        if (detailRow.style.display === "none") {
+            detailRow.style.display = "table-row";
+            if (icon) { icon.classList.remove("fa-chevron-right"); icon.classList.add("fa-chevron-down"); }
+            rowState[groupKey] = true;
+        } else {
+            detailRow.style.display = "none";
+            if (icon) { icon.classList.remove("fa-chevron-down"); icon.classList.add("fa-chevron-right"); }
+            rowState[groupKey] = false;
+        }
+    };
+
+    // maps
+    const readyMap = {}; tres.filter(e=>e.flow==='ready').forEach(e=>{ const p=e.product, t=e.type_B||'unknown', pc=e.pieces; if(!readyMap[p]) readyMap[p]={}; if(!readyMap[p][t]) readyMap[p][t]={}; if(!readyMap[p][t][pc]) readyMap[p][t][pc]={count:0,total:0,entries:[]}; readyMap[p][t][pc].count+=1; readyMap[p][t][pc].total+=pc; readyMap[p][t][pc].entries.push(e); });
+    const outflowMap = {}; tres.filter(e=>e.flow==='outflow').forEach(e=>{ const m=e.given_to||'unknown', p=e.product, t=e.type_B||'unknown', pc=e.pieces; if(!outflowMap[m]) outflowMap[m]={}; if(!outflowMap[m][p]) outflowMap[m][p]={}; if(!outflowMap[m][p][t]) outflowMap[m][p][t]={}; if(!outflowMap[m][p][t][pc]) outflowMap[m][p][t][pc]={count:0,total:0,entries:[]}; outflowMap[m][p][t][pc].count+=1; outflowMap[m][p][t][pc].total+=pc; outflowMap[m][p][t][pc].entries.push(e); });
+    const inflowMap = {}; tres.filter(e=>e.flow==='inflow').forEach(e=>{ const m=e.given_to||'unknown', p=e.product, t=e.type_B||'unknown', pc=e.pieces; if(!inflowMap[m]) inflowMap[m]={}; if(!inflowMap[m][p]) inflowMap[m][p]={}; if(!inflowMap[m][p][t]) inflowMap[m][p][t]={}; if(!inflowMap[m][p][t][pc]) inflowMap[m][p][t][pc]={count:0,total:0,entries:[]}; inflowMap[m][p][t][pc].count+=1; inflowMap[m][p][t][pc].total+=pc; inflowMap[m][p][t][pc].entries.push(e); });
+
+    // populate filters (simplified, same as before)
+    function uniqueValues(arr) { return [...new Set(arr)].sort(); }
+    const filterReadyType = document.getElementById('filterReadyType');
+    const filterReadyProduct = document.getElementById('filterReadyProduct');
+    uniqueValues(tres.filter(e=>e.flow==='ready').map(e=>e.type_B)).forEach(t=>filterReadyType.add(new Option(t,t)));
+    uniqueValues(tres.filter(e=>e.flow==='ready').map(e=>e.product)).forEach(p=>filterReadyProduct.add(new Option(p,p)));
+
+    const filterOutflowType = document.getElementById('filterOutflowType');
+    const filterOutflowMaster = document.getElementById('filterOutflowMaster');
+    const filterOutflowProduct = document.getElementById('filterOutflowProduct');
+    uniqueValues(tres.filter(e=>e.flow==='outflow').map(e=>e.type_B)).forEach(t=>filterOutflowType.add(new Option(t,t)));
+    uniqueValues(tres.filter(e=>e.flow==='outflow').map(e=>e.given_to)).forEach(m=>filterOutflowMaster.add(new Option(m,m)));
+    uniqueValues(tres.filter(e=>e.flow==='outflow').map(e=>e.product)).forEach(p=>filterOutflowProduct.add(new Option(p,p)));
+
+    const filterInflowType = document.getElementById('filterInflowType');
+    const filterInflowMaster = document.getElementById('filterInflowMaster');
+    const filterInflowProduct = document.getElementById('filterInflowProduct');
+    uniqueValues(tres.filter(e=>e.flow==='inflow').map(e=>e.type_B)).forEach(t=>filterInflowType.add(new Option(t,t)));
+    uniqueValues(tres.filter(e=>e.flow==='inflow').map(e=>e.given_to)).forEach(m=>filterInflowMaster.add(new Option(m,m)));
+    uniqueValues(tres.filter(e=>e.flow==='inflow').map(e=>e.product)).forEach(p=>filterInflowProduct.add(new Option(p,p)));
+
+    // render functions (identical to previous, but we include them briefly)
+    function renderReady() { /* ... full version from previous ... */
+        const typeFilter = filterReadyType.value, prodFilter = filterReadyProduct.value;
+        const tbody = document.getElementById('readyBody'); tbody.innerHTML = ''; let readyGrand = 0;
+        const rowStateBackup = { ...rowState };
+        Object.keys(readyMap).sort().forEach(prod => {
+            if (prodFilter !== 'all' && prod !== prodFilter) return;
+            Object.keys(readyMap[prod]).sort().forEach(typ => {
+                if (typeFilter !== 'all' && typ !== typeFilter) return;
+                Object.entries(readyMap[prod][typ]).forEach(([pcsStr, grp]) => {
+                    const pcs = parseInt(pcsStr); const groupKey = `ready|${prod}|${typ}|${pcs}`; const expanded = rowStateBackup[groupKey] || false;
+                    const mainRow = document.createElement('tr'); mainRow.setAttribute('data-group', groupKey);
+                    mainRow.innerHTML = `<td><span class="expand-icon" onclick="toggleDetails('${groupKey}')"><i class="fas ${expanded ? 'fa-chevron-down' : 'fa-chevron-right'}"></i></span></td><td>${prod}</td><td><span class="cut-badge-sm">${typ}</span></td><td>${pcs}</td><td>${grp.count}</td><td><strong>${grp.total}</strong></td>`;
+                    tbody.appendChild(mainRow); readyGrand += grp.total;
+                    const detailRow = document.createElement('tr'); detailRow.classList.add('details-row'); detailRow.setAttribute('data-details', groupKey); detailRow.style.display = expanded ? 'table-row' : 'none';
+                    const totalPieces = grp.entries.reduce((s,e)=>s+e.pieces,0); const totalKg = grp.entries.reduce((s,e)=>s+e.kg,0); const avgKg = totalPieces>0?(totalKg/totalPieces).toFixed(2):0;
+                    const entriesHtml = grp.entries.map(e => { const kgPerPc = e.pieces>0?(e.kg/e.pieces).toFixed(2):0; return `<div class="entry-item"><div class="entry-row"><span class="entry-id">#${e.id}</span><span class="entry-date">${formatDate(e.entry_datetime)}</span><span class="entry-pieces">📦 ${e.pieces} pcs</span><span class="entry-kg">⚖️ ${e.kg} kg</span><span class="entry-kg-per-pc">📊 ${kgPerPc} kg/pc</span><span class="entry-given">👤 ${e.given_to || '—'}</span><span class="entry-status ${e.status?.toLowerCase()||''}">${e.status||'—'}</span></div></div>`; }).join('');
+                    detailRow.innerHTML = `<td colspan="7" style="padding:16px; background:#f8fafc;"><div class="details-vertical-container"><div class="group-summary-vertical"><span class="summary-total">📋 Entries: ${grp.count}</span><span class="summary-pieces">📦 Pieces: ${totalPieces}</span><span class="summary-kg">⚖️ KG: ${totalKg.toFixed(2)}</span><span class="summary-avg">📊 Avg: ${avgKg} kg/pc</span></div><div class="entries-vertical-list">${entriesHtml}</div></div></td>`;
+                    tbody.appendChild(detailRow);
+                });
+            });
+            const prodTotal = Object.keys(readyMap[prod]).reduce((acc, typ) => { if(typeFilter!=='all' && typ!==typeFilter) return acc; return acc + Object.values(readyMap[prod][typ]).reduce((s,g)=>s+g.total,0); },0);
+            if(prodTotal>0){ const sub = document.createElement('tr'); sub.classList.add('subtotal-row'); sub.innerHTML = `<td colspan="5" style="text-align:right;">${prod} subtotal →</td><td>${prodTotal}</td>`; tbody.appendChild(sub); }
+        });
+        document.getElementById('readyGrandTotal').innerText = readyGrand;
+    }
+    function renderOutflow() { /* similar, copied from previous but shortened for brevity – full version works */
+        const typeFilter = filterOutflowType.value, masterFilter = filterOutflowMaster.value, prodFilter = filterOutflowProduct.value;
+        const tbody = document.getElementById('outflowBody'); tbody.innerHTML = ''; let outflowGrand = 0; const rowStateBackup = {...rowState};
+        Object.keys(outflowMap).sort().forEach(master => {
+            if(masterFilter!=='all' && master!==masterFilter) return; let firstMaster=true;
+            Object.keys(outflowMap[master]).sort().forEach(prod => {
+                if(prodFilter!=='all' && prod!==prodFilter) return; let firstProd=true;
+                Object.keys(outflowMap[master][prod]).sort().forEach(typ => {
+                    if(typeFilter!=='all' && typ!==typeFilter) return;
+                    Object.entries(outflowMap[master][prod][typ]).forEach(([pcsStr, grp]) => {
+                        const pcs = parseInt(pcsStr); const groupKey = `out|${master}|${prod}|${typ}|${pcs}`; const expanded = rowStateBackup[groupKey] || false;
+                        const mainRow = document.createElement('tr'); mainRow.setAttribute('data-group', groupKey);
+                        mainRow.innerHTML = `<td><span class="expand-icon" onclick="toggleDetails('${groupKey}')"><i class="fas ${expanded ? 'fa-chevron-down' : 'fa-chevron-right'}"></i></span></td><td>${firstMaster?'<span class="master-badge">'+master+'</span>':''}</td><td>${firstProd?prod:''}</td><td><span class="cut-badge-sm">${typ}</span></td><td>${pcs}</td><td>${grp.count}</td><td>${grp.total}</td>`;
+                        tbody.appendChild(mainRow); outflowGrand += grp.total; firstProd=false; firstMaster=false;
+                        const detailRow = document.createElement('tr'); detailRow.classList.add('details-row'); detailRow.setAttribute('data-details', groupKey); detailRow.style.display = expanded ? 'table-row' : 'none';
+                        const totalPieces = grp.entries.reduce((s,e)=>s+e.pieces,0); const totalKg = grp.entries.reduce((s,e)=>s+e.kg,0); const avgKg = totalPieces>0?(totalKg/totalPieces).toFixed(2):0;
+                        const entriesHtml = grp.entries.map(e => { const kgPerPc = e.pieces>0?(e.kg/e.pieces).toFixed(2):0; return `<div class="entry-item"><div class="entry-row"><span class="entry-id">#${e.id}</span><span class="entry-date">${formatDate(e.entry_datetime)}</span><span class="entry-pieces">📦 ${e.pieces} pcs</span><span class="entry-kg">⚖️ ${e.kg} kg</span><span class="entry-kg-per-pc">📊 ${kgPerPc} kg/pc</span><span class="entry-given">👤 ${e.given_to || '—'}</span><span class="entry-status ${e.status?.toLowerCase()||''}">${e.status||'—'}</span></div></div>`; }).join('');
+                        detailRow.innerHTML = `<td colspan="8" style="padding:16px; background:#f8fafc;"><div class="details-vertical-container"><div class="group-summary-vertical"><span class="summary-total">📋 Entries: ${grp.count}</span><span class="summary-pieces">📦 Pieces: ${totalPieces}</span><span class="summary-kg">⚖️ KG: ${totalKg.toFixed(2)}</span><span class="summary-avg">📊 Avg: ${avgKg} kg/pc</span></div><div class="entries-vertical-list">${entriesHtml}</div></div></td>`;
+                        tbody.appendChild(detailRow);
+                    });
+                });
+            });
+            let mTotal = 0;
+            Object.keys(outflowMap[master]).forEach(prod => { if(prodFilter!=='all' && prod!==prodFilter) return; Object.keys(outflowMap[master][prod]).forEach(typ => { if(typeFilter!=='all' && typ!==typeFilter) return; Object.values(outflowMap[master][prod][typ]).forEach(g => mTotal += g.total); }); });
+            if((mTotal>0 && masterFilter==='all') || master===masterFilter){ const sub = document.createElement('tr'); sub.classList.add('subtotal-row'); sub.innerHTML = `<td colspan="6" style="text-align:right;">${master} outflow →</td><td>${mTotal}</td>`; tbody.appendChild(sub); }
+        });
+        document.getElementById('outflowGrandTotal').innerText = outflowGrand;
+    }
+    function renderInflow() { /* analogous */
+        const typeFilter = filterInflowType.value, masterFilter = filterInflowMaster.value, prodFilter = filterInflowProduct.value;
+        const tbody = document.getElementById('inflowBody'); tbody.innerHTML = ''; let inflowGrand = 0; const rowStateBackup = {...rowState};
+        Object.keys(inflowMap).sort().forEach(master => {
+            if(masterFilter!=='all' && master!==masterFilter) return; let firstMaster=true;
+            Object.keys(inflowMap[master]).sort().forEach(prod => {
+                if(prodFilter!=='all' && prod!==prodFilter) return; let firstProd=true;
+                Object.keys(inflowMap[master][prod]).sort().forEach(typ => {
+                    if(typeFilter!=='all' && typ!==typeFilter) return;
+                    Object.entries(inflowMap[master][prod][typ]).forEach(([pcsStr, grp]) => {
+                        const pcs = parseInt(pcsStr); const groupKey = `in|${master}|${prod}|${typ}|${pcs}`; const expanded = rowStateBackup[groupKey] || false;
+                        const mainRow = document.createElement('tr'); mainRow.setAttribute('data-group', groupKey);
+                        mainRow.innerHTML = `<td><span class="expand-icon" onclick="toggleDetails('${groupKey}')"><i class="fas ${expanded ? 'fa-chevron-down' : 'fa-chevron-right'}"></i></span></td><td>${firstMaster?'<span class="master-badge">'+master+'</span>':''}</td><td>${firstProd?prod:''}</td><td><span class="cut-badge-sm">${typ}</span></td><td>${pcs}</td><td>${grp.count}</td><td>${grp.total}</td>`;
+                        tbody.appendChild(mainRow); inflowGrand += grp.total; firstProd=false; firstMaster=false;
+                        const detailRow = document.createElement('tr'); detailRow.classList.add('details-row'); detailRow.setAttribute('data-details', groupKey); detailRow.style.display = expanded ? 'table-row' : 'none';
+                        const totalPieces = grp.entries.reduce((s,e)=>s+e.pieces,0); const totalKg = grp.entries.reduce((s,e)=>s+e.kg,0); const avgKg = totalPieces>0?(totalKg/totalPieces).toFixed(2):0;
+                        const entriesHtml = grp.entries.map(e => { const kgPerPc = e.pieces>0?(e.kg/e.pieces).toFixed(2):0; return `<div class="entry-item"><div class="entry-row"><span class="entry-id">#${e.id}</span><span class="entry-date">${formatDate(e.entry_datetime)}</span><span class="entry-pieces">📦 ${e.pieces} pcs</span><span class="entry-kg">⚖️ ${e.kg} kg</span><span class="entry-kg-per-pc">📊 ${kgPerPc} kg/pc</span><span class="entry-given">👤 ${e.given_to || '—'}</span><span class="entry-status ${e.status?.toLowerCase()||''}">${e.status||'—'}</span></div></div>`; }).join('');
+                        detailRow.innerHTML = `<td colspan="8" style="padding:16px; background:#f8fafc;"><div class="details-vertical-container"><div class="group-summary-vertical"><span class="summary-total">📋 Entries: ${grp.count}</span><span class="summary-pieces">📦 Pieces: ${totalPieces}</span><span class="summary-kg">⚖️ KG: ${totalKg.toFixed(2)}</span><span class="summary-avg">📊 Avg: ${avgKg} kg/pc</span></div><div class="entries-vertical-list">${entriesHtml}</div></div></td>`;
+                        tbody.appendChild(detailRow);
+                    });
+                });
+            });
+            let mTotal = 0;
+            Object.keys(inflowMap[master]).forEach(prod => { if(prodFilter!=='all' && prod!==prodFilter) return; Object.keys(inflowMap[master][prod]).forEach(typ => { if(typeFilter!=='all' && typ!==typeFilter) return; Object.values(inflowMap[master][prod][typ]).forEach(g => mTotal += g.total); }); });
+            if((mTotal>0 && masterFilter==='all') || master===masterFilter){ const sub = document.createElement('tr'); sub.classList.add('subtotal-row'); sub.innerHTML = `<td colspan="6" style="text-align:right;">${master} inflow →</td><td>${mTotal}</td>`; tbody.appendChild(sub); }
+        });
+        document.getElementById('inflowGrandTotal').innerText = inflowGrand;
+    }
+
+    // attach events
+    filterReadyType.addEventListener('change', renderReady);
+    filterReadyProduct.addEventListener('change', renderReady);
+    filterOutflowType.addEventListener('change', renderOutflow);
+    filterOutflowMaster.addEventListener('change', renderOutflow);
+    filterOutflowProduct.addEventListener('change', renderOutflow);
+    filterInflowType.addEventListener('change', renderInflow);
+    filterInflowMaster.addEventListener('change', renderInflow);
+    filterInflowProduct.addEventListener('change', renderInflow);
+    document.getElementById('clearAllFilters').addEventListener('click', function() {
+        filterReadyType.value = 'all'; filterReadyProduct.value = 'all';
+        filterOutflowType.value = 'all'; filterOutflowMaster.value = 'all'; filterOutflowProduct.value = 'all';
+        filterInflowType.value = 'all'; filterInflowMaster.value = 'all'; filterInflowProduct.value = 'all';
+        renderReady(); renderOutflow(); renderInflow();
+    });
+
+    // initial renders
+    renderReady(); renderOutflow(); renderInflow();
+})();
+</script>
+</div>
