@@ -636,7 +636,8 @@
     <div class="header">
       <div class="title-section">
         <i class="fas fa-clipboard-list"></i>
-        <h1>Sicher · Production Dashboard</h1>
+        <h1> Production report
+        </h1>
       </div>
       <div class="date-badge" id="dateBadge"></div>
     </div>
@@ -1240,6 +1241,7 @@ types.forEach((type) => {
                   if (originalTransaction.product) details.push({ label: 'Product', value: originalTransaction.product });
                   if (originalTransaction.type_B) details.push({ label: 'Type', value: originalTransaction.type_B });
                   if (originalTransaction.kg) details.push({ label: 'KG', value: originalTransaction.kg });
+                  if (originalTransaction.kg) details.push({ label: 'KG avg', value: originalTransaction.kg/t.pieces });
                   if (originalTransaction.color) details.push({ label: 'Color', value: originalTransaction.color });
                   if (originalTransaction.cut_by) details.push({ label: 'Cut By', value: originalTransaction.cut_by });
                   if (originalTransaction.labe_made_by) details.push({ label: 'Label Made By', value: originalTransaction.labe_made_by });

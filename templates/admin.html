@@ -766,10 +766,12 @@ html {
    <div style= "padding: 20px;">
    <h2> date range and cuttername </h2>
   {{ render_form(date_from, novalidate=True, extra_classes='login100-form validate-form') }}
+
    {% include "scarch.html" %}
    {% if backend_data %}
    {% include "cutter_reportcard.html" %}
      {% endif %}
+     {% include "inputjs.html" %}
      </div>
  </div>
 {% for message in get_flashed_messages() %}
@@ -784,6 +786,7 @@ html {
    {% if backend_data %}
    {% include "outwoker_production_report.html" %}
    {% endif %}
+   {% include "inputjs.html" %}
 
  </div>
 {% for message in get_flashed_messages() %}

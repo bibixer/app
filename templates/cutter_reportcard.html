@@ -12,6 +12,174 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
     />
     <style>
+      /* Vertical details container */
+.details-vertical-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* Group summary for vertical layout */
+.group-summary-vertical {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    padding: 10px 15px;
+    background: white;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    font-size: 13px;
+}
+
+.summary-total {
+    color: #0369a1;
+    font-weight: 600;
+}
+
+.summary-pieces {
+    color: #166534;
+    font-weight: 600;
+}
+
+.summary-kg {
+    color: #6b21a8;
+    font-weight: 600;
+}
+
+.summary-avg {
+    color: #9a3412;
+    font-weight: 600;
+}
+
+/* Vertical entries list */
+.entries-vertical-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 4px;
+}
+
+/* Individual entry item */
+.entry-item {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 10px 12px;
+    transition: all 0.2s;
+}
+
+.entry-item:hover {
+    background: #f1f5f9;
+    border-color: #94a3b8;
+}
+
+/* Entry row with all details */
+.entry-row {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    font-size: 13px;
+}
+
+.entry-id {
+    font-family: monospace;
+    font-weight: 600;
+    color: #2563eb;
+    background: #dbeafe;
+    padding: 3px 8px;
+    border-radius: 20px;
+    min-width: 60px;
+    text-align: center;
+}
+
+.entry-date {
+    color: #475569;
+    font-weight: 500;
+    min-width: 70px;
+}
+
+.entry-pieces {
+    color: #059669;
+    background: #d1fae5;
+    padding: 3px 10px;
+    border-radius: 20px;
+    min-width: 70px;
+    text-align: center;
+}
+
+.entry-kg {
+    color: #7c3aed;
+    background: #ede9fe;
+    padding: 3px 10px;
+    border-radius: 20px;
+    min-width: 70px;
+    text-align: center;
+}
+
+.entry-kg-per-pc {
+    color: #b45309;
+    background: #ffedd5;
+    padding: 3px 10px;
+    border-radius: 20px;
+    min-width: 80px;
+    text-align: center;
+}
+
+.entry-given {
+    color: #1e293b;
+    background: #f1f5f9;
+    padding: 3px 12px;
+    border-radius: 20px;
+    min-width: 80px;
+    text-align: center;
+}
+
+.entry-status {
+    padding: 3px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 11px;
+    min-width: 70px;
+    text-align: center;
+}
+
+.entry-status.completed {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.entry-status.pending {
+    background: #fef9c3;
+    color: #854d0e;
+}
+
+.entry-status.cancelled {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+/* Scrollbar styling */
+.entries-vertical-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.entries-vertical-list::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 10px;
+}
+
+.entries-vertical-list::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+.entries-vertical-list::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
       * {
         box-sizing: border-box;
         margin: 0;
@@ -813,32 +981,65 @@
                 `;
                 tbody.appendChild(mainRow);
 
-                // Details row with ID, kg, status, given_to
-                const detailRow = document.createElement("tr");
-                detailRow.classList.add("details-row");
-                detailRow.setAttribute("data-details", groupKey);
-                detailRow.style.display = isExpanded ? "table-row" : "none";
+                // Calculate average kg per piece for this group
+const totalPieces = entries.reduce((sum, e) => sum + e.pieces, 0);
+const totalKg = entries.reduce((sum, e) => sum + e.kg, 0);
+const avgKgPerPiece = totalPieces > 0 ? (totalKg / totalPieces).toFixed(2) : 0;
 
-                const entryDetails = entries
-                    .map((e) => {
-                        const dateStr = e.entry_datetime.toLocaleDateString("en-IN", {
-                            day: "numeric",
-                            month: "short",
-                        });
-                        return `<span class="id-chip">ID:${e.id} | ${dateStr} | ${e.pieces}pcs | ⚖️ ${e.kg}kg | ${e.given_to ? e.given_to.substring(0, 15) + "…" : "—"} | <span class="status-badge">${e.status}</span></span>`;
-                    })
-                    .join(" ");
+// Details row with vertical layout
+const detailRow = document.createElement("tr");
+detailRow.classList.add("details-row");
+detailRow.setAttribute("data-details", groupKey);
+detailRow.style.display = isExpanded ? "table-row" : "none";
 
-                detailRow.innerHTML = `
-                    <td></td>
-                    <td colspan="5">
-                        <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
-                            <span style="font-weight: 500; color: #1e4a7a;">📋 Entries (${count}):</span>
-                            <div class="date-chips" style="justify-content: flex-start;">${entryDetails}</div>
-                        </div>
-                    </td>
-                `;
-                tbody.appendChild(detailRow);
+// Create vertical list of entries
+const entryList = entries
+    .map((e) => {
+        const dateStr = e.entry_datetime.toLocaleDateString("en-IN", {
+            day: "numeric",
+            month: "short",
+        });
+
+        // Calculate kg per piece for this entry
+        const kgPerPiece = e.pieces > 0 ? (e.kg / e.pieces).toFixed(2) : 0;
+
+        return `
+            <div class="entry-item">
+                <div class="entry-row">
+                    <span class="entry-id">#${e.id}</span>
+                    <span class="entry-date">${dateStr}</span>
+                    <span class="entry-pieces">📦 ${e.pieces} pcs</span>
+                    <span class="entry-kg">⚖️ ${e.kg} kg</span>
+                    <span class="entry-kg-per-pc">📊 ${kgPerPiece} kg/pc</span>
+                    <span class="entry-given">👤 ${e.given_to ? e.given_to.substring(0, 15) + "…" : "—"}</span>
+                    <span class="entry-status ${e.status?.toLowerCase() || ''}">${e.status || '—'}</span>
+                </div>
+            </div>
+        `;
+    })
+    .join("");
+
+// Group summary at the top
+const groupSummary = `
+    <div class="group-summary-vertical">
+        <span class="summary-total">📋 Total: ${count} entries</span>
+        <span class="summary-pieces">📦 Pieces: ${totalPieces}</span>
+        <span class="summary-kg">⚖️ KG: ${totalKg.toFixed(2)}</span>
+        <span class="summary-avg">📊 Avg: ${avgKgPerPiece} kg/pc</span>
+    </div>
+`;
+
+detailRow.innerHTML = `
+    <td colspan="8" style="padding: 16px; background: #f8fafc;">
+        <div class="details-vertical-container">
+            ${groupSummary}
+            <div class="entries-vertical-list">
+                ${entryList}
+            </div>
+        </div>
+    </td>
+`;
+tbody.appendChild(detailRow);
 
                 firstRow = false;
             });

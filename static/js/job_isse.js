@@ -101,6 +101,16 @@ function addRow() {
                                                                                         readonly>
 
                                                                                     </td>
+                                                                                    <td>
+                                                                                      <input
+                                                                                        type="number"
+                                                                                        min="0"
+                                                                                        step="0.01"
+                                                                                        class="item-kg-avg"
+                                                                                        placeholder="0.00"
+                                                                                        readonly>
+
+                                                                                    </td>
                                                                                         <td><button type="button" class="btn-remove">×</button></td>
                                                                                       `;
 
@@ -144,6 +154,7 @@ function addRow() {
       tr.querySelector(".item-type").value = item.type;
       tr.querySelector(".item-qty").value = item.pics;
       tr.querySelector(".item-kg").value = item.kg;
+      tr.querySelector(".item-kg-avg").value = (item.kg / item.pics);
 
       updateTotalKg();
       updadateTotalPics();
@@ -195,6 +206,7 @@ function addRow() {
       tr.querySelector(".item-type").value = item.type;
       tr.querySelector(".item-qty").value = item.pics;
       tr.querySelector(".item-kg").value = item.kg;
+      tr.querySelector(".item-kg-avg").value = (item.kg / item.pics);
       updateTotalKg();
       updadateTotalPics();
       updateSummaryTab();
