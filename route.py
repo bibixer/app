@@ -1,7 +1,7 @@
 from functools import wraps
 
 from flask import flash, render_template, redirect, url_for,session,request, jsonify
-from form import Lump_data, bundle_invadata, Item_data, Outworker_form, Cutter_form, Return_form, Login_form, Date_form, Date_form_with_name
+from form import Lump_data, bundle_invadata, Item_data, Outworker_form, Cutter_form, Return_form, Login_form, Date_form, Date_form_with_name,bale_data_form
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from data_entry import add_data_lump,add_cutter,add_items,add_outworker_db,add_jobcard,in_move_entery
 from data_Process import get_serch_data, get_job_card_data_creation, get_retun_card_data, get_movemet_data, \
@@ -39,7 +39,21 @@ def register_routes(app,db):
     @login_manager.user_loader
     def load_user(user_id):
         return db.session.get(User, int(user_id))
+    @app.route("/bale_entery",methods=["GET", "POST"])
+    @login_required
+    def bale_entery():
+        form_name  = " bale entery "
+        current_form = bale_data_form()
+        if current_form.validate_on_submit():
+            print(current_form.data)
 
+        return render_template(
+            "user.html",
+            form_name=form_name,
+            current_form=current_form,
+            # data=data_autofill,
+            id=current_user.role
+        )
     @app.route("/lumpentry", methods=["GET", "POST"])
     @login_required
     def lump_home():
@@ -404,7 +418,7 @@ def register_routes(app,db):
         if current_user.role == 1:
             return redirect("/admin_dashord")
         elif current_user.role == 2:
-            return redirect("/lumpentry")
+            return redirect(url_for("bale_entery"))
         else:
             return redirect(url_for("logout"))
 

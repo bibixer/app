@@ -50,13 +50,22 @@ class Lump_data(FlaskForm):
         }
     )
     meters = FloatField(
-        "Meter of Lump",
+        "Meter of Lump as per bale",
         validators=[DataRequired()],
         render_kw={
             "placeholder": "Enter meter of lump",
 
         }
     )
+    meters_add_remove = FloatField(
+        "add or removes",
+        validators=[DataRequired()],
+        render_kw={
+            "placeholder": "Enter meter of lump",
+
+        }
+    )
+
     numbers_of_bundles = IntegerField(
         "Number of Bundles",
         validators=[DataRequired()],
@@ -205,11 +214,11 @@ class bale_data_form(FlaskForm):
     party_name = StringField("party name",validators=[DataRequired()],render_kw={"placeholder": "Enter name of party"})
     lot_number =  IntegerField(
         "Lot Number",
-        validators=[DataRequired()],
+        validators=[DataRequired()],render_kw={"placeholder": "Enter LOT number"}
     )
     lot_count = IntegerField(
         "Lot Count",
-        validators=[DataRequired()],
+        validators=[DataRequired()],render_kw={"placeholder": "Enter Lot Count"}
     )
     bale_number = IntegerField(
         "bale number",
@@ -217,7 +226,7 @@ class bale_data_form(FlaskForm):
         render_kw={"placeholder": "Enter bale number"}
 
     )
-    packing_date = DateField('bale date')
+    packing_date = DateField('bale date',validators=[DataRequired()])
 
     cuter_name = StringField(
         "Cut By",
@@ -234,5 +243,11 @@ class bale_data_form(FlaskForm):
         render_kw={
             "placeholder": "Enter product name",
             'id': "product_name",
+        }
+    )
+    submit = SubmitField(
+        "Submit",
+        render_kw={
+            "class": "button"
         }
     )

@@ -77,6 +77,7 @@ class Lump(db.Model):
     product = db.Column(db.String(100), nullable=False)
     # meter in blundel
     meters = db.Column(db.Float, nullable=False)
+    meters_add_remove = db.Column(db.Float, nullable=False)
     color = db.Column(db.String(100))
     number_of_bundlie = db.Column(db.Integer, nullable=False)
 class Cuter(db.Model):

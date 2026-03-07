@@ -64,7 +64,8 @@ if __name__ == '__main__':
     serve(app, host='127.0.0.1', port=5000, threads=8)
     # with app.app_context():
     #      new_columns = {
-    #              "bale_id ": (db.Integer,False),
+    #              "meters_add_remove": (db.Float,False),
+    #               "bale_id ": (db.Integer, False),
     #          }
     #      ensure_new_column(new_columns, ["LumpData"])
 
