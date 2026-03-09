@@ -169,7 +169,15 @@ class Bale_date(db.Model):
     enter_user = db.Column(db.String(50), nullable=False)
     # worker
     cut_by = db.Column(db.String(50), nullable=False)
-    lump_ids = db.Column(db.JSON, nullable=False)
+    product = db.Column(db.String(50), nullable=False)
+    # lump_ids = db.Column(db.JSON, nullable=False)
+
+class Party(db.Model):
+    __tablename__ = "party"
+    id = db.Column(db.Integer, primary_key=True)
+    name =  db.Column(db.String(50), nullable=False,unique=True)
+    enter_user = db.Column(db.String(50), nullable=False)
+
 
 
 

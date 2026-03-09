@@ -1,16 +1,25 @@
 from functools import wraps
 
 from flask import flash, render_template, redirect, url_for,session,request, jsonify
-from form import Lump_data, bundle_invadata, Item_data, Outworker_form, Cutter_form, Return_form, Login_form, Date_form, Date_form_with_name,bale_data_form
+from form import Lump_data, bundle_invadata, Item_data, Outworker_form, Cutter_form, Return_form, Login_form, Date_form, Date_form_with_name,bale_data_form,party_name
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
-from data_entry import add_data_lump,add_cutter,add_items,add_outworker_db,add_jobcard,in_move_entery
+from data_entry import add_cutter,add_items,add_outworker_db,add_jobcard,in_move_entery,bale_data_entry,add_party
 from data_Process import get_serch_data, get_job_card_data_creation, get_retun_card_data, get_movemet_data, \
     get_current_week_range, home_dashboard,get_cutter_report_data,outworker_name,master_report_card
 from modes import User
-def reset_session():
+def reset_session(flow:int):
+    # remove all bale lever1
+    # remove all lump  vevel
+    if flow== 1:
+        keys_roremove =  ["bundle_data","current_bundle","bundles","sno","bale_data","current_lump","sno_lump"]
+    if flow == 2:
+        keys_roremove = ["bundle_data", "current_bundle", "bundles", "sno"]
+        if  (str(type(session['bale_data']['packing_date']))) == "<class 'datetime.datetime'>":
+            session['bale_data']['packing_date'] =  session['bale_data']['packing_date'].strftime("%a, %d %b %Y")
     for key in list(session.keys()):
-        if key == "bundle_data" or key ==  "current_bundle" or  key ==  "bundles" or key=="sno":
+        if key in keys_roremove:
             session.pop(key)
+
 
 def register_routes(app,db):
     login_manager = LoginManager(app)
@@ -43,25 +52,63 @@ def register_routes(app,db):
     @login_required
     def bale_entery():
         form_name  = " bale entery "
+        data_autofill = get_serch_data()
         current_form = bale_data_form()
         if current_form.validate_on_submit():
-            print(current_form.data)
+            if current_form.cuter_name.data not in data_autofill["cuter_data"]:
+                flash("select cutter name from blow","warning")
+                return redirect(url_for("bale_entery"))
+            if current_form.product_name.data not in data_autofill["product_data"]:
+                flash("select product name from blow","warning")
+                return redirect(url_for("bale_entery"))
+            if current_form.party_name.data not in data_autofill["party_data"]:
+                flash("select party name from blow","warning")
+                return redirect(url_for("bale_entery"))
+
+            ### do some date vlaidation
+
+        ## data prosessing
+            data =  current_form.data
+            data.pop("csrf_token", None)
+            data['packing_date'] = data['packing_date'].strftime("%a, %d %b %Y")
+            reset_session(1)
+            session["bale_data"] = data
+            session["current_lump"] = 1
+            session["sno_lump"] = 0
+            return  redirect(url_for("lump_home"))
 
         return render_template(
             "user.html",
             form_name=form_name,
             current_form=current_form,
-            # data=data_autofill,
+            data=data_autofill,
             id=current_user.role
         )
     @app.route("/lumpentry", methods=["GET", "POST"])
     @login_required
     def lump_home():
-        
-        form_name = "lump entry"
+        if (
+                "bale_data" not in session
+                or "current_lump" not in session
+                or "sno_lump" not in session
+        ):
+            return redirect(url_for("bale_entery"))
+        total = int(session["bale_data"]["number_lup"])
+        current = int(session["current_lump"])
+        if current > total:
+            reset_session(1)
+            flash("You have successfully entered the bale.", "success")
+            return redirect(url_for('bale_entery'))
+
+        form_name = f"lump entry ({current}/{total}) "
         current_form = Lump_data()
         # data to auto fill
         data_autofill = get_serch_data()
+        if not current_form.validate_on_submit():
+            current_form.party_name.data = session["bale_data"]["party_name"]
+
+            current_form.cuter_name.data = session["bale_data"]["cuter_name"]
+            current_form.product_name.data =  session["bale_data"]["product_name"]
         if current_form.validate_on_submit():
             data = current_form.data.copy()
             if current_form.cuter_name.data not in data_autofill["cuter_data"]:
@@ -70,19 +117,27 @@ def register_routes(app,db):
             if current_form.product_name.data not in data_autofill["product_data"]:
                 flash("select product name from blow","warning")
                 return redirect(url_for("lump_home"))
+            if current_form.party_name.data not in data_autofill["party_data"]:
+                flash("select party name from blow","warning")
+                return redirect(url_for("lump_home"))
             data.pop("csrf_token", None)
+
+            ### do some date vlaidation
+
+            # =
             if data['numbers_of_bundles'] > 6 :
                     flash("you can not enter more then 6")
                     return redirect(url_for("lump_home"))
 
                 # 🔄 reset any old flow
-            reset_session()
+            reset_session(2)
 
                 # 🚀 initialize bundle workflow
             session["bundle_data"] = data
             session["current_bundle"] = 1
             session["bundles"] = {}
             session["sno"]=0
+            session["current_lump"] = current + 1
             return redirect(url_for("bundle_entery"))
 
 
@@ -113,16 +168,19 @@ def register_routes(app,db):
         # ✅ All bundles completed
         if current > total:
             all_data = {
+
+
                 "main": session["bundle_data"],
-                "bundles": session["bundles"]
+                "bundles": session["bundles"],
+                "bale_data" :session["bale_data"]
             }
 
             # print(all_data)
-            add_data_lump(all_data,current_user)
-
-            reset_session()
+            bale_data_entry(all_data, current_user)
+            reset_session(2)
             flash("You have successfully entered the bundle.", "success")
             return redirect(url_for("lump_home"))
+
 
         form_name = f"Bundle Entry ({current}/{total})"
         current_form = bundle_invadata()
@@ -134,6 +192,9 @@ def register_routes(app,db):
         if current_form.validate_on_submit():
             data = current_form.data.copy()
             data.pop("csrf_token", None)
+            ### do some date vlaidation
+
+            # =
 
             # ⚠️ use string keys for session safety
             session["bundles"][str(current)] = data
@@ -174,6 +235,29 @@ def register_routes(app,db):
             "user.html",
             form_name=form_name,
             current_form=current_form,id=current_user.role
+        )
+
+    @app.route("/add_suppy", methods=["GET", "POST"])
+    @login_required
+    @oly_admin
+    def add_suppy():
+        form_name = "add new suppy"
+        current_form = party_name()
+
+        if current_form.validate_on_submit():
+            data = current_form.data.copy()
+            party = add_party(data, current_user)
+            if party == 101:
+                flash(f"You have successfully added  {data['name']} .", "success")
+                return redirect(url_for("add_suppy"))
+            elif party["or"] == False:
+                flash(f"call  badx {party['exception']}")
+                return redirect(url_for("add_suppy"))
+
+        return render_template(
+            "user.html",
+            form_name=form_name,
+            current_form=current_form, id=current_user.role
         )
     @app.route("/add_outworver", methods=["GET", "POST"])
     @login_required

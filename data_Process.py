@@ -1,6 +1,6 @@
 from sqlalchemy.sql.functions import current_user
 
-from modes import Cuter,Item_data,Outworker,Bundle,Jobcard,Jobmovement,Lump
+from modes import Cuter,Item_data,Outworker,Bundle,Jobcard,Jobmovement,Lump,Party
 from datetime import datetime,timedelta,time
 from collections import defaultdict
 from sqlalchemy import func
@@ -17,6 +17,15 @@ def get_cuter_name():
                 cuter_name_list.append(cuter.name)
     return cuter_name_list
 
+def get_party_name():
+    cuter_name = Party.query.all()
+    party_name_list = []
+    for party in cuter_name:
+        if party.name != '':
+            if (str(party.name)).upper() not in party_name_list:
+                party_name_list.append(party.name)
+    return party_name_list
+
 def get_product_namm():
     product =  Item_data.query.all()
     product_list = []
@@ -31,6 +40,7 @@ def get_serch_data():
     return {
         "product_data":get_product_namm(),
         "cuter_data":get_cuter_name(),
+        "party_data":get_party_name()
     }
 
 

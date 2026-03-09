@@ -4,13 +4,14 @@ from wtforms.validators import DataRequired
 
 
 class Lump_data(FlaskForm):
-
+    party_name = StringField("party name", validators=[DataRequired()],
+                             render_kw={"placeholder": "Enter name of party", "id": "party_name",'disabled': True})
     cuter_name = StringField(
         "Cut By",
         validators=[DataRequired()],
         render_kw={
             "placeholder": "Enter cutter name",
-             "id":"cuter_name",
+             "id":"cuter_name",'disabled': True
         }
     )
 
@@ -19,7 +20,7 @@ class Lump_data(FlaskForm):
         validators=[DataRequired()],
         render_kw={
             "placeholder": "Enter product name",
-             'id':"product_name",
+             'id':"product_name",'disabled': True
         }
     )
 
@@ -211,7 +212,7 @@ class party_name(FlaskForm):
         }
     )
 class bale_data_form(FlaskForm):
-    party_name = StringField("party name",validators=[DataRequired()],render_kw={"placeholder": "Enter name of party"})
+    party_name = StringField("party name",validators=[DataRequired()],render_kw={"placeholder": "Enter name of party","id":"party_name"})
     lot_number =  IntegerField(
         "Lot Number",
         validators=[DataRequired()],render_kw={"placeholder": "Enter LOT number"}
@@ -244,6 +245,10 @@ class bale_data_form(FlaskForm):
             "placeholder": "Enter product name",
             'id': "product_name",
         }
+    )
+    number_lup = IntegerField(
+        "lump cut",
+        validators=[DataRequired()], render_kw={"placeholder": "Enter lump cut  Count"}
     )
     submit = SubmitField(
         "Submit",

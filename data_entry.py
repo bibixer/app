@@ -1,4 +1,4 @@
-from modes import db, Bundle, Lump, Cuter, Item_data, Outworker,Jobcard,Jobmovement
+from modes import db, Bundle, Lump, Cuter, Item_data, Outworker,Jobcard,Jobmovement,Bale_date,Party
 from datetime import datetime
 from data_Process import outworker_name,get_movemet_data
 from data_print_format import outworker_qr_print,buldel_qr_print
@@ -7,7 +7,54 @@ def add_data_to_database(data):
     db.session.add(data)
     db.session.commit()
     return 101
-def add_data_lump(data,current_user):
+def bale_data_entry(data,current_user):
+    if current_user.is_authenticated:
+        if current_user.role != 1:
+            return 404
+    if not  current_user.is_authenticated:
+        return 404
+
+
+    bale_data =  data['bale_data']
+    bale_data['packing_date'] = datetime.strptime(bale_data['packing_date'],"%a, %d %b %Y")
+    # check for cuuter date =
+    old_date =  Bale_date.query.filter_by(
+        part_name=bale_data['party_name'],
+        lot_number=bale_data['lot_number'],
+        lot_count=bale_data['lot_count'],
+        bale_number= bale_data['bale_number'],
+        enter_user =  current_user.username,
+         cut_by = bale_data['cuter_name'],
+        product = bale_data['product_name'],
+        bale_date= bale_data['packing_date']
+
+    ).first()
+    if old_date == None:
+        bale = Bale_date(
+            part_name=bale_data['party_name'],
+            lot_number=bale_data['lot_number'],
+            lot_count=bale_data['lot_count'],
+            bale_number= bale_data['bale_number'],
+            enter_user =  current_user.username,
+             cut_by = bale_data['cuter_name'],
+            product = bale_data['product_name'],
+            bale_date= bale_data['packing_date'],
+
+
+
+        )
+        db.session.add(bale)
+        db.session.flush()
+        id_b =  bale.id
+    elif old_date !=  None:
+        id_b = old_date.id
+
+    data_to_print = add_data_lump(data,current_user,id_b)
+    db.session.commit()
+    buldel_qr_print(data_to_print)
+
+
+def add_data_lump(data,current_user,bale_id):
     # try:
         lump_data = data['main']
         lump = Lump(
@@ -18,14 +65,16 @@ def add_data_lump(data,current_user):
             product = lump_data['product_name'],
             meters = lump_data['meters'],
             color = lump_data['colors'],
-            number_of_bundlie = lump_data['numbers_of_bundles']
+            number_of_bundlie = lump_data['numbers_of_bundles'],
+            bale_id= bale_id,
+            meters_add_remove=lump_data['meters_add_remove']
+
 
         )
         db.session.add(lump)
         db.session.flush()
         all_bun_data = add_bundle(data,lump.id,lump_data['bundle_type'],lump_data['cuter_name'])
-        db.session.commit()
-        buldel_qr_print(all_bun_data)
+        return (all_bun_data)
 def add_bundle(data,lump_id,type,cuter):
     fulldata_list = []
     bundle_data = data['bundles']
@@ -57,6 +106,13 @@ def add_cutter(data,current_user):
         cuuter = Cuter(name=data["name"].upper(),
                        enter_user=current_user.username)
         return add_data_to_database(cuuter)
+
+@error_hendle
+def add_party(data,current_user):
+       paty = Party(name=data["name"].upper(),
+                       enter_user=current_user.username)
+       return add_data_to_database(paty)
+
 @error_hendle
 def add_items(data,current_user):
     item =  Item_data(name=data["name"].upper()
