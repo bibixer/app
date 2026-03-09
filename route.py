@@ -236,7 +236,6 @@ def register_routes(app,db):
             form_name=form_name,
             current_form=current_form,id=current_user.role
         )
-
     @app.route("/add_suppy", methods=["GET", "POST"])
     @login_required
     @oly_admin

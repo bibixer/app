@@ -197,9 +197,6 @@ class Date_form_with_name(FlaskForm):
         'Submit',
         render_kw={"class": "button"})
 
-
-
-
 class party_name(FlaskForm):
     name = StringField(
         "Name",
