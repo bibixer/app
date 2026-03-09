@@ -1151,230 +1151,7 @@
         // ------------------------------------------------------------------
         // BACKEND DATA - keeping original structure
         // ------------------------------------------------------------------
-        const backendResponse = {
-          name: "Production Manager",
-          date_from: "2026-02-20",
-          date_to: "2026-03-05",
-          tres: [
-            // Original production entries (no lump data)
-            {
-              id: 1,
-              product: "Vimal",
-              type_B: "sliced",
-              pieces: 37,
-              kg: 7.915,
-              status: "completed",
-              given_to: null,
-              entry_datetime: "2026-02-26T10:00:00",
-            },
-            {
-              id: 2,
-              product: "Vimal",
-              type_B: "sliced",
-              pieces: 37,
-              kg: 7.915,
-              status: "given",
-              given_to: "ram",
-              entry_datetime: "2026-02-28T14:30:00",
-            },
-            {
-              id: 3,
-              product: "Vimal",
-              type_B: "diced",
-              pieces: 40,
-              kg: 8.2,
-              status: "completed",
-              given_to: null,
-              entry_datetime: "2026-02-26T11:00:00",
-            },
-            {
-              id: 4,
-              product: "Vimal",
-              type_B: "diced",
-              pieces: 40,
-              kg: 8.2,
-              status: "completed",
-              given_to: null,
-              entry_datetime: "2026-02-27T09:15:00",
-            },
-            {
-              id: 5,
-              product: "Vimal",
-              type_B: "julienne",
-              pieces: 35,
-              kg: 7.2,
-              status: "given",
-              given_to: "shyam",
-              entry_datetime: "2026-02-27T16:20:00",
-            },
-            {
-              id: 6,
-              product: "Vimal",
-              type_B: "batons",
-              pieces: 32,
-              kg: 6.85,
-              status: "completed",
-              given_to: null,
-              entry_datetime: "2026-02-28T13:45:00",
-            },
-
-            // Lump data with supplier/lot/bale attributes (keeping original structure)
-            {
-              id: 101,
-              product: "Vimal",
-              type_B: "sliced",
-              pieces: 37,
-              kg: 7.915,
-              status: "completed",
-              lump_id: 1,
-              supplier: "Asisa Textiles",
-              lot_number: "406X4",
-              bale_number: 1,
-              packing_date: "2026-02-20",
-              meter: 148,
-              entry_datetime: "2026-02-26T10:00:00",
-            },
-            {
-              id: 102,
-              product: "Vimal",
-              type_B: "sliced",
-              pieces: 37,
-              kg: 7.915,
-              status: "given",
-              given_to: "ram",
-              lump_id: 1,
-              supplier: "Asisa Textiles",
-              lot_number: "406X4",
-              bale_number: 1,
-              packing_date: "2026-02-20",
-              meter: 148,
-              entry_datetime: "2026-02-28T14:30:00",
-            },
-            {
-              id: 103,
-              product: "Vimal",
-              type_B: "diced",
-              pieces: 40,
-              kg: 8.2,
-              status: "completed",
-              lump_id: 2,
-              supplier: "Asisa Textiles",
-              lot_number: "406X4",
-              bale_number: 2,
-              packing_date: "2026-02-20",
-              meter: 146,
-              entry_datetime: "2026-02-26T11:00:00",
-            },
-            {
-              id: 104,
-              product: "Vimal",
-              type_B: "diced",
-              pieces: 40,
-              kg: 8.2,
-              status: "completed",
-              lump_id: 2,
-              supplier: "Asisa Textiles",
-              lot_number: "406X4",
-              bale_number: 2,
-              packing_date: "2026-02-20",
-              meter: 146,
-              entry_datetime: "2026-02-27T09:15:00",
-            },
-            {
-              id: 105,
-              product: "Vimal",
-              type_B: "julienne",
-              pieces: 35,
-              kg: 7.2,
-              status: "given",
-              given_to: "shyam",
-              lump_id: 3,
-              supplier: "Asisa Textiles",
-              lot_number: "406X4",
-              bale_number: 3,
-              packing_date: "2026-02-21",
-              meter: 150,
-              entry_datetime: "2026-02-27T16:20:00",
-            },
-            {
-              id: 106,
-              product: "Vimal",
-              type_B: "batons",
-              pieces: 32,
-              kg: 6.85,
-              status: "completed",
-              lump_id: 4,
-              supplier: "Asisa Textiles",
-              lot_number: "406X4",
-              bale_number: 4,
-              packing_date: "2026-02-21",
-              meter: 152,
-              entry_datetime: "2026-02-28T13:45:00",
-            },
-            {
-              id: 107,
-              product: "Vimal",
-              type_B: "sliced",
-              pieces: 38,
-              kg: 8.1,
-              status: "completed",
-              lump_id: 5,
-              supplier: "Asisa Textiles",
-              lot_number: "408X2",
-              bale_number: 1,
-              packing_date: "2026-02-25",
-              meter: 140,
-              entry_datetime: "2026-02-28T10:30:00",
-            },
-            {
-              id: 108,
-              product: "Vimal",
-              type_B: "diced",
-              pieces: 42,
-              kg: 9.0,
-              status: "completed",
-              lump_id: 6,
-              supplier: "Asisa Textiles",
-              lot_number: "408X2",
-              bale_number: 2,
-              packing_date: "2026-02-25",
-              meter: 135,
-              entry_datetime: "2026-02-28T15:20:00",
-            },
-            {
-              id: 109,
-              product: "Vimal",
-              type_B: "sliced",
-              pieces: 36,
-              kg: 7.5,
-              status: "completed",
-              lump_id: 7,
-              supplier: "Ram Tex",
-              lot_number: "410X3",
-              bale_number: 1,
-              packing_date: "2026-02-22",
-              meter: 144,
-              entry_datetime: "2026-03-01T09:00:00",
-            },
-            {
-              id: 110,
-              product: "Vimal",
-              type_B: "diced",
-              pieces: 39,
-              kg: 8.0,
-              status: "given",
-              given_to: "mohan",
-              lump_id: 8,
-              supplier: "Ram Tex",
-              lot_number: "410X3",
-              bale_number: 2,
-              packing_date: "2026-02-22",
-              meter: 148,
-              entry_datetime: "2026-03-01T11:30:00",
-            },
-          ],
-        };
-
+        const backendResponse ={{backend_data | tojson}}
         // Process dates
         backendResponse.date_from = new Date(backendResponse.date_from);
         backendResponse.date_to = new Date(backendResponse.date_to);
@@ -1474,32 +1251,36 @@
         document.getElementById("workDaysDisplay").innerText = WORKING_DAYS;
 
         // Group production data
-        const groups = {};
-        tres.forEach((entry) => {
-          if (!entry.lump_id) {
-            const product = entry.product.trim();
-            const type = entry.type_B || "unknown";
-            const pieces = entry.pieces;
-            if (!groups[product]) groups[product] = {};
-            if (!groups[product][type]) groups[product][type] = {};
-            if (!groups[product][type][pieces]) {
-              groups[product][type][pieces] = {
-                count: 0,
-                total: 0,
-                entries: [],
-              };
-            }
-            groups[product][type][pieces].count += 1;
-            groups[product][type][pieces].entries.push({
-              id: entry.id,
-              entry_datetime: entry.entry_datetime,
-              pieces: entry.pieces,
-              kg: entry.kg,
-              status: entry.status,
-              given_to: entry.given_to,
-            });
-          }
-        });
+        // Group production data
+const groups = {};
+tres.forEach((entry) => {
+  // FIX: Check for entries WITHOUT lump_id OR with type_B containing 'goodCUT'
+  // Production entries are those with type_B 'goodCUT 20 picset' and no given_to
+  if (!entry.lump_id || entry.type_B !== '') {
+    const product = entry.product.trim();
+    const type = entry.type_B || "unknown";
+    const pieces = entry.pieces;
+    if (!groups[product]) groups[product] = {};
+    if (!groups[product][type]) groups[product][type] = {};
+    if (!groups[product][type][pieces]) {
+      groups[product][type][pieces] = {
+        count: 0,
+        total: 0,
+        entries: [],
+      };
+    }
+
+    groups[product][type][pieces].count += 1;
+    groups[product][type][pieces].entries.push({
+      id: entry.id,
+      entry_datetime: entry.entry_datetime,
+      pieces: entry.pieces,
+      kg: entry.kg,
+      status: entry.status,
+      given_to: entry.given_to,
+    });
+  }
+});
 
         Object.keys(groups).forEach((product) => {
           Object.keys(groups[product]).forEach((type) => {
@@ -1826,52 +1607,48 @@
           selectedSpan.innerText = productKey;
         }
 
-        function updateGroupedDailyBar() {
-          const dailyProductMap = new Map();
-          tres.forEach((entry) => {
-            if (!entry.lump_id) {
-              const dateStr = entry.entry_datetime.toLocaleDateString("en-IN", {
-                day: "numeric",
-                month: "short",
-              });
-              const product = entry.product.trim();
-              if (!dailyProductMap.has(dateStr))
-                dailyProductMap.set(dateStr, {});
-              const dayData = dailyProductMap.get(dateStr);
-              dayData[product] = (dayData[product] || 0) + entry.pieces;
-            }
-          });
-          const allProducts = [
-            ...new Set(
-              tres.filter((e) => !e.lump_id).map((e) => e.product.trim()),
-            ),
-          ].sort();
-          const sortedDates = Array.from(dailyProductMap.keys()).sort((a, b) =>
-            a.localeCompare(b, undefined, { numeric: true }),
-          );
-          const series = allProducts.map((product) => ({
-            name: product,
-            points: sortedDates.map((date) => ({
-              name: date,
-              y: (dailyProductMap.get(date) || {})[product] || 0,
-            })),
-          }));
-          if (dailyBarChart) {
-            dailyBarChart.options({ series });
-          } else {
-            dailyBarChart = JSC.chart("dailyGroupBarChart", {
-              type: "column",
-              title_label_text: "Daily production by product",
-              xAxis: { label_text: "Date" },
-              yAxis: { label_text: "Pieces" },
-              series: series,
-              toolbar_visible: false,
-              legend_visible: true,
-            });
-          }
-          document.getElementById("dailyBarEmptyMessage").style.display =
-            "none";
-        }
+      function updateGroupedDailyBar() {
+  const dailyProductMap = new Map();
+  tres.forEach((entry) => {
+    // FIX: Include all entries for daily production chart
+    // Show both production and given items to track daily activity
+    const dateStr = entry.entry_datetime.toLocaleDateString("en-IN", {
+      day: "numeric",
+      month: "short",
+    });
+    const product = entry.product.trim();
+    if (!dailyProductMap.has(dateStr)) dailyProductMap.set(dateStr, {});
+    const dayData = dailyProductMap.get(dateStr);
+    dayData[product] = (dayData[product] || 0) + entry.pieces;
+  });
+  const allProducts = [
+    ...new Set(tres.map((e) => e.product.trim())),
+  ].sort();
+  const sortedDates = Array.from(dailyProductMap.keys()).sort((a, b) =>
+    a.localeCompare(b, undefined, { numeric: true }),
+  );
+  const series = allProducts.map((product) => ({
+    name: product,
+    points: sortedDates.map((date) => ({
+      name: date,
+      y: (dailyProductMap.get(date) || {})[product] || 0,
+    })),
+  }));
+  if (dailyBarChart) {
+    dailyBarChart.options({ series });
+  } else {
+    dailyBarChart = JSC.chart("dailyGroupBarChart", {
+      type: "column",
+      title_label_text: "Daily production by product",
+      xAxis: { label_text: "Date" },
+      yAxis: { label_text: "Pieces" },
+      series: series,
+      toolbar_visible: false,
+      legend_visible: true,
+    });
+  }
+  document.getElementById("dailyBarEmptyMessage").style.display = "none";
+}
 
         let dailyBarChart = null;
         updateGroupedDailyBar();

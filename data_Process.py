@@ -1,6 +1,6 @@
-from sqlalchemy.sql.functions import current_user
+# from sqlalchemy.sql.functions import current_user
 
-from modes import Cuter,Item_data,Outworker,Bundle,Jobcard,Jobmovement,Lump,Party
+from modes import Cuter,Item_data,Outworker,Bundle,Jobcard,Jobmovement,Lump,Party,Bale_date
 from datetime import datetime,timedelta,time
 from collections import defaultdict
 from sqlalchemy import func
@@ -352,12 +352,34 @@ def get_cutter_report_data(data,current_user):
     for i in all_date:
       all_b = (Bundle.query.filter(Bundle.lump_id == i.id).all())
       for b in all_b:
-          all_bundle.append(b.to_dict_2())
+          # all_bundle.append(b.to_dict_2())
+          data_b= b.to_dict_2()
+          # need to add
+          # supplier: "Ram Tex",
+          #               lot_number: "410X3",
+          #               bale_number: 2,
+          #               packing_date: "2026-02-22",
+          #               meter: 148,
+          lump = Lump.query.get(b.lump_id)
+          data_b['meter'] = lump.meters
+          if  lump.bale_id:
+              bale =  Bale_date.query.get(lump.bale_id)
+              data_b["supplier"]  = bale.part_name
+              data_b["lot_number"] =  f"{bale.lot_number}X{bale.lot_count}"
+              data_b['packing_date'] = str(bale.bale_date)
+          elif not  lump.bale_id:
+              data_b["supplier"] = "UNKNOWN"
+              data_b["lot_number"] = "UNKNOWN"
+              data_b['packing_date'] = "UNKNOWN"
+
+          all_bundle.append(data_b)
+          print(all_bundle)
+
 
     return {
         'name': data.name.data,
-        'date_from': data.date_from.data,
-        'date_to':data.date_to.data,
+        'date_from': data.date_from.data.strftime("%Y-%m-%d"),
+        'date_to':data.date_to.data.strftime("%Y-%m-%d"),
         'tres': all_bundle,
 
     }
