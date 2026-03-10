@@ -404,7 +404,7 @@ def register_routes(app,db):
         return render_template("admin.html",date_from=date_from,type="DASHBORD", outflow_data=dash_bord_data["outflow_pie"],inflow_data=dash_bord_data["inflow_pie"],dash_bord_data=dash_bord_data)
     @app.route("/cutter_report",methods=["GET", "POST"])
     @login_required
-    # @oly_admin
+    @oly_admin
     def cutter_report():
         name_data_form =  Date_form_with_name()
         range_data = get_current_week_range()
