@@ -572,6 +572,57 @@ def master_report_card(data:dict,current_user):
     }
 
 # reddy
+
+def get_movemet_data_2(master_name,date_from):
+    # 1️⃣ Fetch all data in ONE query
+    job_data = (Jobmovement.query
+                .filter_by(name_of_mater=master_name)
+                .filter(Jobmovement.date < datetime.combine(date_from, time.min))
+                .order_by(Jobmovement.product_name, Jobmovement.type_B)
+                .all()
+                )
+
+    if not job_data:
+        return 404
+
+    # 2️⃣ Build product → IN/OUT structure
+    product_flow = defaultdict(
+        lambda: defaultdict(lambda: {"IN": [], "OUT": []})
+    )
+
+    for job in job_data:
+        product_flow[job.product_name][job.type_B][job.flow_type].append(
+            job.to_dict()
+        )
+
+    # 3️⃣ Format final job-card output
+    result = {
+        "name": master_name,
+        "date": datetime.now().strftime("%d %b, %Y"),
+        "items": []
+    }
+
+    item_id = 0
+    for product, types in product_flow.items():
+        for type_b, flows in types.items():
+
+            total_in = sum(i.get("inflow", 0) for i in flows["IN"])
+            total_out = sum(i.get("outflow", 0) for i in flows["OUT"])
+
+            balance = total_out - total_in
+
+            if balance != 0:
+                item_id += 1
+                result["items"].append({
+                    "item_id": item_id,
+                    "name": product,
+                    "colour": type_b,
+                    "issued": balance,
+
+                })
+    return result
+
+
 #  { id: 101, product: "Panel", type_B: "sliced", pieces: 5, kg: 12.5, status: "completed", given_to: null, entry_datetime: new Date("2025-03-02"), flow: "ready" }
 def product_data (data:dict,current_user):
     if current_user.is_authenticated:
@@ -597,10 +648,62 @@ def product_data (data:dict,current_user):
                                  "entry_datetime":product.entry_datetime.strftime("%Y-%m-%d"),
                                  "avg_cloth": avg_cloth[product.lump_id]["avg_cloth"]})
     # { id: 201, product: "Panel", type_B: "sliced", pieces: 4, kg: 8.0, status: "completed", given_to: "Mohan", entry_datetime: new Date("2025-03-08"), flow: "outflow" }
-    outflow = []
+    outflow = Jobmovement.query.filter_by(flow_type="OUT").filter(
+    Jobmovement.date.between(
+        datetime.combine(data['date_from'], time.min),  # 00:00:00 of start date
+        datetime.combine(data['date_to'], time.max)     # 23:59:59 of end date
+    )
+    ).order_by(Jobmovement.product_name, Jobmovement.type_B).all()
+    for out  in outflow:
+        buble  =  Bundle.query.get(out.bundle)
+        data_F = {
+            'id': out.id,
+            "product": out.product_name,
+            "type_B":out.type_B,
+            "pieces": out.outflow ,
+            'kg':buble.kg,
+            "status": "completed",
+            "given_to": out.name_of_mater ,
+            "entry_datetime" :out.date.strftime("%Y-%m-%d"),
+            "flow": "outflow"
 
 
-    return {"proddcut": product_list,"ouwoker": { "Mohan": 150, "Suresh": 80, "Gopal": 45, "Ramesh": 210, "Dinesh": 30 }}
+        }
+
+        product_list.append(data_F)
+    inflow = Jobmovement.query.filter_by(flow_type="IN").filter(
+    Jobmovement.date.between(
+        datetime.combine(data['date_from'], time.min),  # 00:00:00 of start date
+        datetime.combine(data['date_to'], time.max)     # 23:59:59 of end date
+    )
+    ).order_by(Jobmovement.product_name, Jobmovement.type_B).all()
+    for inf  in inflow :
+        data_F = {
+            'id': inf .id,
+            "product": inf.product_name,
+            "type_B":inf.type_B,
+            "pieces": inf.inflow,
+            'kg':0.0,
+            "status": "completed",
+            "given_to": inf.name_of_mater ,
+            "entry_datetime" :inf.date.strftime("%Y-%m-%d"),
+            "flow": "inflow"
+
+
+        }
+
+        product_list.append(data_F)
+    all_out_name =  outworker_name(oly_full_name=True)
+    all_dat =  {}
+    for all in all_out_name:
+        data_o = get_movemet_data_2(all,date_from=data['date_from'])
+
+        if data_o != 404:
+            total = 0
+            for dat in data_o['items']:
+                total += dat['issued']
+            all_dat[data_o['name']] = - total
+    return {"proddcut": product_list,"ouwoker": all_dat}
 
 
 

@@ -480,13 +480,14 @@ def register_routes(app,db):
 
     @app.route("/product_report", methods=["GET", "POST"])
     @login_required
-    @oly_admin
+    # @oly_admin
     def product_report():
         name_data_form = Date_form()
         range_data = get_current_week_range()
         if not name_data_form.is_submitted():
             name_data_form.date_from.data = range_data["from_date"].date()
             name_data_form.date_to.data = range_data["to_date"].date()
+
         report =  product_data(name_data_form.data.copy(),current_user)
 
 
