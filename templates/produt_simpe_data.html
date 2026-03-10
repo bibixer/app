@@ -475,39 +475,14 @@
     // ----------------------------------------------------------------------
     // SAMPLE DATA (unified – used by both master balance AND tables)
     // ----------------------------------------------------------------------
-    const productionData = {
-        tres: [
-            // READY
-            { id: 101, product: "Panel", type_B: "sliced", pieces: 5, kg: 12.5, status: "completed", given_to: null, entry_datetime: new Date("2025-03-02"), flow: "ready" },
-            { id: 102, product: "Panel", type_B: "diced", pieces: 3, kg: 4.2, status: "completed", given_to: null, entry_datetime: new Date("2025-03-03"), flow: "ready" },
-            { id: 103, product: "Strip", type_B: "julienne", pieces: 8, kg: 6.0, status: "completed", given_to: null, entry_datetime: new Date("2025-03-04"), flow: "ready" },
-            { id: 104, product: "Panel", type_B: "sliced", pieces: 7, kg: 14.0, status: "completed", given_to: null, entry_datetime: new Date("2025-03-05"), flow: "ready" },
-            { id: 105, product: "Strip", type_B: "batons", pieces: 4, kg: 3.8, status: "completed", given_to: null, entry_datetime: new Date("2025-03-06"), flow: "ready" },
-            { id: 106, product: "Dice", type_B: "small", pieces: 10, kg: 5.5, status: "completed", given_to: null, entry_datetime: new Date("2025-03-07"), flow: "ready" },
-            { id: 107, product: "Dice", type_B: "medium", pieces: 6, kg: 7.2, status: "pending", given_to: null, entry_datetime: new Date("2025-03-08"), flow: "ready" },
-            { id: 108, product: "Cube", type_B: "large", pieces: 2, kg: 4.0, status: "completed", given_to: null, entry_datetime: new Date("2025-03-09"), flow: "ready" },
-            // OUTFLOW
-            { id: 201, product: "Panel", type_B: "sliced", pieces: 4, kg: 8.0, status: "completed", given_to: "Mohan", entry_datetime: new Date("2025-03-08"), flow: "outflow" },
-            { id: 202, product: "Panel", type_B: "sliced", pieces: 3, kg: 6.0, status: "completed", given_to: "Suresh", entry_datetime: new Date("2025-03-09"), flow: "outflow" },
-            { id: 203, product: "Panel", type_B: "diced", pieces: 2, kg: 3.0, status: "pending", given_to: "Mohan", entry_datetime: new Date("2025-03-10"), flow: "outflow" },
-            { id: 204, product: "Strip", type_B: "julienne", pieces: 5, kg: 3.5, status: "completed", given_to: "Gopal", entry_datetime: new Date("2025-03-11"), flow: "outflow" },
-            { id: 205, product: "Strip", type_B: "batons", pieces: 3, kg: 2.9, status: "completed", given_to: "Suresh", entry_datetime: new Date("2025-03-12"), flow: "outflow" },
-            { id: 206, product: "Dice", type_B: "small", pieces: 4, kg: 2.2, status: "completed", given_to: "Mohan", entry_datetime: new Date("2025-03-13"), flow: "outflow" },
-            { id: 207, product: "Cube", type_B: "large", pieces: 1, kg: 2.5, status: "completed", given_to: "Gopal", entry_datetime: new Date("2025-03-14"), flow: "outflow" },
-            // INFLOW
-            { id: 301, product: "Panel", type_B: "sliced", pieces: 6, kg: 13.0, status: "completed", given_to: "Mohan", entry_datetime: new Date("2025-03-08"), flow: "inflow" },
-            { id: 302, product: "Panel", type_B: "diced", pieces: 4, kg: 6.5, status: "completed", given_to: "Mohan", entry_datetime: new Date("2025-03-09"), flow: "inflow" },
-            { id: 303, product: "Strip", type_B: "julienne", pieces: 7, kg: 5.6, status: "completed", given_to: "Suresh", entry_datetime: new Date("2025-03-10"), flow: "inflow" },
-            { id: 304, product: "Dice", type_B: "small", pieces: 5, kg: 2.5, status: "completed", given_to: "Gopal", entry_datetime: new Date("2025-03-12"), flow: "inflow" },
-            { id: 305, product: "Panel", type_B: "sliced", pieces: 3, kg: 6.2, status: "completed", given_to: "Suresh", entry_datetime: new Date("2025-03-14"), flow: "inflow" },
-            { id: 306, product: "Dice", type_B: "medium", pieces: 5, kg: 6.0, status: "pending", given_to: "Mohan", entry_datetime: new Date("2025-03-15"), flow: "inflow" },
-            { id: 307, product: "Cube", type_B: "large", pieces: 2, kg: 4.8, status: "completed", given_to: "Gopal", entry_datetime: new Date("2025-03-16"), flow: "inflow" }
-        ]
-    };
-    const tres = productionData.tres;
+    const data =  {{backend_data | tojson}}
+    const tres = data.proddcut;
+    tres.forEach((entry) => {
+          entry.entry_datetime = new Date(entry.entry_datetime);
+        });
 
     // --- helper for master balance ---
-    const masterOldBalances = { "Mohan": 150, "Suresh": 80, "Gopal": 45, "Ramesh": 210, "Dinesh": 30 };
+    const masterOldBalances = data.ouwoker;
 
     // aggregate given/taken for master balance (using same tres)
     const givenMap = new Map();

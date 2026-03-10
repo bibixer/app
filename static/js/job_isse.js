@@ -90,7 +90,11 @@ function addRow() {
                                                                                         <td><input class="item-name" readonly></td>
                                                                                         <td><input class="item-colour" readonly></td>
                                                                                         <td><input class="item-type" readonly></td>
-                                                                                        <td><input type="number" min="1" class="item-qty" readonly></td>
+                                                                                        <td><input type="number" class="item-qty"type="number"
+                                                                                        min="0"
+                                                                                        step="0.01"
+
+                                                                                        placeholder="0.00" readonly></td>
                                                                                     <td>
                                                                                       <input
                                                                                         type="number"
@@ -107,6 +111,16 @@ function addRow() {
                                                                                         min="0"
                                                                                         step="0.01"
                                                                                         class="item-kg-avg"
+                                                                                        placeholder="0.00"
+                                                                                        readonly>
+
+                                                                                    </td>
+                                                                                    <td>
+                                                                                      <input
+                                                                                        type="number"
+                                                                                        min="0"
+                                                                                        step="0.01"
+                                                                                        class="item-cloth-avg"
                                                                                         placeholder="0.00"
                                                                                         readonly>
 
@@ -155,6 +169,8 @@ function addRow() {
       tr.querySelector(".item-qty").value = item.pics;
       tr.querySelector(".item-kg").value = item.kg;
       tr.querySelector(".item-kg-avg").value = (item.kg / item.pics);
+      tr.querySelector(".item-cloth-avg").value = item.avg_cloth;
+
 
       updateTotalKg();
       updadateTotalPics();
@@ -207,6 +223,8 @@ function addRow() {
       tr.querySelector(".item-qty").value = item.pics;
       tr.querySelector(".item-kg").value = item.kg;
       tr.querySelector(".item-kg-avg").value = (item.kg / item.pics);
+      tr.querySelector(".item-cloth-avg").value = item.avg_cloth;
+
       updateTotalKg();
       updadateTotalPics();
       updateSummaryTab();

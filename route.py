@@ -5,7 +5,7 @@ from form import Lump_data, bundle_invadata, Item_data, Outworker_form, Cutter_f
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from data_entry import add_cutter,add_items,add_outworker_db,add_jobcard,in_move_entery,bale_data_entry,add_party
 from data_Process import get_serch_data, get_job_card_data_creation, get_retun_card_data, get_movemet_data, \
-    get_current_week_range, home_dashboard,get_cutter_report_data,outworker_name,master_report_card
+    get_current_week_range, home_dashboard,get_cutter_report_data,outworker_name,master_report_card,product_data
 from modes import User
 def reset_session(flow:int):
     # remove all bale lever1
@@ -487,9 +487,10 @@ def register_routes(app,db):
         if not name_data_form.is_submitted():
             name_data_form.date_from.data = range_data["from_date"].date()
             name_data_form.date_to.data = range_data["to_date"].date()
+        report =  product_data(name_data_form.data.copy(),current_user)
 
 
-        return render_template("admin.html", date_from=name_data_form, type="PRODUCT_Report")
+        return render_template("admin.html", date_from=name_data_form, type="PRODUCT_Report",backend_data= report)
 
 
     @app.route("/")

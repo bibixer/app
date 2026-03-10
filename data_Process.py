@@ -71,30 +71,32 @@ def age_clothused(product):
     total_pic  =  0
     for pro in all_date:
         total_pic += pro.pieces
-    print(f"for  {product.lump_id}  ")
-    print(lump_data.meters)
+    # print(f"for  {product.lump_id}  ")
+    # print(lump_data.meters)
     add = lump_data.meters_add_remove
     if add == "":
         print(add)
         add= 0.0
-    print(type(int(add)))
-    print(total_pic)
-
-
-
+    # print(type(float(add)))
+    # print(total_pic)
+    # print((float(lump_data.meters) + float(add)) / int(total_pic))
+    return {"avg_cloth":((float(lump_data.meters) + float(add)) / int(total_pic)) }
 
 def get_product():
     product_bunle =  Bundle.query.all()
     product_list = []
+    avg_cloth = {}
     for product in product_bunle:
         if product.status.upper()  == "READY":
-            age_clothused(product)
+            if product.lump_id not in  avg_cloth.keys():
+                avg_cloth[product.lump_id] = age_clothused(product)
             product_list.append({"id":product.id,
                              "name":product.product,
                              "colour":product.color,
                              "pics":product.pieces,
                             "type":product.type_B,
-                             "kg":product.kg})
+                             "kg":product.kg,
+                             "avg_cloth":avg_cloth[product.lump_id]["avg_cloth"]})
     return product_list
 
 def get_job_card_data_creation():
@@ -568,5 +570,40 @@ def master_report_card(data:dict,current_user):
         'tres': product_flow_data,
 
     }
+
+# reddy
+#  { id: 101, product: "Panel", type_B: "sliced", pieces: 5, kg: 12.5, status: "completed", given_to: null, entry_datetime: new Date("2025-03-02"), flow: "ready" }
+def product_data (data:dict,current_user):
+    if current_user.is_authenticated:
+        if current_user.role != 1:
+            return 404
+    if not current_user.is_authenticated:
+        return 404
+    product_bunle = Bundle.query.all()
+    product_list = []
+    avg_cloth = {}
+    for product in product_bunle:
+        if product.status.upper() == "READY":
+            if product.lump_id not in avg_cloth.keys():
+                avg_cloth[product.lump_id] = age_clothused(product)
+            product_list.append({"id": product.id,
+                                 "product": product.product,
+                                 "colour": product.color,
+                                 "pieces": product.pieces,
+                                 "type_B": product.type_B,
+                                 "kg": product.kg,
+                                 "given_to":None,
+                                 "flow": "ready",
+                                 "entry_datetime":product.entry_datetime.strftime("%Y-%m-%d"),
+                                 "avg_cloth": avg_cloth[product.lump_id]["avg_cloth"]})
+    # { id: 201, product: "Panel", type_B: "sliced", pieces: 4, kg: 8.0, status: "completed", given_to: "Mohan", entry_datetime: new Date("2025-03-08"), flow: "outflow" }
+    outflow = []
+
+
+    return {"proddcut": product_list,"ouwoker": { "Mohan": 150, "Suresh": 80, "Gopal": 45, "Ramesh": 210, "Dinesh": 30 }}
+
+
+
+
 
 
