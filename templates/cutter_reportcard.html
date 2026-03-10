@@ -1049,7 +1049,7 @@
           <div class="card-header">
             <i class="fas fa-table"></i>
             <h2>
-              Production details <small>click ▶ to see ID, kg, status</small>
+              Production details
             </h2>
           </div>
           <div class="table-wrapper">
@@ -1108,6 +1108,28 @@
             </div>
           </div>
           <hr />
+          <!-- Add this after the cut type chart or wherever you want it -->
+      <div class="selector-panel" style="margin-top: 10px;">
+  <i class="fas fa-user"></i>
+  <span style="font-weight: 500">Cutter:</span>
+  <select id="cutterSelect">
+    <option value="All">All Cutters</option>
+  </select>
+</div>
+<div class="chart-item">
+  <div class="chart-title">
+    <i class="fas fa-user-cut"></i> Cutter split
+  </div>
+  <div id="cutterChart"></div>
+  <div
+    id="cutterChartEmptyMessage"
+    class="empty-message"
+    style="display: none"
+  >
+    No cutter data available
+  </div>
+</div>
+
           <div class="chart-item">
             <div class="chart-title">
               <i class="fas fa-chart-bar"></i> Daily production (all products)
@@ -1272,13 +1294,14 @@ tres.forEach((entry) => {
 
     groups[product][type][pieces].count += 1;
     groups[product][type][pieces].entries.push({
-      id: entry.id,
-      entry_datetime: entry.entry_datetime,
-      pieces: entry.pieces,
-      kg: entry.kg,
-      status: entry.status,
-      given_to: entry.given_to,
-    });
+  id: entry.id,
+  entry_datetime: entry.entry_datetime,
+  pieces: entry.pieces,
+  kg: entry.kg,
+  status: entry.status,
+  given_to: entry.given_to,
+  cutter: entry.cutter,  // This line is crucial
+});
   }
 });
 
@@ -1349,24 +1372,39 @@ tres.forEach((entry) => {
               detailRow.style.display = isExpanded ? "table-row" : "none";
 
               const entryList = entries
-                .map((e) => {
-                  const dateStr = e.entry_datetime.toLocaleDateString("en-IN", {
-                    day: "numeric",
-                    month: "short",
-                  });
-                  const kgPerPiece =
-                    e.pieces > 0 ? (e.kg / e.pieces).toFixed(2) : 0;
-                  return `<div class="entry-item"><div class="entry-row">
-                            <span class="entry-id">#${e.id}</span>
-                            <span class="entry-date">${dateStr}</span>
-                            <span class="entry-pieces">📦 ${e.pieces} pcs</span>
-                            <span class="entry-kg">⚖️ ${e.kg} kg</span>
-                            <span class="entry-kg-per-pc">📊 ${kgPerPiece} kg/pc</span>
-                            <span class="entry-given">👤 ${e.given_to ? e.given_to.substring(0, 15) + "…" : "—"}</span>
-                            <span class="entry-status ${e.status?.toLowerCase() || ""}">${e.status || "—"}</span>
-                        </div></div>`;
-                })
-                .join("");
+  .map((e) => {
+    const dateStr = e.entry_datetime.toLocaleDateString("en-IN", {
+      day: "numeric",
+      month: "short",
+    });
+    const kgPerPiece = e.pieces > 0 ? (e.kg / e.pieces).toFixed(2) : 0;
+
+    // Get cutter name (handle both string and object cases)
+    const cutterName = e.cutter ?
+      (typeof e.cutter === 'object' ? e.cutter.name || JSON.stringify(e.cutter) : e.cutter)
+      : "—";
+
+    // Truncate long cutter names
+    const displayCutter = cutterName.length > 15 ? cutterName.substring(0, 12) + "…" : cutterName;
+
+    return `<div class="entry-item">
+      <div class="entry-row">
+        <span class="entry-id">#${e.id}</span>
+        <span class="entry-date">${dateStr}</span>
+        <span class="entry-pieces">📦 ${e.pieces} pcs</span>
+        <span class="entry-kg">⚖️ ${e.kg} kg</span>
+        <span class="entry-kg-per-pc">📊 ${kgPerPiece} kg/pc</span>
+        <span class="entry-given">👤 ${e.given_to ? e.given_to.substring(0, 15) + "…" : "—"}</span>
+        <span class="cutby" style="background:#e2edfe; padding:3px 12px; border-radius:20px;">
+          ✂️ ${displayCutter}
+        </span>
+        <span class="entry-status ${e.status?.toLowerCase() === 'ready' ? 'completed' : e.status?.toLowerCase() || ''}">
+          ${e.status || "—"}
+        </span>
+      </div>
+    </div>`;
+  })
+  .join("");
 
               detailRow.innerHTML = `<td colspan="8" style="padding: 16px; background: #f8fafc;"><div class="details-vertical-container">
                         <div class="group-summary-vertical">
@@ -1606,7 +1644,196 @@ tres.forEach((entry) => {
           }
           selectedSpan.innerText = productKey;
         }
+        // Add this after your existing chart variables
+let cutterChart = null;
+const cutterChartDiv = document.getElementById("cutterChart");
+const cutterEmptyMessage = document.getElementById("cutterChartEmptyMessage");
 
+// Function to update cutter pie chart
+function updateCutterPie(productKey) {
+  // Filter entries based on selected product
+  const filteredEntries = productKey === "All"
+    ? tres
+    : tres.filter(e => e.product.trim() === productKey);
+
+  // Group by cutter
+  const cutterMap = new Map();
+
+  filteredEntries.forEach(entry => {
+    // Only count production entries (you can adjust this condition)
+    if (!entry.given_to) {  // Count only entries not given to someone
+      const cutter = entry.cutter || "Unknown";
+      const currentTotal = cutterMap.get(cutter) || 0;
+      cutterMap.set(cutter, currentTotal + entry.pieces);
+    }
+  });
+
+  // Convert to chart data format
+  const cutterData = Array.from(cutterMap.entries())
+    .map(([name, pieces]) => ({
+      name: name,
+      y: pieces
+    }))
+    .sort((a, b) => b.y - a.y); // Sort by pieces descending
+
+  if (cutterData.length === 0) {
+    cutterChartDiv.style.display = "none";
+    cutterEmptyMessage.style.display = "block";
+    return;
+  }
+
+  cutterChartDiv.style.display = "block";
+  cutterEmptyMessage.style.display = "none";
+
+  if (cutterChart) {
+    cutterChart.options({
+      series: [{
+        name: "Cutters",
+        points: cutterData
+      }],
+      title_label_text: productKey === "All"
+        ? "Cutter Distribution - All Products"
+        : `Cutter Distribution - ${productKey}`
+    });
+  } else {
+    cutterChart = JSC.chart("cutterChart", {
+      legend_position: "inside left bottom",
+      defaultSeries: {
+        type: "pie",
+        pointSelection: true
+      },
+      defaultPoint_label: {
+        text: "<b>%name</b><br>%yValue pcs<br>%percentOfSeries%",
+        placement: "auto",
+        autoHide: false,
+        style: { fontSize: "12px", fontWeight: "500", color: "#1e3a6b" }
+      },
+      defaultTooltip: {
+        label_text: "<b>%name</b><br>Pieces: %yValue<br>Share: %percentOfSeries%",
+        style: { fontSize: "13px" }
+      },
+      toolbar_items: {
+        Mode: {
+          margin: 10,
+          type: "select",
+          events_change: function (val) {
+            cutterChart.options({
+              defaultPoint: { label: { placement: val } }
+            });
+          },
+          items: "enum_placement",
+        },
+        "Auto Hide": {
+          type: "checkbox",
+          events_change: function (val) {
+            cutterChart.options({
+              defaultPoint: { label: { autoHide: val } }
+            });
+          },
+        },
+      },
+      title_label_text: productKey === "All"
+        ? "Cutter Distribution - All Products"
+        : `Cutter Distribution - ${productKey}`,
+      yAxis: {
+        label_text: "Pieces",
+        formatString: "n"
+      },
+      series: [{
+        name: "Cutters",
+        points: cutterData
+      }]
+    });
+  }
+}
+
+// Add metrics for cutters (optional)
+function updateCutterMetrics() {
+  const cutterMetricsDiv = document.getElementById("cutterMetrics");
+  if (!cutterMetricsDiv) {
+    // Create metrics div if it doesn't exist
+    const metricsRow = document.createElement("div");
+    metricsRow.className = "metrics-row";
+    metricsRow.id = "cutterMetrics";
+    document.querySelector("#cutterChart").parentNode.appendChild(metricsRow);
+  }
+
+  const cutterMap = new Map();
+  tres.forEach(entry => {
+    if (!entry.given_to) {
+      const cutter = entry.cutter || "Unknown";
+      cutterMap.set(cutter, (cutterMap.get(cutter) || 0) + entry.pieces);
+    }
+  });
+
+  const cutterData = Array.from(cutterMap.entries())
+    .map(([name, pieces]) => ({ name, pieces }))
+    .sort((a, b) => b.pieces - a.pieces);
+
+  let metricsHtml = "";
+
+  if (cutterData.length > 0) {
+    // Top cutter
+    metricsHtml += `
+      <div class="metric-card">
+        <div class="metric-icon"><i class="fas fa-crown"></i></div>
+        <div class="metric-content">
+          <span class="metric-label">Top cutter</span>
+          <span class="metric-value">${cutterData[0].name} <small>${formatNumber(cutterData[0].pieces)} pcs</small></span>
+        </div>
+      </div>
+    `;
+
+    // Average per cutter
+    const avg = (cutterData.reduce((sum, c) => sum + c.pieces, 0) / cutterData.length).toFixed(1);
+    metricsHtml += `
+      <div class="metric-card">
+        <div class="metric-icon"><i class="fas fa-chart-line"></i></div>
+        <div class="metric-content">
+          <span class="metric-label">Average</span>
+          <span class="metric-value">${formatNumber(avg)} <small>pcs</small></span>
+        </div>
+      </div>
+    `;
+
+    // Total cutters
+    metricsHtml += `
+      <div class="metric-card">
+        <div class="metric-icon"><i class="fas fa-users"></i></div>
+        <div class="metric-content">
+          <span class="metric-label">Total cutters</span>
+          <span class="metric-value">${cutterData.length} <small>people</small></span>
+        </div>
+      </div>
+    `;
+  }
+
+  document.getElementById("cutterMetrics").innerHTML = metricsHtml;
+}
+
+// Update the product select change handler to also update cutter chart
+const originalChangeHandler = select.onchange;
+select.addEventListener("change", (e) => {
+  const product = e.target.value;
+  updateCutPie(product);
+  updateCutterPie(product); // Add this line
+});
+
+// Also update when switching to All Products or when page loads
+// Initialize cutter chart
+if (sortedProducts.length > 0) {
+  updateCutterPie(sortedProducts[0]); // For specific product
+} else {
+  updateCutterPie("All"); // Fallback to All
+}
+updateCutterMetrics();
+
+// If you have a global "All Products" option, make sure to handle it
+// You might want to add an "All Products" option to your product select
+const allOption = document.createElement("option");
+allOption.value = "All";
+allOption.textContent = "All Products";
+select.insertBefore(allOption, select.firstChild);
       function updateGroupedDailyBar() {
   const dailyProductMap = new Map();
   tres.forEach((entry) => {
@@ -1909,23 +2136,24 @@ tres.forEach((entry) => {
 
                   // Bundle table
                   const table = document.createElement("table");
-                  table.className = "bundle-table";
-                  table.innerHTML = `
-                                <thead><tr><th>ID</th><th>Pcs</th><th>Kg</th><th>Status</th><th>To</th></tr></thead>
-                                <tbody>
-                                    ${lump.entries
-                                      .map(
-                                        (e) => `<tr>
-                                        <td>#${e.id}</td>
-                                        <td>${e.pieces}</td>
-                                        <td>${e.kg}</td>
-                                        <td><span class="status-badge">${e.status}</span></td>
-                                        <td>${e.given_to || "—"}</td>
-                                    </tr>`,
-                                      )
-                                      .join("")}
-                                </tbody>
-                            `;
+table.className = "bundle-table";
+table.innerHTML = `
+              <thead><tr><th>ID</th><th>Pcs</th><th>Kg</th><th>Cutter</th><th>Status</th><th>To</th></tr></thead>
+              <tbody>
+                  ${lump.entries
+                    .map(
+                      (e) => `<tr>
+                      <td>#${e.id}</td>
+                      <td>${e.pieces}</td>
+                      <td>${e.kg}</td>
+                      <td>${e.cutter || "—"}</td>
+                      <td><span class="status-badge">${e.status}</span></td>
+                      <td>${e.given_to || "—"}</td>
+                  </tr>`,
+                    )
+                    .join("")}
+              </tbody>
+          `;
                   lumpDiv.appendChild(table);
                   baleDiv.appendChild(lumpDiv);
                 });

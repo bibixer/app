@@ -45,7 +45,7 @@ class Bundle(db.Model):
             "cutter":cuter
         }
 
-    def to_dict_2(self):
+    def to_dict_2(self,cutter):
         return {
             "id":self.id,
             "entry_datetime":self.entry_datetime,
@@ -58,6 +58,7 @@ class Bundle(db.Model):
           'given_by' : self.given_by,
           'given_date': self.given_date,
         'status' : self.status,
+            "cutter": cutter
 
 
         }

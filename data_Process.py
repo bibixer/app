@@ -385,7 +385,8 @@ def get_cutter_report_data(data,current_user):
       all_b = (Bundle.query.filter(Bundle.lump_id == i.id).all())
       for b in all_b:
           # all_bundle.append(b.to_dict_2())
-          data_b= b.to_dict_2()
+          cutter =  Lump.query.get(b.lump_id).cut_by
+          data_b= b.to_dict_2(cutter)
           # need to add
           # supplier: "Ram Tex",
           #               lot_number: "410X3",
