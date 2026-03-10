@@ -125,8 +125,8 @@ def register_routes(app,db):
             ### do some date vlaidation
 
             # =
-            if data['numbers_of_bundles'] > 6 :
-                    flash("you can not enter more then 6")
+            if data['numbers_of_bundles'] > 20 :
+                    flash("you can not enter more then 20")
                     return redirect(url_for("lump_home"))
 
                 # 🔄 reset any old flow
@@ -482,15 +482,12 @@ def register_routes(app,db):
     @login_required
     @oly_admin
     def product_report():
-        name_data_form = Date_form_with_name()
+        name_data_form = Date_form()
         range_data = get_current_week_range()
         if not name_data_form.is_submitted():
             name_data_form.date_from.data = range_data["from_date"].date()
             name_data_form.date_to.data = range_data["to_date"].date()
-            name_data_form.name.render_kw = {
-                'placeholder': 'Enter product Name',
 
-            }
 
         return render_template("admin.html", date_from=name_data_form, type="PRODUCT_Report")
 

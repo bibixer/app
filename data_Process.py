@@ -61,13 +61,34 @@ def outworker_name(**kwargs):
 
 ## get prodrdut id
 # data domy
-# { id: 125, name: "Vimal", colour: "Red", pics: 25, kg: 12.75 }
+# { id: 125, name: "Vimal", colour: "Red", pics: 25, kg: 12.75 ,avg cloth used   }
+
+#  total avage cloth used =  total used / total pics
+
+def age_clothused(product):
+    all_date =  Bundle.query.filter_by(lump_id=product.lump_id).all()
+    lump_data =  Lump.query.get(product.lump_id)
+    total_pic  =  0
+    for pro in all_date:
+        total_pic += pro.pieces
+    print(f"for  {product.lump_id}  ")
+    print(lump_data.meters)
+    add = lump_data.meters_add_remove
+    if add == "":
+        print(add)
+        add= 0.0
+    print(type(int(add)))
+    print(total_pic)
+
+
+
 
 def get_product():
     product_bunle =  Bundle.query.all()
     product_list = []
     for product in product_bunle:
         if product.status.upper()  == "READY":
+            age_clothused(product)
             product_list.append({"id":product.id,
                              "name":product.product,
                              "colour":product.color,
@@ -373,7 +394,7 @@ def get_cutter_report_data(data,current_user):
               data_b['packing_date'] = "UNKNOWN"
 
           all_bundle.append(data_b)
-          print(all_bundle)
+
 
 
     return {
