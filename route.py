@@ -409,6 +409,7 @@ def register_routes(app,db):
         name_data_form =  Date_form_with_name()
         range_data = get_current_week_range()
         cuter_name = get_serch_data()["cuter_data"]
+        cuter_name.append("all_cutter")
         if not name_data_form.is_submitted():
             name_data_form.date_from.data = range_data["from_date"].date()
             name_data_form.date_to.data = range_data["to_date"].date()

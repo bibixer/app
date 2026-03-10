@@ -364,13 +364,22 @@ def get_cutter_report_data(data,current_user):
             return 404
     if not  current_user.is_authenticated:
         return 404
+    if data.name.data == "all_cutter":
+        all_date = Lump.query.filter(
+            Lump.entry_datetime.between(
+                datetime.combine(data.date_from.data, time.min),  # 00:00:00 of start date
+                datetime.combine(data.date_to.data, time.max)  # 23:59:59.999999 of end date
+            )
+        ).all()
+    elif data.name.data != "all_cutter":
+        all_date = Lump.query.filter_by(cut_by=data.name.data).filter(
+            Lump.entry_datetime.between(
+                datetime.combine(data.date_from.data, time.min),  # 00:00:00 of start date
+                datetime.combine(data.date_to.data, time.max)  # 23:59:59.999999 of end date
+            )
+        ).all()
 
-    all_date = Lump.query.filter_by(cut_by=data.name.data).filter(
-        Lump.entry_datetime.between(
-            datetime.combine(data.date_from.data, time.min),  # 00:00:00 of start date
-            datetime.combine(data.date_to.data, time.max)  # 23:59:59.999999 of end date
-        )
-    ).all()
+
     all_bundle = []
     for i in all_date:
       all_b = (Bundle.query.filter(Bundle.lump_id == i.id).all())
