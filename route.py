@@ -443,7 +443,7 @@ def register_routes(app,db):
 
     @app.route("/outworker_report", methods=["GET", "POST"])
     @login_required
-    # @oly_admin
+    @oly_admin
     def outworker_report():
         name_data_form = Date_form_with_name()
         range_data = get_current_week_range()
@@ -481,7 +481,7 @@ def register_routes(app,db):
 
     @app.route("/product_report", methods=["GET", "POST"])
     @login_required
-    # @oly_admin
+    @oly_admin
     def product_report():
         name_data_form = Date_form()
         range_data = get_current_week_range()
