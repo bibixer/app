@@ -421,18 +421,18 @@
 
     <!-- ========== EXISTING TABLES SECTION (with filters) ========== -->
     <div class="filter-bar" id="globalFilterBar">
-        <div class="filter-group">
+        <div class="filter-group" id="redyPro">
             <label><i class="fas fa-filter"></i> Ready filters:</label>
             <select id="filterReadyType"><option value="all">All types</option></select>
             <select id="filterReadyProduct"><option value="all">All products</option></select>
         </div>
-        <div class="filter-group">
+        <div class="filter-group" id="out_flow">
             <label><i class="fas fa-arrow-right"></i> Outflow filters:</label>
             <select id="filterOutflowType"><option value="all">All types</option></select>
             <select id="filterOutflowMaster"><option value="all">All masters</option></select>
             <select id="filterOutflowProduct"><option value="all">All products</option></select>
         </div>
-        <div class="filter-group">
+        <div class="filter-group" id="in_flow">
             <label><i class="fas fa-arrow-left"></i> Inflow filters:</label>
             <select id="filterInflowType"><option value="all">All types</option></select>
             <select id="filterInflowMaster"><option value="all">All masters</option></select>
@@ -588,7 +588,7 @@
                     tbody.appendChild(mainRow); readyGrand += grp.total;
                     const detailRow = document.createElement('tr'); detailRow.classList.add('details-row'); detailRow.setAttribute('data-details', groupKey); detailRow.style.display = expanded ? 'table-row' : 'none';
                     const totalPieces = grp.entries.reduce((s,e)=>s+e.pieces,0); const totalKg = grp.entries.reduce((s,e)=>s+e.kg,0); const avgKg = totalPieces>0?(totalKg/totalPieces).toFixed(2):0;
-                    const entriesHtml = grp.entries.map(e => { const kgPerPc = e.pieces>0?(e.kg/e.pieces).toFixed(2):0; return `<div class="entry-item"><div class="entry-row"><span class="entry-id">#${e.id}</span><span class="entry-date">${formatDate(e.entry_datetime)}</span><span class="entry-pieces">📦 ${e.pieces} pcs</span><span class="entry-kg">⚖️ ${e.kg} kg</span><span class="entry-kg-per-pc">📊 ${kgPerPc} kg/pc</span><span class="entry-given">👤 ${e.given_to || '—'}</span><span class="entry-status ${e.status?.toLowerCase()||''}">${e.status||'—'}</span></div></div>`; }).join('');
+                    const entriesHtml = grp.entries.map(e => { const kgPerPc = e.pieces>0?(e.kg/e.pieces).toFixed(2):0; return `<div class="entry-item"><div class="entry-row"><span class="entry-id">#${e.id}</span><span class="entry-date">${formatDate(e.entry_datetime)}</span><span class="entry-pieces">📦 ${e.pieces} pcs</span><span class="entry-kg">⚖️ ${e.kg} kg</span><span class="entry-kg-per-pc">📊 ${kgPerPc} kg/pc</span><span class="entry-kg-per-pc">📊 ${e.avg_cloth} mtr/pc</span><span class="entry-given">👤 ${e.given_to || '—'}</span><span class="entry-status ${e.status?.toLowerCase()||''}">${e.status||'—'}</span></div></div>`; }).join('');
                     detailRow.innerHTML = `<td colspan="7" style="padding:16px; background:#f8fafc;"><div class="details-vertical-container"><div class="group-summary-vertical"><span class="summary-total">📋 Entries: ${grp.count}</span><span class="summary-pieces">📦 Pieces: ${totalPieces}</span><span class="summary-kg">⚖️ KG: ${totalKg.toFixed(2)}</span><span class="summary-avg">📊 Avg: ${avgKg} kg/pc</span></div><div class="entries-vertical-list">${entriesHtml}</div></div></td>`;
                     tbody.appendChild(detailRow);
                 });

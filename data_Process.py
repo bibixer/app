@@ -400,7 +400,9 @@ def get_cutter_report_data(data,current_user):
               data_b["supplier"]  = bale.part_name
               data_b["lot_number"] =  f"{bale.lot_number}X{bale.lot_count}"
               data_b['packing_date'] = str(bale.bale_date)
+              data_b["bale_number"]  = bale.bale_number
           elif not  lump.bale_id:
+
               data_b["supplier"] = "UNKNOWN"
               data_b["lot_number"] = "UNKNOWN"
               data_b['packing_date'] = "UNKNOWN"
@@ -713,6 +715,7 @@ def product_data (data:dict,current_user):
             for dat in data_o['items']:
                 total += dat['issued']
             all_dat[data_o['name']] = - total
+
     return {"proddcut": product_list,"ouwoker": all_dat}
 
 

@@ -373,7 +373,7 @@ async function submitData() {
                               <html lang="en">
                               <head>
                               <meta charset="UTF-8">
-                              <title>${jobData.jobId  + jobData.party }</title>
+                              <title>${jobData.jobId +"--" + jobData.party }</title>
 
                               <style>
                               @page { size: A5 portrait; margin: 0; }

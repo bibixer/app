@@ -187,6 +187,8 @@ def register_routes(app,db):
         if not current_form.validate_on_submit():
             if session['sno'] != 0:
                 current_form.no_of_so.data = session['sno'] +1
+            if  session["bundle_data"]['bundle_type'] == "goodCUT 20 picset" or  session["bundle_data"]['bundle_type'] == "fent 20 picset":
+                current_form.no_of_pics.data = 20
 
 
         if current_form.validate_on_submit():
