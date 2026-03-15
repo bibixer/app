@@ -61,9 +61,7 @@ logging.basicConfig(filename='flask.log', level=logging.INFO)
 if __name__ == '__main__':
     app = create_app()
     logging.info("Flask service starting")
-    app.run(debug=True)
-
-    # serve(app, host='127.0.0.1', port=5000, threads=8)
+    serve(app, host='127.0.0.1', port=5000, threads=8)
     # with app.app_context():
     #      new_columns = {
     #              "meters_add_remove": (db.Float,False),
