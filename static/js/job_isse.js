@@ -407,7 +407,7 @@ function buildPrintHTML(jobData) {
       total_all += `
 
 
-            <h3>Total ${item.name} ${item.type}: ${productTypeGroups[productKey].totalQty}</h3>
+            <h2>Total ${item.name} ${item.type}: ${productTypeGroups[productKey].totalQty}</h2>
 
 
         <!-- Spacer row -->
@@ -431,15 +431,15 @@ function buildPrintHTML(jobData) {
                               .a5-container {
                                 width: 148mm;
                                 height: 210mm;
-                                padding: 8mm;
+                                padding: 6mm;
 //
                               }
 
                               .inner-border {
                                 width: 100%;
                                 height: 100%;
-                                border: 1px dotted #000;
-                                padding: 6mm;
+                                border: 2px dotted #000;
+                                padding: 3mm;
                                 box-sizing: border-box;
                                 display: flex;
                                 flex-direction: column;
@@ -498,7 +498,7 @@ function buildPrintHTML(jobData) {
                                 width: 110mm;
                                 opacity: 0.17;
                                 pointer-events: none;
-                                padding-top: 100px;
+                                padding-top: 120px;
 
                               }
                               .signature {
