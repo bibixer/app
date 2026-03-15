@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, IntegerField, SubmitField, SelectField, FloatField, PasswordField, DateField
-from wtforms.validators import DataRequired
-
+from wtforms.validators import DataRequired,InputRequired
+from datetime import date
 
 class Lump_data(FlaskForm):
     party_name = StringField("party name", validators=[DataRequired()],
@@ -30,9 +30,10 @@ class Lump_data(FlaskForm):
             ("lump", "Lump"),
             ("good_cut", "Good Cut"),
             ("fent", "Fent"),
-            ("un_cut", "Un Cut"),
+            ("goodCUT 20 picset", "goodCUT 20 picset"),
             ("fent 20 picset", "fent 20 picset"),
-            ("goodCUT 20 picset", "goodCUT 20 picset")
+            ("un_cut", "Un Cut")
+
         ],
         validators=[DataRequired()],
         render_kw={
@@ -60,11 +61,12 @@ class Lump_data(FlaskForm):
     )
     meters_add_remove = FloatField(
         "add or removes",
-        validators=[DataRequired()],
+        validators=[InputRequired()],
         render_kw={
             "placeholder": "Enter meter of lump",
 
-        }
+        },
+        default=0.0
     )
 
     numbers_of_bundles = IntegerField(
@@ -73,7 +75,8 @@ class Lump_data(FlaskForm):
         render_kw={
             "placeholder": "Enter number of bundles",
              
-        }
+        },
+    default = 2
     )
     submit = SubmitField(
         "next",
@@ -209,22 +212,23 @@ class party_name(FlaskForm):
         }
     )
 class bale_data_form(FlaskForm):
-    party_name = StringField("party name",validators=[DataRequired()],render_kw={"placeholder": "Enter name of party","id":"party_name"})
+    party_name = StringField("party name",validators=[DataRequired()],render_kw={"placeholder": "Enter name of party","id":"party_name"},default="UNKNOW")
     lot_number =  IntegerField(
         "Lot Number",
-        validators=[DataRequired()],render_kw={"placeholder": "Enter LOT number"}
+        validators=[InputRequired()],render_kw={"placeholder": "Enter LOT number"},default=9090
     )
     lot_count = IntegerField(
         "Lot Count",
-        validators=[DataRequired()],render_kw={"placeholder": "Enter Lot Count"}
+        validators=[DataRequired()],render_kw={"placeholder": "Enter Lot Count"},default=1
     )
+
+    packing_date = DateField('bale date',validators=[DataRequired()],default=date.today)
     bale_number = IntegerField(
         "bale number",
         validators=[DataRequired()],
         render_kw={"placeholder": "Enter bale number"}
 
     )
-    packing_date = DateField('bale date',validators=[DataRequired()])
 
     cuter_name = StringField(
         "Cut By",

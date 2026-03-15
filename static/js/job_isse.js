@@ -674,6 +674,8 @@ function handleQRInput(rawValue, tr, idInput) {
   tr.querySelector(".item-type").value = item.type;
   tr.querySelector(".item-qty").value = item.pics;
   tr.querySelector(".item-kg").value = item.kg;
+  tr.querySelector(".item-kg-avg").value = (item.kg / item.pics);
+  tr.querySelector(".item-cloth-avg").value = item.avg_cloth;
 
   updateTotalKg();
   updadateTotalPics();
