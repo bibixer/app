@@ -80,7 +80,7 @@ def age_clothused(product):
     # print(type(float(add)))
     # print(total_pic)
     # print((float(lump_data.meters) + float(add)) / int(total_pic))
-    return {"avg_cloth":((float(lump_data.meters) + float(add)) / int(total_pic)) }
+    return {"avg_cloth":((float(lump_data.meters) + float(add)) / int(total_pic)),'cutter_name':lump_data.cut_by}
 
 def get_product():
     product_bunle =  Bundle.query.all()
@@ -96,7 +96,13 @@ def get_product():
                              "pics":product.pieces,
                             "type":product.type_B,
                              "kg":product.kg,
-                             "avg_cloth":avg_cloth[product.lump_id]["avg_cloth"]})
+                             "avg_cloth":avg_cloth[product.lump_id]["avg_cloth"],
+                             "cutter_name":avg_cloth[product.lump_id]['cutter_name'],
+                             "so_no":product.s_no,
+                             "cutting_date":product.entry_datetime.strftime("%Y-%m-%d")
+                                 }
+
+                              )
     return product_list
 
 def get_job_card_data_creation():
