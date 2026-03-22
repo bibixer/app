@@ -11,8 +11,8 @@ def bale_data_entry(data,current_user):
     # if current_user.is_authenticated:
     #     if current_user.role != 1:
     #         return 404
-    # if not  current_user.is_authenticated:
-    #     return 404
+    if not  current_user.is_authenticated:
+        return 404
 
 
     bale_data =  data['bale_data']

@@ -176,10 +176,14 @@ def register_routes(app,db):
             }
 
             # print(all_data)
-            bale_data_entry(all_data, current_user)
+            result = bale_data_entry(all_data, current_user)
             reset_session(2)
-            flash("You have successfully entered the bundle.", "success")
-            return redirect(url_for("lump_home"))
+            if result == 404:
+                flash("you do not have rights", "success")
+                return redirect(url_for("lump_home"))
+            else:
+                flash("You have successfully entered the bundle.", "success")
+                return redirect(url_for("lump_home"))
 
 
         form_name = f"Bundle Entry ({current}/{total})"
