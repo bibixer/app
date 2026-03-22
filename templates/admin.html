@@ -683,7 +683,15 @@ html {
         <span class="link-text">-Bundle Entry</span>
       </a>
     </li>
+ <li class="navbar-item flexbox-left">
+      <a class="navbar-item-inner flexbox-left" href="/find_edit">
+        <div class="navbar-item-inner-icon-wrapper flexbox">
 
+          <ion-icon name="cube-outline">find</ion-icon>
+        </div>
+        <span class="link-text">-and edit </span>
+      </a>
+    </li>
     <li class="navbar-item flexbox-left">
       <a class="navbar-item-inner flexbox-left" href="/logout">
         <div class="navbar-item-inner-icon-wrapper flexbox">
@@ -758,6 +766,7 @@ html {
     transition: background 0.3s ease;
   }
 </style>
+
  <div class="responsive-form-wrapper">
    <h2> date range </h2>
   {{ render_form(date_from, novalidate=True, extra_classes='login100-form validate-form') }}
@@ -790,6 +799,18 @@ html {
  <div class="responsive-form-wrapper">
    <h2> date range and Out-worker name </h2>
   {{ render_form(date_from, novalidate=True, extra_classes='login100-form validate-form') }}
+   {% include "scarch.html" %}
+   {% if backend_data %}
+   {% include "outwoker_production_report.html" %}
+   {% endif %}
+   {% include "inputjs.html" %}
+
+ </div>
+    {% elif type== "PRODUCT_find_edit"%}
+ <div class="responsive-form-wrapper">
+   <h2> find and edit </h2>
+  {{ render_form(date_from, novalidate=True, extra_classes='login100-form validate-form') }}
+     <h2>in cuter name select all_bundle to see all date  </h2>
    {% include "scarch.html" %}
    {% if backend_data %}
    {% include "outwoker_production_report.html" %}

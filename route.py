@@ -1,7 +1,6 @@
 from functools import wraps
-
 from flask import flash, render_template, redirect, url_for,session,request, jsonify
-from form import Lump_data, bundle_invadata, Item_data, Outworker_form, Cutter_form, Return_form, Login_form, Date_form, Date_form_with_name,bale_data_form,party_name
+from form import Lump_data, bundle_invadata, Item_data, Outworker_form, Cutter_form, Return_form, Login_form, Date_form, Date_form_with_name,bale_data_form,party_name,Find_and_edit
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from data_entry import add_cutter,add_items,add_outworker_db,add_jobcard,in_move_entery,bale_data_entry,add_party
 from data_Process import get_serch_data, get_job_card_data_creation, get_retun_card_data, get_movemet_data, \
@@ -531,3 +530,32 @@ def register_routes(app,db):
         logout_user()
         return redirect(url_for('login'))
     # laber print done
+
+    ## find function
+    @app.route("/find_edit",methods=["GET", "POST"])
+    @login_required
+    # @oly_admin
+    def find_edit():
+
+        current_form = Find_and_edit()
+        data_autofill = {}
+        data_autofill["cuter_data"]  = get_serch_data()["cuter_data"]
+        data_autofill['cuter_data'].append("all_bundle")
+        if current_form.is_submitted():
+            data_sumit =  current_form.data.copy()
+            data_sumit.pop('submit')
+            data_sumit.pop('csrf_token')
+            date_keys =  ['data_from', 'cutter_name' ,'bundle_sn','bundle_id']
+            input_keys = []
+            for k in date_keys:
+                print(data_sumit)
+                if data_sumit[k] != None:
+                    if data_sumit[k] != "":
+                        input_keys.append(k)
+            # print(input_keys)
+            if input_keys == []:
+                flash("need some input" , "danger")
+                return redirect(url_for("find_edit"))
+
+
+        return render_template("admin.html", date_from=current_form, type="PRODUCT_find_edit",data=data_autofill)

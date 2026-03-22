@@ -28,11 +28,15 @@
         <h2>{{form_name}}</h2>
         {{ render_form( current_form, novalidate=True ) }} {% for message in
         get_flashed_messages() %}
+
         <div style="text-align: center"><h1>{{ message|safe }}</h1></div>
         {% endfor %}
       </div>
     </div>
-    {% include "inputjs.html" %} {% if id %} {% include "scarch.html" %} {%
+
+    {% include "inputjs.html" %}
+
+    {% if id %} {% include "scarch.html" %} {%
     endif %}
   </body>
 </html>

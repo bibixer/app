@@ -726,6 +726,36 @@ def product_data (data:dict,current_user):
 
 
 
-
+# data needy by edit find
+#     const baseData = [
+#         // Bundle/Lump data with given_by and given_to (from the provided record)
+#         {
+#             id: 1935, level: 'lump', lump_id: 887, bale_number: 7902, bale_id: 2,
+#             cutter: 'RAJENDRA', entry_datetime: 'Wed, 18 Mar 2026 18:18:31 GMT',
+#             given_by: 'chandan', given_date: 'Thu, 19 Mar 2026 11:15:15 GMT',
+#             given_to: '38***VIDYA--38/-', kg: 4.61, lot_number: '9090X1',
+#             meter: 47.0, packing_date: '2026-03-18', pieces: 20,
+#             product: 'MAHAMAYA 2MTR', status: 'GIVEN', supplier: 'UNKNOW',
+#             type_B: 'lump', so_number: 202,
+#             // Lump specific fields
+#             cut_by: 'RAJENDRA', bundle_type: 'good_cut', meters: 47.0,
+#             meters_add_remove: 1.5, color: 'RED', number_of_bundlie: 2
+#         },
+#         // Bundles under this lump
+#         {
+#             id: 4001, level: 'bundle', bundle_id: 8001, lump_id: 887,
+#             product: 'MAHAMAYA 2MTR', color: 'RED', pieces: 12, kg: 2.76,
+#             type_B: 'bundle', no_of_so: 202, status: 'GIVEN',
+#             entry_datetime: '2026-03-18 18:30:00',
+#             given_by: 'chandan', given_date: 'Thu, 19 Mar 2026 11:15:15 GMT',
+#             given_to: '38***VIDYA--38/-'
+#         },
+#         {
+#             id: 4002, level: 'bundle', bundle_id: 8002, lump_id: 887,
+#             product: 'MAHAMAYA 2MTR', color: 'BLUE', pieces: 8, kg: 1.85,
+#             type_B: 'bundle', no_of_so: 202, status: 'READY',
+#             entry_datetime: '2026-03-18 19:00:00',
+#             given_by: null, given_date: null, given_to: null
+#         },
 
 

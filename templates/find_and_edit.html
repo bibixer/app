@@ -1,0 +1,874 @@
+
+    <style>
+
+
+        .badx {
+            background: linear-gradient(135deg, #eef2ff 0%, #f8fafc 100%);
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            padding: 28px 24px;
+            color: #0f172a;
+            min-height: 100vh;
+        }
+
+        .app-container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* premium toolbar card */
+        .toolbar {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(12px);
+            border-radius: 28px;
+            padding: 20px 28px;
+            margin-bottom: 28px;
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.02);
+        }
+
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            font-size: 1.65rem;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            background: linear-gradient(135deg, #1e293b, #2d3a4e);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .level-selector {
+            background: #f1f5f9;
+            padding: 6px 12px;
+            border-radius: 60px;
+            display: inline-flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .level-option {
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: transparent;
+            color: #475569;
+        }
+
+        .level-option.active {
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            color: white;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+        }
+
+        .level-option:hover:not(.active) {
+            background: #e2e8f0;
+        }
+
+        .stats-badge {
+            background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+            padding: 8px 18px;
+            border-radius: 60px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #3730a3;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.6), 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .filter-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            align-items: flex-end;
+            margin-top: 8px;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            min-width: 140px;
+            flex: 1 0 auto;
+        }
+
+        .filter-group label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #475569;
+        }
+
+        .filter-group input, .filter-group select {
+            padding: 10px 14px;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            background: #fefefe;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            outline: none;
+        }
+
+        .filter-group input:focus, .filter-group select:focus {
+            border-color: #6366f1;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        .reset-btn {
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 0 2px 4px rgba(79, 70, 229, 0.2);
+        }
+
+        .reset-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(79, 70, 229, 0.3);
+        }
+
+        /* table wrapper premium */
+        .table-wrapper {
+            border-radius: 24px;
+            background: white;
+            border: 1px solid #e9eef3;
+            overflow-x: auto;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.08);
+        }
+
+        .hierarchy-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 0.85rem;
+            min-width: 1000px;
+        }
+
+        .hierarchy-table th {
+            background: linear-gradient(to bottom, #fafcff, #f1f5f9);
+            padding: 16px 18px;
+            text-align: left;
+            font-weight: 700;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #334155;
+            border-bottom: 1px solid #e2e8f0;
+            position: sticky;
+            top: 0;
+            backdrop-filter: blur(4px);
+        }
+
+        .hierarchy-table td {
+            padding: 16px 18px;
+            border-bottom: 1px solid #f0f4fa;
+            vertical-align: middle;
+            transition: background 0.2s ease;
+        }
+
+        .bundle-row td {
+            background-color: #ffffff;
+        }
+        .lump-row td {
+            background-color: #fffaf5;
+        }
+        .bale-row td {
+            background-color: #fffef7;
+        }
+
+        .hierarchy-table tr:hover td {
+            background: #f8faff !important;
+            transition: 0.15s;
+        }
+
+        .expand-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 10px;
+            background: #eef2ff;
+            color: #4f46e5;
+            font-weight: 800;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        .expand-icon:hover {
+            background: #6366f1;
+            color: white;
+            transform: scale(1.02);
+        }
+
+        .level-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .badge-bundle {
+            background: #ede9fe;
+            color: #6d28d9;
+            border: 1px solid #ddd6fe;
+        }
+        .badge-lump {
+            background: #ffedd5;
+            color: #c2410c;
+            border: 1px solid #fed7aa;
+        }
+        .badge-bale {
+            background: #fef3c7;
+            color: #b45309;
+            border: 1px solid #fed7aa;
+        }
+
+        .main-card {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .title-row {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .title-row strong {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #0f172a;
+        }
+        .sub-info {
+            font-size: 0.7rem;
+            color: #5b6e8c;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .detail-line {
+            font-size: 0.8rem;
+            line-height: 1.45;
+            color: #1e293b;
+            display: flex;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 6px;
+        }
+        .detail-label {
+            font-weight: 700;
+            color: #475569;
+            min-width: 85px;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+        }
+        .detail-value {
+            font-weight: 500;
+        }
+
+        .given-badge {
+            background: #fef3c7;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            display: inline-block;
+            margin-top: 4px;
+        }
+
+        .metrics-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .metric-chip {
+            background: #f8fafc;
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            display: inline-block;
+            width: fit-content;
+            border: 1px solid #eef2ff;
+        }
+
+        .edit-link {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white;
+            padding: 8px 18px;
+            border-radius: 32px;
+            text-decoration: none;
+            font-size: 0.7rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 6px rgba(34,197,94,0.2);
+            border: none;
+            cursor: pointer;
+        }
+        .edit-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 18px rgba(34,197,94,0.35);
+            background: linear-gradient(135deg, #15803d, #166534);
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 56px !important;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .subnote {
+            font-size: 0.7rem;
+            color: #94a3b8;
+            margin-top: 4px;
+        }
+
+        .level-hint {
+            background: #fef9e3;
+            padding: 8px 16px;
+            border-radius: 16px;
+            font-size: 0.75rem;
+            color: #b45309;
+            margin-top: 12px;
+            display: inline-block;
+        }
+
+        @media (max-width: 780px) {
+            .badx { padding: 16px; }
+            .filter-group { min-width: 100%; }
+        }
+    </style>
+
+<div class="badx">
+<div class="app-container">
+    <div class="toolbar">
+        <div class="header-row">
+            <h2>🏭 Bundle Default View</h2>
+            <div class="stats-badge" id="statsDisplay">📊 loading...</div>
+        </div>
+
+        <!-- TOP LEVEL SELECTOR: Bundle is default active -->
+        <div style="margin-bottom: 20px;">
+            <div class="level-selector" id="levelSelector">
+                <div class="level-option" data-level="bale">📦 Top Level: Bale</div>
+                <div class="level-option" data-level="lump">🔸 Top Level: Lump</div>
+                <div class="level-option active" data-level="bundle">📦 Top Level: Bundle</div>
+            </div>
+            <div class="level-hint" id="levelHint">
+                🔽 <strong>Bundle view</strong> → shows all Bundles with Given By / Given To information
+            </div>
+        </div>
+
+        <div class="filter-row">
+            <div class="filter-group">
+                <label>🆔 Bundle ID</label>
+                <input type="text" id="filterBundleId" placeholder="8001, 8002, etc">
+            </div>
+            <div class="filter-group">
+                <label>✂️ Cutter / Given By</label>
+                <input type="text" id="filterCutter" placeholder="RAJENDRA, chandan">
+            </div>
+            <div class="filter-group">
+                <label>🔢 SO / Lot number</label>
+                <input type="text" id="filterSo" placeholder="101, 202, 9090X1">
+            </div>
+            <div class="filter-group">
+                <label>🏷️ Product</label>
+                <input type="text" id="filterProduct" placeholder="MAHAMAYA, SILK">
+            </div>
+            <div class="filter-group">
+                <label>👥 Given To</label>
+                <input type="text" id="filterGivenTo" placeholder="VIDYA, name">
+            </div>
+            <button id="resetFiltersBtn" class="reset-btn">⟳ Reset filters</button>
+        </div>
+    </div>
+
+    <div class="table-wrapper">
+        <table class="hierarchy-table">
+            <thead>
+                <tr>
+                    <th style="width: 48px"></th>
+                    <th style="min-width: 240px">Main Info</th>
+                    <th style="min-width: 280px">Details & Given Data</th>
+                    <th style="min-width: 180px">Metrics / Specs</th>
+                    <th style="width: 110px">Action</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <!-- dynamic rows -->
+            </tbody>
+         </table>
+    </div>
+</div>
+
+<script>
+    // ======================== MASTER DATA with GIVEN BY / GIVEN TO ========================
+    const baseData = [
+        // Bundle/Lump data with given_by and given_to (from the provided record)
+        {
+            id: 1935, level: 'lump', lump_id: 887, bale_number: 7902, bale_id: 2,
+            cutter: 'RAJENDRA', entry_datetime: 'Wed, 18 Mar 2026 18:18:31 GMT',
+            given_by: 'chandan', given_date: 'Thu, 19 Mar 2026 11:15:15 GMT',
+            given_to: '38***VIDYA--38/-', kg: 4.61, lot_number: '9090X1',
+            meter: 47.0, packing_date: '2026-03-18', pieces: 20,
+            product: 'MAHAMAYA 2MTR', status: 'GIVEN', supplier: 'UNKNOW',
+            type_B: 'lump', so_number: 202,
+            // Lump specific fields
+            cut_by: 'RAJENDRA', bundle_type: 'good_cut', meters: 47.0,
+            meters_add_remove: 1.5, color: 'RED', number_of_bundlie: 2
+        },
+        // Bundles under this lump
+        {
+            id: 4001, level: 'bundle', bundle_id: 8001, lump_id: 887,
+            product: 'MAHAMAYA 2MTR', color: 'RED', pieces: 12, kg: 2.76,
+            type_B: 'bundle', no_of_so: 202, status: 'GIVEN',
+            entry_datetime: '2026-03-18 18:30:00',
+            given_by: 'chandan', given_date: 'Thu, 19 Mar 2026 11:15:15 GMT',
+            given_to: '38***VIDYA--38/-'
+        },
+        {
+            id: 4002, level: 'bundle', bundle_id: 8002, lump_id: 887,
+            product: 'MAHAMAYA 2MTR', color: 'BLUE', pieces: 8, kg: 1.85,
+            type_B: 'bundle', no_of_so: 202, status: 'READY',
+            entry_datetime: '2026-03-18 19:00:00',
+            given_by: null, given_date: null, given_to: null
+        },
+
+        // Additional standalone bundle with given data
+        {
+            id: 4003, level: 'bundle', bundle_id: 8003, lump_id: null,
+            product: 'PREMIUM SILK SAREE', color: 'GOLD', pieces: 25, kg: 8.5,
+            type_B: 'bundle', no_of_so: 303, status: 'GIVEN',
+            entry_datetime: '2026-03-20 14:30:00',
+            given_by: 'meena_kumari', given_date: 'Sat, 21 Mar 2026 09:00:00 GMT',
+            given_to: 'SILK_HOUSE_DELHI'
+        },
+
+        // Another bundle with given data
+        {
+            id: 4004, level: 'bundle', bundle_id: 8004, lump_id: null,
+            product: 'COTTON DELUXE', color: 'WHITE', pieces: 50, kg: 12.3,
+            type_B: 'bundle', no_of_so: 404, status: 'GIVEN',
+            entry_datetime: '2026-03-21 10:15:00',
+            given_by: 'rajesh_s', given_date: 'Mon, 23 Mar 2026 08:30:00 GMT',
+            given_to: 'TEXPORT_LTD'
+        },
+
+        // Regular bundle (not given)
+        {
+            id: 4005, level: 'bundle', bundle_id: 8005, lump_id: null,
+            product: 'ORGANIC COTTON', color: 'NATURAL', pieces: 35, kg: 9.2,
+            type_B: 'bundle', no_of_so: 505, status: 'PACKED',
+            entry_datetime: '2026-03-22 11:00:00',
+            given_by: null, given_date: null, given_to: null
+        },
+
+        // Additional bundle with ID 8006
+        {
+            id: 4006, level: 'bundle', bundle_id: 8006, lump_id: 888,
+            product: 'PREMIUM 3MTR', color: 'GOLD', pieces: 42, kg: 12.5,
+            type_B: 'bundle', no_of_so: 202, status: 'INSPECT',
+            entry_datetime: '2026-03-19 10:00:00',
+            given_by: null, given_date: null, given_to: null
+        },
+
+        // Bundle with ID 8007
+        {
+            id: 4007, level: 'bundle', bundle_id: 8007, lump_id: null,
+            product: 'SILK EMBROIDERY', color: 'MAROON', pieces: 15, kg: 4.8,
+            type_B: 'bundle', no_of_so: 606, status: 'READY',
+            entry_datetime: '2026-03-23 09:30:00',
+            given_by: 'anita', given_date: 'Tue, 24 Mar 2026 10:00:00 GMT',
+            given_to: 'FASHION_HOUSE'
+        },
+
+        // Additional lumps with bundles (for Lump view testing)
+        {
+            id: 2001, level: 'lump', lump_id: 888, bale_number: 1, bale_id: 1,
+            cutter: 'SURESH', entry_datetime: '2026-03-19 09:15:22',
+            given_by: null, given_date: null, given_to: null,
+            product: 'PREMIUM 3MTR', status: 'PACKED', so_number: 202,
+            cut_by: 'SURESH', bundle_type: 'fant', meters: 88.2,
+            meters_add_remove: 0, color: 'GOLD', number_of_bundlie: 5
+        },
+
+        // Bale data for Bale view
+        {
+            id: 1001, level: 'bale', bale_id: 1, bale_number: 1,
+            part_name: 'COTTON RAW', lot_number: 9090, lot_count: 150,
+            cutter: 'RAJENDRA', entry_datetime: '2026-03-18 10:30:00',
+            so_number: 101, status: 'ACTIVE'
+        }
+    ];
+
+    let masterData = baseData.map(i => ({ ...i }));
+
+    // DEFAULT TOP LEVEL = BUNDLE
+    let currentTopLevel = 'bundle';
+
+    // Expand/collapse state
+    let expandedState = new Set();
+
+    function initExpansions() {
+        expandedState.clear();
+        if (currentTopLevel === 'bale') {
+            const allBaleIds = [...new Set(masterData.filter(i => i.level === 'bale').map(i => i.bale_id))];
+            allBaleIds.forEach(bid => expandedState.add(`bale_${bid}`));
+            const allLumpIds = [...new Set(masterData.filter(i => i.level === 'lump').map(i => i.lump_id))];
+            allLumpIds.forEach(lid => expandedState.add(`lump_${lid}`));
+        } else if (currentTopLevel === 'lump') {
+            const allLumpIds = [...new Set(masterData.filter(i => i.level === 'lump').map(i => i.lump_id))];
+            allLumpIds.forEach(lid => expandedState.add(`lump_${lid}`));
+        }
+    }
+
+    // DOM elements
+    const tbody = document.getElementById('tableBody');
+    const filterBundleId = document.getElementById('filterBundleId');
+    const filterCutter = document.getElementById('filterCutter');
+    const filterSo = document.getElementById('filterSo');
+    const filterProduct = document.getElementById('filterProduct');
+    const filterGivenTo = document.getElementById('filterGivenTo');
+    const resetBtn = document.getElementById('resetFiltersBtn');
+    const statsSpan = document.getElementById('statsDisplay');
+    const levelHint = document.getElementById('levelHint');
+
+    // Level selector event
+    document.querySelectorAll('.level-option').forEach(opt => {
+        opt.addEventListener('click', () => {
+            const level = opt.dataset.level;
+            if (level === currentTopLevel) return;
+            currentTopLevel = level;
+            document.querySelectorAll('.level-option').forEach(o => o.classList.remove('active'));
+            opt.classList.add('active');
+
+            if (currentTopLevel === 'bale') {
+                levelHint.innerHTML = '🔽 <strong>Bale view</strong> → shows Bale + nested Lumps + nested Bundles';
+            } else if (currentTopLevel === 'lump') {
+                levelHint.innerHTML = '🔽 <strong>Lump view</strong> → shows Lump + nested Bundles';
+            } else {
+                levelHint.innerHTML = '🔽 <strong>Bundle view</strong> → shows all Bundles with Given By / Given To information';
+            }
+
+            initExpansions();
+            renderTable();
+        });
+    });
+
+    function itemPassesFilters(item) {
+        // Bundle ID filter (only applies to bundle level items)
+        const bundleIdVal = filterBundleId.value.trim();
+        if (bundleIdVal && item.level === 'bundle') {
+            const bundleIdStr = String(item.bundle_id || '');
+            if (!bundleIdStr.includes(bundleIdVal)) return false;
+        }
+
+        const cutterVal = filterCutter.value.trim().toLowerCase();
+        if (cutterVal) {
+            const cutterField = item.cutter || item.cut_by || item.given_by || '';
+            if (!cutterField.toLowerCase().includes(cutterVal)) return false;
+        }
+
+        const soVal = filterSo.value.trim().toLowerCase();
+        if (soVal) {
+            const soField = String(item.so_number || item.no_of_so || '');
+            const lotField = String(item.lot_number || '');
+            if (!soField.includes(soVal) && !lotField.includes(soVal)) return false;
+        }
+
+        const productVal = filterProduct.value.trim().toLowerCase();
+        if (productVal) {
+            const prodField = item.product || item.part_name || '';
+            if (!prodField.toLowerCase().includes(productVal)) return false;
+        }
+
+        const givenToVal = filterGivenTo.value.trim().toLowerCase();
+        if (givenToVal) {
+            const givenToField = item.given_to || '';
+            if (!givenToField.toLowerCase().includes(givenToVal)) return false;
+        }
+
+        return true;
+    }
+
+    function getHierarchyRows() {
+        const rows = [];
+
+        if (currentTopLevel === 'bale') {
+            const bales = masterData.filter(i => i.level === 'bale').sort((a,b) => (a.bale_number||0) - (b.bale_number||0));
+            for (const bale of bales) {
+                if (!itemPassesFilters(bale)) continue;
+                const baleKey = `bale_${bale.bale_id}`;
+                const isExpanded = expandedState.has(baleKey);
+                rows.push({ item: bale, level: 'bale', parentKey: null, isExpanded, depth: 0 });
+                if (isExpanded) {
+                    const lumps = masterData.filter(i => i.level === 'lump' && i.bale_number === bale.bale_number);
+                    for (const lump of lumps) {
+                        if (!itemPassesFilters(lump)) continue;
+                        const lumpKey = `lump_${lump.lump_id}`;
+                        const isLumpExpanded = expandedState.has(lumpKey);
+                        rows.push({ item: lump, level: 'lump', parentKey: baleKey, isExpanded: isLumpExpanded, depth: 1 });
+                        if (isLumpExpanded) {
+                            const bundles = masterData.filter(i => i.level === 'bundle' && i.lump_id === lump.lump_id);
+                            for (const bundle of bundles) {
+                                if (!itemPassesFilters(bundle)) continue;
+                                rows.push({ item: bundle, level: 'bundle', parentKey: lumpKey, isExpanded: false, depth: 2 });
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        else if (currentTopLevel === 'lump') {
+            const lumps = masterData.filter(i => i.level === 'lump').sort((a,b) => (a.lump_id||0) - (b.lump_id||0));
+            for (const lump of lumps) {
+                if (!itemPassesFilters(lump)) continue;
+                const lumpKey = `lump_${lump.lump_id}`;
+                const isExpanded = expandedState.has(lumpKey);
+                rows.push({ item: lump, level: 'lump', parentKey: null, isExpanded, depth: 0 });
+                if (isExpanded) {
+                    const bundles = masterData.filter(i => i.level === 'bundle' && i.lump_id === lump.lump_id);
+                    for (const bundle of bundles) {
+                        if (!itemPassesFilters(bundle)) continue;
+                        rows.push({ item: bundle, level: 'bundle', parentKey: lumpKey, isExpanded: false, depth: 1 });
+                    }
+                }
+            }
+        }
+        else {
+            // BUNDLE view - flat list, includes given_by and given_to
+            const bundles = masterData.filter(i => i.level === 'bundle').sort((a,b) => (a.bundle_id||0) - (b.bundle_id||0));
+            for (const bundle of bundles) {
+                if (!itemPassesFilters(bundle)) continue;
+                rows.push({ item: bundle, level: 'bundle', parentKey: null, isExpanded: false, depth: 0 });
+            }
+        }
+
+        return rows;
+    }
+
+    function renderDetails(item) {
+        if (item.level === 'bale') {
+            return `
+                <div class="detail-line"><span class="detail-label">📦 Part</span><span class="detail-value">${escapeHtml(item.part_name || '—')}</span></div>
+                <div class="detail-line"><span class="detail-label">🔢 Lot</span><span class="detail-value">${item.lot_number ?? '—'}</span></div>
+                <div class="detail-line"><span class="detail-label">📊 Lot count</span><span class="detail-value">${item.lot_count ?? '—'}</span></div>
+            `;
+        }
+        if (item.level === 'lump') {
+            return `
+                <div class="detail-line"><span class="detail-label">✂️ Cut by</span><span class="detail-value">${escapeHtml(item.cut_by || item.cutter || '—')}</span></div>
+                <div class="detail-line"><span class="detail-label">🧵 Product</span><span class="detail-value">${escapeHtml(item.product || '—')}</span></div>
+                <div class="detail-line"><span class="detail-label">🎨 Color</span><span class="detail-value">${escapeHtml(item.color || '—')}</span></div>
+                <div class="detail-line"><span class="detail-label">📦 Bundle type</span><span class="detail-value">${escapeHtml(item.bundle_type || '—')}</span></div>
+                ${item.given_by ? `<div class="detail-line"><span class="detail-label">👥 Given by</span><span class="detail-value">${escapeHtml(item.given_by)}</span></div>` : ''}
+                ${item.given_to ? `<div class="detail-line"><span class="detail-label">🎯 Given to</span><span class="detail-value">${escapeHtml(item.given_to)}</span></div>` : ''}
+                ${item.given_date ? `<div class="detail-line"><span class="detail-label">📅 Given date</span><span class="detail-value">${escapeHtml(item.given_date)}</span></div>` : ''}
+            `;
+        }
+        // BUNDLE view - includes given_by and given_to prominently
+        return `
+            <div class="detail-line"><span class="detail-label">🆔 Bundle ID</span><span class="detail-value"><strong>${item.bundle_id ?? '—'}</strong></span></div>
+            <div class="detail-line"><span class="detail-label">🧵 Product</span><span class="detail-value">${escapeHtml(item.product || '—')}</span></div>
+            <div class="detail-line"><span class="detail-label">🎨 Color</span><span class="detail-value">${escapeHtml(item.color || '—')}</span></div>
+            <div class="detail-line"><span class="detail-label">📄 SO ref</span><span class="detail-value">${item.no_of_so ?? item.so_number ?? '—'}</span></div>
+            <div class="detail-line"><span class="detail-label">🏷️ type_B</span><span class="detail-value">${escapeHtml(item.type_B || 'bundle')}</span></div>
+            ${item.given_by ? `
+                <div class="detail-line"><span class="detail-label">👥 Given by</span><span class="detail-value"><strong>${escapeHtml(item.given_by)}</strong></span></div>
+                <div class="detail-line"><span class="detail-label">🎯 Given to</span><span class="detail-value"><strong>${escapeHtml(item.given_to || '—')}</strong></span></div>
+                <div class="detail-line"><span class="detail-label">📅 Given date</span><span class="detail-value">${escapeHtml(item.given_date || '—')}</span></div>
+            ` : '<div class="detail-line"><span class="detail-label">👥 Given</span><span class="detail-value">Not given yet</span></div>'}
+        `;
+    }
+
+    function renderMetrics(item) {
+        if (item.level === 'bale') {
+            return `<div class="metric-chip">🏷️ Bale #${item.bale_number ?? '—'}</div>`;
+        }
+        if (item.level === 'lump') {
+            return `
+                <div class="metric-chip">📏 ${item.meters ?? item.meter ?? 0} m</div>
+                <div class="metric-chip">📦 Bundles: ${item.number_of_bundlie ?? 0}</div>
+            `;
+        }
+        return `
+            <div class="metric-chip">🔢 Pieces: ${item.pieces ?? 0}</div>
+            <div class="metric-chip">⚖️ ${item.kg ?? 0} kg</div>
+        `;
+    }
+
+    function getLevelIdentifier(item) {
+        if (item.level === 'bale') return `Bale #${item.bale_number} · ${item.part_name || ''}`;
+        if (item.level === 'lump') return `Lump ID ${item.lump_id} · ${item.product || ''}`;
+        return `Bundle #${item.bundle_id} · ${item.product || ''}`;
+    }
+
+    function getEditUrl(item) {
+        if (item.level === 'bale') return `/edit/bale/${item.bale_id}`;
+        if (item.level === 'lump') return `/edit/lump/${item.lump_id}`;
+        if (item.level === 'bundle') return `/edit/bundle/${item.bundle_id}`;
+        return '#';
+    }
+
+    function toggleExpand(levelType, id) {
+        const key = `${levelType}_${id}`;
+        if (expandedState.has(key)) expandedState.delete(key);
+        else expandedState.add(key);
+        renderTable();
+    }
+
+    function renderTable() {
+        const rowsData = getHierarchyRows();
+        const totalVisible = rowsData.length;
+        statsSpan.innerText = `📊 ${totalVisible} visible · ${masterData.length} total (top: ${currentTopLevel})`;
+
+        if (rowsData.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" class="no-data">✨ No records match filters. Try resetting filters. ✨</td></tr>`;
+            return;
+        }
+
+        let html = '';
+        for (const row of rowsData) {
+            const item = row.item;
+            const levelClass = row.level === 'bale' ? 'bale-row' : (row.level === 'lump' ? 'lump-row' : 'bundle-row');
+            const badgeClass = row.level === 'bale' ? 'badge-bale' : (row.level === 'lump' ? 'badge-lump' : 'badge-bundle');
+            const identifier = getLevelIdentifier(item);
+
+            let showExpand = false;
+            let expandId = null;
+            let expandLevelType = null;
+            let isExpanded = false;
+
+            if (row.level === 'bale' && currentTopLevel === 'bale') {
+                showExpand = true;
+                expandId = item.bale_id;
+                expandLevelType = 'bale';
+                isExpanded = row.isExpanded;
+            } else if (row.level === 'lump' && (currentTopLevel === 'bale' || currentTopLevel === 'lump')) {
+                const hasBundles = masterData.some(b => b.level === 'bundle' && b.lump_id === item.lump_id);
+                if (hasBundles) {
+                    showExpand = true;
+                    expandId = item.lump_id;
+                    expandLevelType = 'lump';
+                    isExpanded = row.isExpanded;
+                }
+            }
+
+            const editUrl = getEditUrl(item);
+            let statusColor = '#94a3b8';
+            if (item.status === 'GIVEN') statusColor = '#22c55e';
+            else if (item.status === 'ACTIVE' || item.status === 'READY') statusColor = '#22c55e';
+            else if (item.status === 'PACKED') statusColor = '#f97316';
+
+            html += `<tr class="${levelClass}">
+                <td style="text-align:center; vertical-align:middle;">
+                    ${showExpand && expandId ?
+                        `<span class="expand-icon" onclick="toggleExpand('${expandLevelType}', '${expandId}')">${isExpanded ? '−' : '+'}</span>`
+                        : '<span style="display:inline-block; width:28px;"></span>'}
+                </td>
+                <td>
+                    <div class="main-card">
+                        <div class="title-row">
+                            <span class="level-badge ${badgeClass}">${row.level.toUpperCase()}</span>
+                            <strong>${escapeHtml(identifier)}</strong>
+                        </div>
+                        <div class="sub-info">
+                            📅 ${escapeHtml(item.entry_datetime || '—')}
+                            <span class="status-dot" style="background:${statusColor}"></span>
+                            <span>${item.status || '—'}</span>
+                        </div>
+                        ${item.given_by && row.level === 'bundle' ? `<div class="given-badge">🎁 Given: ${escapeHtml(item.given_by)} → ${escapeHtml(item.given_to || '?')}</div>` : ''}
+                    </div>
+                </td>
+                <td>
+                    <div class="details-panel">
+                        ${renderDetails(item)}
+                    </div>
+                </td>
+                <td>
+                    <div class="metrics-grid">
+                        ${renderMetrics(item)}
+                    </div>
+                </td>
+                <td>
+                    <a href="${editUrl}" class="edit-link" target="_blank" rel="noopener noreferrer">
+                        ✏️ Edit ${row.level}
+                    </a>
+                    <div class="subnote">redirects to page</div>
+                </td>
+              </tr>`;
+        }
+        tbody.innerHTML = html;
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str).replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    function resetFilters() {
+        filterBundleId.value = '';
+        filterCutter.value = '';
+        filterSo.value = '';
+        filterProduct.value = '';
+        filterGivenTo.value = '';
+        renderTable();
+    }
+
+    function attachFilterEvents() {
+        filterBundleId.addEventListener('input', () => renderTable());
+        filterCutter.addEventListener('input', () => renderTable());
+        filterSo.addEventListener('input', () => renderTable());
+        filterProduct.addEventListener('input', () => renderTable());
+        filterGivenTo.addEventListener('input', () => renderTable());
+        resetBtn.addEventListener('click', resetFilters);
+    }
+
+    window.toggleExpand = toggleExpand;
+    initExpansions();
+    attachFilterEvents();
+    renderTable();
+</script>
+</div>

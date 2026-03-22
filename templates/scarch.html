@@ -46,17 +46,21 @@
 
     <script>
       $( function() {
-
-
+        {% if data["cuter_data"] %}
         $( "#cuter_name" ).autocomplete({
           source: {{ data["cuter_data"] | tojson}}
         });
+         {% endif %}
+        {% if data["product_data"] %}
         $( "#product_name" ).autocomplete({
           source: {{ data["product_data"] | tojson}}
         });
+         {% endif %}
+        {% if data["party_data"] %}
         $( "#party_name" ).autocomplete({
           source: {{ data["party_data"] | tojson}}
         });
+         {% endif %}
       } );
     </script>
 
