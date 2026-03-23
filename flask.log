@@ -3289,3 +3289,804 @@ INFO:root:Flask service starting
 INFO:waitress:Serving on http://127.0.0.1:5000
 INFO:root:Flask service starting
 INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+ERROR:app:Exception on /find_edit [POST]
+Traceback (most recent call last):
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/home/badx/Desktop/bh manfiation/app/route.py", line 558, in find_edit
+    if input_keys == {}:
+       ^^^^^^^^^^
+NameError: name 'input_keys' is not defined
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+ERROR:app:Exception on /find_edit [POST]
+Traceback (most recent call last):
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/home/badx/Desktop/bh manfiation/app/route.py", line 561, in find_edit
+    result = find_edit(current_form, input_data)
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+TypeError: register_routes.<locals>.find_edit() takes 0 positional arguments but 2 were given
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+ERROR:app:Exception on /find_edit [POST]
+Traceback (most recent call last):
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/home/badx/Desktop/bh manfiation/app/route.py", line 561, in find_edit
+    result = find_edit(current_user, input_data)
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+TypeError: register_routes.<locals>.find_edit() takes 0 positional arguments but 2 were given
+ERROR:app:Exception on /find_edit [POST]
+Traceback (most recent call last):
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/home/badx/Desktop/bh manfiation/app/route.py", line 561, in find_edit
+    result = find_edit(current_user, input_data)
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+TypeError: register_routes.<locals>.find_edit() takes 0 positional arguments but 2 were given
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+ERROR:app:Exception on /find_edit [POST]
+Traceback (most recent call last):
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/home/badx/Desktop/bh manfiation/app/route.py", line 561, in find_edit
+    result = find_edit_data(current_user, input_data)
+  File "/home/badx/Desktop/bh manfiation/app/data_Process.py", line 776, in find_edit_data
+    condtion.append(colume == data[k]["data"])
+                              ~~~~^^^
+KeyError: 'entry_datet'
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+ERROR:app:Exception on /find_edit [POST]
+Traceback (most recent call last):
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/sqlalchemy/engine/default.py", line 951, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.ProgrammingError: Error binding parameter 1: type 'set' is not supported
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/home/badx/Desktop/bh manfiation/app/route.py", line 561, in find_edit
+    result = find_edit_data(current_user, input_data)
+  File "/home/badx/Desktop/bh manfiation/app/data_Process.py", line 779, in find_edit_data
+    bundel = Bundle.query.filter(*condtion).all()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/sqlalchemy/orm/query.py", line 2704, in all
+    return self._iter().all()  # type: ignore
+           ~~~~~~~~~~^^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/sqlalchemy/orm/query.py", line 2857, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ~~~~~~~~~~~~~~~~~~~~^
+        statement,
+        ^^^^^^^^^^
+        params,
+        ^^^^^^^
+        execution_options={"_sa_orm_load_options": self.load_options},
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/sqlalchemy/orm/session.py", line 2351, in execute
+    return self._execute_internal(
+           ~~~~~~~~~~~~~~~~~~~~~~^
+        statement,
+        ^^^^^^^^^^
+    ...<4 lines>...
+        _add_event=_add_event,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/sqlalchemy/orm/session.py", line 2249, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self,
+        ^^^^^
+    ...<4 lines>...
+        conn,
+        ^^^^^
+    )
+    ^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/sqlalchemy/orm/context.py", line 306, in orm_execute_statement
+    result = conn.execute(
+        statement, params or {}, execution_options=execution_options
+    )
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 1419, in execute
+    return meth(
+        self,
+        distilled_parameters,
+        execution_options or NO_OPTIONS,
+    )
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/sqlalchemy/sql/elements.py", line 526, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self, distilled_params, execution_options
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 1641, in _execute_clauseelement
+    ret = self._execute_context(
+        dialect,
+    ...<8 lines>...
+        cache_hit=cache_hit,
+    )
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 1846, in _execute_context
+    return self._exec_single_context(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        dialect, context, statement, parameters
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 1986, in _exec_single_context
+    self._handle_dbapi_exception(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        e, str_statement, effective_parameters, cursor, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 2355, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/sqlalchemy/engine/default.py", line 951, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+sqlalchemy.exc.ProgrammingError: (sqlite3.ProgrammingError) Error binding parameter 1: type 'set' is not supported
+[SQL: SELECT "Bundle".id AS "Bundle_id", "Bundle".entry_datetime AS "Bundle_entry_datetime", "Bundle".lump_id AS "Bundle_lump_id", "Bundle".product AS "Bundle_product", "Bundle".color AS "Bundle_color", "Bundle".pieces AS "Bundle_pieces", "Bundle".kg AS "Bundle_kg", "Bundle"."type_B" AS "Bundle_type_B", "Bundle".given_to AS "Bundle_given_to", "Bundle".given_by AS "Bundle_given_by", "Bundle".given_date AS "Bundle_given_date", "Bundle".status AS "Bundle_status", "Bundle".s_no AS "Bundle_s_no" 
+FROM "Bundle" 
+WHERE "Bundle".s_no = ?]
+[parameters: ({1},)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+ERROR:app:Exception on /find_edit [POST]
+Traceback (most recent call last):
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/home/badx/Desktop/bh manfiation/app/route.py", line 561, in find_edit
+    result = find_edit_data(current_user, input_data)
+  File "/home/badx/Desktop/bh manfiation/app/data_Process.py", line 783, in find_edit_data
+    print(bun.to_dict2("badx"))
+          ^^^^^^^^^^^^
+AttributeError: 'Bundle' object has no attribute 'to_dict2'. Did you mean: 'to_dict'?
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+ERROR:app:Exception on /find_edit [POST]
+Traceback (most recent call last):
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/home/badx/Desktop/bh manfiation/app/route.py", line 573, in find_edit
+    return render_template("admin.html", date_from=current_form, type="PRODUCT_find_edit",data=data_autofill)
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/templating.py", line 149, in render_template
+    template = app.jinja_env.get_or_select_template(template_name_or_list)
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/jinja2/environment.py", line 1087, in get_or_select_template
+    return self.get_template(template_name_or_list, parent, globals)
+           ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/jinja2/environment.py", line 1016, in get_template
+    return self._load_template(name, globals)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/jinja2/environment.py", line 975, in _load_template
+    template = self.loader.load(self, name, self.make_globals(globals))
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/jinja2/loaders.py", line 138, in load
+    code = environment.compile(source, name, filename)
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/jinja2/environment.py", line 771, in compile
+    self.handle_exception(source=source_hint)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/home/badx/Desktop/bh manfiation/app/templates/admin.html", line 815, in template
+    {% include "find_and_edit.html" %}
+    ^^^^^^^^^^^^^^^^^^^^
+jinja2.exceptions.TemplateSyntaxError: expected token 'end of statement block', got '{'
+ERROR:app:Exception on /find_edit [POST]
+Traceback (most recent call last):
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/home/badx/Desktop/bh manfiation/app/route.py", line 573, in find_edit
+    return render_template("admin.html", date_from=current_form, type="PRODUCT_find_edit",data=data_autofill)
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/templating.py", line 149, in render_template
+    template = app.jinja_env.get_or_select_template(template_name_or_list)
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/jinja2/environment.py", line 1087, in get_or_select_template
+    return self.get_template(template_name_or_list, parent, globals)
+           ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/jinja2/environment.py", line 1016, in get_template
+    return self._load_template(name, globals)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/jinja2/environment.py", line 975, in _load_template
+    template = self.loader.load(self, name, self.make_globals(globals))
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/jinja2/loaders.py", line 138, in load
+    code = environment.compile(source, name, filename)
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/jinja2/environment.py", line 771, in compile
+    self.handle_exception(source=source_hint)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/home/badx/Desktop/bh manfiation/app/templates/admin.html", line 815, in template
+    {% include "find_and_edit.html" %}
+    ^^^^^^^^^^^^^^^^^^^^
+jinja2.exceptions.TemplateSyntaxError: expected token 'end of statement block', got '{'
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+ERROR:app:Exception on /find_edit [POST]
+Traceback (most recent call last):
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/home/badx/Desktop/bh manfiation/app/route.py", line 573, in find_edit
+    return render_template("admin.html", date_from=current_form, type="PRODUCT_find_edit",data=data_autofill)
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/templating.py", line 149, in render_template
+    template = app.jinja_env.get_or_select_template(template_name_or_list)
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/jinja2/environment.py", line 1087, in get_or_select_template
+    return self.get_template(template_name_or_list, parent, globals)
+           ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/jinja2/environment.py", line 1016, in get_template
+    return self._load_template(name, globals)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/jinja2/environment.py", line 975, in _load_template
+    template = self.loader.load(self, name, self.make_globals(globals))
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/jinja2/loaders.py", line 138, in load
+    code = environment.compile(source, name, filename)
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/jinja2/environment.py", line 771, in compile
+    self.handle_exception(source=source_hint)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/home/badx/Desktop/bh manfiation/app/templates/admin.html", line 814, in template
+    {% include "scarch.html"}
+    ^^^^^^^^^^^^^^^^^^^^^^
+jinja2.exceptions.TemplateSyntaxError: unexpected '}'
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+ERROR:app:Exception on /find_edit [POST]
+Traceback (most recent call last):
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/home/badx/Desktop/bh manfiation/app/route.py", line 561, in find_edit
+    result = find_edit_data(current_user, input_data)
+  File "/home/badx/Desktop/bh manfiation/app/data_Process.py", line 796, in find_edit_data
+    colume = getattr(Bundle, k)
+AttributeError: type object 'Bundle' has no attribute 'cut_by'
+ERROR:app:Exception on /find_edit [POST]
+Traceback (most recent call last):
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/home/badx/Desktop/bh manfiation/app/route.py", line 561, in find_edit
+    result = find_edit_data(current_user, input_data)
+  File "/home/badx/Desktop/bh manfiation/app/data_Process.py", line 796, in find_edit_data
+    colume = getattr(Bundle, k)
+AttributeError: type object 'Bundle' has no attribute 'cut_by'
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+ERROR:app:Exception on /find_edit [POST]
+Traceback (most recent call last):
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/home/badx/Desktop/bh manfiation/app/route.py", line 561, in find_edit
+    result = find_edit_data(current_user, input_data)
+  File "/home/badx/Desktop/bh manfiation/app/data_Process.py", line 797, in find_edit_data
+    condtion.append(colume == data[k]["data"])
+    ^^^^^^^^
+NameError: name 'condtion' is not defined. Did you mean: 'condtion_b'?
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+ERROR:app:Exception on /find_edit [POST]
+Traceback (most recent call last):
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/home/badx/Desktop/bh manfiation/app/route.py", line 561, in find_edit
+    result = find_edit_data(current_user, input_data)
+  File "/home/badx/Desktop/bh manfiation/app/data_Process.py", line 793, in find_edit_data
+    datetime.combine(data[k]["data"], time.min),  # 00:00:00 of start date
+                     ~~~~^^^
+KeyError: 'entry_datetime'
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+ERROR:app:Exception on /find_edit [POST]
+Traceback (most recent call last):
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/home/badx/Desktop/bh manfiation/app/route.py", line 561, in find_edit
+    result = find_edit_data(current_user, input_data)
+  File "/home/badx/Desktop/bh manfiation/app/data_Process.py", line 793, in find_edit_data
+    datetime.combine(data[k]["data"], time.min),  # 00:00:00 of start date
+                     ~~~~^^^
+KeyError: 'entry_datetime'
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+ERROR:app:Exception on /find_edit [POST]
+Traceback (most recent call last):
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/home/badx/Desktop/bh manfiation/app/route.py", line 561, in find_edit
+    result = find_edit_data(current_user, input_data)
+  File "/home/badx/Desktop/bh manfiation/app/data_Process.py", line 793, in find_edit_data
+    datetime.combine(data[k]["data"], time.min),  # 00:00:00 of start date
+                     ~~~~^^^
+KeyError: 'entry_datetime'
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+ERROR:app:Exception on /find_edit [POST]
+Traceback (most recent call last):
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/home/badx/Desktop/bh manfiation/app/route.py", line 561, in find_edit
+    result = find_edit_data(current_user, input_data)
+  File "/home/badx/Desktop/bh manfiation/app/data_Process.py", line 794, in find_edit_data
+    datetime.combine(data[k]["data"], time.min),  # 00:00:00 of start date
+                     ~~~~^^^
+KeyError: 'entry_datetime'
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+ERROR:app:Exception on /find_edit [POST]
+Traceback (most recent call last):
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/home/badx/Desktop/bh manfiation/app/route.py", line 561, in find_edit
+    result = find_edit_data(current_user, input_data)
+  File "/home/badx/Desktop/bh manfiation/app/data_Process.py", line 796, in find_edit_data
+    datetime.combine(data[k]["data"], time.min),  # 00:00:00 of start date
+                     ~~~~^^^
+KeyError: 'entry_datetime'
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+ERROR:app:Exception on /find_edit [POST]
+Traceback (most recent call last):
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/home/badx/Desktop/bh manfiation/app/route.py", line 561, in find_edit
+    result = find_edit_data(current_user, input_data)
+  File "/home/badx/Desktop/bh manfiation/app/data_Process.py", line 800, in find_edit_data
+    condtion_l.append(colume == data[k]["data"])
+                                ~~~~^^^
+KeyError: 'entry_datetime'
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+ERROR:app:Exception on /find_edit [POST]
+Traceback (most recent call last):
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/home/badx/Desktop/bh manfiation/app/route.py", line 561, in find_edit
+    result = find_edit_data(current_user, input_data)
+  File "/home/badx/Desktop/bh manfiation/app/data_Process.py", line 800, in find_edit_data
+    condtion_l.append(colume == data[k]["data"])
+                                ~~~~^^^
+KeyError: 'entry_datetime'
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+ERROR:app:Exception on /find_edit [POST]
+Traceback (most recent call last):
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/home/badx/Desktop/bh manfiation/app/route.py", line 561, in find_edit
+    result = find_edit_data(current_user, input_data)
+  File "/home/badx/Desktop/bh manfiation/app/data_Process.py", line 817, in find_edit_data
+    lump_data[bun.lump_id] = {
+    ~~~~~~~~~^^^^^^^^^^^^^
+TypeError: 'Lump' object does not support item assignment
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+ERROR:app:Exception on /find_edit [POST]
+Traceback (most recent call last):
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/home/badx/Desktop/bh manfiation/app/route.py", line 561, in find_edit
+    result = find_edit_data(current_user, input_data)
+  File "/home/badx/Desktop/bh manfiation/app/data_Process.py", line 816, in find_edit_data
+    lump_data =  Lump.get(bun.lump_id)
+                 ^^^^^^^^
+AttributeError: type object 'Lump' has no attribute 'get'
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+ERROR:app:Exception on /find_edit [POST]
+Traceback (most recent call last):
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/home/badx/Desktop/bh manfiation/app/route.py", line 561, in find_edit
+    result = find_edit_data(current_user, input_data)
+  File "/home/badx/Desktop/bh manfiation/app/data_Process.py", line 816, in find_edit_data
+    lump_data = Lump.get(bun.lump_id)
+                ^^^^^^^^
+AttributeError: type object 'Lump' has no attribute 'get'
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+ERROR:app:Exception on /find_edit [POST]
+Traceback (most recent call last):
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/home/badx/Desktop/bh manfiation/app/route.py", line 561, in find_edit
+    result = find_edit_data(current_user, input_data)
+  File "/home/badx/Desktop/bh manfiation/app/data_Process.py", line 816, in find_edit_data
+    lump_data = Lump.get(bun.lump_id)
+                ^^^^^^^^
+AttributeError: type object 'Lump' has no attribute 'get'
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+ERROR:app:Exception on /find_edit [POST]
+Traceback (most recent call last):
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/home/badx/Desktop/bh manfiation/app/route.py", line 561, in find_edit
+    result = find_edit_data(current_user, input_data)
+  File "/home/badx/Desktop/bh manfiation/app/data_Process.py", line 848, in find_edit_data
+    'given_date': bun.given_date.strftime("%a, %d %b %Y %H:%M:%S GMT"),
+                  ^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'strftime'
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+ERROR:app:Exception on /find_edit [POST]
+Traceback (most recent call last):
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/home/badx/Desktop/bh manfiation/app/route.py", line 561, in find_edit
+    result = find_edit_data(current_user, input_data)
+  File "/home/badx/Desktop/bh manfiation/app/data_Process.py", line 842, in find_edit_data
+    'bale_number': bale[lump_data[bun.lump_id]["bale_id"]]["bale_number"] if "bale_id" in lump_data[bun.lump_id]["bale_id"] else None,
+                                                                                          ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+KeyError: 'bale_id'
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000

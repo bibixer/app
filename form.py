@@ -259,16 +259,16 @@ class bale_data_form(FlaskForm):
     )
 
 class Find_and_edit(FlaskForm):
-    data_from = DateField(label="date of cut")
-    cutter_name = StringField(
+    entry_datetime = DateField(label="date of cut")
+    cut_by = StringField(
         "Cut By",
         render_kw={
             "placeholder": "Enter cutter name",
             "id": "cuter_name",
         }
     )
-    bundle_sn =  IntegerField(label="bundle so_number")
-    bundle_id = IntegerField(label="bundle id")
+    s_no =  IntegerField(label="bundle so_number")
+    id= IntegerField(label="bundle id")
     submit = SubmitField(
         "Submit",
         render_kw={

@@ -4,7 +4,7 @@ from form import Lump_data, bundle_invadata, Item_data, Outworker_form, Cutter_f
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from data_entry import add_cutter,add_items,add_outworker_db,add_jobcard,in_move_entery,bale_data_entry,add_party
 from data_Process import get_serch_data, get_job_card_data_creation, get_retun_card_data, get_movemet_data, \
-    get_current_week_range, home_dashboard,get_cutter_report_data,outworker_name,master_report_card,product_data
+    get_current_week_range, home_dashboard,get_cutter_report_data,outworker_name,master_report_card,product_data,find_edit_data
 from modes import User
 def reset_session(flow:int):
     # remove all bale lever1
@@ -534,28 +534,47 @@ def register_routes(app,db):
     ## find function
     @app.route("/find_edit",methods=["GET", "POST"])
     @login_required
-    # @oly_admin
+    @oly_admin
     def find_edit():
 
         current_form = Find_and_edit()
         data_autofill = {}
         data_autofill["cuter_data"]  = get_serch_data()["cuter_data"]
-        data_autofill['cuter_data'].append("all_bundle")
+        # data_autofill['cuter_data'].append("all_bundle")
         if current_form.is_submitted():
             data_sumit =  current_form.data.copy()
             data_sumit.pop('submit')
             data_sumit.pop('csrf_token')
-            date_keys =  ['data_from', 'cutter_name' ,'bundle_sn','bundle_id']
-            input_keys = []
+
+            date_keys =  ['entry_datetime', "cut_by" ,'s_no','id']
+            input_data = {}
             for k in date_keys:
                 print(data_sumit)
                 if data_sumit[k] != None:
                     if data_sumit[k] != "":
-                        input_keys.append(k)
-            # print(input_keys)
-            if input_keys == []:
+                        input_data[k] =  {"data":data_sumit[k]}
+
+            print(input_data)
+            if input_data == {}:
                 flash("need some input" , "danger")
                 return redirect(url_for("find_edit"))
+            result = find_edit_data(current_user, input_data)
+            if result == 404 :
+                flash("you ae not allowed ", "danger")
+                return redirect(url_for("find_edit"))
+            elif result == 403 :
+                flash("log in first ", "danger")
+                return redirect(url_for("find_edit"))
+            elif result == 405 :
+                flash("no data found  ", "danger")
+                return redirect(url_for("find_edit"))
+            else:
+                return render_template("admin.html", date_from=current_form, type="PRODUCT_find_edit",
+                                       data=data_autofill,backend_data= result)
+
+
+
+
 
 
         return render_template("admin.html", date_from=current_form, type="PRODUCT_find_edit",data=data_autofill)

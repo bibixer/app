@@ -602,8 +602,10 @@ if (nameFilter) {
                         <div class="inv-card-header">
                             <span class="inv-id-badge">ID: ${item.id}</span>
                             <span class="inv-name-badge">${escapeHtml(item.name)}</span>
+                            <span class="inv-name-badge" > <a href=/edit/lump/${item.id}>edit</a></span>
                         </div>
                         <div class="inv-details-grid">
+
                             <div class="inv-detail-row"><span class="inv-detail-label">✂️ Cutter</span><span class="inv-detail-value">${escapeHtml(item.cutter_name)}</span></div>
                             <div class="inv-detail-row"><span class="inv-detail-label">🔢 SO No</span><span class="inv-detail-value">${item.so_no}</span></div>
                             <div class="inv-detail-row"><span class="inv-detail-label">📅 Date</span><span class="inv-detail-value">${formatDateDisplay(item.cutting_date)}</span></div>

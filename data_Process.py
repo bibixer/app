@@ -726,36 +726,114 @@ def product_data (data:dict,current_user):
 
 
 
-# data needy by edit find
-#     const baseData = [
-#         // Bundle/Lump data with given_by and given_to (from the provided record)
-#         {
-#             id: 1935, level: 'lump', lump_id: 887, bale_number: 7902, bale_id: 2,
-#             cutter: 'RAJENDRA', entry_datetime: 'Wed, 18 Mar 2026 18:18:31 GMT',
-#             given_by: 'chandan', given_date: 'Thu, 19 Mar 2026 11:15:15 GMT',
-#             given_to: '38***VIDYA--38/-', kg: 4.61, lot_number: '9090X1',
-#             meter: 47.0, packing_date: '2026-03-18', pieces: 20,
-#             product: 'MAHAMAYA 2MTR', status: 'GIVEN', supplier: 'UNKNOW',
-#             type_B: 'lump', so_number: 202,
-#             // Lump specific fields
-#             cut_by: 'RAJENDRA', bundle_type: 'good_cut', meters: 47.0,
-#             meters_add_remove: 1.5, color: 'RED', number_of_bundlie: 2
-#         },
-#         // Bundles under this lump
-#         {
-#             id: 4001, level: 'bundle', bundle_id: 8001, lump_id: 887,
-#             product: 'MAHAMAYA 2MTR', color: 'RED', pieces: 12, kg: 2.76,
-#             type_B: 'bundle', no_of_so: 202, status: 'GIVEN',
-#             entry_datetime: '2026-03-18 18:30:00',
-#             given_by: 'chandan', given_date: 'Thu, 19 Mar 2026 11:15:15 GMT',
-#             given_to: '38***VIDYA--38/-'
-#         },
-#         {
-#             id: 4002, level: 'bundle', bundle_id: 8002, lump_id: 887,
-#             product: 'MAHAMAYA 2MTR', color: 'BLUE', pieces: 8, kg: 1.85,
-#             type_B: 'bundle', no_of_so: 202, status: 'READY',
-#             entry_datetime: '2026-03-18 19:00:00',
-#             given_by: null, given_date: null, given_to: null
-#         },
 
+
+def find_edit_data(current_user,data:dict):
+    if current_user.is_authenticated:
+        if current_user.role != 1:
+            return 404
+    if not current_user.is_authenticated:
+        return 403
+    final_data = []
+    bundle_colume  = ['entry_datetime' ,'s_no','id']
+    # column = getattr(Bundle, field)
+    # conditions.append(column == value)
+    lump_clome =  ['cut_by','entry_datetime']
+
+    condtion_b =  []
+    condtion_l = []
+
+    for k in bundle_colume:
+        if k in data.keys():
+
+            if k == "entry_datetime":
+                colume =  getattr(Bundle, k)
+                condtion_b.append(colume.between(
+                    datetime.combine(data[k]["data"], time.min),  # 00:00:00 of start date
+                    datetime.combine(data[k]["data"], time.max)))
+            else:
+                colume = getattr(Bundle, k)
+                condtion_b.append(colume == data[k]["data"])
+
+    lup_id = []
+
+    if 'cut_by' in data.keys():
+        for k in lump_clome:
+            if k == "entry_datetime":
+                if "entry_datetime" in data.keys():
+                    colume =  getattr(Lump, k)
+                    condtion_l.append(colume.between(
+                        datetime.combine(data[k]["data"], time.min),  # 00:00:00 of start date
+                        datetime.combine(data[k]["data"], time.max)))
+            else:
+                colume = getattr(Lump, k)
+                condtion_l.append(colume == data[k]["data"])
+        subquery = Lump.query.filter(*condtion_l).with_entities(Lump.id)
+
+        condtion_b.append(Bundle.lump_id.in_(subquery))
+
+
+
+    bundel = Bundle.query.filter(*condtion_b).all()
+    if bundel == []:
+        #  no data found
+        return 405
+    # print(bundel)
+    lump_data = {}
+    bale = {}
+
+    for bun in bundel:
+        lump_id = bun.lump_id
+
+        # ---- LUMP ----
+        if lump_id not in lump_data:
+            lump_obj = Lump.query.get(lump_id)
+
+            lump_data[lump_id] = {
+                "cut_by": lump_obj.cut_by,
+                "meters": lump_obj.meters,
+                "meters_add_remove": lump_obj.meters_add_remove,
+            }
+
+            # ---- BALE ----
+            if lump_obj.bale_id:
+                bale_id = lump_obj.bale_id
+                lump_data[lump_id]["bale_id"] = bale_id
+
+                if bale_id not in bale:
+                    bale_obj = Bale_date.query.get(bale_id)
+
+                    bale[bale_id] = {
+                        "part_name": bale_obj.part_name,
+                        "lot_number": f"{bale_obj.lot_number}X{bale_obj.lot_count}",
+                        "bale_date": bale_obj.bale_date,
+                        "bale_number": bale_obj.bale_number,
+                    }
+        data_a =  {
+                    'lump_id': bun.lump_id,
+                    'bale_number': bale[lump_data[bun.lump_id]["bale_id"]]["bale_number"] if "bale_id" in lump_data[bun.lump_id].keys() else None,
+                    'bale_id':  lump_data[bun.lump_id]["bale_id"]  if "bale_id" in lump_data[bun.lump_id].keys() else None,
+                    'bundle_id': bun.id,
+                    'cutter': lump_data[bun.lump_id]["cut_by"],
+                    'entry_datetime': bun.entry_datetime.strftime("%a, %d %b %Y %H:%M:%S GMT"),
+                    'given_by': bun.given_by,
+                    'given_date': bun.given_date.strftime("%a, %d %b %Y %H:%M:%S GMT") if bun.given_date else None,
+                    'given_to': bun.given_to,
+                    'kg': bun.kg,
+                    'lot_number': bale[lump_data[bun.lump_id]["bale_id"]]["lot_number"] if "bale_id" in lump_data[bun.lump_id].keys() else None,
+                    'meter': lump_data[bun.lump_id]["meters"],
+                    'packing_date': bale[lump_data[bun.lump_id]["bale_id"]]["bale_date"].strftime("%Y-%m-%d") if "bale_id" in lump_data[bun.lump_id].keys() else None,
+                    'pieces': bun.pieces,
+                    'product': bun.product,
+                    'status': bun.status,
+                    'supplier': bale[lump_data[bun.lump_id]["bale_id"]]["part_name"] if "bale_id" in lump_data[bun.lump_id].keys() else None,
+                    'type_B': bun.type_B,
+                    'so_number': bun.s_no,
+                    'meters_add_remove': lump_data[bun.lump_id]["meters_add_remove"],
+                    'color': bun.color
+
+        }
+        # print(data_a)
+        final_data.append(data_a)
+    return  final_data
 
