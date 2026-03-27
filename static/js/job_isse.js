@@ -78,9 +78,11 @@ custInput.addEventListener("blur", () =>
 );
 
 /* ================= TABLE ROW ================= */
+let so_number = 0;
 function addRow() {
   const tr = document.createElement("tr");
-  tr.innerHTML = `
+  so_number += 1;
+  tr.innerHTML = `                                                                        <td><input class="so_numbe" readonly value=${so_number}></td>
                                                                                         <td>
                                                                                           <div class="input-group">
                                                                                             <input class="item-id" autocomplete="off" placeholder="Item ID / Name">
@@ -127,6 +129,7 @@ function addRow() {
                                                                                     </td>
                                                                                         <td><button type="button" class="btn-remove">×</button></td>
                                                                                       `;
+  // so_number += 1;
 
   const idInput = tr.querySelector(".item-id");
   const sug = tr.querySelector(".suggestions");
@@ -168,9 +171,8 @@ function addRow() {
       tr.querySelector(".item-type").value = item.type;
       tr.querySelector(".item-qty").value = item.pics;
       tr.querySelector(".item-kg").value = item.kg;
-      tr.querySelector(".item-kg-avg").value = (item.kg / item.pics);
+      tr.querySelector(".item-kg-avg").value = item.kg / item.pics;
       tr.querySelector(".item-cloth-avg").value = item.avg_cloth;
-
 
       updateTotalKg();
       updadateTotalPics();
@@ -222,7 +224,7 @@ function addRow() {
       tr.querySelector(".item-type").value = item.type;
       tr.querySelector(".item-qty").value = item.pics;
       tr.querySelector(".item-kg").value = item.kg;
-      tr.querySelector(".item-kg-avg").value = (item.kg / item.pics);
+      tr.querySelector(".item-kg-avg").value = item.kg / item.pics;
       tr.querySelector(".item-cloth-avg").value = item.avg_cloth;
 
       updateTotalKg();
@@ -239,6 +241,7 @@ function addRow() {
   );
 
   tr.querySelector(".btn-remove").addEventListener("click", () => {
+    so_number = so_number - 1;
     if (tbody.rows.length > 1) tr.remove();
     else tr.querySelectorAll("input").forEach((i) => (i.value = ""));
     updateTotalKg();
@@ -332,64 +335,64 @@ async function submitData() {
       }
     }
 
-function buildPrintHTML(jobData) {
-  const summaryMap = {};
-  const productTypeGroups = {}; // Track groups by name and type
+    function buildPrintHTML(jobData) {
+      const summaryMap = {};
+      const productTypeGroups = {}; // Track groups by name and type
 
-  jobData.items.forEach((item) => {
-    const key = item.name_of_prduct + "||" + item.type + "||" + item.qty;
+      jobData.items.forEach((item) => {
+        const key = item.name_of_prduct + "||" + item.type + "||" + item.qty;
 
-    if (!summaryMap[key]) {
-      summaryMap[key] = {
-        name: item.name_of_prduct,
-        type: item.type,
-        qty: item.qty,
-        count: 0,
-        idKgPairs: [],
-      };
-    }
+        if (!summaryMap[key]) {
+          summaryMap[key] = {
+            name: item.name_of_prduct,
+            type: item.type,
+            qty: item.qty,
+            count: 0,
+            idKgPairs: [],
+          };
+        }
 
-    summaryMap[key].count++;
-    summaryMap[key].idKgPairs.push(`[${item.item_id}/-]`);
+        summaryMap[key].count++;
+        summaryMap[key].idKgPairs.push(`[${item.item_id}/-]`);
 
-    // Track product type groups for subtotal calculation
-    const productKey = item.name_of_prduct + "||" + item.type;
-    if (!productTypeGroups[productKey]) {
-      productTypeGroups[productKey] = {
-        entries: [],
-        totalQty: 0
-      };
-    }
-  });
+        // Track product type groups for subtotal calculation
+        const productKey = item.name_of_prduct + "||" + item.type;
+        if (!productTypeGroups[productKey]) {
+          productTypeGroups[productKey] = {
+            entries: [],
+            totalQty: 0,
+          };
+        }
+      });
 
-  // Calculate totals for each product type
-  Object.values(summaryMap).forEach((item) => {
-    const productKey = item.name + "||" + item.type;
-    if (productTypeGroups[productKey]) {
-      const total = item.qty * item.count;
-      productTypeGroups[productKey].entries.push(item);
-      productTypeGroups[productKey].totalQty += total;
-    }
-  });
+      // Calculate totals for each product type
+      Object.values(summaryMap).forEach((item) => {
+        const productKey = item.name + "||" + item.type;
+        if (productTypeGroups[productKey]) {
+          const total = item.qty * item.count;
+          productTypeGroups[productKey].entries.push(item);
+          productTypeGroups[productKey].totalQty += total;
+        }
+      });
 
-  let tableRows = "";
-  let total_all= ""
-  let index = 1;
+      let tableRows = "";
+      let total_all = "";
+      let index = 1;
 
-  // Sort items by product name and type for better grouping
-  const sortedItems = Object.values(summaryMap).sort((a, b) => {
-    if (a.name === b.name) {
-      return a.type.localeCompare(b.type);
-    }
-    return a.name.localeCompare(b.name);
-  });
+      // Sort items by product name and type for better grouping
+      const sortedItems = Object.values(summaryMap).sort((a, b) => {
+        if (a.name === b.name) {
+          return a.type.localeCompare(b.type);
+        }
+        return a.name.localeCompare(b.name);
+      });
 
-  sortedItems.forEach((item) => {
-    const productKey = item.name + "||" + item.type;
-    const total = item.qty * item.count;
-    const idKgDisplay = item.idKgPairs.join(', ');
+      sortedItems.forEach((item) => {
+        const productKey = item.name + "||" + item.type;
+        const total = item.qty * item.count;
+        const idKgDisplay = item.idKgPairs.join(", ");
 
-    tableRows += `
+        tableRows += `
       <tr>
         <td><h3>${index}</h3></td>
         <td><h2>${item.name}</h2><p>${idKgDisplay}</p></td>
@@ -398,13 +401,17 @@ function buildPrintHTML(jobData) {
       </tr>
     `;
 
-    // Check if this is the last entry for this product type
-    const isLastInGroup = sortedItems.indexOf(item) === sortedItems.length - 1 ||
-                          productKey !== (sortedItems[sortedItems.indexOf(item) + 1]?.name + "||" + sortedItems[sortedItems.indexOf(item) + 1]?.type);
+        // Check if this is the last entry for this product type
+        const isLastInGroup =
+          sortedItems.indexOf(item) === sortedItems.length - 1 ||
+          productKey !==
+            sortedItems[sortedItems.indexOf(item) + 1]?.name +
+              "||" +
+              sortedItems[sortedItems.indexOf(item) + 1]?.type;
 
-    // If this is the last item in a product type group and there are multiple entries, show subtotal
-    if (isLastInGroup && productTypeGroups[productKey].entries.length > 0) {
-      total_all += `
+        // If this is the last item in a product type group and there are multiple entries, show subtotal
+        if (isLastInGroup && productTypeGroups[productKey].entries.length > 0) {
+          total_all += `
 
 
             <h2>Total ${item.name} ${item.type}: ${productTypeGroups[productKey].totalQty}</h2>
@@ -412,17 +419,17 @@ function buildPrintHTML(jobData) {
 
         <!-- Spacer row -->
       `;
-    }
+        }
 
-    index++;
-  });
+        index++;
+      });
 
       return `
                               <!doctype html>
                               <html lang="en">
                               <head>
                               <meta charset="UTF-8">
-                              <title>${jobData.jobId +"--" + jobData.party }</title>
+                              <title>${jobData.jobId + "--" + jobData.party}</title>
 
                               <style>
                               @page { size: A5 portrait; margin: 0; }
@@ -731,7 +738,7 @@ function handleQRInput(rawValue, tr, idInput) {
   tr.querySelector(".item-type").value = item.type;
   tr.querySelector(".item-qty").value = item.pics;
   tr.querySelector(".item-kg").value = item.kg;
-  tr.querySelector(".item-kg-avg").value = (item.kg / item.pics);
+  tr.querySelector(".item-kg-avg").value = item.kg / item.pics;
   tr.querySelector(".item-cloth-avg").value = item.avg_cloth;
 
   updateTotalKg();

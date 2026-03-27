@@ -182,7 +182,7 @@ def get_movemet_data(master_name):
                 item_id += 1
                 result["items"].append({
                     "item_id": item_id,
-                    "name": product,
+                    "name": product.replace(" ","_"),
                     "colour": type_b,
                     "issued": balance,
                     "history": []

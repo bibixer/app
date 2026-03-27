@@ -377,21 +377,26 @@ def register_routes(app,db):
         return render_template("job_retun.html",data=data,id=current_user.role)
     @app.route("/summit-retune", methods=["POST"])
     @login_required
-    @oly_admin
+    # @oly_admin
     def summit_retune():
         data = request.get_json()
+
         res = in_move_entery(data,current_user)
-        if res["code"] == 101 :
-         # print(res)
-         return jsonify(success=True, message="Data saved",jobData=res)
+        print(res)
+        if type(res) == dict:
+            if res["code"] == 101:
+             # print(res)
+                return jsonify(success=True, message="Data saved",jobData=res)
         elif res  == 404 :
-            return jsonify(success=False, message="Data not  saved iisue")
+            return jsonify(success=False, message="Data not  saved iisue",code=404)
         elif res == 401:
-            return jsonify(success=False, message="name of master not in data base ")
+            return jsonify(success=False, message="name of master not in data base ",code=401)
         elif res == 403:
-            return jsonify(success=False, message="item do not macha base ")
+            return jsonify(success=False, message="item do not macha base ",code=403)
         elif res == 405:
-            return jsonify(success=False, message="send data not right ")
+            return jsonify(success=False, message="send data not right ",code=405)
+        else:
+            return jsonify(success=False, message="item do not macha base ", code=res)
     @app.route("/admin_dashord", methods=["GET", "POST"])
     @login_required
     @oly_admin
@@ -578,3 +583,21 @@ def register_routes(app,db):
 
 
         return render_template("admin.html", date_from=current_form, type="PRODUCT_find_edit",data=data_autofill)
+
+    @app.route("/edit/<string:type_enty>/<int:entry_id>",methods=['GET'])
+    @login_required
+    @oly_admin
+    def edit(type_enty, entry_id):
+        if current_user.role != 4:
+            flash("403 Forbidden: You do not have permission to access this page.")
+            return redirect("/")
+        # / edit / bale / ;
+        #  / edit / lump / ${item.lump_id}`;
+        # return ` / edit / bundle /
+        #
+        try:
+            entry_id = int(entry_id)
+            type_entry = str(type_entry).lower()
+        except (ValueError, TypeError):
+            flash("Invalid entry ID or type.")
+            return redirect("/")

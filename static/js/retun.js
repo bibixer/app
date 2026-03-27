@@ -176,12 +176,13 @@ async function submitReturn() {
   });
 
   const data_R = await response.json();
+  console.log(data_R);
   if (data_R.success) {
     generateAndPrintHTML(data_R.jobData.jobData);
     window.location.replace("/retune_product?ok=101");
   }
   if (!data_R.success) {
-    window.location.replace("/retune_product?ok=401");
+    window.location.replace(`/retune_product?ok=${data_R.code}`);
   }
 
   function generateAndPrintHTML(jobData) {

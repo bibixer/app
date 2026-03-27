@@ -367,7 +367,7 @@
                 <input type="text" id="filterCutter" placeholder="RAJENDRA, chandan">
             </div>
             <div class="filter-group">
-                <label>🔢 SO / Lot number</label>
+                <label>🔢 SO / bale number</label>
                 <input type="text" id="filterSo" placeholder="202, 9090X1">
             </div>
             <div class="filter-group">
@@ -575,7 +575,7 @@
         const soVal = filterSo.value.trim().toLowerCase();
         if (soVal) {
             const soField = String(item.so_number || '');
-            const lotField = String(item.lot_number || '');
+            const lotField = String(item.bale_number || '');
             if (!soField.includes(soVal) && !lotField.includes(soVal)) return false;
         }
 
@@ -660,6 +660,7 @@
         }
         return `
             <div class="detail-line"><span class="detail-label">🆔 ${item.level === 'lump' ? 'Lump ID' : 'Bundle ID'}</span><span class="detail-value"><strong>${item.level === 'lump' ? item.lump_id : item.bundle_id}</strong></span></div>
+
             <div class="detail-line"><span class="detail-label">📦 Product</span><span class="detail-value">${escapeHtml(item.product || '—')}</span></div>
             <div class="detail-line"><span class="detail-label">🎨 Color</span><span class="detail-value">${escapeHtml(item.color || '—')}</span></div>
 
@@ -687,7 +688,7 @@
     function getLevelIdentifier(item) {
         if (item.level === 'bale') return `Bale #${item.bale_number}`;
         if (item.level === 'lump') return `Lump ID ${item.lump_id} · ${item.product || ''}`;
-        return `Bundle #${item.bundle_id} · ${item.product || ''}`;
+        return `Bundle #${item.bundle_id} --${item.cutter} --${item.so_number} · ${item.product || ''}`;
     }
 
     function getEditUrl(item) {

@@ -138,7 +138,9 @@ def add_outworker_db(data,current_user):
 # @error_hendle
 def check_name_master(data):
     all_data = outworker_name(oly_full_name=True)
-    if data in all_data:
+    # print(all_data)
+    # print(str(data))
+    if str(data) in all_data:
         return True
     else:
         return False
@@ -284,19 +286,21 @@ def check_return_item(data):
 
         # 1️⃣ Check ID exists
         if item_id not in db_items:
-            return False
+            return 4031
 
         db_item = db_items[item_id]
 
         # 2️⃣ Check name matches for same ID
-        if db_item["name"] != token_name:
-            return False
+        print(token_name.lstrip())
+        print(db_item["name"].lstrip())
+        if db_item["name"].lstrip()!= token_name.lstrip() :
+            return 4032
 
         # 3️⃣ Check quantity rule
         if returned_qty > db_item["issued"]:
-            return False
+            return 4033
         if type_B != db_item["colour"]:
-            return False
+            return 4034
 
 
     return True,
@@ -308,14 +312,14 @@ def in_move_entery(data,current_user):
         if not check_name_master(data['name']):
             # print(data['name'])
             return 401
-
-        if not check_return_item(data):
-            return 403
+        check_i = check_return_item(data)
+        if  type(check_i) == int:
+            return check_i
         for item in data['items']:
             job_movement = Jobmovement(
                 date=datetime.now(),
                 partculer = f"taken {item["name_of_product"]} from {data['name']} by {current_user.username}",
-                product_name = item["name_of_product"],
+                product_name = item["name_of_product"].replace("_"," "),
                 name_of_mater = data['name'],
                 enter_user = current_user.username,
                 flow_type = "IN",
@@ -334,6 +338,7 @@ def in_move_entery(data,current_user):
             "username":current_user.username
         }
     }
+
     except:
         return 404
 

@@ -35,23 +35,22 @@
         height: 100vh; /* full viewport height */
       }
 
-     .bill-card {
-    max-width: 1400px;
-    width: 100%;
-    margin: 0 auto;
-    background: var(--white);
-    padding: 32px;
-    border-radius: 24px;
-    box-shadow: var(--shadow-lg);
-    position: relative;
-    z-index: 1;
-    max-height: 90vh;
-    overflow-y: auto;
-    overflow-x: auto;
-    scroll-behavior: smooth;
-    margin-top: 100px;
-}
-
+      .bill-card {
+        max-width: 1400px;
+        width: 100%;
+        margin: 0 auto;
+        background: var(--white);
+        padding: 32px;
+        border-radius: 24px;
+        box-shadow: var(--shadow-lg);
+        position: relative;
+        z-index: 1;
+        max-height: 90vh;
+        overflow-y: auto;
+        overflow-x: auto;
+        scroll-behavior: smooth;
+        margin-top: 100px;
+      }
 
       h2 {
         margin-top: 0;
@@ -306,20 +305,19 @@
         }
       }
       /* Sticky Header */
-.form-header {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 20px;
-    margin-bottom: 24px;
-    position: sticky;
-    top: 0;
-    background: var(--white);
-    z-index: 100;
-    padding: 16px 0;
-    margin-top: -16px;
-    border-bottom: 1px solid var(--border);
-}
-
+      .form-header {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 20px;
+        margin-bottom: 24px;
+        position: sticky;
+        top: 0;
+        background: var(--white);
+        z-index: 100;
+        padding: 16px 0;
+        margin-top: -16px;
+        border-bottom: 1px solid var(--border);
+      }
     </style>
   </head>
 
@@ -349,15 +347,16 @@
         <table id="billTable">
           <thead>
             <tr>
-<th style="width: 20%;">Item ID / Search</th>
-<th style="width: 15%;">Item Name</th>
-<th style="width: 10%;">Colour</th>
-<th style="width: 10%;">Type</th>
-<th style="width: 10%;">Pics</th>
-<th style="width: 10%;">KG</th>
-<th style="width: 10%;">Avg KG</th>
-<th style="width: 10%;">Avg cloth</th>
-<th style="width: 4%;"></th>
+              <th style="width: 8%">so.</th>
+              <th style="width: 20%">Item ID / Search</th>
+              <th style="width: 15%">Item Name</th>
+              <th style="width: 10%">Colour</th>
+              <th style="width: 10%">Type</th>
+              <th style="width: 10%">Pics</th>
+              <th style="width: 10%">KG</th>
+              <th style="width: 9%">Avg KG</th>
+              <th style="width: 9%">Avg cloth</th>
+              <th style="width: 2%"></th>
             </tr>
           </thead>
           <tbody></tbody>
@@ -419,6 +418,6 @@
       }
     </style>
     <script src="static/js/job_isse.js"></script>
-       {% include "side_bar.html" %}
+    {% include "side_bar.html" %}
   </body>
 </html>
