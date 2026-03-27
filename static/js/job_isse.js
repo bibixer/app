@@ -653,8 +653,11 @@ document.addEventListener("keydown", (e) => {
 
   // Skip if suggestion dropdown is open
   const sug = el.closest(".input-group")?.querySelector(".suggestions");
-  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "a") {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "m") {
     submitData();
+  }
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "i") {
+     window.location.replace("/retune_product")
   }
   if (sug && !sug.hidden) return;
 

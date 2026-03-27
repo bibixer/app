@@ -616,7 +616,7 @@
 
         // Keyboard shortcut for submit (Ctrl+A)
         document.addEventListener("keydown", (e) => {
-          if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "a") {
+          if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "m") {
             e.preventDefault();
             submitReturn();
           }

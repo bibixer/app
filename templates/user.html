@@ -24,10 +24,23 @@
         />
       </div>
 
+
       <div class="form-container">
+         {% if ret %}
+         <h3>Press Ctrl + I to open Job Card</h3>
+  <script>
+   document.addEventListener("keydown", (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "i") {
+    e.preventDefault(); // stop default browser action
+    window.location.replace("/jobcard");
+  }
+});
+  </script>
+  {% endif %}
         <h2>{{form_name}}</h2>
         {{ render_form( current_form, novalidate=True ) }} {% for message in
         get_flashed_messages() %}
+
 
         <div style="text-align: center"><h1>{{ message|safe }}</h1></div>
         {% endfor %}
@@ -38,5 +51,7 @@
 
     {% if id %} {% include "scarch.html" %} {%
     endif %}
+
+
   </body>
 </html>

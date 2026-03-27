@@ -359,7 +359,7 @@ def register_routes(app,db):
 
         return render_template("user.html",
                                form_name=form_name,
-                               current_form=current_form,data_r=data_r,id=current_user.role)
+                               current_form=current_form,data_r=data_r,id=current_user.role,ret=True)
     @app.route("/job_retun", methods=["GET", "POST"])
     @login_required
     @oly_admin
