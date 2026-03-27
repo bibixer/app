@@ -300,7 +300,24 @@ async function submitData() {
       errorEl.hidden = false;
     }
     alert("Bill submitted");
+    if (data_R.success){
     generateAndPrintHTML(data_R.jobData);
+      tbody.innerHTML = "";
+
+    // 2️⃣ clear customer & date
+    custInput.value = "";
+    billDate.value = "";
+
+    // 3️⃣ clear output/debug
+    output.textContent = "";
+
+    // 4️⃣ focus first field (fast entry UX)
+    custInput.focus();
+    addRow();
+    updateTotalKg();
+    updadateTotalPics();
+    updateSummaryTab();
+    location.reload();}
 
     function generateAndPrintHTML(jobData) {
       const fileName =
@@ -621,22 +638,7 @@ async function submitData() {
     /* ===== CLEAR EVERYTHING AFTER SUCCESS ===== */
 
     // 1️⃣ clear table rows
-    tbody.innerHTML = "";
 
-    // 2️⃣ clear customer & date
-    custInput.value = "";
-    billDate.value = "";
-
-    // 3️⃣ clear output/debug
-    output.textContent = "";
-
-    // 4️⃣ focus first field (fast entry UX)
-    custInput.focus();
-    addRow();
-    updateTotalKg();
-    updadateTotalPics();
-    updateSummaryTab();
-    location.reload();
 
     // <!--    output.textContent = JSON.stringify(data_R, null, 2)-->
   } catch (err) {

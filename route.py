@@ -315,10 +315,11 @@ def register_routes(app,db):
         data = request.get_json()
         ok = add_jobcard(data,current_user)
         # print(ok)
-        if ok["code"] == 101 :
-            return  jsonify(success=True, message="Data saved",jobData=ok["jobData"])
+        if type(ok) == dict:
+            if ok["code"] == 101:
+                return jsonify(success=True, message="Data saved", jobData=ok["jobData"])
         elif ok ==401:
-            return jsonify(success=False, message="name of master not in data base ")
+            return jsonify(success=False, message="Master name not found. Check spelling or turn off Caps Lock (scanner), or enter manually. ")
         elif ok == 403:
             return jsonify(success=False, message="product do not mach data base data base ")
         elif ok == 405:
