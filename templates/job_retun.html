@@ -5,11 +5,6 @@
     <meta charset="UTF-8" />
     <title>Job Return entry</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!--    <link rel="preconnect" href="https://fonts.googleapis.com" />-->
-    <!--    <link-->
-    <!--      rel="stylesheet"-->
-    <!--      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"-->
-    <!--    />-->
 
     <style>
       :root {
@@ -20,6 +15,7 @@
         --text-main: #1e293b;
         --text-muted: #64748b;
         --border: #e2e8f0;
+        --active-row: #eef2ff;
       }
 
       body {
@@ -31,8 +27,8 @@
       }
 
       .card {
-        width: 90%; /* make it wider */
-        max-width: 1200px; /* limit max width */
+        width: 90%;
+        max-width: 1400px;
         margin: auto;
         background: var(--card-bg);
         border-radius: 12px;
@@ -58,7 +54,6 @@
         color: var(--text-main);
       }
 
-      /* Top Stats Bar */
       .job-info-bar {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
@@ -81,9 +76,9 @@
         color: var(--text-main);
       }
 
-      /* Table Styling */
       .table-container {
         padding: 0 16px;
+        overflow-x: auto;
       }
       table {
         width: 100%;
@@ -98,15 +93,20 @@
         font-weight: 600;
         color: var(--text-muted);
         border-bottom: 2px solid var(--border);
+        background: #f8fafc;
       }
 
       td {
         padding: 16px 12px;
-        vertical-align: middle;
+        vertical-align: top;
         border-bottom: 1px solid var(--border);
+        transition: background-color 0.2s;
       }
 
-      /* Inputs & Badges */
+      tr.active-row {
+        background-color: var(--active-row);
+      }
+
       .id-badge {
         font-family: monospace;
         color: var(--primary);
@@ -120,31 +120,138 @@
         border-radius: 99px;
         font-size: 13px;
         font-weight: 600;
+        display: inline-block;
       }
       .remaining-badge.low {
         background: #fee2e2;
         color: #991b1b;
       }
 
-      input[type="number"] {
-        width: 80px;
+      .return-input {
+        width: 100px;
         padding: 8px 12px;
-        border: 1px solid var(--border);
+        border: 2px solid var(--border);
         border-radius: 6px;
         font-size: 14px;
-        transition: border-color 0.2s;
+        transition: all 0.2s;
+        font-weight: 500;
       }
-      input[type="number"]:focus {
+      .return-input:focus {
         outline: none;
         border-color: var(--primary);
         box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        background: #fff;
       }
 
-      /* History Styling */
+      /* Calculator Styles */
+      .calculator {
+        margin-top: 0;
+        padding: 8px;
+        background: #f8fafc;
+        border-radius: 8px;
+        border-left: 3px solid var(--primary);
+      }
+      .calculator-title {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--text-muted);
+        margin-bottom: 6px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .calc-rows-container {
+        max-height: 200px;
+        overflow-y: auto;
+      }
+      .calc-row {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+        margin-bottom: 6px;
+        flex-wrap: wrap;
+        padding: 6px;
+        background: white;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        transition: all 0.2s;
+      }
+      .calc-row:focus-within {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
+      }
+      .calc-input {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+      .calc-input label {
+        font-size: 11px;
+        color: var(--text-muted);
+        font-weight: 500;
+      }
+      .calc-input input {
+        width: 60px;
+        padding: 4px 6px;
+        font-size: 12px;
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        text-align: center;
+      }
+      .calc-input input:focus {
+        outline: none;
+        border-color: var(--primary);
+      }
+      .calc-total {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--primary);
+        margin-left: 4px;
+        min-width: 40px;
+      }
+      .remove-calc-btn {
+        background: #ef4444;
+        color: white;
+        border: none;
+        padding: 3px 8px;
+        border-radius: 4px;
+        font-size: 10px;
+        cursor: pointer;
+        transition: background 0.2s;
+        margin-left: auto;
+      }
+      .remove-calc-btn:hover {
+        background: #dc2626;
+      }
+      .calc-summary {
+        margin-top: 6px;
+        padding-top: 6px;
+        border-top: 1px solid var(--border);
+        font-size: 12px;
+        font-weight: 600;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .apply-calc-btn {
+        background: #10b981;
+        color: white;
+        border: none;
+        padding: 4px 12px;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      .apply-calc-btn:hover {
+        background: #059669;
+      }
+
       .history-toggle {
         cursor: pointer;
         color: var(--primary);
-        font-size: 13px;
+        font-size: 12px;
         font-weight: 500;
         display: flex;
         align-items: center;
@@ -157,7 +264,7 @@
         margin: 8px 0;
         padding: 12px;
         border-radius: 8px;
-        font-size: 13px;
+        font-size: 12px;
         border-left: 3px solid var(--primary);
       }
       .history-item {
@@ -168,7 +275,6 @@
         color: var(--text-main);
       }
 
-      /* Footer */
       .card-footer {
         padding: 24px 32px;
         background: #ffffff;
@@ -183,9 +289,14 @@
         font-weight: 600;
         cursor: pointer;
         transition: background 0.2s;
+        font-size: 14px;
       }
       .btn-submit:hover {
         background: var(--primary-hover);
+      }
+      .btn-submit:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.3);
       }
 
       .chevron {
@@ -195,13 +306,7 @@
       .chevron.open {
         transform: rotate(90deg);
       }
-      body {
-        margin: 0;
-        height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
+
       body {
         margin: 0;
         font-family: -apple-system, BlinkMacSystemFont, sans-serif;
@@ -215,13 +320,11 @@
         animation: gradient 15s ease infinite;
         background-size: 400% 400%;
         background-attachment: fixed;
-
-        /* Center card */
         display: flex;
         justify-content: center;
         align-items: center;
-        min-height: 100vh; /* full viewport height */
-        padding: 20px; /* space on small screens */
+        min-height: 100vh;
+        padding: 20px;
       }
 
       @keyframes gradient {
@@ -266,22 +369,31 @@
         2% {
           transform: translateX(1);
         }
-
         25% {
           transform: translateX(-25%);
         }
-
         50% {
           transform: translateX(-50%);
         }
-
         75% {
           transform: translateX(-25%);
         }
-
         100% {
           transform: translateX(1);
         }
+      }
+
+      .shortcut-hint {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: rgba(0,0,0,0.8);
+        color: white;
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-family: monospace;
+        z-index: 1000;
       }
     </style>
   </head>
@@ -297,10 +409,6 @@
       </div>
 
       <div class="job-info-bar">
-        <!--        <div class="info-group">-->
-        <!--          <label>ID</label>-->
-        <!--          <span id="jobId"></span>-->
-        <!--        </div>-->
         <div class="info-group">
           <label>Master Name</label>
           <span id="jobName"></span>
@@ -315,27 +423,28 @@
         <table id="returnTable">
           <thead>
             <tr>
-              <th>S.NO</th>
-              <th>product Name</th>
-              <th>Type</th>
-              <th>Balance</th>
-              <th>Return</th>
+              <th style="width: 5%">#</th>
+              <th style="width: 20%">Product Name</th>
+              <th style="width: 10%">Type</th>
+              <th style="width: 10%">Balance</th>
+              <th style="width: 12%">Return </th>
+              <th style="width: 43%">Quick Calc </th>
             </tr>
           </thead>
           <tbody></tbody>
         </table>
       </div>
-      <!-- <h2 id="error-message" hidden>erroe</h2> -->
       <div class="card-footer">
         <button onclick="submitReturn()" class="btn-submit">
-          Confirm Return
+          ✓ Confirm Return (Ctrl+A)
         </button>
       </div>
     </div>
-    <!-- <h2 id="error-message" hidden>erroe</h2> -->
+
     <script>
       const JOB_CARD = {{ data | tojson}};
     </script>
-    <script src="static/js/retun.js"></script>
+    <script src="static/js/retun.js">
+    </script>
   </body>
 </html>

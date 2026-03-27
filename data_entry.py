@@ -291,8 +291,8 @@ def check_return_item(data):
         db_item = db_items[item_id]
 
         # 2️⃣ Check name matches for same ID
-        print(token_name.lstrip())
-        print(db_item["name"].lstrip())
+        # print(token_name.lstrip())
+        # print(db_item["name"].lstrip())
         if db_item["name"].lstrip()!= token_name.lstrip() :
             return 4032
 

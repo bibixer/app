@@ -275,38 +275,3 @@ class Find_and_edit(FlaskForm):
             "class": "button"
         }
     )
-class bundle_edit(FlaskForm):
-    date_of_entry = DateField(
-        "date od entrty",
-        validators=[DataRequired()],
-        render_kw={
-            'disabled': True
-           ,
-        }
-    )
-    product_name = StringField(
-        "Product Name",
-        validators=[DataRequired()],
-        render_kw={
-            "placeholder": "Enter product name",
-            'id': "product_name",
-        }
-    )
-    cut_by = StringField(
-        "Cut By",
-        render_kw={
-            "placeholder": "Enter cutter name",
-            "id": "cuter_name",
-        }
-    )
-
-    no_of_so = IntegerField("sn.o", validators=[DataRequired()],
-                              render_kw={"placeholder": "Enter number of pics"})
-    no_of_pics = IntegerField("Number of Pics", validators=[DataRequired()],render_kw={"placeholder": "Enter number of pics"})
-    kg_of_bundle = FloatField("kg",validators=[DataRequired()],render_kw={"placeholder": "Enter kg"})
-    submit = SubmitField(
-        "Submit",
-        render_kw={
-            "class": "button"
-        }
-    )
