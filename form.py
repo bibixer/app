@@ -278,3 +278,144 @@ class Find_and_edit(FlaskForm):
 
 
 
+#     cuter_name = StringField(
+#         "Cut By",
+#         validators=[DataRequired()],
+#         render_kw={
+#             "placeholder": "Enter cutter name",
+#             "id": "cuter_name",
+#         }
+#     )
+#
+#     product_name = StringField(
+#         "Product Name autoupdate lump and bundle",
+#         validators=[DataRequired()],
+#         render_kw={
+#             "placeholder": "Enter product name",
+#             'id': "product_name",
+#         }
+#     )
+#
+#     submit = SubmitField(
+#         "Update",
+#         render_kw={
+#             "class": "button"
+#         }
+#     )
+#
+# class Lump_update(FlaskForm):
+#     cuter_name = StringField(
+#         "Cut By",
+#         validators=[DataRequired()],
+#         render_kw={
+#             "placeholder": "Enter cutter name",
+#             "id": "cuter_name", 'disabled': True
+#         }
+#     )
+#
+#     product_name = StringField(
+#         "Product Name",
+#         validators=[DataRequired()],
+#         render_kw={
+#             "placeholder": "Enter product name autoupdate bundle" ,
+#             'id': "product_name", 'disabled': True
+#         }
+#     )
+#
+#     bundle_type = SelectField(
+#         "Type of Bundle autoupdate bundle "  ,
+#         choices=[
+#             ("lump", "Lump"),
+#             ("good_cut", "Good Cut"),
+#             ("fent", "Fent"),
+#             ("goodCUT 20 picset", "goodCUT 20 picset"),
+#             ("fent 20 picset", "fent 20 picset"),
+#             ("un_cut", "Un Cut")
+#
+#         ],
+#         validators=[DataRequired()],
+#         render_kw={
+#             "class": "form-select"
+#         }
+#     )
+#
+#     colors = StringField(
+#         "Color of Lump autoupdate bundle ",
+#         validators=[DataRequired()],
+#         render_kw={
+#             "placeholder": "Enter color of lump",
+#
+#         }
+#     )
+#     meters = FloatField(
+#         "Meter of Lump as per bale",
+#         validators=[DataRequired()],
+#         render_kw={
+#             "placeholder": "Enter meter of lump",
+#
+#         }
+#     )
+#     meters_add_remove = FloatField(
+#         "add or removes",
+#         validators=[InputRequired()],
+#         render_kw={
+#             "placeholder": "Enter meter of lump",
+#
+#         },
+#         default=0.0
+#     )
+#
+#     submit = SubmitField(
+#         "update",
+#         render_kw={
+#             "class": "button"
+#         }
+#     )
+#
+# class Bundle_update(FlaskForm):
+#
+#         no_of_so = IntegerField("sn.o", validators=[DataRequired()],
+#                                 render_kw={"placeholder": "Enter so number "})
+#         product_name = StringField(
+#             "Product Name",
+#             validators=[DataRequired()],
+#             render_kw={
+#                 "placeholder": "Enter product name autoupdate bundle",
+#                 'id': "product_name", 'disabled': True
+#             }
+#         )
+#
+#         bundle_type = SelectField(
+#             "Type of Bundle autoupdate bundle ",
+#             choices=[
+#                 ("lump", "Lump"),
+#                 ("good_cut", "Good Cut"),
+#                 ("fent", "Fent"),
+#                 ("goodCUT 20 picset", "goodCUT 20 picset"),
+#                 ("fent 20 picset", "fent 20 picset"),
+#                 ("un_cut", "Un Cut")
+#
+#             ],
+#             validators=[DataRequired()],
+#             render_kw={
+#                 "class": "form-select"
+#             }
+#         )
+#         no_of_pics = IntegerField("Number of Pics", validators=[DataRequired()],
+#                                   render_kw={"placeholder": "Enter number of pics"})
+#         kg_of_bundle = FloatField("kg", validators=[DataRequired()], render_kw={"placeholder": "Enter kg"})
+#
+#         given_to_  =  StringField(
+#             "given to update on job card",
+#             validators=[DataRequired()],
+#             render_kw={
+#                 "placeholder": "Enter product name autoupdate bundle",
+#                 'id': "product_name", 'disabled': True
+#             })
+#         submit = SubmitField(
+#             "update",
+#             render_kw={
+#                 "class": "button"
+#             }
+#         )
+

@@ -585,20 +585,4 @@ def register_routes(app,db):
 
         return render_template("admin.html", date_from=current_form, type="PRODUCT_find_edit",data=data_autofill)
 
-    @app.route("/edit/<string:type_enty>/<int:entry_id>",methods=['GET'])
-    @login_required
-    @oly_admin
-    def edit(type_enty, entry_id):
-        if current_user.role != 1:
-            flash("403 Forbidden: You do not have permission to access this page.")
-            return redirect("/")
-        # / edit / bale / ;
-        #  / edit / lump / ${item.lump_id}`;
-        # return ` / edit / bundle /
-        #
-        try:
-            entry_id = int(entry_id)
-            type_entry = str(type_entry).lower()
-        except (ValueError, TypeError):
-            flash("Invalid entry ID or type.")
-            return redirect("/")
+

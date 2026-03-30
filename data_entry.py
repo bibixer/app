@@ -225,8 +225,7 @@ def add_jobcard(data,current_user):
     db.session.flush()
     add_job_movemet_out(data,job_card.id,current_user)
     db.session.commit()
-
-    return {
+    data_p = {
         "code":101,
         "jobData":{
             "jobId": job_card.id,
@@ -237,6 +236,9 @@ def add_jobcard(data,current_user):
             "username": current_user.username
         }
     }
+    # job_cade_print(data_p)
+
+    return  data_p
 def add_job_movemet_out(data,job_id,current_user):
     for item in data['items']:
         job_movement = Jobmovement(
