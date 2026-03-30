@@ -383,7 +383,7 @@ def register_routes(app,db):
         data = request.get_json()
 
         res = in_move_entery(data,current_user)
-        print(res)
+        # print(res)
         if type(res) == dict:
             if res["code"] == 101:
              # print(res)
@@ -555,12 +555,12 @@ def register_routes(app,db):
             date_keys =  ['entry_datetime', "cut_by" ,'s_no','id']
             input_data = {}
             for k in date_keys:
-                print(data_sumit)
+                # print(data_sumit)
                 if data_sumit[k] != None:
                     if data_sumit[k] != "":
                         input_data[k] =  {"data":data_sumit[k]}
 
-            print(input_data)
+            # print(input_data)
             if input_data == {}:
                 flash("need some input" , "danger")
                 return redirect(url_for("find_edit"))
