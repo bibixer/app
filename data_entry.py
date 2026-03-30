@@ -1,7 +1,7 @@
 from modes import db, Bundle, Lump, Cuter, Item_data, Outworker,Jobcard,Jobmovement,Bale_date,Party
 from datetime import datetime
 from data_Process import outworker_name,get_movemet_data
-from data_print_format import outworker_qr_print,buldel_qr_print
+from data_print_format import outworker_qr_print,buldel_qr_print,job_cade_print
 
 def add_data_to_database(data):
     db.session.add(data)
@@ -236,7 +236,7 @@ def add_jobcard(data,current_user):
             "username": current_user.username
         }
     }
-    # job_cade_print(data_p)
+    job_cade_print(data_p)
 
     return  data_p
 def add_job_movemet_out(data,job_id,current_user):
@@ -318,9 +318,10 @@ def in_move_entery(data,current_user):
         if  type(check_i) == int:
             return check_i
         for item in data['items']:
+            # print(item[''])
             job_movement = Jobmovement(
                 date=datetime.now(),
-                partculer = f"taken {item["name_of_product"]} from {data['name']} by {current_user.username}",
+                partculer = f"taken {item["name_of_product"]} from {data['name']} by {current_user.username} | {item['note']} ",
                 product_name = item["name_of_product"].replace("_"," "),
                 name_of_mater = data['name'],
                 enter_user = current_user.username,

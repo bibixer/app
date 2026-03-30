@@ -259,29 +259,49 @@
           chevron.classList.toggle("open", !isVisible);
         }
       }
+  const getCalculatorEntries = (rowIndex) => {
+  const rows = calculatorData[rowIndex]?.rows || [];
+  const entries = rows
+    .map(row => {
+      const pieces = parseInt(row.piecesInput?.value) || 0;
+      const count = parseInt(row.countInput?.value) || 0;
+      return pieces > 0 && count > 0 ? `${pieces}X${count}` : null;
+    })
+    .filter(entry => entry !== null);
+
+  return entries.length > 0 ? entries.join(', ') : '';
+};
+
+const buildPayload = () => {
+  const rows = document.querySelectorAll("#returnTable tbody tr");
+  const items = [];
+
+  rows.forEach((row, index) => {
+    const input = document.getElementById(`return-input-${index}`);
+    if (!input) return;
+
+    const itemData = JOB_CARD.items[index];
+    const returnedValue = Number(input.value) || 0;
+
+    // Get calculator entries for this row
+    const calculatorNote = getCalculatorEntries(index);
+
+    items.push({
+      item_id: itemData.item_id,
+      returned: returnedValue,
+      type_R: itemData.colour,
+      remaining: Number(input.dataset.remaining),
+      name: itemData.name,
+      calculator_note: calculatorNote, // This will send "5X2, 3X4, 10X1" format
+    });
+  });
+
+  return items;
+};
 
       async function submitReturn() {
-        const rows = document.querySelectorAll("#returnTable tbody tr");
-        const items = [];
 
-        rows.forEach((row, index) => {
-          const input = document.getElementById(`return-input-${index}`);
-          if (!input) return;
-
-          const itemId = JOB_CARD.items[index].item_id;
-          const itemtype = JOB_CARD.items[index].colour;
-          const remaining = Number(input.dataset.remaining);
-          const returnedValue = Number(input.value) || 0;
-          const name = JOB_CARD.items[index].name;
-
-          items.push({
-            item_id: itemId,
-            returned: returnedValue,
-            type_R: itemtype,
-            remaining,
-            name,
-          });
-        });
+const items = buildPayload();
 
         for (const item of items) {
           if (item.returned < 0) {
@@ -297,17 +317,18 @@
           }
         }
 
-        const payload = {
-          name: JOB_CARD.name,
-          items: items
-            .filter((item) => item.returned > 0)
-            .map((item) => ({
-              item_id: item.item_id,
-              returned: item.returned,
-              name_of_product: item.name,
-              type: item.type_R,
-            })),
-        };
+       const payload = {
+  name: JOB_CARD.name,
+  items: items
+    .filter((item) => item.returned > 0)
+    .map((item) => ({
+      item_id: item.item_id,
+      returned: item.returned,
+      name_of_product: item.name,
+      note: item.calculator_note || null,  // ✅ ADD COMMA HERE
+      type: item.type_R,
+    })),
+};
 
         if (payload.items.length === 0) {
           alert("Please enter at least one return quantity.");
@@ -360,6 +381,7 @@
                 name: item.name_of_product,
                 type: item.type,
                 qty: item.returned,
+                note : item.note
               };
             } else {
               summaryMap[key].qty += item.returned;
@@ -375,7 +397,7 @@
                 <td><strong>${index}</strong></td>
                 <td><strong>${item.name}</strong></td>
                 <td><strong>${item.type}</strong></td>
-                <td><strong>${item.qty}</strong></td>
+                <td><strong>${item.qty}--${item.note}</strong></td>
               </tr>
             `;
             total_return_pcs += item.qty;

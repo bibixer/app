@@ -383,7 +383,7 @@ def register_routes(app,db):
         data = request.get_json()
 
         res = in_move_entery(data,current_user)
-        # print(res)
+        print(res)
         if type(res) == dict:
             if res["code"] == 101:
              # print(res)
