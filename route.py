@@ -589,7 +589,7 @@ def register_routes(app,db):
     @login_required
     @oly_admin
     def edit(type_enty, entry_id):
-        if current_user.role != 4:
+        if current_user.role != 1:
             flash("403 Forbidden: You do not have permission to access this page.")
             return redirect("/")
         # / edit / bale / ;
