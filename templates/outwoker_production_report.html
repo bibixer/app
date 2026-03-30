@@ -1329,6 +1329,8 @@
                           if (originalTransaction.give_by) details.push({ label: 'Given By', value: originalTransaction.give_by });
                           if (originalTransaction.give_taken) details.push({ label: 'Give/Taken', value: originalTransaction.give_taken });
                           if (originalTransaction.flow) details.push({ label: 'Flow', value: originalTransaction.flow });
+                          if (originalTransaction.note) details.push({ label: 'note', value: originalTransaction.note });
+
                           if (originalTransaction.entry_datetime) {
                             details.push({
                               label: 'Entry Time',
@@ -1419,6 +1421,8 @@
                         if (originalTransaction.give_by) details.push({ label: 'Given By', value: originalTransaction.give_by });
                         if (originalTransaction.give_taken) details.push({ label: 'Give/Taken', value: originalTransaction.give_taken });
                         if (originalTransaction.flow) details.push({ label: 'Flow', value: originalTransaction.flow });
+                        if (originalTransaction.note) details.push({ label: 'note', value: originalTransaction.note });
+
                         if (originalTransaction.entry_datetime) {
                           details.push({
                             label: 'Entry Time',

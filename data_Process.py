@@ -578,6 +578,7 @@ def master_report_card(data:dict,current_user):
                        "kg": 0.01,
                        "flow": "in",
                        "give_taken":date_range_data.enter_user,
+                   "note":date_range_data.partculer
                })
 
     return {
