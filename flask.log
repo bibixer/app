@@ -4501,3 +4501,131 @@ INFO:root:Flask service starting
 INFO:waitress:Serving on http://127.0.0.1:5000
 INFO:root:Flask service starting
 INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+ERROR:app:Exception on /submit-jobcard [POST]
+Traceback (most recent call last):
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/home/badx/Desktop/bh manfiation/app/route.py", line 316, in submit_jobcard
+    ok = add_jobcard(data,current_user)
+  File "/home/badx/Desktop/bh manfiation/app/data_entry.py", line 239, in add_jobcard
+    job_cade_print(data)
+    ~~~~~~~~~~~~~~^^^^^^
+  File "/home/badx/Desktop/bh manfiation/app/data_print_format.py", line 35, in job_cade_print
+    print(data.id)
+          ^^^^^^^
+AttributeError: 'dict' object has no attribute 'id'
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+ERROR:app:Exception on /submit-jobcard [POST]
+Traceback (most recent call last):
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/home/badx/Desktop/bh manfiation/app/route.py", line 316, in submit_jobcard
+    ok = add_jobcard(data,current_user)
+  File "/home/badx/Desktop/bh manfiation/app/data_entry.py", line 239, in add_jobcard
+    job_cade_print(data_p)
+    ~~~~~~~~~~~~~~^^^^^^^^
+  File "/home/badx/Desktop/bh manfiation/app/data_print_format.py", line 36, in job_cade_print
+    buldel_qr_print(data)
+    ~~~~~~~~~~~~~~~^^^^^^
+  File "/home/badx/Desktop/bh manfiation/app/data_print_format.py", line 29, in buldel_qr_print
+    pd_data.to_csv(f"to_print/bundle/{d['id']}.csv", index=False)
+                                      ~^^^^^^
+TypeError: string indices must be integers, not 'str'
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+ERROR:app:Exception on /submit-jobcard [POST]
+Traceback (most recent call last):
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/pandas/core/indexes/base.py", line 3812, in get_loc
+    return self._engine.get_loc(casted_key)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "pandas/_libs/index.pyx", line 167, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas/_libs/index.pyx", line 196, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas/_libs/hashtable_class_helper.pxi", line 7088, in pandas._libs.hashtable.PyObjectHashTable.get_item
+  File "pandas/_libs/hashtable_class_helper.pxi", line 7096, in pandas._libs.hashtable.PyObjectHashTable.get_item
+KeyError: 'qty'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/home/badx/Desktop/bh manfiation/app/route.py", line 316, in submit_jobcard
+    ok = add_jobcard(data,current_user)
+  File "/home/badx/Desktop/bh manfiation/app/data_entry.py", line 239, in add_jobcard
+    job_cade_print(data_p)
+    ~~~~~~~~~~~~~~^^^^^^^^
+  File "/home/badx/Desktop/bh manfiation/app/data_print_format.py", line 36, in job_cade_print
+    build_custom_csvs_pandas(data)
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/home/badx/Desktop/bh manfiation/app/data_print_format.py", line 81, in build_custom_csvs_pandas
+    qty = row["qty"]
+          ~~~^^^^^^^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/pandas/core/series.py", line 1133, in __getitem__
+    return self._get_value(key)
+           ~~~~~~~~~~~~~~~^^^^^
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/pandas/core/series.py", line 1249, in _get_value
+    loc = self.index.get_loc(label)
+  File "/media/badx/course and study/home/badx/Desktop/side pro/bh manfiation/app/.venv/lib/python3.13/site-packages/pandas/core/indexes/base.py", line 3819, in get_loc
+    raise KeyError(key) from err
+KeyError: 'qty'
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
