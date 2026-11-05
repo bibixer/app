@@ -3,9 +3,21 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Better desktop detection (more reliable than touch check)
   const isPC = window.matchMedia("(pointer: fine)").matches;
-  if (!isPC) return;
+  const forms = document.querySelectorAll(".form-container form");
 
-  const forms = document.querySelectorAll("form.form");
+  forms.forEach(form => {
+    form.addEventListener("submit", function (event) {
+      if (form.dataset.submitting === "true") {
+        event.preventDefault();
+        return;
+      }
+      form.dataset.submitting = "true";
+      const button = form.querySelector("button[type=submit], input[type=submit]");
+      if (button) setTimeout(() => { button.disabled = true; }, 0);
+    });
+  });
+
+  if (!isPC) return;
 
   forms.forEach(form => {
 

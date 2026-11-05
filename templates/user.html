@@ -44,6 +44,21 @@
 
         <div style="text-align: center"><h1>{{ message|safe }}</h1></div>
         {% endfor %}
+        {% if item_rows is defined %}
+        <details style="margin-top:24px">
+          <summary style="cursor:pointer;font-weight:700">Edit an existing item</summary>
+          <input id="itemSearch" type="search" placeholder="Search items or aliases" style="width:100%;margin:12px 0;padding:9px">
+          <div style="max-height:280px;overflow:auto">
+            {% for item in item_rows %}
+            <div class="item-link" data-search="{{ (item.name ~ ' ' ~ (item.alias_rows|map(attribute='alias')|join(' ')))|lower }}" style="padding:8px;border-bottom:1px solid #ddd">
+              <a href="{{ url_for('edit_entry', entity_type='product', entity_id=item.id) }}">{{ item.name }}</a>
+              {% if item.alias_rows %}<small> — {{ item.alias_rows|map(attribute='alias')|join(', ') }}</small>{% endif %}
+            </div>
+            {% endfor %}
+          </div>
+        </details>
+        <script>document.getElementById('itemSearch').addEventListener('input', e => document.querySelectorAll('.item-link').forEach(row => row.hidden = !row.dataset.search.includes(e.target.value.toLowerCase().trim())));</script>
+        {% endif %}
       </div>
     </div>
 

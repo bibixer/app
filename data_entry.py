@@ -1,18 +1,49 @@
-from modes import db, Bundle, Lump, Cuter, Item_data, Outworker,Jobcard,Jobmovement,Bale_date,Party
+from modes import db, Bundle, Lump, Cuter, Item_data, Outworker, OutworkerAlias,Jobcard,Jobmovement,Bale_date,Party,RequestDedup
+import logging
 from datetime import datetime
-from data_Process import outworker_name,get_movemet_data
+import hashlib
+from sqlalchemy.exc import IntegrityError
+from item_aliases import normalize_name, parse_aliases, validate_names, resolve_item_name
+from modes import ItemAlias
+from master_aliases import validate_master_aliases, resolve_master_name
+from data_Process import outworker_name,get_jobcard_return_data
 from data_print_format import outworker_qr_print,buldel_qr_print,job_cade_print
 
 def add_data_to_database(data):
     db.session.add(data)
     db.session.commit()
     return 101
-def bale_data_entry(data,current_user):
+
+
+def claim_write(request_key, endpoint, current_user):
+    """Atomically claim a browser submission before changing business data."""
+    if not isinstance(request_key, str) or not request_key or len(request_key) > 128:
+        return False
+    stable_key = hashlib.sha256(
+        f"{current_user.username}:{endpoint}:{request_key}".encode("utf-8")
+    ).hexdigest()
+    try:
+        db.session.add(RequestDedup(
+            request_key=stable_key,
+            endpoint=endpoint,
+            username=current_user.username,
+            created_at=datetime.now(),
+        ))
+        db.session.flush()
+        return True
+    except IntegrityError:
+        db.session.rollback()
+        return False
+
+
+def bale_data_entry(data,current_user,request_key):
     # if current_user.is_authenticated:
     #     if current_user.role != 1:
     #         return 404
     if not  current_user.is_authenticated:
         return 404
+    if not claim_write(request_key, "lump_workflow", current_user):
+        return 409
 
 
     bale_data =  data['bale_data']
@@ -51,7 +82,11 @@ def bale_data_entry(data,current_user):
 
     data_to_print = add_data_lump(data,current_user,id_b)
     db.session.commit()
-    buldel_qr_print(data_to_print)
+    try:
+        buldel_qr_print(data_to_print)
+    except Exception:
+        logging.exception("Lump saved, but bundle label printing failed")
+    return 101
 
 
 def add_data_lump(data,current_user,bale_id):
@@ -99,42 +134,64 @@ def error_hendle(func):
         try:
             return func(*args, **kwargs)
         except Exception as e:
+            db.session.rollback()
             return {"or":False,"exception":e}
     return eror
 @error_hendle
-def add_cutter(data,current_user):
+def add_cutter(data,current_user,request_key):
+        if not claim_write(request_key, "add_cutter", current_user):
+            return 409
         cuuter = Cuter(name=data["name"].upper(),
                        enter_user=current_user.username)
         return add_data_to_database(cuuter)
 
 @error_hendle
-def add_party(data,current_user):
+def add_party(data,current_user,request_key):
+       if not claim_write(request_key, "add_party", current_user):
+           return 409
        paty = Party(name=data["name"].upper(),
                        enter_user=current_user.username)
        return add_data_to_database(paty)
 
 @error_hendle
-def add_items(data,current_user):
-    item =  Item_data(name=data["name"].upper()
+def add_items(data,current_user,request_key):
+    if not claim_write(request_key, "add_item", current_user):
+        return 409
+    name = normalize_name(data["name"])
+    aliases = parse_aliases(data.get("aliases"))
+    validate_names(name, aliases)
+    item =  Item_data(name=name
     ,size = data["size"]
     ,meters = data["meter"],
     enter_user=current_user.username
     )
+    db.session.add(item)
+    db.session.flush()
+    db.session.add_all(ItemAlias(item_id=item.id, alias=alias) for alias in aliases)
     return add_data_to_database(item)
 @error_hendle
-def add_outworker_db(data,current_user):
-    outworker = Outworker(name=data["name"].upper(),
+def add_outworker_db(data,current_user,request_key):
+    if not claim_write(request_key, "add_outworker", current_user):
+        return 409
+    name = normalize_name(data["name"])
+    aliases = parse_aliases(data.get("aliases"))
+    validate_master_aliases(name, aliases)
+    outworker = Outworker(name=name,
                           adders= data["address"],
                           number = data["number"],
                           enter_user=current_user.username
                           )
+    db.session.add(outworker)
+    db.session.flush()
+    db.session.add_all(OutworkerAlias(worker_id=outworker.id, alias=alias) for alias in aliases)
     OUT=add_data_to_database(outworker)
     if OUT == 101:
-        pint = outworker_qr_print(outworker)
-        if pint == 101 :
-            return 101
-        else:
-           return 404
+        try:
+            if outworker_qr_print(outworker) != 101:
+                logging.error("Outworker %s saved, but QR printing did not succeed", outworker.id)
+        except Exception:
+            logging.exception("Outworker %s saved, but QR printing failed", outworker.id)
+        return 101
 # @error_hendle
 def check_name_master(data):
     all_data = outworker_name(oly_full_name=True)
@@ -147,6 +204,8 @@ def check_name_master(data):
 # 101 ok 401 name 403 falt on itetem
 def check_product(data):
     item_ids = [item["item_id"] for item in data["items"]]
+    if len(item_ids) != len(set(item_ids)):
+        return False
 
     bundles = Bundle.query.filter(Bundle.id.in_(item_ids)).all()
 
@@ -193,28 +252,36 @@ def validate_payload_structure(data):
             if field not in item:
                 return False
 
-        if not isinstance(item["item_id"], str):
-            return False,
+        if not isinstance(item["item_id"], str) or not item["item_id"].isdigit():
+            return False
         if not isinstance(item["type"], str):
-            return False,
+            return False
 
         if not isinstance(item["name_of_prduct"], str):
-            return False,
+            return False
 
-        if not isinstance(item["qty"], (int, float)):
-            return False,
+        if not isinstance(item["qty"], (int, float)) or item["qty"] <= 0:
+            return False
 
-        if not isinstance(item["kg"], (int, float)):
+        if not isinstance(item["kg"], (int, float)) or item["kg"] < 0:
             return False
 
     return True
-def add_jobcard(data,current_user):
+def add_jobcard(data,current_user,request_key):
     if not validate_payload_structure(data):
         return 405
+    if not claim_write(request_key, "add_jobcard", current_user):
+        return 409
     if not check_name_master(data["customer"]):
+        db.session.rollback()
         return 401
     if not check_product(data):
+        db.session.rollback()
         return 403
+    return _persist_jobcard(data, current_user)
+
+
+def _persist_jobcard(data, current_user):
     job_card = Jobcard(
     date = datetime.now(),
     given_to = data["customer"],
@@ -236,9 +303,93 @@ def add_jobcard(data,current_user):
             "username": current_user.username
         }
     }
-    job_cade_print(data_p)
+    try:
+        job_cade_print(data_p)
+    except Exception:
+        logging.exception("Job card %s saved, but CSV printing failed", job_card.id)
 
     return  data_p
+
+
+def validate_manual_jobcard(data):
+    if not isinstance(data, dict):
+        return False
+    if not isinstance(data.get("customer"), str) or not data["customer"].strip():
+        return False
+    rows = data.get("rows")
+    if not isinstance(rows, list) or not rows or len(rows) > 100:
+        return False
+    for row in rows:
+        if not isinstance(row, dict):
+            return False
+        if not isinstance(row.get("product"), str) or not row["product"].strip():
+            return False
+        if not isinstance(row.get("type"), str) or not row["type"].strip():
+            return False
+        pieces = row.get("pieces")
+        count = row.get("count")
+        if isinstance(pieces, bool) or not isinstance(pieces, int) or pieces <= 0:
+            return False
+        if isinstance(count, bool) or not isinstance(count, int) or count <= 0 or count > 500:
+            return False
+    return True
+
+
+def add_manual_jobcard(data, current_user, request_key):
+    """Create a job card directly from manual patterns, without inventory bundles."""
+    if not validate_manual_jobcard(data):
+        return 405
+    product_names = [resolve_item_name(row["product"]) for row in data["rows"]]
+    if any(name is None for name in product_names):
+        return 406
+    if not claim_write(request_key, "add_manual_jobcard", current_user):
+        return 409
+    master_name = resolve_master_name(data["customer"])
+    if not master_name:
+        db.session.rollback()
+        return 401
+
+    job_card = Jobcard(
+        date=datetime.now(), given_to=master_name,
+        given_by=current_user.username, product_list=[],
+    )
+    db.session.add(job_card)
+    db.session.flush()
+    items = [{
+        "item_id": f"MANUAL-{job_card.id}-{index}",
+        "name_of_prduct": product_names[index - 1],
+        "type": row["type"].strip(),
+        "pieces_per_bundle": row["pieces"],
+        "bundle_count": row["count"],
+        "qty": row["pieces"] * row["count"],
+        "kg": 0,
+        "source": "MANUAL",
+    } for index, row in enumerate(data["rows"], start=1)]
+
+    job_card.product_list = items
+    for item in items:
+        db.session.add(Jobmovement(
+            date=datetime.now(), jobcard=str(job_card.id), bundle=None,
+            outflow=item["qty"], name_of_mater=job_card.given_to,
+            enter_user=current_user.username,
+            partculer=f'Manual job card {job_card.id}, line {item["item_id"]}'[:50],
+            product_name=item["name_of_prduct"], flow_type="OUT",
+            type_B=item["type"],
+        ))
+    db.session.commit()
+    result = {
+        "code": 101,
+        "jobData": {
+            "jobId": job_card.id, "party": job_card.given_to,
+            "toal_p": ".", "date": job_card.date.strftime("%d-%m-%Y"),
+            "items": items, "username": current_user.username,
+        },
+    }
+    try:
+        job_cade_print(result)
+    except Exception:
+        logging.exception("Manual job card %s saved, but CSV printing failed", job_card.id)
+    return result
 def add_job_movemet_out(data,job_id,current_user):
     for item in data['items']:
         job_movement = Jobmovement(
@@ -254,9 +405,9 @@ def add_job_movemet_out(data,job_id,current_user):
         ,product_name = item["name_of_prduct"],
         flow_type = "OUT",
         type_B = item["type"]
-    )
+        )
         db.session.add(job_movement)
-        update_bundle(data,current_user)
+    update_bundle(data,current_user)
 def update_bundle(data,current_user):
     for buindle in data['items']:
         bunld = Bundle.query.filter_by(id=buindle['item_id']).first()
@@ -265,25 +416,32 @@ def update_bundle(data,current_user):
         bunld.given_to = data["customer"]
         bunld.given_by = str(current_user.username)
 def check_return_item(data):
-    db_data = get_movemet_data(data["name"])
+    if not isinstance(data, dict) or not isinstance(data.get("jobcard_id"), int) or isinstance(data.get("jobcard_id"), bool) or data["jobcard_id"] < 1:
+        return 405
+    if not isinstance(data.get("items"), list) or not data["items"]:
+        return 405
+    db_data = get_jobcard_return_data(data["jobcard_id"])
+    if db_data is None:
+        return 404
+    if data.get("name") != db_data["name"]:
+        return 401
+    db_items = {item["item_id"]: item for item in db_data["items"]}
 
-    if db_data == 404:
-        return False
 
-    # Map by item_id
-    db_items = {
-        int(item["item_id"]): item
-        for item in db_data["items"]
-
-    }
-
-
+    seen_ids = set()
     for item in data["items"]:
-        item_id = int(item["item_id"])
-        returned_qty = int(item["returned"])
-        token_name = item["name_of_product"]
+        try:
+            item_id = int(item["item_id"])
+            returned_qty = item["returned"]
+            token_name = item["name_of_product"]
+            type_B = item['type']
+        except (KeyError, TypeError, ValueError):
+            return 405
+        if (item_id in seen_ids or isinstance(returned_qty, bool)
+                or not isinstance(returned_qty, int) or returned_qty <= 0):
+            return 405
+        seen_ids.add(item_id)
         # print(item)
-        type_B = item['type']
 
 
         # 1️⃣ Check ID exists
@@ -295,7 +453,7 @@ def check_return_item(data):
         # 2️⃣ Check name matches for same ID
         # print(token_name.lstrip())
         # print(db_item["name"].lstrip())
-        if db_item["name"].lstrip()!= token_name.lstrip() :
+        if db_item["name"] != token_name:
             return 4032
 
         # 3️⃣ Check quantity rule
@@ -305,23 +463,25 @@ def check_return_item(data):
             return 4034
 
 
-    return True,
-def in_move_entery(data,current_user):
+    return True
+def in_move_entery(data,current_user,request_key):
     # if validate_return_structure_(data):
     #     return 405
 
     try:
-        if not check_name_master(data['name']):
-            # print(data['name'])
-            return 401
+        if not claim_write(request_key, "return_items", current_user):
+            return 409
         check_i = check_return_item(data)
-        if  type(check_i) == int:
+        if check_i is not True:
+            db.session.rollback()
             return check_i
         for item in data['items']:
             # print(item[''])
+            note = str(item.get("note") or "").strip()
             job_movement = Jobmovement(
                 date=datetime.now(),
-                partculer = f"taken {item["name_of_product"]} from {data['name']} by {current_user.username} | {item['note']} ",
+                jobcard=str(data["jobcard_id"]),
+                partculer=f"Return card {data['jobcard_id']} {note}"[:50],
                 product_name = item["name_of_product"].replace("_"," "),
                 name_of_mater = data['name'],
                 enter_user = current_user.username,
@@ -335,6 +495,7 @@ def in_move_entery(data,current_user):
         return {
         "code": 101,
         "jobData": {
+            "jobcard_id": data["jobcard_id"],
             "party": data['name'],
             "date": datetime.now().strftime("%d-%m-%Y"),
             "items": data['items'],
@@ -342,7 +503,6 @@ def in_move_entery(data,current_user):
         }
     }
 
-    except:
+    except Exception:
+        db.session.rollback()
         return 404
-
-

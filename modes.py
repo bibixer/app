@@ -94,6 +94,14 @@ class Outworker(db.Model):
     adders = db.Column(db.String(50), nullable=False)
     number = db.Column(db.Integer, nullable=False)
     enter_user = db.Column(db.String(50), nullable=False)
+
+class OutworkerAlias(db.Model):
+    __tablename__ = "OutworkerAlias"
+    id = db.Column(db.Integer, primary_key=True)
+    worker_id = db.Column(db.Integer, db.ForeignKey("OutworkData.id"), nullable=False, index=True)
+    alias = db.Column(db.String(50), nullable=False, unique=True)
+    worker = db.relationship("Outworker", backref=db.backref("alias_rows", lazy=True))
+
 class Item_data(db.Model):
     __tablename__ = "ItemData"
     id = db.Column(db.Integer, primary_key=True)
@@ -102,11 +110,18 @@ class Item_data(db.Model):
     size = db.Column(db.Float(50), nullable=False)
     enter_user = db.Column(db.String(50), nullable=False)
 
+class ItemAlias(db.Model):
+    __tablename__ = "ItemAlias"
+    id = db.Column(db.Integer, primary_key=True)
+    item_id = db.Column(db.Integer, db.ForeignKey("ItemData.id"), nullable=False, index=True)
+    alias = db.Column(db.String(50), nullable=False, unique=True)
+    item = db.relationship("Item_data", backref=db.backref("alias_rows", lazy=True))
+
 class Jobcard(db.Model):
     __tablename__ = "JobcardData"
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.DateTime, nullable=False)
-    given_to = db.Column(db.Integer, nullable=False)
+    given_to = db.Column(db.String(100), nullable=False)
     # told_by = db.Column(db.String(50), nullable=False)
     # given by
     given_by = db.Column(db.String(50), nullable=False)
@@ -180,6 +195,32 @@ class Party(db.Model):
     enter_user = db.Column(db.String(50), nullable=False)
 
 
+class RequestDedup(db.Model):
+    """One row per client write request.
+
+    The unique key is the database-level guard against two workers accepting the
+    same browser submission at the same time.
+    """
+    __tablename__ = "request_dedup"
+    id = db.Column(db.Integer, primary_key=True)
+    request_key = db.Column(db.String(128), nullable=False, unique=True, index=True)
+    endpoint = db.Column(db.String(100), nullable=False)
+    username = db.Column(db.String(100), nullable=False)
+    created_at = db.Column(db.DateTime, nullable=False)
+
+
+class EditLog(db.Model):
+    """Append-only audit history for every edit made from the admin UI."""
+    __tablename__ = "edit_log"
+    id = db.Column(db.Integer, primary_key=True)
+    entity_type = db.Column(db.String(50), nullable=False, index=True)
+    entity_id = db.Column(db.Integer, nullable=False, index=True)
+    action = db.Column(db.String(30), nullable=False, default="UPDATE")
+    old_values = db.Column(db.JSON, nullable=False)
+    new_values = db.Column(db.JSON, nullable=False)
+    changed_fields = db.Column(db.JSON, nullable=False)
+    username = db.Column(db.String(100), nullable=False)
+    changed_at = db.Column(db.DateTime, nullable=False)
 
 
 

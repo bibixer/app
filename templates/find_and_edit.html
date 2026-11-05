@@ -442,7 +442,7 @@
             }
 
             // Extract lump info (only if it has lump_id)
-            if (record.lump_id && type === 'lump') {
+            if (record.lump_id) {
                 const lumpKey = record.lump_id;
                 if (!lumpsMap.has(lumpKey)) {
                     lumpsMap.set(lumpKey, {
@@ -464,7 +464,7 @@
                         product: record.product,
                         status: record.status,
                         supplier: record.supplier,
-                        type_B: 'lump',
+                        type_B: record.type_B,
                         so_number: record.so_number,
                         meters_add_remove: record.meters_add_remove,
                         color: record.color
@@ -494,7 +494,7 @@
                     product: record.product,
                     status: record.status,
                     supplier: record.supplier,
-                    type_B: 'bundle',
+                    type_B: record.type_B,
                     so_number: record.so_number,
                     meters_add_remove: record.meters_add_remove || 0,
                     color: record.color

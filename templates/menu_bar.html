@@ -1,177 +1,46 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-<!--  <link href="https://fonts.googleapis.com/css2?family=Oswald&display=swap" rel="stylesheet" />-->
-  <style>
+<style>
+  :root { --app-nav-height:64px; --app-nav-bg:#0f172a; --app-nav-panel:#172033; --app-nav-text:#e8eef8; --app-nav-muted:#9cabc2; }
+  .app-navbar,.app-navbar *{box-sizing:border-box}.app-navbar{position:fixed;inset:0 0 auto 0;height:var(--app-nav-height);z-index:100000;display:flex;align-items:center;gap:18px;padding:0 18px;color:var(--app-nav-text);background:rgba(15,23,42,.97);border-bottom:1px solid rgba(255,255,255,.09);box-shadow:0 6px 24px rgba(15,23,42,.18);font-family:Inter,ui-sans-serif,system-ui,sans-serif}
+  .app-brand{display:flex;align-items:center;gap:10px;color:#fff;text-decoration:none;min-width:max-content}.app-brand img{width:38px;height:38px;object-fit:contain;background:#fff;border-radius:9px;padding:3px}.app-brand-copy{line-height:1.05}.app-brand-title{display:block;font-size:15px;font-weight:800;letter-spacing:.03em}.app-brand-subtitle{display:block;color:var(--app-nav-muted);font-size:10px;margin-top:4px;text-transform:uppercase;letter-spacing:.09em}
+  .app-nav-links{display:flex;align-items:center;gap:4px;flex:1;min-width:0;height:100%}.app-nav-link,.app-dropdown-button{display:flex;align-items:center;gap:7px;min-height:40px;padding:0 11px;border:0;border-radius:9px;color:var(--app-nav-muted);background:transparent;text-decoration:none;font:600 13px/1 inherit;white-space:nowrap;cursor:pointer}.app-nav-link:hover,.app-dropdown-button:hover,.app-nav-link:focus-visible,.app-dropdown-button:focus-visible{color:#fff;background:rgba(255,255,255,.08);outline:none}.app-nav-link.active,.app-dropdown.active>.app-dropdown-button{color:#fff;background:linear-gradient(135deg,#526ff0,#7257dc);box-shadow:0 5px 14px rgba(82,111,240,.26)}.app-nav-icon{font-size:16px;line-height:1}
+  .app-dropdown{position:relative}.app-dropdown-button::after{content:"";width:6px;height:6px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg) translateY(-2px);margin-left:2px}.app-dropdown-menu{position:absolute;top:calc(100% + 10px);right:0;width:245px;padding:8px;border:1px solid rgba(255,255,255,.1);border-radius:13px;background:var(--app-nav-panel);box-shadow:0 18px 45px rgba(2,6,23,.35);opacity:0;visibility:hidden;transform:translateY(-7px);transition:.16s ease}.app-dropdown:hover .app-dropdown-menu,.app-dropdown:focus-within .app-dropdown-menu,.app-dropdown.open .app-dropdown-menu{opacity:1;visibility:visible;transform:translateY(0)}.app-dropdown-menu a{display:flex;gap:10px;align-items:center;padding:10px 11px;border-radius:8px;color:#cbd5e1;text-decoration:none;font-size:13px;font-weight:600}.app-dropdown-menu a:hover,.app-dropdown-menu a.active{color:#fff;background:rgba(91,124,250,.18)}.app-menu-label{padding:8px 11px 5px;color:#7f90aa;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em}.app-menu-divider{height:1px;margin:6px 5px;background:rgba(255,255,255,.08)}
+  .app-user{display:flex;align-items:center;gap:9px;min-width:max-content}.app-user-badge{width:34px;height:34px;display:grid;place-items:center;border-radius:50%;background:#273653;color:#fff;font-weight:800;font-size:13px}.app-logout{color:#fecaca}.app-menu-toggle{display:none;width:40px;height:40px;padding:0;border:0;border-radius:9px;background:rgba(255,255,255,.08);color:#fff;cursor:pointer;font-size:22px}
+  .app-drawer-overlay{position:fixed;inset:0;z-index:100001;background:rgba(2,6,23,.57);opacity:0;visibility:hidden;transition:.2s ease}.app-drawer{position:fixed;z-index:100002;inset:0 0 0 auto;width:min(88vw,340px);padding:15px;overflow:auto;color:var(--app-nav-text);background:var(--app-nav-bg);transform:translateX(102%);transition:.24s ease;font-family:Inter,ui-sans-serif,system-ui,sans-serif}.app-drawer.open{transform:translateX(0)}.app-drawer-overlay.open{opacity:1;visibility:visible}.app-drawer-head{display:flex;align-items:center;justify-content:space-between;padding:4px 4px 15px;border-bottom:1px solid rgba(255,255,255,.08)}.app-drawer-close{width:38px;height:38px;border:0;border-radius:9px;background:rgba(255,255,255,.08);color:#fff;font-size:24px;cursor:pointer}.app-drawer-group{margin-top:18px}.app-drawer-title{margin:0 10px 7px;color:#788ba7;font-size:10px;font-weight:800;letter-spacing:.11em;text-transform:uppercase}.app-drawer a{display:flex;align-items:center;gap:12px;padding:11px 12px;margin:3px 0;border-radius:9px;color:#cbd5e1;text-decoration:none;font-size:14px;font-weight:650}.app-drawer a:hover,.app-drawer a.active{color:#fff;background:rgba(91,124,250,.2)}.app-nav-offset{height:var(--app-nav-height)}
+  @media(max-width:1120px){.app-nav-link .app-nav-text{display:none}.app-nav-link{padding:0 12px}.app-brand-subtitle{display:none}}
+  @media(max-width:760px){.app-navbar{padding:0 12px}.app-nav-links,.app-user .app-logout,.app-user-badge{display:none}.app-brand{flex:1}.app-menu-toggle{display:grid;place-items:center}.app-brand-subtitle{display:block}}
+</style>
 
-    input[type="checkbox"] {
-      display: none;
-    }
+{% set endpoint = request.endpoint or '' %}
+{% set report_endpoints = ['admin_dashord','cutter_report','outworker_report','product_report'] %}
+{% set manage_endpoints = ['find_edit','edit_index','edit_entry','edit_logs','add_item','add_outworker','add_cuter','add_suppy'] %}
 
-    .uni-wrapper {
-      position: fixed;
-      top: 0;
-      left: 0;
-      height: 100%;
-      width: 100%;
-      background: #000;
-      clip-path: circle(25px at calc(100% - 45px) 45px);
-      transition: all 0.3s ease-in-out;
-      z-index: 5;
-      overflow: auto;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 0;
-    }
-
-    #menu:checked ~ .uni-wrapper {
-      clip-path: circle(75%);
-    }
-
-    .cross-dot {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      width: 60px;
-      height: 60px;
-      background-color: #111;
-      border-radius: 50%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 15;
-    }
-
-    .cross-dot label {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      width: 30px;
-      height: 22px;
-      cursor: pointer;
-    }
-
-    .cross-dot label span {
-      height: 4px;
-      border-radius: 4px;
-      background-color: #fff;
-      transition: 0.4s ease;
-    }
-
-    #menu:checked + .cross-dot label span:nth-child(1) {
-      transform: translateY(9px) rotate(45deg);
-    }
-
-    #menu:checked + .cross-dot label span:nth-child(2) {
-      opacity: 0;
-    }
-
-    #menu:checked + .cross-dot label span:nth-child(3) {
-      transform: translateY(-9px) rotate(-45deg);
-    }
-
-    .uni-nav-list {
-      list-style: none;
-      text-align: center;
-      padding: 0;
-      margin: 0;
-      max-width: 400px;
-    }
-
-    .uni-nav-item {
-      margin: 15px 0;
-    }
-
-    .uni-nav-link {
-      text-decoration: none;
-      font-size: 30px;
-      font-weight: 500;
-      padding: 5px 30px;
-      color: #fff;
-      border-radius: 50px;
-      background: #000;
-      position: relative;
-      line-height: 50px;
-      transition: all 0.3s ease;
-      display: inline-block;
-      user-select: none;
-    }
-
-    .uni-nav-link:after {
-      position: absolute;
-      content: "";
-      background: linear-gradient(#14ffe9, #ffeb3b, #ff00e0);
-      width: 104%;
-      height: 110%;
-      left: -2%;
-      top: -5%;
-      border-radius: 50px;
-      transform: scaleY(0);
-      z-index: -1;
-      animation: uni-rotate 1.5s linear infinite;
-      transition: transform 0.3s ease;
-    }
-
-    .uni-nav-link:hover:after {
-      transform: scaleY(1);
-    }
-
-    .uni-nav-link:hover {
-      color: #fff;
-    }
-
-    @keyframes uni-rotate {
-      0% { filter: hue-rotate(0deg); }
-      100% { filter: hue-rotate(360deg); }
-    }
-  </style>
-</head>
-<body>
-
-  <!-- Menu Checkbox -->
-  <input type="checkbox" id="menu" autocomplete="off" />
-
-  <!-- Toggle Button (Animated X icon) -->
-  <div class="cross-dot">
-    <label for="menu">
-      <span></span>
-      <span></span>
-      <span></span>
-    </label>
+<nav class="app-navbar" aria-label="Main navigation">
+  <a class="app-brand" href="{{ url_for('home') }}"><img src="{{ url_for('static',filename='images/BH.svg') }}" alt="BH"><span class="app-brand-copy"><span class="app-brand-title">BH Manufacturing</span><span class="app-brand-subtitle">Production Tracker</span></span></a>
+  <div class="app-nav-links">
+    <a class="app-nav-link {% if endpoint=='home' %}active{% endif %}" href="{{ url_for('home') }}"><span class="app-nav-icon">⌂</span><span class="app-nav-text">Dashboard</span></a>
+    <a class="app-nav-link {% if endpoint in ['bale_entery','lump_home','bundle_entery'] %}active{% endif %}" href="{{ url_for('bale_entery') }}"><span class="app-nav-icon">▣</span><span class="app-nav-text">Bale Entry</span></a>
+    {% if id == 1 %}
+    <a class="app-nav-link {% if endpoint=='job_card' %}active{% endif %}" href="{{ url_for('job_card') }}"><span class="app-nav-icon">⌁</span><span class="app-nav-text">Scan Job</span></a>
+    <a class="app-nav-link {% if endpoint=='manual_job_card' %}active{% endif %}" href="{{ url_for('manual_job_card') }}"><span class="app-nav-icon">✎</span><span class="app-nav-text">Manual Job</span></a>
+    <a class="app-nav-link {% if endpoint in ['retune_product','job_retun'] %}active{% endif %}" href="{{ url_for('retune_product') }}"><span class="app-nav-icon">↩</span><span class="app-nav-text">Returns</span></a>
+    <div class="app-dropdown {% if endpoint in report_endpoints %}active{% endif %}"><button class="app-dropdown-button" type="button"><span class="app-nav-icon">▥</span><span>Reports</span></button><div class="app-dropdown-menu"><div class="app-menu-label">Reports</div><a class="{% if endpoint=='admin_dashord' %}active{% endif %}" href="{{ url_for('admin_dashord') }}">◫ Dashboard report</a><a class="{% if endpoint=='cutter_report' %}active{% endif %}" href="{{ url_for('cutter_report') }}">✂ Cutter report</a><a class="{% if endpoint=='outworker_report' %}active{% endif %}" href="{{ url_for('outworker_report') }}">♙ Outworker report</a><a class="{% if endpoint=='product_report' %}active{% endif %}" href="{{ url_for('product_report') }}">▦ Product report</a></div></div>
+    <div class="app-dropdown {% if endpoint in manage_endpoints %}active{% endif %}"><button class="app-dropdown-button" type="button"><span class="app-nav-icon">⚙</span><span>Manage</span></button><div class="app-dropdown-menu"><div class="app-menu-label">Data</div><a class="{% if endpoint=='find_edit' %}active{% endif %}" href="{{ url_for('find_edit') }}">⌕ Find entries</a><a class="{% if endpoint in ['edit_index','edit_entry'] %}active{% endif %}" href="{{ url_for('edit_index') }}">✎ Edit center</a><a class="{% if endpoint=='edit_logs' %}active{% endif %}" href="{{ url_for('edit_logs') }}">☷ Edit history</a><div class="app-menu-divider"></div><div class="app-menu-label">Master data</div><a class="{% if endpoint=='add_item' %}active{% endif %}" href="{{ url_for('add_item') }}">＋ Add product</a><a class="{% if endpoint=='add_outworker' %}active{% endif %}" href="{{ url_for('add_outworker') }}">＋ Add outworker</a><a class="{% if endpoint=='add_cuter' %}active{% endif %}" href="{{ url_for('add_cuter') }}">＋ Add cutter</a><a class="{% if endpoint=='add_suppy' %}active{% endif %}" href="{{ url_for('add_suppy') }}">＋ Add supplier</a></div></div>
+    {% endif %}
   </div>
+  <div class="app-user"><span class="app-user-badge" title="{% if id==1 %}Administrator{% else %}Operator{% endif %}">{% if id==1 %}A{% else %}U{% endif %}</span><a class="app-nav-link app-logout" href="{{ url_for('logout') }}">Log out</a></div>
+  <button class="app-menu-toggle" id="appMenuOpen" type="button" aria-label="Open navigation" aria-expanded="false">☰</button>
+</nav>
+<div class="app-nav-offset" aria-hidden="true"></div>
 
-  <!-- Fullscreen Navigation -->
-  <div class="uni-wrapper">
-    <ul class="uni-nav-list">
-      <li class="uni-nav-item"><a href="/" class="uni-nav-link">Home</a></li>
-      {% if id == 1 %}
-      <li class="uni-nav-item"><a href="/bale_entery" class="uni-nav-link">bundle entery</a></li>
-      <li class="uni-nav-item"><a href="/add_outworver" class="uni-nav-link">add outwoker</a></li>
-      <li class="uni-nav-item"><a href="/add_items" class="uni-nav-link">add products</a></li>
-      <li class="uni-nav-item"><a href="/add_cutter" class="uni-nav-link">add cutter</a></li>
-      <li class="uni-nav-item"><a href="/add_suppy" class="uni-nav-link">add party</a></li>
-      <li class="uni-nav-item"><a href="/jobcard" class="uni-nav-link">job card</a></li>
-      <li class="uni-nav-item"><a href="/find_edit" class="uni-nav-link">find and edit</a></li>
-      <li class="uni-nav-item"><a href="/retune_product" class="uni-nav-link">job retun</a></li>
-      {% endif %}
-      <li class="uni-nav-item"><a href="/logout" class="uni-nav-link">logout</a></li>
-    </ul>
-  </div>
+<div class="app-drawer-overlay" id="appDrawerOverlay"></div>
+<aside class="app-drawer" id="appDrawer" aria-label="Mobile navigation" aria-hidden="true">
+  <div class="app-drawer-head"><strong>Navigation</strong><button class="app-drawer-close" id="appMenuClose" type="button" aria-label="Close navigation">×</button></div>
+  <div class="app-drawer-group"><div class="app-drawer-title">Workflow</div><a class="{% if endpoint=='home' %}active{% endif %}" href="{{ url_for('home') }}">⌂ Dashboard</a><a class="{% if endpoint in ['bale_entery','lump_home','bundle_entery'] %}active{% endif %}" href="{{ url_for('bale_entery') }}">▣ Bale and bundle entry</a>{% if id==1 %}<a class="{% if endpoint=='job_card' %}active{% endif %}" href="{{ url_for('job_card') }}">⌁ Scanning job card</a><a class="{% if endpoint=='manual_job_card' %}active{% endif %}" href="{{ url_for('manual_job_card') }}">✎ Manual bulk job card</a><a class="{% if endpoint in ['retune_product','job_retun'] %}active{% endif %}" href="{{ url_for('retune_product') }}">↩ Job returns</a>{% endif %}</div>
+  {% if id==1 %}<div class="app-drawer-group"><div class="app-drawer-title">Reports</div><a class="{% if endpoint=='admin_dashord' %}active{% endif %}" href="{{ url_for('admin_dashord') }}">◫ Dashboard report</a><a href="{{ url_for('cutter_report') }}">✂ Cutter report</a><a href="{{ url_for('outworker_report') }}">♙ Outworker report</a><a href="{{ url_for('product_report') }}">▦ Product report</a></div>
+  <div class="app-drawer-group"><div class="app-drawer-title">Manage</div><a href="{{ url_for('find_edit') }}">⌕ Find entries</a><a href="{{ url_for('edit_index') }}">✎ Edit center</a><a href="{{ url_for('edit_logs') }}">☷ Edit history</a><a href="{{ url_for('add_item') }}">＋ Products</a><a href="{{ url_for('add_outworker') }}">＋ Outworkers</a><a href="{{ url_for('add_cuter') }}">＋ Cutters</a><a href="{{ url_for('add_suppy') }}">＋ Suppliers</a></div>{% endif %}
+  <div class="app-drawer-group"><a class="app-logout" href="{{ url_for('logout') }}">⇥ Log out</a></div>
+</aside>
 
-  <!-- Reset menu on back/refresh -->
-  <script>
-    window.addEventListener('pageshow', () => {
-      document.getElementById('menu').checked = false;
-    });
-
-    document.addEventListener("visibilitychange", function () {
-      if (document.visibilityState === 'visible') {
-        document.getElementById('menu').checked = false;
-      }
-    });
-  </script>
-
-</body>
-</html>
+<script>
+(()=>{const drawer=document.getElementById('appDrawer'),overlay=document.getElementById('appDrawerOverlay'),openButton=document.getElementById('appMenuOpen'),closeButton=document.getElementById('appMenuClose');if(!drawer||!overlay||!openButton||!closeButton)return;const setOpen=open=>{drawer.classList.toggle('open',open);overlay.classList.toggle('open',open);drawer.setAttribute('aria-hidden',String(!open));openButton.setAttribute('aria-expanded',String(open));document.documentElement.style.overflow=open?'hidden':''};openButton.addEventListener('click',()=>setOpen(true));closeButton.addEventListener('click',()=>setOpen(false));overlay.addEventListener('click',()=>setOpen(false));document.addEventListener('keydown',event=>{if(event.key==='Escape')setOpen(false)});document.querySelectorAll('.app-dropdown-button').forEach(button=>button.addEventListener('click',event=>{event.stopPropagation();const menu=button.closest('.app-dropdown');document.querySelectorAll('.app-dropdown.open').forEach(item=>{if(item!==menu)item.classList.remove('open')});menu.classList.toggle('open')}));document.addEventListener('click',()=>document.querySelectorAll('.app-dropdown.open').forEach(item=>item.classList.remove('open')))})();
+</script>

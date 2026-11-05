@@ -1,9 +1,14 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, IntegerField, SubmitField, SelectField, FloatField, PasswordField, DateField
+from wtforms import StringField, TextAreaField, IntegerField, SubmitField, SelectField, FloatField, PasswordField, DateField, HiddenField
 from wtforms.validators import DataRequired,InputRequired
 from datetime import date
+from uuid import uuid4
 
-class Lump_data(FlaskForm):
+class WriteForm(FlaskForm):
+    submission_token = HiddenField(default=lambda: uuid4().hex, validators=[DataRequired()])
+
+
+class Lump_data(WriteForm):
     party_name = StringField("party name", validators=[DataRequired()],
                              render_kw={"placeholder": "Enter name of party", "id": "party_name",'disabled': True})
     cuter_name = StringField(
@@ -86,7 +91,7 @@ class Lump_data(FlaskForm):
     )
 
 
-class bundle_invadata(FlaskForm):
+class bundle_invadata(WriteForm):
     no_of_so = IntegerField("sn.o", validators=[DataRequired()],
                               render_kw={"placeholder": "Enter number of pics"})
     no_of_pics = IntegerField("Number of Pics", validators=[DataRequired()],render_kw={"placeholder": "Enter number of pics"})
@@ -97,11 +102,15 @@ class bundle_invadata(FlaskForm):
             "class": "button"
         }
     )
-class Item_data(FlaskForm):
+class Item_data(WriteForm):
     name = StringField(
         "Name",
         validators=[DataRequired()],
 
+    )
+    aliases = TextAreaField(
+        "Aliases (comma or new line separated)",
+        render_kw={"placeholder": "Example: VIMAL 2M, VIMAL TWO METER"},
     )
     size = FloatField(
         "Size",
@@ -116,10 +125,14 @@ class Item_data(FlaskForm):
         }
     )
 
-class Outworker_form(FlaskForm):
+class Outworker_form(WriteForm):
     name = StringField(
         "Name",
         validators=[DataRequired()],
+    )
+    aliases = TextAreaField(
+        "Master aliases (comma or new line separated)",
+        render_kw={"placeholder": "Example: RAM, RAM MASTER"},
     )
     address = StringField("address",validators=[DataRequired()],render_kw={"placeholder": "Enter address"}
                           )
@@ -133,7 +146,7 @@ class Outworker_form(FlaskForm):
             "class": "button"
         }
     )
-class Cutter_form(FlaskForm):
+class Cutter_form(WriteForm):
     name = StringField(
         "Name",
         validators=[DataRequired()],
@@ -145,10 +158,10 @@ class Cutter_form(FlaskForm):
         }
     )
 class Return_form(FlaskForm):
-    name = StringField(
-        "Name",
-        render_kw={"placeholder": "Enter name of outworker"
-                   ,"id":"job_name"}
+    jobcard_id = IntegerField(
+        "Job card number",
+        validators=[InputRequired()],
+        render_kw={"placeholder": "Enter job card number", "min": 1, "id": "jobcard_id"}
     )
     submit = SubmitField(
         "Submit",
@@ -200,7 +213,7 @@ class Date_form_with_name(FlaskForm):
         'Submit',
         render_kw={"class": "button"})
 
-class party_name(FlaskForm):
+class party_name(WriteForm):
     name = StringField(
         "Name",
         validators=[DataRequired()],render_kw={"placeholder": "Enter name of party"}
@@ -211,7 +224,7 @@ class party_name(FlaskForm):
             "class": "button"
         }
     )
-class bale_data_form(FlaskForm):
+class bale_data_form(WriteForm):
     party_name = StringField("party name",validators=[DataRequired()],render_kw={"placeholder": "Enter name of party","id":"party_name"},default="UNKNOW")
     lot_number =  IntegerField(
         "Lot Number",
@@ -275,6 +288,11 @@ class Find_and_edit(FlaskForm):
             "class": "button"
         }
     )
+
+
+class EditEntryForm(WriteForm):
+    version = HiddenField(validators=[DataRequired()])
+    submit = SubmitField("Save changes", render_kw={"class": "button"})
 
 
 
@@ -418,4 +436,3 @@ class Find_and_edit(FlaskForm):
 #                 "class": "button"
 #             }
 #         )
-

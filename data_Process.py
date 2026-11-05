@@ -1,6 +1,7 @@
 # from sqlalchemy.sql.functions import current_user
 
 from modes import Cuter,Item_data,Outworker,Bundle,Jobcard,Jobmovement,Lump,Party,Bale_date
+from item_aliases import item_name_suggestions
 from datetime import datetime,timedelta,time
 from collections import defaultdict
 from sqlalchemy import func
@@ -27,14 +28,7 @@ def get_party_name():
     return party_name_list
 
 def get_product_namm():
-    product =  Item_data.query.all()
-    product_list = []
-    for product in product:
-        if str(product.name) != '':
-            if (str(product.name)).upper() not in product_list:
-
-                product_list.append(product.name)
-    return product_list
+    return item_name_suggestions()
 
 def get_serch_data():
     return {
@@ -188,6 +182,45 @@ def get_movemet_data(master_name):
                     "history": []
                 })
     return result
+
+
+def get_jobcard_return_data(jobcard_id):
+    """Outstanding product/type balances for one card, excluding unlinked legacy returns."""
+    card = db.session.get(Jobcard, jobcard_id)
+    if card is None:
+        return None
+    movements = Jobmovement.query.filter_by(jobcard=str(card.id)).order_by(Jobmovement.id).all()
+    groups = {}
+    for movement in movements:
+        if movement.name_of_mater != card.given_to:
+            continue
+        key = (movement.product_name, movement.type_B)
+        group = groups.setdefault(key, {"issued_total": 0, "returned_total": 0, "history": []})
+        if movement.flow_type == "OUT":
+            group["issued_total"] += movement.outflow or 0
+        elif movement.flow_type == "IN":
+            group["returned_total"] += movement.inflow or 0
+            group["history"].append({
+                "date": movement.date.strftime("%d-%m-%Y"),
+                "returned": movement.inflow or 0,
+            })
+    items = []
+    for (name, type_name), group in groups.items():
+        balance = group["issued_total"] - group["returned_total"]
+        if balance > 0:
+            items.append({
+                "item_id": len(items) + 1,
+                "name": name.replace(" ", "_"),
+                "colour": type_name,
+                "issued": balance,
+                "history": group["history"],
+            })
+    return {
+        "jobcard_id": card.id,
+        "name": card.given_to,
+        "date": card.date.strftime("%d %b, %Y"),
+        "items": items,
+    }
 
 
 def get_current_week_range():
@@ -550,19 +583,19 @@ def master_report_card(data:dict,current_user):
     if rag_date !=[]:
          for date_range_data in rag_date:
            if date_range_data.flow_type == "OUT":
-               buundle = Bundle.query.get(date_range_data.bundle)
-               lump =  Lump.query.get(buundle.lump_id)
+               buundle = Bundle.query.get(date_range_data.bundle) if date_range_data.bundle else None
+               lump = Lump.query.get(buundle.lump_id) if buundle else None
                product_flow_data.append({
                        'id': date_range_data.id,
                        "entry_datetime": date_range_data.date,
                        "product": date_range_data.product_name,
                        "type_B": date_range_data.type_B,
                        "pieces": date_range_data.outflow,
-                       "kg": buundle.kg,
+                       "kg": buundle.kg if buundle else 0,
                        "flow": "out",
-                       "color": buundle.color,
-                       "cut_by":lump.cut_by,
-                       "labe_made_by":lump.enter_user,
+                       "color": buundle.color if buundle else "",
+                       "cut_by": lump.cut_by if lump else "",
+                       "labe_made_by": lump.enter_user if lump else "",
                        "bindle_id":date_range_data.bundle,
                        "give_by":date_range_data.enter_user,
                })
@@ -674,13 +707,13 @@ def product_data (data:dict,current_user):
     )
     ).order_by(Jobmovement.product_name, Jobmovement.type_B).all()
     for out  in outflow:
-        buble  =  Bundle.query.get(out.bundle)
+        buble = Bundle.query.get(out.bundle) if out.bundle else None
         data_F = {
             'id': out.id,
             "product": out.product_name,
             "type_B":out.type_B,
             "pieces": out.outflow ,
-            'kg':buble.kg,
+            'kg': buble.kg if buble else 0,
             "status": "completed",
             "given_to": out.name_of_mater ,
             "entry_datetime" :out.date.strftime("%Y-%m-%d"),

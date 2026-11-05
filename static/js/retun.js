@@ -210,9 +210,9 @@
                 <td><span class="id-badge">${index + 1}</span></td>
                 <td class="name-badge">
                   <div style="font-weight:600">${item.name}</div>
-                  <div class="history-toggle" onclick="toggleHistory(${index})">
-<!--                    <span class="chevron" id="chevron-${index}">▶</span> View History-->
-                  </div>
+                  <button type="button" class="history-toggle" onclick="toggleHistory(${index})" aria-expanded="false" aria-controls="history-${index}">
+                    <span class="chevron" id="chevron-${index}">▶</span> Return history
+                  </button>
                   <div class="history-content" id="history-${index}">${historyHtml}</div>
                 </td>
                 <td class="item-colour">${item.colour}</td>
@@ -257,6 +257,7 @@
           const isVisible = content.style.display === "block";
           content.style.display = isVisible ? "none" : "block";
           chevron.classList.toggle("open", !isVisible);
+          chevron.closest('button').setAttribute('aria-expanded', String(!isVisible));
         }
       }
   const getCalculatorEntries = (rowIndex) => {
@@ -299,6 +300,9 @@ const buildPayload = () => {
   return items;
 };
 
+      let activeReturnRequestId = crypto.randomUUID();
+      let returnSubmitInFlight = false;
+
       async function submitReturn() {
 
 const items = buildPayload();
@@ -317,8 +321,10 @@ const items = buildPayload();
           }
         }
 
-       const payload = {
+const payload = {
   name: JOB_CARD.name,
+  jobcard_id: JOB_CARD.jobcard_id,
+  request_id: activeReturnRequestId,
   items: items
     .filter((item) => item.returned > 0)
     .map((item) => ({
@@ -335,6 +341,9 @@ const items = buildPayload();
           return;
         }
 
+        if (returnSubmitInFlight) return;
+        returnSubmitInFlight = true;
+
         try {
           const response = await fetch("/summit-retune", {
             method: "POST",
@@ -344,19 +353,28 @@ const items = buildPayload();
 
           const data_R = await response.json();
           console.log(data_R);
+          if (data_R.duplicate) {
+            alert(data_R.message);
+            window.location.replace("/retune_product?ok=101");
+            return;
+          }
           if (data_R.success) {
+            activeReturnRequestId = crypto.randomUUID();
             generateAndPrintHTML(data_R.jobData.jobData);
             window.location.replace("/retune_product?ok=101");
           } else {
-            window.location.replace(`/retune_product?ok=${data_R.code}`);
+            returnSubmitInFlight = false;
+            alert(data_R.message || "Return could not be saved. Refresh this job card to see its latest balance.");
+            window.location.reload();
           }
         } catch (error) {
+          returnSubmitInFlight = false;
           console.error("Error submitting return:", error);
           alert("Error submitting return. Please try again.");
         }
 
         function generateAndPrintHTML(jobData) {
-          const fileName = jobData.date + "_" + jobData.party + "_return.html";
+          const fileName = jobData.date + "_jobcard_" + jobData.jobcard_id + "_return.html";
           const htmlContent = buildPrintHTML(jobData);
           const blob = new Blob([htmlContent], { type: "text/html" });
           const url = URL.createObjectURL(blob);
@@ -409,7 +427,7 @@ const items = buildPayload();
             <html lang="en">
             <head>
                               <meta charset="UTF-8">
-                              <title>${jobData.date + "_" + jobData.party.replace(/\s+/g, "_")}</title>
+                              <title>Job Card #${jobData.jobcard_id} Return</title>
 
                               <style>
                               @page { size: A5 portrait; margin: 0; }
@@ -538,6 +556,7 @@ const items = buildPayload();
                                         <div class="info-row">
                                           <strong>Party Name</strong>
                                           <span class="line"><strong>${jobData.party}</strong></span>
+                                          <span class="line"><strong>Job Card #${jobData.jobcard_id}</strong></span>
                                         </div>
 
                                         <div class="info-row">

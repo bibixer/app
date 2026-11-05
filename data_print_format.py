@@ -48,12 +48,23 @@ def build_custom_csvs_pandas(data):
         date = clean_text(job["date"])
 
         df = pd.DataFrame(job["items"])
+        # Manual rows represent several bundles in one line; scanned rows represent one.
+        if "pieces_per_bundle" not in df:
+            df["pieces_per_bundle"] = df["qty"]
+        else:
+            df["pieces_per_bundle"] = df["pieces_per_bundle"].fillna(df["qty"])
+        if "bundle_count" not in df:
+            df["bundle_count"] = 1
+        else:
+            df["bundle_count"] = df["bundle_count"].fillna(1)
+        df["pieces_per_bundle"] = df["pieces_per_bundle"].astype(int)
+        df["bundle_count"] = df["bundle_count"].astype(int)
 
         # 🔹 STEP 1: GROUP BY PRODUCT + TYPE ONLY
         grouped = (
             df.groupby(["name_of_prduct", "type"])
             .agg(
-                qty_counts=("qty", lambda x: x.value_counts().to_dict()),
+                qty_counts=("pieces_per_bundle", lambda x: df.loc[x.index].groupby("pieces_per_bundle")["bundle_count"].sum().to_dict()),
                 ids=("item_id", lambda x: list(x))
             )
             .reset_index()

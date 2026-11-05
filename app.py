@@ -4,14 +4,19 @@ from route import register_routes
 from modes import db,User
 import logging
 from waitress import serve
+import os
 
 def create_app():
     app = Flask(__name__)
-    app.config['SECRET_KEY'] = '8BYkEfBA6O6donzWlSihBXox7C0sKR6b'
-    app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///cloth.db"
+    app.config['SECRET_KEY'] = os.environ.get(
+        "APP_SECRET_KEY", "8BYkEfBA6O6donzWlSihBXox7C0sKR6b"
+    )
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
+        "DATABASE_URI", "sqlite:///cloth.db"
+    )
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SQLALCHEMY_BINDS'] = {
-        'users': 'sqlite:///users.db'
+        'users': os.environ.get("USERS_DATABASE_URI", "sqlite:///users.db")
     }
 
     db.init_app(app)

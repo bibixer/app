@@ -262,6 +262,9 @@ requestAnimationFrame(() => {
 });
 
 /* ================= SUBMIT ================= */
+let activeJobRequestId = crypto.randomUUID();
+let jobSubmitInFlight = false;
+
 async function submitData() {
   if (!custInput.value) return alert("Select customer");
 
@@ -280,7 +283,11 @@ async function submitData() {
   const payload = {
     customer: custInput.value,
     items,
+    request_id: activeJobRequestId,
   };
+
+  if (jobSubmitInFlight) return;
+  jobSubmitInFlight = true;
 
   try {
     const res = await fetch("/submit-jobcard", {
@@ -293,14 +300,23 @@ async function submitData() {
     console.log(data_R);
     if (!res.ok) throw new Error("Submit failed");
 
+    if (data_R.duplicate) {
+      alert(data_R.message);
+      location.reload();
+      return;
+    }
+
     if (!data_R.success) {
       const errorEl = document.getElementById("error-message");
       errorEl.textContent = data_R.message;
       console.log(data_R.message);
       errorEl.hidden = false;
+      jobSubmitInFlight = false;
+      return;
     }
     alert("Bill submitted");
     if (data_R.success){
+    activeJobRequestId = crypto.randomUUID();
     generateAndPrintHTML(data_R.jobData);
       tbody.innerHTML = "";
 
@@ -642,6 +658,7 @@ async function submitData() {
 
     // <!--    output.textContent = JSON.stringify(data_R, null, 2)-->
   } catch (err) {
+    jobSubmitInFlight = false;
     console.error(err);
     alert("Save failed");
   }
