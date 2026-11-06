@@ -3,12 +3,16 @@ from flask import flash, render_template, redirect, url_for,session,request, jso
 from form import Lump_data, bundle_invadata, Item_data, Outworker_form, Cutter_form, Return_form, Login_form, Date_form, Date_form_with_name,bale_data_form,party_name,Find_and_edit,EditEntryForm
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from data_entry import add_cutter,add_items,add_outworker_db,add_jobcard,add_manual_jobcard,in_move_entery,bale_data_entry,add_party
-from data_Process import get_serch_data, get_job_card_data_creation, get_jobcard_return_data, \
-    get_current_week_range, home_dashboard,get_cutter_report_data,outworker_name,master_report_card,product_data,find_edit_data
-from modes import User, Item_data as ProductModel
+from data_Process import get_serch_data, get_job_card_data_creation, get_jobcard_return_data, get_jobcard_ledger, \
+    get_current_week_range, home_dashboard,get_cutter_report_data,outworker_name,outworker_job_ledger,product_data,find_edit_data
+from modes import User, Jobcard, Item_data as ProductModel
 from edit_service import ENTITY_CONFIG, edit_context, save_entry, audit_logs, search_entries
 from item_aliases import resolve_item_name, item_name_mapping
 from master_aliases import master_name_mapping, master_name_options
+from bundle_types import BUNDLE_TYPE_CHOICES
+from return_reconciliation import unassigned_returns, assign_return
+from data_Process import outworker_period_account
+from payroll_routes import register_payroll_routes
 def reset_session(flow:int):
     # remove all bale lever1
     # remove all lump  vevel
@@ -46,6 +50,8 @@ def register_routes(app,db):
                 return redirect(url_for("home"))
 
         return admin_
+
+    register_payroll_routes(app, oly_admin)
 
     @login_manager.user_loader
     def load_user(user_id):
@@ -245,6 +251,7 @@ def register_routes(app,db):
             "manual_jobcard.html", id=current_user.role, data=job_card_data_c,
             product_names=list(product_names), product_alias_map=product_names,
             master_alias_map=master_names, master_options=master_name_options(),
+            bundle_type_choices=BUNDLE_TYPE_CHOICES,
         )
 
     @app.route("/submit-manual-jobcard", methods=["POST"])
@@ -434,10 +441,32 @@ def register_routes(app,db):
         if data is None:
             flash(f"Job card #{jobcard_id} was not found.", "danger")
             return redirect(url_for("retune_product"))
-        if not data["items"]:
-            flash(f"Job card #{jobcard_id} has no remaining pieces to return.", "warning")
+        if not data["items"] and not data["completed_items"]:
+            flash(f"Job card #{jobcard_id} has no returnable items or return history.", "warning")
             return redirect(url_for("retune_product"))
         return render_template("job_retun.html",data=data,id=current_user.role)
+    @app.route("/jobcard/ledger")
+    @login_required
+    @oly_admin
+    def jobcard_ledger_lookup():
+        error = None
+        if "jobcard_id" in request.args:
+            raw_id = request.args.get("jobcard_id", "").strip()
+            if not raw_id.isdecimal() or int(raw_id) < 1:
+                error = "Enter a valid job card number."
+            elif db.session.get(Jobcard, int(raw_id)) is None:
+                error = f"Job card #{raw_id} was not found."
+            else:
+                return redirect(url_for("jobcard_ledger", jobcard_id=int(raw_id)))
+        return render_template("jobcard_ledger_lookup.html", id=current_user.role, error=error)
+    @app.route("/jobcard/<int:jobcard_id>/ledger")
+    @login_required
+    @oly_admin
+    def jobcard_ledger(jobcard_id):
+        detail = get_jobcard_ledger(jobcard_id)
+        if detail is None:
+            return "Job card not found.", 404
+        return render_template("jobcard_ledger.html", detail=detail, id=current_user.role)
     @app.route("/summit-retune", methods=["POST"])
     @login_required
     @oly_admin
@@ -545,33 +574,38 @@ def register_routes(app,db):
         if not name_data_form.is_submitted():
             name_data_form.date_from.data = range_data["from_date"].date()
             name_data_form.date_to.data = range_data["to_date"].date()
-            name_data_form.name.render_kw = {
-                'placeholder': 'Enter outworker Name',"id":"name_f"
-            }
+        report = None
+        pending_returns = []
         if name_data_form.validate_on_submit():
-            data = name_data_form.data.copy()
-            if data["name"] not in outworker_name_data:
-                flash("ented name not in list", "danger")
-                return redirect(url_for("outworker_report"))
-            if data["date_from"] >  data['date_to']:
-                flash("date range is wong  data from is gater then date to", "danger")
-                return redirect(url_for("outworker_report"))
-
-            report =  master_report_card(data,current_user)
-            if report == 404:
-                flash("user not allowed", "danger")
-
-                return redirect(url_for("outworker_report"))
-            elif report == 402:
-                flash("ented name not in databases", "danger")
-                return redirect(url_for("outworker_report"))
-            elif report == 403:
-                flash("no flow for the name", "danger")
-                return redirect(url_for("outworker_report"))
-            return render_template("admin.html", date_from=name_data_form, type="OUTWOKER_Report",
-                                   name=outworker_name_data,backend_data=report)
-
-        return render_template("admin.html", date_from=name_data_form, type="OUTWOKER_Report", name=outworker_name_data)
+            name = name_data_form.name.data.strip()
+            if name not in outworker_name_data:
+                flash("Select an outworker from the list.", "danger")
+            elif name_data_form.date_from.data > name_data_form.date_to.data:
+                flash("The From date must be on or before the To date.", "danger")
+            else:
+                if request.form.get("action") == "assign_return":
+                    try:
+                        assign_return(
+                            int(request.form.get("movement_id", "")),
+                            int(request.form.get("card_id", "")), current_user,
+                        )
+                        flash("Return linked to the job card. Its ledger has been updated.", "success")
+                    except ValueError as error:
+                        flash(str(error), "danger")
+                report = outworker_job_ledger(
+                    name, name_data_form.date_from.data, name_data_form.date_to.data,
+                )
+                report["account"] = outworker_period_account(
+                    name, name_data_form.date_from.data, name_data_form.date_to.data,
+                )
+                pending_returns = unassigned_returns(name)
+        elif name_data_form.is_submitted():
+            flash("Enter an outworker and valid From and To dates.", "danger")
+        return render_template(
+            "outworker_job_report.html", id=current_user.role,
+            current_form=name_data_form, names=outworker_name_data, report=report,
+            pending_returns=pending_returns,
+        )
 
     @app.route("/product_report", methods=["GET", "POST"])
     @login_required
@@ -603,12 +637,18 @@ def register_routes(app,db):
     def login():
         name_from = Login_form()
         if name_from.validate_on_submit():
-            user = User.query.filter_by(username=name_from.user_name.data).first()
+            username = name_from.user_name.data.strip().lower()
+            user = User.query.filter_by(username=username).first()
             if user and user.check_password(name_from.password.data):
                 login_user(user)
                 return redirect("/")
             else:
-                flash("Invalid credentials")
+                flash("Username or password is incorrect.", "danger")
+        elif request.method == "POST":
+            if name_from.csrf_token.errors:
+                flash("This login form expired. Reload the page and try again.", "warning")
+            else:
+                flash("Enter both a username and password.", "warning")
 
         return render_template('user.html', form_name="Login",
             current_form=name_from)

@@ -159,6 +159,14 @@ class Jobmovement(db.Model):
 
         }
 
+class ReturnBreakdown(db.Model):
+    """Exact input used for one saved job-card return movement."""
+    __tablename__ = "ReturnBreakdown"
+    id = db.Column(db.Integer, primary_key=True)
+    movement_id = db.Column(db.Integer, db.ForeignKey("JobmovementData.id"), nullable=False, unique=True, index=True)
+    entry_method = db.Column(db.String(20), nullable=False)
+    calculation_rows = db.Column(db.JSON, nullable=False, default=list)
+
 class User(UserMixin, db.Model):
     __bind_key__ = 'users'
     __tablename__ = 'users'
@@ -221,6 +229,63 @@ class EditLog(db.Model):
     changed_fields = db.Column(db.JSON, nullable=False)
     username = db.Column(db.String(100), nullable=False)
     changed_at = db.Column(db.DateTime, nullable=False)
+
+
+class OutworkerRate(db.Model):
+    __tablename__ = "outworker_rate"
+    id = db.Column(db.Integer, primary_key=True)
+    product_id = db.Column(db.Integer, db.ForeignKey("ItemData.id"), nullable=False)
+    bundle_type = db.Column(db.String(50), nullable=False, default="")
+    rate_units = db.Column(db.BigInteger, nullable=False)  # 1 rupee = 10,000 units
+    updated_by = db.Column(db.String(100), nullable=False)
+    updated_at = db.Column(db.DateTime, nullable=False)
+    __table_args__ = (
+        db.UniqueConstraint("product_id", "bundle_type"),
+        db.CheckConstraint("rate_units > 0"),
+    )
+
+
+class OutworkerAdvance(db.Model):
+    __tablename__ = "outworker_advance"
+    id = db.Column(db.Integer, primary_key=True)
+    worker_id = db.Column(db.Integer, db.ForeignKey("OutworkData.id"), nullable=False, index=True)
+    worker_name = db.Column(db.String(100), nullable=False)
+    amount_paise = db.Column(db.BigInteger, nullable=False)
+    paid_at = db.Column(db.DateTime, nullable=False)
+    method = db.Column(db.String(20), nullable=False)
+    reference = db.Column(db.String(100), nullable=False, default="")
+    note = db.Column(db.String(500), nullable=False, default="")
+    recorded_by = db.Column(db.String(100), nullable=False)
+    __table_args__ = (db.CheckConstraint("amount_paise > 0"),)
+
+
+class OutworkerPayroll(db.Model):
+    __tablename__ = "outworker_payroll"
+    id = db.Column(db.Integer, primary_key=True)
+    worker_id = db.Column(db.Integer, db.ForeignKey("OutworkData.id"), nullable=False, index=True)
+    worker_name = db.Column(db.String(100), nullable=False)
+    gross_paise = db.Column(db.BigInteger, nullable=False)
+    deduction_paise = db.Column(db.BigInteger, nullable=False)
+    net_paise = db.Column(db.BigInteger, nullable=False)
+    paid_at = db.Column(db.DateTime, nullable=False)
+    method = db.Column(db.String(20), nullable=False)
+    reference = db.Column(db.String(100), nullable=False, default="")
+    note = db.Column(db.String(500), nullable=False, default="")
+    recorded_by = db.Column(db.String(100), nullable=False)
+    __table_args__ = (
+        db.CheckConstraint("gross_paise >= 0 AND deduction_paise >= 0 AND net_paise >= 0"),
+        db.CheckConstraint("gross_paise = deduction_paise + net_paise"),
+    )
+
+
+class OutworkerPayrollJob(db.Model):
+    __tablename__ = "outworker_payroll_job"
+    id = db.Column(db.Integer, primary_key=True)
+    payroll_id = db.Column(db.Integer, db.ForeignKey("outworker_payroll.id"), nullable=False, index=True)
+    jobcard_id = db.Column(db.Integer, db.ForeignKey("JobcardData.id"), nullable=False, unique=True)
+    pieces = db.Column(db.Integer, nullable=False)
+    amount_paise = db.Column(db.BigInteger, nullable=False)
+    lines = db.Column(db.JSON, nullable=False)
 
 
 

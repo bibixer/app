@@ -1,6 +1,6 @@
 # from sqlalchemy.sql.functions import current_user
 
-from modes import Cuter,Item_data,Outworker,Bundle,Jobcard,Jobmovement,Lump,Party,Bale_date
+from modes import Cuter,Item_data,Outworker,Bundle,Jobcard,Jobmovement,ReturnBreakdown,Lump,Party,Bale_date,OutworkerPayrollJob
 from item_aliases import item_name_suggestions
 from datetime import datetime,timedelta,time
 from collections import defaultdict
@@ -185,11 +185,43 @@ def get_movemet_data(master_name):
 
 
 def get_jobcard_return_data(jobcard_id):
-    """Outstanding product/type balances for one card, excluding unlinked legacy returns."""
+    """Given and returned quantities for one card, excluding unlinked legacy returns."""
     card = db.session.get(Jobcard, jobcard_id)
     if card is None:
         return None
     movements = Jobmovement.query.filter_by(jobcard=str(card.id)).order_by(Jobmovement.id).all()
+    return_ids = [movement.id for movement in movements if movement.flow_type == "IN"]
+    breakdowns = {
+        row.movement_id: row
+        for row in ReturnBreakdown.query.filter(ReturnBreakdown.movement_id.in_(return_ids)).all()
+    } if return_ids else {}
+    return _build_jobcard_return_data(card, movements, breakdowns)
+
+
+def _build_jobcard_return_data(card, movements, breakdowns):
+    """Share one card's given patterns and return history with reports and entry."""
+
+    def product_key(name, type_name):
+        return (str(name).replace("_", " ").strip().casefold(), str(type_name).strip().casefold())
+
+    given_patterns = defaultdict(dict)
+    pattern_totals = defaultdict(int)
+    for row in card.product_list if isinstance(card.product_list, list) else []:
+        if not isinstance(row, dict):
+            continue
+        quantity = row.get("qty")
+        if isinstance(quantity, bool) or not isinstance(quantity, int) or quantity <= 0:
+            continue
+        pieces = row.get("pieces_per_bundle", quantity)
+        count = row.get("bundle_count", 1)
+        if (isinstance(pieces, bool) or isinstance(count, bool)
+                or not isinstance(pieces, int) or not isinstance(count, int)
+                or pieces <= 0 or count <= 0 or pieces * count != quantity):
+            continue
+        key = product_key(row.get("name_of_prduct", ""), row.get("type", ""))
+        given_patterns[key][pieces] = given_patterns[key].get(pieces, 0) + count
+        pattern_totals[key] += quantity
+
     groups = {}
     for movement in movements:
         if movement.name_of_mater != card.given_to:
@@ -200,19 +232,43 @@ def get_jobcard_return_data(jobcard_id):
             group["issued_total"] += movement.outflow or 0
         elif movement.flow_type == "IN":
             group["returned_total"] += movement.inflow or 0
+            breakdown = breakdowns.get(movement.id)
             group["history"].append({
                 "date": movement.date.strftime("%d-%m-%Y"),
+                "time": movement.date.strftime("%H:%M"),
                 "returned": movement.inflow or 0,
+                "entry_method": breakdown.entry_method if breakdown else "legacy",
+                "calculation_rows": breakdown.calculation_rows if breakdown else [],
+                "entered_by": movement.enter_user,
             })
     items = []
+    completed_items = []
     for (name, type_name), group in groups.items():
         balance = group["issued_total"] - group["returned_total"]
+        key = product_key(name, type_name)
+        pattern_rows = ([{"pieces": pieces, "count": count} for pieces, count in given_patterns[key].items()]
+                        if pattern_totals[key] == group["issued_total"] else [])
+        given = {
+            "total": group["issued_total"],
+            "date": card.date.strftime("%d-%m-%Y"),
+            "time": card.date.strftime("%H:%M"),
+            "entered_by": card.given_by,
+            "calculation_rows": pattern_rows,
+        }
         if balance > 0:
             items.append({
                 "item_id": len(items) + 1,
                 "name": name.replace(" ", "_"),
                 "colour": type_name,
                 "issued": balance,
+                "given": given,
+                "history": group["history"],
+            })
+        elif group["issued_total"] > 0 and group["history"]:
+            completed_items.append({
+                "name": name.replace(" ", "_"),
+                "colour": type_name,
+                "given": given,
                 "history": group["history"],
             })
     return {
@@ -220,7 +276,208 @@ def get_jobcard_return_data(jobcard_id):
         "name": card.given_to,
         "date": card.date.strftime("%d %b, %Y"),
         "items": items,
+        "completed_items": completed_items,
     }
+
+
+def outworker_job_ledger(name, date_from, date_to, jobcard_id=None):
+    """Job cards created in the range, with all returns linked to those cards."""
+    card_query = Jobcard.query.filter(
+        Jobcard.given_to == name,
+        Jobcard.date.between(datetime.combine(date_from, time.min), datetime.combine(date_to, time.max)),
+    )
+    if jobcard_id is not None:
+        card_query = card_query.filter(Jobcard.id == jobcard_id)
+    cards = card_query.order_by(Jobcard.date.desc(), Jobcard.id.desc()).all()
+    summary = {"jobs": 0, "given": 0, "returned": 0, "remaining": 0, "open_jobs": 0, "completed_jobs": 0}
+    if not cards:
+        return {"name": name, "date_from": date_from, "date_to": date_to, "summary": summary, "jobs": []}
+
+    card_ids = {str(card.id) for card in cards}
+    paid_jobs = {row.jobcard_id: row.payroll_id for row in OutworkerPayrollJob.query.filter(
+        OutworkerPayrollJob.jobcard_id.in_([card.id for card in cards])).all()}
+    movements = (Jobmovement.query.filter(Jobmovement.jobcard.in_(card_ids))
+                 .order_by(Jobmovement.date, Jobmovement.id).all())
+    movement_ids = [movement.id for movement in movements if movement.flow_type == "IN"]
+    breakdowns = {
+        row.movement_id: row
+        for row in ReturnBreakdown.query.filter(ReturnBreakdown.movement_id.in_(movement_ids)).all()
+    } if movement_ids else {}
+    movements_by_card = defaultdict(list)
+    for movement in movements:
+        if movement.name_of_mater == name:
+            movements_by_card[movement.jobcard].append(movement)
+
+    jobs = []
+    for card in cards:
+        card_movements = movements_by_card[str(card.id)]
+        card_data = _build_jobcard_return_data(card, card_movements, breakdowns)
+        products = []
+        for item in card_data["items"] + card_data["completed_items"]:
+            given = item["given"]["total"]
+            returned = sum(entry["returned"] for entry in item["history"])
+            products.append({
+                "name": item["name"].replace("_", " "), "type": item["colour"],
+                "given": given, "returned": returned, "remaining": given - returned,
+                "given_patterns": item["given"]["calculation_rows"],
+                "returns": item["history"],
+            })
+        products.sort(key=lambda item: (item["name"].casefold(), item["type"].casefold()))
+        given_total = sum(item["given"] for item in products)
+        returned_total = sum(item["returned"] for item in products)
+        remaining_total = given_total - returned_total
+
+        running_balance = 0
+        product_balances = defaultdict(int)
+        ledger = []
+        source_rows = card.product_list if isinstance(card.product_list, list) else []
+        used_source_rows = set()
+        for movement in card_movements:
+            if movement.flow_type not in ("OUT", "IN"):
+                continue
+            given_qty = (movement.outflow or 0) if movement.flow_type == "OUT" else 0
+            returned_qty = (movement.inflow or 0) if movement.flow_type == "IN" else 0
+            running_balance += given_qty - returned_qty
+            product_key = (movement.product_name, movement.type_B)
+            product_balances[product_key] += given_qty - returned_qty
+            breakdown = breakdowns.get(movement.id)
+            calculation_rows = breakdown.calculation_rows if breakdown else []
+            if movement.flow_type == "OUT":
+                matching_rows = []
+                for index, source in enumerate(source_rows):
+                    if index in used_source_rows or not isinstance(source, dict):
+                        continue
+                    source_name = str(source.get("name_of_prduct", "")).replace("_", " ").strip().casefold()
+                    movement_name = movement.product_name.replace("_", " ").strip().casefold()
+                    if (source_name != movement_name or source.get("type") != movement.type_B
+                            or source.get("qty") != given_qty):
+                        continue
+                    source_id = str(source.get("item_id") or "")
+                    exact_reference = (source_id == str(movement.bundle) if movement.bundle
+                                       else bool(source_id) and movement.partculer.endswith(source_id))
+                    if exact_reference:
+                        matching_rows = [(index, source)]
+                        break
+                    if not source_id:
+                        matching_rows.append((index, source))
+                if len(matching_rows) == 1:
+                    index, source = matching_rows[0]
+                    pieces = source.get("pieces_per_bundle", given_qty)
+                    count = source.get("bundle_count", 1)
+                    if (isinstance(pieces, int) and not isinstance(pieces, bool)
+                            and isinstance(count, int) and not isinstance(count, bool)
+                            and pieces > 0 and count > 0 and pieces * count == given_qty):
+                        calculation_rows = [{"pieces": pieces, "count": count}]
+                        used_source_rows.add(index)
+                elif movement.bundle and given_qty > 0:
+                    calculation_rows = [{"pieces": given_qty, "count": 1}]
+            ledger.append({
+                "id": movement.id, "date": movement.date, "product": movement.product_name,
+                "type": movement.type_B, "given": given_qty, "returned": returned_qty,
+                "balance": running_balance, "product_balance": product_balances[product_key],
+                "bundle": movement.bundle if movement.flow_type == "OUT" else None,
+                "method": breakdown.entry_method if breakdown else "legacy" if movement.flow_type == "IN" else "given",
+                "calculation_rows": calculation_rows,
+                "entered_by": movement.enter_user,
+            })
+
+        status = ("Check balance" if any(balance < 0 for balance in product_balances.values())
+                  else "Open" if any(balance > 0 for balance in product_balances.values())
+                  else "Complete" if given_total else "No movements")
+        jobs.append({
+            "id": card.id, "date": card.date, "given_by": card.given_by,
+            "payroll_id": paid_jobs.get(card.id),
+            "last_activity": card_movements[-1].date if card_movements else card.date,
+            "given": given_total, "returned": returned_total, "remaining": remaining_total,
+            "status": status, "products": products, "ledger": ledger,
+        })
+        summary["jobs"] += 1
+        summary["given"] += given_total
+        summary["returned"] += returned_total
+        summary["remaining"] += remaining_total
+        summary["open_jobs"] += status == "Open"
+        summary["completed_jobs"] += status == "Complete"
+    return {"name": name, "date_from": date_from, "date_to": date_to, "summary": summary, "jobs": jobs}
+
+
+def outworker_period_account(name, date_from, date_to):
+    """Piece account by movement dates, including balances from older jobs."""
+    start = datetime.combine(date_from, time.min)
+    end = datetime.combine(date_to, time.max)
+    cards = {str(card.id): card for card in Jobcard.query.filter(
+        Jobcard.given_to == name, Jobcard.date <= end,
+    ).all()}
+    rows = (Jobmovement.query.filter(
+        Jobmovement.jobcard.in_(list(cards)), Jobmovement.name_of_mater == name,
+        Jobmovement.date <= end, Jobmovement.flow_type.in_(["OUT", "IN"]),
+    ).order_by(Jobmovement.date, Jobmovement.id).all()) if cards else []
+    totals = {"opening": 0, "given": 0, "returned": 0, "closing": 0,
+              "incomplete_jobs": 0, "pieces_left": 0}
+    products = {}
+    jobs = {}
+    for row in rows:
+        key = (row.product_name, row.type_B)
+        product = products.setdefault(key, {
+            "name": row.product_name.replace("_", " "), "type": row.type_B,
+            "opening": 0, "given": 0, "returned": 0, "closing": 0,
+            "pieces_left": 0, "incomplete_jobs": 0, "jobs": [],
+        })
+        given = (row.outflow or 0) if row.flow_type == "OUT" else 0
+        returned = (row.inflow or 0) if row.flow_type == "IN" else 0
+        if row.date < start:
+            product["opening"] += given - returned
+        else:
+            product["given"] += given
+            product["returned"] += returned
+        product["closing"] += given - returned
+        job = jobs.setdefault(row.jobcard, {
+            "id": cards[row.jobcard].id, "date": cards[row.jobcard].date,
+            "given": 0, "returned": 0, "remaining": 0, "pieces_left": 0,
+            "products": {},
+        })
+        job["given"] += given
+        job["returned"] += returned
+        job["remaining"] += given - returned
+        detail = job["products"].setdefault(key, {
+            "name": product["name"], "type": row.type_B,
+            "given": 0, "returned": 0, "remaining": 0,
+        })
+        detail["given"] += given
+        detail["returned"] += returned
+        detail["remaining"] += given - returned
+
+    outstanding = []
+    for job in jobs.values():
+        for key, detail in job["products"].items():
+            if detail["remaining"] > 0:
+                job["pieces_left"] += detail["remaining"]
+                products[key]["pieces_left"] += detail["remaining"]
+                products[key]["incomplete_jobs"] += 1
+            products[key]["jobs"].append({
+                "id": job["id"], "date": job["date"], **detail,
+            })
+        job["products"] = sorted(job["products"].values(), key=lambda item: (item["name"], item["type"]))
+        if job["pieces_left"] > 0:
+            outstanding.append(job)
+            totals["pieces_left"] += job["pieces_left"]
+    totals["incomplete_jobs"] = len(outstanding)
+    for product in products.values():
+        for field in ("opening", "given", "returned", "closing"):
+            totals[field] += product[field]
+    return {
+        "totals": totals,
+        "products": sorted(products.values(), key=lambda item: (item["name"], item["type"])),
+        "outstanding_jobs": sorted(outstanding, key=lambda job: (job["date"], job["id"])),
+    }
+
+
+def get_jobcard_ledger(jobcard_id):
+    """Full linked movement history for one job card, independent of report dates."""
+    card = db.session.get(Jobcard, jobcard_id)
+    if card is None:
+        return None
+    report = outworker_job_ledger(card.given_to, card.date.date(), card.date.date(), jobcard_id=card.id)
+    return {"outworker": card.given_to, "job": report["jobs"][0]} if report["jobs"] else None
 
 
 def get_current_week_range():

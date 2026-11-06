@@ -3,6 +3,7 @@ from wtforms import StringField, TextAreaField, IntegerField, SubmitField, Selec
 from wtforms.validators import DataRequired,InputRequired
 from datetime import date
 from uuid import uuid4
+from bundle_types import BUNDLE_TYPE_CHOICES
 
 class WriteForm(FlaskForm):
     submission_token = HiddenField(default=lambda: uuid4().hex, validators=[DataRequired()])
@@ -31,15 +32,7 @@ class Lump_data(WriteForm):
 
     bundle_type = SelectField(
         "Type of Bundle",
-        choices=[
-            ("lump", "Lump"),
-            ("good_cut", "Good Cut"),
-            ("fent", "Fent"),
-            ("goodCUT 20 picset", "goodCUT 20 picset"),
-            ("fent 20 picset", "fent 20 picset"),
-            ("un_cut", "Un Cut")
-
-        ],
+        choices=BUNDLE_TYPE_CHOICES,
         validators=[DataRequired()],
         render_kw={
             "class": "form-select"

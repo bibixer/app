@@ -1,9 +1,28 @@
 // Store calculator data for each row
       let calculatorData = {};
 
+      function positiveWholeNumber(value) {
+        const number = Number(value);
+        return Number.isSafeInteger(number) && number > 0 ? number : 0;
+      }
+
       function focusAtEnd(input) {
         if (!input) return;
         input.focus();
+      }
+
+      function focusCalculatorForRow(rowIndex) {
+        const calculator = calculatorData[rowIndex];
+        if (!calculator) return;
+        let targetRow = calculator.rows.find(row => !row.piecesInput.value || !row.countInput.value);
+        if (!targetRow) {
+          addCalculatorRow(rowIndex);
+          targetRow = calculator.rows[calculator.rows.length - 1];
+        }
+        highlightActiveRow(rowIndex);
+        const target = targetRow.piecesInput.value ? targetRow.countInput : targetRow.piecesInput;
+        target.focus();
+        target.scrollIntoView({ block: "nearest" });
       }
 
       function fillJobInfo() {
@@ -26,8 +45,8 @@
         let total = 0;
         if (calculatorData[rowIndex]) {
           calculatorData[rowIndex].rows.forEach(row => {
-            const pieces = parseInt(row.piecesInput.value) || 0;
-            const count = parseInt(row.countInput.value) || 0;
+            const pieces = positiveWholeNumber(row.piecesInput.value);
+            const count = positiveWholeNumber(row.countInput.value);
             total += pieces * count;
           });
         }
@@ -37,9 +56,14 @@
 
         if (returnInput) {
           if (total <= maxRemaining) {
-            if (total !== 0){
-            returnInput.value = total;
-            returnInput.dispatchEvent(new Event('change'));}
+            if (total !== 0) {
+              returnInput.value = total;
+              returnInput.dataset.entryMethod = 'calculator';
+              returnInput.dispatchEvent(new Event('change'));
+            } else if (returnInput.dataset.entryMethod === 'calculator') {
+              returnInput.value = '';
+              returnInput.dataset.entryMethod = 'direct';
+            }
           } else if (total > maxRemaining && total > 0) {
             alert(`Total calculated (${total}) exceeds remaining balance (${maxRemaining}) for ${returnInput.getAttribute('data-name')}`);
           }
@@ -65,12 +89,12 @@
           <div class="calc-input">
             <label>Pcs:</label>
             <input type="number" class="calc-pieces" data-row="${rowIndex}" data-calc-id="${rowId}"
-                   min="0" value="${piecesValue}" placeholder="0" style="width: 60px;">
+                   min="1" step="1" value="${piecesValue}" placeholder="0" style="width: 60px;">
           </div>
           <div class="calc-input">
             <label>× Cnt:</label>
             <input type="number" class="calc-count" data-row="${rowIndex}" data-calc-id="${rowId}"
-                   min="0" value="${countValue}" placeholder="0" style="width: 60px;">
+                   min="1" step="1" value="${countValue}" placeholder="0" style="width: 60px;">
           </div>
           <span>=</span>
           <span class="calc-total" id="calc-total-${rowIndex}-${rowId}">0</span>
@@ -84,8 +108,8 @@
         const totalSpan = newRow.querySelector(`.calc-total`);
 
         const updateTotalAndReturn = () => {
-          const pieces = parseInt(piecesInput.value) || 0;
-          const count = parseInt(countInput.value) || 0;
+          const pieces = positiveWholeNumber(piecesInput.value);
+          const count = positiveWholeNumber(countInput.value);
           const total = pieces * count;
           totalSpan.innerText = total;
           // Update the return field with total from ALL rows
@@ -116,8 +140,8 @@
           if (e.key === "Enter") {
             e.preventDefault();
 
-            const pieces = parseInt(piecesInput.value) || 0;
-            const count = parseInt(countInput.value) || 0;
+            const pieces = positiveWholeNumber(piecesInput.value);
+            const count = positiveWholeNumber(countInput.value);
 
             if (pieces === 0 && count === 0) {
               // Move to return field
@@ -187,49 +211,81 @@
         }
       }
 
+      function escapeHistoryText(value) {
+        return String(value ?? '').replace(/[&<>"']/g, character => ({
+          '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+        })[character]);
+      }
+
+      function renderHistory(history, given) {
+        const givenRows = Array.isArray(given?.calculation_rows) ? given.calculation_rows : [];
+        const givenHtml = given ? `<article class="history-entry given-entry">
+          <div class="history-entry-head"><span>Given · ${escapeHistoryText(given.date)} · ${escapeHistoryText(given.time)}</span><strong>${Number(given.total) || 0} pcs given</strong></div>
+          ${givenRows.length
+            ? `<div class="history-lines">${givenRows.map(row => `<div><span>${Number(row.pieces)} × ${Number(row.count)}</span><strong>${Number(row.pieces) * Number(row.count)} pcs</strong></div>`).join('')}</div>`
+            : '<p class="history-method">Bundle breakdown not recorded</p>'}
+          <span class="history-user">Given by ${escapeHistoryText(given.entered_by)}</span>
+        </article>` : '';
+        const returnsHtml = !history || history.length === 0
+          ? '<p class="history-empty">No returns recorded yet</p>'
+          : history.map(entry => {
+          const date = escapeHistoryText(entry.date);
+          const time = escapeHistoryText(entry.time);
+          const user = escapeHistoryText(entry.entered_by);
+          const total = Number(entry.returned) || 0;
+          const rows = Array.isArray(entry.calculation_rows) ? entry.calculation_rows : [];
+          const detail = entry.entry_method === 'calculator' && rows.length
+            ? `<div class="history-lines">${rows.map(row => `<div><span>${Number(row.pieces)} × ${Number(row.count)}</span><strong>${Number(row.pieces) * Number(row.count)} pcs</strong></div>`).join('')}</div>`
+            : `<p class="history-method">${entry.entry_method === 'direct' ? 'Direct entry' : 'Older return · calculation not recorded'}</p>`;
+          return `<article class="history-entry"><div class="history-entry-head"><span>${date} · ${time}</span><strong>${total} pcs returned</strong></div>${detail}<span class="history-user">Entered by ${user}</span></article>`;
+          }).join('');
+        return `<div class="history-given-panel"><h3>Given on job card</h3>${givenHtml}</div><div class="history-return-panel"><h3>Return entries</h3>${returnsHtml}</div>`;
+      }
+
+      function renderCompletedHistory(items) {
+        const section = document.getElementById('completedHistory');
+        const list = document.getElementById('completedHistoryList');
+        if (!section || !list || !items?.length) return;
+        section.hidden = false;
+        list.innerHTML = items.map(item => `<details class="completed-item"><summary><span>${escapeHistoryText(item.name)} <small>${escapeHistoryText(item.colour)}</small></span><span class="completed-status">${Number(item.given?.total) || 0} pcs given · Fully returned</span></summary><div class="history-content completed-content">${renderHistory(item.history, item.given)}</div></details>`).join('');
+      }
+
       function renderTable(items) {
         const tbody = document.querySelector("#returnTable tbody");
+        if (!tbody) return;
         tbody.innerHTML = items
           .map((item, index) => {
             const remaining = item.issued;
-            const historyHtml =
-              item.history && item.history.length > 0
-                ? item.history
-                    .map(
-                      (h) =>
-                        `<div class="history-item">📅 ${h.date} — Returned <b>${h.returned}</b> pcs</div>`,
-                    )
-                    .join("")
-                : '<div class="history-item">No previous returns</div>';
+            const historyHtml = renderHistory(item.history, item.given);
 
             // Initialize calculator data for this row
             calculatorData[index] = { rows: [], nextId: 0 };
 
             return `
               <tr data-row-index="${index}">
-                <td><span class="id-badge">${index + 1}</span></td>
-                <td class="name-badge">
-                  <div style="font-weight:600">${item.name}</div>
+                <td data-label="Row"><span class="id-badge">${index + 1}</span></td>
+                <td class="name-badge" data-label="Product">
+                  <div style="font-weight:600">${escapeHistoryText(item.name)}</div>
                   <button type="button" class="history-toggle" onclick="toggleHistory(${index})" aria-expanded="false" aria-controls="history-${index}">
-                    <span class="chevron" id="chevron-${index}">▶</span> Return history
+                    <span class="chevron" id="chevron-${index}">▶</span> Given &amp; return history
                   </button>
-                  <div class="history-content" id="history-${index}">${historyHtml}</div>
                 </td>
-                <td class="item-colour">${item.colour}</td>
-                <td><span class="remaining-badge ${remaining < 10 ? "low" : ""}">${remaining} pcs</span></td>
-                <td>
+                <td class="item-colour" data-label="Type">${escapeHistoryText(item.colour)}</td>
+                <td data-label="Given"><span class="given-badge">${Number(item.given?.total) || 0} pcs</span></td>
+                <td data-label="Balance"><span class="remaining-badge ${remaining < 10 ? "low" : ""}">${remaining} pcs</span></td>
+                <td data-label="Return">
                   <input type="number" class="return-input" id="return-input-${index}"
                          min="0" max="${remaining}"
                          placeholder="0"
                          data-remaining="${remaining}"
-                         data-name="${item.name}"
+                         data-name="${escapeHistoryText(item.name)}"
                          data-row-index="${index}"
                          >
                 </td>
-                <td class="calculator-cell">
+                <td class="calculator-cell" data-label="Quick Calc">
                   <div class="calculator" id="calculator-${index}">
                     <div class="calculator-title">
-                      📊 Quick Calc (Enter → Auto-fill)
+                      📊 Quick Calc (Ctrl+C to open · Esc to return)
                     </div>
                     <div class="calc-rows-container" id="calculator-rows-${index}"></div>
                     <div class="calc-summary">
@@ -239,6 +295,7 @@
                   </div>
                 </td>
               </tr>
+              <tr class="history-row" id="history-${index}" hidden><td class="history-row-cell" colspan="7"><div class="history-content">${historyHtml}</div></td></tr>
             `;
           })
           .join("");
@@ -246,7 +303,6 @@
         // Add initial calculator rows for each item (2 rows for faster entry)
         items.forEach((item, index) => {
           addCalculatorRow(index);
-<!--          addCalculatorRow(index); // Second row for multi-line entry-->
         });
       }
 
@@ -254,27 +310,26 @@
         const content = document.getElementById(`history-${index}`);
         const chevron = document.getElementById(`chevron-${index}`);
         if (content && chevron) {
-          const isVisible = content.style.display === "block";
-          content.style.display = isVisible ? "none" : "block";
-          chevron.classList.toggle("open", !isVisible);
-          chevron.closest('button').setAttribute('aria-expanded', String(!isVisible));
+          const isOpening = content.hidden;
+          content.hidden = !isOpening;
+          chevron.classList.toggle("open", isOpening);
+          chevron.closest('button').setAttribute('aria-expanded', String(isOpening));
         }
       }
   const getCalculatorEntries = (rowIndex) => {
   const rows = calculatorData[rowIndex]?.rows || [];
-  const entries = rows
+  return rows
     .map(row => {
-      const pieces = parseInt(row.piecesInput?.value) || 0;
-      const count = parseInt(row.countInput?.value) || 0;
-      return pieces > 0 && count > 0 ? `${pieces}X${count}` : null;
+      const pieces = positiveWholeNumber(row.piecesInput?.value);
+      const count = positiveWholeNumber(row.countInput?.value);
+      return pieces > 0 && count > 0
+        ? { pieces, count } : null;
     })
-    .filter(entry => entry !== null);
-
-  return entries.length > 0 ? entries.join(', ') : '';
+    .filter(Boolean);
 };
 
 const buildPayload = () => {
-  const rows = document.querySelectorAll("#returnTable tbody tr");
+  const rows = document.querySelectorAll("#returnTable tbody tr[data-row-index]");
   const items = [];
 
   rows.forEach((row, index) => {
@@ -285,7 +340,7 @@ const buildPayload = () => {
     const returnedValue = Number(input.value) || 0;
 
     // Get calculator entries for this row
-    const calculatorNote = getCalculatorEntries(index);
+    const calculationRows = input.dataset.entryMethod === 'calculator' ? getCalculatorEntries(index) : [];
 
     items.push({
       item_id: itemData.item_id,
@@ -293,7 +348,8 @@ const buildPayload = () => {
       type_R: itemData.colour,
       remaining: Number(input.dataset.remaining),
       name: itemData.name,
-      calculator_note: calculatorNote, // This will send "5X2, 3X4, 10X1" format
+      entry_method: calculationRows.length ? 'calculator' : 'direct',
+      calculation_rows: calculationRows,
     });
   });
 
@@ -306,6 +362,26 @@ const buildPayload = () => {
       async function submitReturn() {
 
 const items = buildPayload();
+
+        for (const [index, item] of items.entries()) {
+          if (item.entry_method !== 'calculator') continue;
+          const rows = calculatorData[index]?.rows || [];
+          const incompleteRow = rows.find(row => {
+            const pieces = row.piecesInput.value.trim();
+            const count = row.countInput.value.trim();
+            return (pieces || count) && (!positiveWholeNumber(pieces) || !positiveWholeNumber(count));
+          });
+          if (incompleteRow) {
+            alert(`Item #${item.item_id}: Complete each Quick Calc line with whole numbers before saving.`);
+            (incompleteRow.piecesInput.value ? incompleteRow.countInput : incompleteRow.piecesInput).focus();
+            return;
+          }
+          const sum = item.calculation_rows.reduce((total, row) => total + row.pieces * row.count, 0);
+          if (sum !== item.returned) {
+            alert(`Item #${item.item_id}: Quick Calc total must match the Return quantity.`);
+            return;
+          }
+        }
 
         for (const item of items) {
           if (item.returned < 0) {
@@ -331,7 +407,8 @@ const payload = {
       item_id: item.item_id,
       returned: item.returned,
       name_of_product: item.name,
-      note: item.calculator_note || null,  // ✅ ADD COMMA HERE
+      entry_method: item.entry_method,
+      calculation_rows: item.calculation_rows,
       type: item.type_R,
     })),
 };
@@ -415,7 +492,7 @@ const payload = {
                 <td><strong>${index}</strong></td>
                 <td><strong>${item.name}</strong></td>
                 <td><strong>${item.type}</strong></td>
-                <td><strong>${item.qty}--${item.note}</strong></td>
+                <td><strong>${item.qty}${item.note ? ' — ' + item.note : ''}</strong></td>
               </tr>
             `;
             total_return_pcs += item.qty;
@@ -617,6 +694,11 @@ const payload = {
       document.addEventListener("DOMContentLoaded", () => {
         fillJobInfo();
         renderTable(JOB_CARD.items);
+        renderCompletedHistory(JOB_CARD.completed_items || []);
+
+        document.querySelectorAll('.return-input').forEach(input => {
+          input.addEventListener('input', () => { input.dataset.entryMethod = 'direct'; });
+        });
 
         const getInputs = () => Array.from(document.querySelectorAll(".return-input"));
 
@@ -627,6 +709,18 @@ const payload = {
         // Keyboard Navigation Logic for Return Inputs
         document.addEventListener("keydown", (e) => {
           const el = document.activeElement;
+          if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "c" && el?.classList.contains("return-input")) {
+            e.preventDefault();
+            focusCalculatorForRow(Number(el.dataset.rowIndex));
+            return;
+          }
+          if (e.key === "Escape" && el?.matches(".calc-pieces, .calc-count")) {
+            e.preventDefault();
+            const rowIndex = Number(el.dataset.row);
+            focusAtEnd(document.getElementById(`return-input-${rowIndex}`));
+            highlightActiveRow(rowIndex);
+            return;
+          }
           if (!el || !el.classList.contains("return-input")) return;
 
           const inputs = getInputs();

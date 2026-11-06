@@ -1,4 +1,4 @@
-from modes import db, Bundle, Lump, Cuter, Item_data, Outworker, OutworkerAlias,Jobcard,Jobmovement,Bale_date,Party,RequestDedup
+from modes import db, Bundle, Lump, Cuter, Item_data, Outworker, OutworkerAlias,Jobcard,Jobmovement,ReturnBreakdown,Bale_date,Party,RequestDedup
 import logging
 from datetime import datetime
 import hashlib
@@ -6,6 +6,7 @@ from sqlalchemy.exc import IntegrityError
 from item_aliases import normalize_name, parse_aliases, validate_names, resolve_item_name
 from modes import ItemAlias
 from master_aliases import validate_master_aliases, resolve_master_name
+from bundle_types import BUNDLE_TYPE_VALUES
 from data_Process import outworker_name,get_jobcard_return_data
 from data_print_format import outworker_qr_print,buldel_qr_print,job_cade_print
 
@@ -324,7 +325,7 @@ def validate_manual_jobcard(data):
             return False
         if not isinstance(row.get("product"), str) or not row["product"].strip():
             return False
-        if not isinstance(row.get("type"), str) or not row["type"].strip():
+        if not isinstance(row.get("type"), str) or row["type"] not in BUNDLE_TYPE_VALUES:
             return False
         pieces = row.get("pieces")
         count = row.get("count")
@@ -462,6 +463,28 @@ def check_return_item(data):
         if type_B != db_item["colour"]:
             return 4034
 
+        method = item.get("entry_method", "direct")
+        rows = item.get("calculation_rows", [])
+        if method not in ("direct", "calculator") or not isinstance(rows, list) or len(rows) > 100:
+            return 405
+        if method == "direct" and rows:
+            return 405
+        if method == "calculator":
+            if not rows:
+                return 405
+            calculated_total = 0
+            for row in rows:
+                if not isinstance(row, dict):
+                    return 405
+                pieces, count = row.get("pieces"), row.get("count")
+                if (isinstance(pieces, bool) or isinstance(count, bool)
+                        or not isinstance(pieces, int) or not isinstance(count, int)
+                        or pieces <= 0 or count <= 0):
+                    return 405
+                calculated_total += pieces * count
+            if calculated_total != returned_qty:
+                return 405
+
 
     return True
 def in_move_entery(data,current_user,request_key):
@@ -476,8 +499,10 @@ def in_move_entery(data,current_user,request_key):
             db.session.rollback()
             return check_i
         for item in data['items']:
-            # print(item[''])
-            note = str(item.get("note") or "").strip()
+            rows = item.get("calculation_rows", [])
+            method = item.get("entry_method", "direct")
+            note = ", ".join(f'{row["pieces"]}X{row["count"]}' for row in rows) if method == "calculator" else ""
+            item["note"] = note
             job_movement = Jobmovement(
                 date=datetime.now(),
                 jobcard=str(data["jobcard_id"]),
@@ -491,6 +516,12 @@ def in_move_entery(data,current_user,request_key):
             )
 
             db.session.add(job_movement)
+            db.session.flush()
+            db.session.add(ReturnBreakdown(
+                movement_id=job_movement.id,
+                entry_method=method,
+                calculation_rows=rows,
+            ))
         db.session.commit()
         return {
         "code": 101,
