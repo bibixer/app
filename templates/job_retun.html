@@ -35,7 +35,7 @@
       <section class="completed-history" id="completedHistory" hidden aria-label="Fully returned products"><h3>Fully returned products</h3><p>Open a product to review what was given and each saved return.</p><div class="completed-list" id="completedHistoryList"></div></section>
       {% if data['items'] %}<div class="card-footer"><p class="footer-note">Check quantities before confirming this return against job card #{{ data.jobcard_id }}.</p><button type="button" onclick="submitReturn()" class="btn-submit">✓ Confirm Return (Ctrl+M)</button></div>{% endif %}
     </section>
-  
+
   <script>const JOB_CARD = {{ data | tojson }};</script>
   <script src="{{ url_for('static', filename='js/retun.js') }}"></script>
 {% endblock %}

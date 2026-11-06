@@ -247,7 +247,7 @@
         const list = document.getElementById('completedHistoryList');
         if (!section || !list || !items?.length) return;
         section.hidden = false;
-        list.innerHTML = items.map(item => `<details class="completed-item"><summary><span>${escapeHistoryText(item.name)} <small>${escapeHistoryText(item.colour)}</small></span><span class="completed-status">${Number(item.given?.total) || 0} pcs given · Fully returned</span></summary><div class="history-content completed-content">${renderHistory(item.history, item.given)}</div></details>`).join('');
+        list.innerHTML = items.map(item => `<details class="completed-item"><summary><span>${escapeHistoryText(item.name.replace(/_/g, " "))} <small>${escapeHistoryText(item.colour)}</small></span><span class="completed-status">${Number(item.given?.total) || 0} pcs given · Fully returned</span></summary><div class="history-content completed-content">${renderHistory(item.history, item.given)}</div></details>`).join('');
       }
 
       function renderTable(items) {
@@ -265,7 +265,7 @@
               <tr data-row-index="${index}">
                 <td data-label="Row"><span class="id-badge">${index + 1}</span></td>
                 <td class="name-badge" data-label="Product">
-                  <div style="font-weight:600">${escapeHistoryText(item.name)}</div>
+                  <div style="font-weight:600">${escapeHistoryText(item.name.replace(/_/g, " "))}</div>
                   <button type="button" class="history-toggle" onclick="toggleHistory(${index})" aria-expanded="false" aria-controls="history-${index}">
                     <span class="chevron" id="chevron-${index}">▶</span> Given &amp; return history
                   </button>
@@ -278,7 +278,7 @@
                          min="0" max="${remaining}"
                          placeholder="0"
                          data-remaining="${remaining}"
-                         data-name="${escapeHistoryText(item.name)}"
+                         data-name="${escapeHistoryText(item.name.replace(/_/g, " "))}"
                          data-row-index="${index}"
                          >
                 </td>
