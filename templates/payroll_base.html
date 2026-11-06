@@ -1,0 +1,5 @@
+{% extends "app_base.html" %}
+{% block title %}Outworker payroll · BH Manufacturing{% endblock %}
+{% block page_css %}<link rel="stylesheet" href="{{ url_for('static', filename='style/pages/payroll_base.css') }}">{% endblock %}
+{% block main_class %}pay-shell{% endblock %}
+{% block notifications %}{% for category,message in get_flashed_messages(with_categories=true) %}<div class="notice {{ category }}" role="alert">{{ message }}</div>{% endfor %}{% endblock %}

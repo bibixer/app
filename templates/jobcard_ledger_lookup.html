@@ -1,0 +1,12 @@
+{% extends "app_base.html" %}
+{% block title %}Open Job Card Ledger · BH Manufacturing{% endblock %}
+{% block page_css %}<link rel="stylesheet" href="{{ url_for('static', filename='style/pages/jobcard_ledger_lookup.css') }}">{% endblock %}
+{% block main_class %}lookup-shell page-jobcard-ledger-lookup{% endblock %}
+{% block content %}
+<header class="page-head"><p class="eyebrow">Job card accounts</p><h1>Open a job card ledger</h1><p class="lead">Enter a job card number to see its complete Given and Return history, who recorded each movement, and what is still outstanding.</p></header>
+    <div class="layout">
+      <section class="card search-card" aria-labelledby="search-title"><h2 id="search-title">Find by job card number</h2><p>Use the number printed on the original job card.</p><form method="get" action="{{ url_for('jobcard_ledger_lookup') }}"><label for="jobcard_id">Job card number</label><input class="number-input" id="jobcard_id" name="jobcard_id" type="number" min="1" step="1" inputmode="numeric" placeholder="For example, 123" value="{{ request.args.get('jobcard_id', '') }}" required autofocus>{% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}<button class="open-button" type="submit">Open full ledger →</button><p class="form-hint">Press Enter after typing the number.</p></form></section>
+      <aside class="card side-card"><h2>What the ledger shows</h2><p>Every quantity stays attached to its job card.</p><ul class="features"><li><span class="feature-icon">↗</span><span>When pieces were given, their bundle patterns, and who gave them.</span></li><li><span class="feature-icon">↩</span><span>Every return with its date, recorded by user, and calculation.</span></li><li><span class="feature-icon">＝</span><span>Remaining pieces and running balances for the product and job.</span></li></ul></aside>
+    </div>
+    <nav class="quick-links" aria-label="Related reports"><a class="quick-link" href="{{ url_for('outworker_report') }}">Browse outworker jobs →</a><a class="quick-link" href="{{ url_for('retune_product') }}">Job returns →</a></nav>
+{% endblock %}

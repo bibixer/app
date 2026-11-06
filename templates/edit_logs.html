@@ -1,0 +1,18 @@
+{% extends "app_base.html" %}
+{% block title %}Edit logs{% endblock %}
+{% block page_css %}<link rel="stylesheet" href="{{ url_for('static', filename='style/pages/edit_logs.css') }}">{% endblock %}
+{% block main_class %}page-edit-logs{% endblock %}
+{% block content %}
+<header class="ui-heading"><div><p class="ui-kicker">Administration / History</p><h1>Edit audit log</h1><p class="ui-description">A permanent record of who changed an entry, when it changed and the exact values before and after.</p></div><a class="head-link" href="{{ url_for('edit_index') }}">← Edit center</a></header>
+  <div class="table-wrap"><table><thead><tr><th>Time</th><th>User</th><th>Entry</th><th>Action</th><th>Fields</th><th>Before</th><th>After</th></tr></thead>
+  <tbody>
+  {% for log in logs %}
+    <tr>
+      <td>{{ log.changed_at }}</td><td>{{ log.username }}</td>
+      <td><a href="{{ url_for('payroll_rates') if log.entity_type == 'outworker_rate' else url_for('edit_entry', entity_type=log.entity_type, entity_id=log.entity_id) }}">{{ log.entity_type }} #{{ log.entity_id }}</a></td>
+      <td><span class="tag">{{ log.action }}</span></td><td>{{ log.changed_fields|join(', ') }}</td>
+      <td><code>{{ log.old_values|tojson(indent=2) }}</code></td><td><code>{{ log.new_values|tojson(indent=2) }}</code></td>
+    </tr>
+  {% else %}<tr><td colspan="7">No edits recorded yet.</td></tr>{% endfor %}
+  </tbody></table></div>
+{% endblock %}

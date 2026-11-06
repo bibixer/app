@@ -1,0 +1,246 @@
+/* BH Manufacturing · shared application design. Navigation owns its own styles. */
+body.app-ui {
+  --ui-bg:#f3f5f7; --ui-surface:#fff; --ui-ink:#192e3d; --ui-muted:#657786;
+  --ui-accent:#116d63; --ui-accent-hover:#0b554e; --ui-accent-soft:#eaf4f0;
+  --ui-line:#dfe6eb; --ui-blue:#326b95; --ui-amber:#9b681b; --ui-red:#aa3b4d;
+  --ui-shadow:0 2px 6px #18334503,0 10px 28px #18334504;
+  --primary:var(--ui-accent); --primary-hover:var(--ui-accent-hover); --ink:var(--ui-ink);
+  --muted:var(--ui-muted); --line:var(--ui-line); --border:var(--ui-line); --blue:var(--ui-blue);
+  --teal:var(--ui-accent); --paper:#fff; --surface:#fff; --white:#fff; --bg:var(--ui-bg);
+  --text-main:var(--ui-ink); --text-muted:var(--ui-muted); --soft:#f6f8fa;
+  margin:0; padding:0; min-height:100vh; height:auto; display:block;
+  background:var(--ui-bg); color:var(--ui-ink); animation:none;
+  font:400 14px/1.55 Inter,"Segoe UI",system-ui,-apple-system,BlinkMacSystemFont,sans-serif;
+  -webkit-font-smoothing:antialiased; overflow-x:clip; color-scheme:light;
+}
+.app-ui [hidden]{display:none!important}
+.ui-scope,.ui-scope *,.ui-scope *::before,.ui-scope *::after{box-sizing:border-box}
+.ui-skip{position:fixed;top:8px;left:10px;z-index:200000;transform:translateY(-160%);padding:10px 18px;background:#fff;color:#116d63;border-radius:6px;font-weight:700}.ui-skip:focus{transform:translateY(0)}
+body.app-ui .ui-shell{position:relative;z-index:1;width:min(1536px,100%);max-width:1536px;height:auto;max-height:none;overflow:visible;margin:0 auto;padding:34px clamp(18px,3vw,44px) 64px;outline:none}
+.ui-waves{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:0}
+.ui-wave{position:absolute;left:-10%;bottom:-140px;width:220%;height:240px;border-radius:50% 50% 0 0;background:#dcebe6;opacity:.28;animation:ui-wave 24s -3s ease-in-out infinite}
+.ui-wave:nth-child(2){bottom:-165px;background:#dce6ed;animation:ui-wave 31s linear reverse infinite;opacity:.3}
+.ui-wave:nth-child(3){bottom:-180px;background:#e7eee3;animation:ui-wave 37s -8s ease-in-out infinite;opacity:.4}
+@keyframes ui-wave{0%,100%{transform:translateX(0)}50%{transform:translateX(-30%)}}
+.app-ui .ui-scope h1{margin:0;font-size:clamp(26px,2.5vw,34px);line-height:1.2;font-weight:750;letter-spacing:-.035em;color:var(--ui-ink)}
+.app-ui .ui-scope h2{font-size:19px;font-weight:720;line-height:1.35;letter-spacing:-.025em;color:var(--ui-ink)}
+.app-ui .ui-scope h3{font-size:16px;font-weight:700;line-height:1.4;letter-spacing:-.015em;color:var(--ui-ink)}
+.app-ui .ui-scope p{line-height:1.6}
+.app-ui .ui-scope a{color:var(--ui-accent);text-underline-offset:3px}
+.app-ui .ui-scope :is(.page-head,.page-top,.pay-head,.ui-heading){display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap;margin:0 0 28px;padding:0 0 23px;border-bottom:1px solid var(--ui-line)}
+.app-ui .ui-scope :is(.eyebrow,.ui-kicker){margin:0 0 9px;color:var(--ui-accent);font-size:10px;font-weight:800;letter-spacing:.15em;text-transform:uppercase}
+.app-ui .ui-scope :is(.lead,.page-subtitle,.ui-description){max-width:780px;margin:10px 0 0;color:var(--ui-muted);font-size:14px;line-height:1.65}
+.app-ui .ui-scope :is(.hint,.report-note,.footnote,.footer-note,.metric-foot,.section-note,.ledger-ref,.small.muted){color:var(--ui-muted);font-size:12px;line-height:1.6}
+.app-ui .ui-scope :is(.panel,.card,.job-card,.product,.fact,.total:not(td),.metric,.box,.table-card,.chart-card,.balance-section,.supplier-section,.flow-card,.summary-item,.toolbar,.ui-panel){border:1px solid var(--ui-line);border-radius:12px;background:var(--ui-surface);box-shadow:var(--ui-shadow)}
+.app-ui .ui-scope :is(.panel,.ui-panel){padding:24px}
+.app-ui .ui-scope :is(.panel,.card,.job-card,.box,.ui-panel){min-width:0}
+.app-ui .ui-scope :is(.panel,.card,.box)::before{background:var(--ui-accent)}
+.app-ui .ui-scope :is(.card-header,.section-head,.section-title,.subhead){border-color:var(--ui-line);gap:14px}
+.app-ui .ui-scope :is(.section-head,.section-title,.subhead){display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;margin:26px 0 14px}
+.app-ui .ui-scope :is(.section-head,.section-title,.subhead) :is(h2,h3,p){margin:0}
+.app-ui .ui-scope :is(.section-head,.section-title,.subhead) :is(p,span){color:var(--ui-muted);font-size:12px}
+.app-ui .ui-scope :is(.card-header,.filters-head) p{color:var(--ui-muted);font-size:13px}
+.app-ui .ui-scope :is(input,select,textarea,button){font:inherit}
+.app-ui .ui-scope :is(input:not([type=checkbox]):not([type=radio]):not([type=hidden]):not([type=submit]),select,textarea){width:100%;min-height:44px;margin-top:6px;padding:10px 12px;border:1px solid #cbd6de;border-radius:7px;background:#fff;color:var(--ui-ink);font-size:14px;line-height:1.4;box-shadow:0 1px 2px #18334503;transition:border-color .15s,box-shadow .15s}
+.app-ui .ui-scope :is(input,textarea)::placeholder{color:#91a0ad;font-weight:400;opacity:1}
+.app-ui .ui-scope :is(input,select,textarea):focus{outline:0;border-color:var(--ui-accent);box-shadow:0 0 0 3px #116d6318}
+.app-ui .ui-scope input[readonly],.app-ui .ui-scope input:disabled{background:#f4f7f9;color:#718391;border-color:#e2e8ed}
+.app-ui .ui-scope :is(input,select,textarea).is-invalid{border-color:var(--ui-red)}
+.app-ui .ui-scope :is(.invalid-feedback,.field-error,.error){margin-top:5px;color:var(--ui-red);font-size:12px}
+.app-ui .ui-scope :is(label,.field,.filter-field,.date-field){color:#415665;font-size:12px;font-weight:650;letter-spacing:.01em}
+.app-ui .ui-scope :is(input[type=checkbox],input[type=radio]){width:18px;height:18px;accent-color:var(--ui-accent)}
+.app-ui .ui-scope textarea{min-height:94px;resize:vertical}
+.app-ui .ui-scope :is(button,input[type=submit],.button,.head-link,.quick-link,.action,.edit-link){display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:42px;padding:10px 16px;margin-top:0;border:1px solid transparent;border-radius:7px;background:var(--ui-accent);color:#fff;font:650 13px/1.4 Inter,"Segoe UI",system-ui,sans-serif;letter-spacing:0;text-transform:none;text-decoration:none;box-shadow:0 1px 2px #12372e10;cursor:pointer;transition:background .15s,border-color .15s;transform:none}
+.app-ui .ui-scope :is(button,input[type=submit],.button,.action):hover:not(:disabled){background:var(--ui-accent-hover);color:white;transform:none;box-shadow:0 1px 2px #12372e10}
+.app-ui .ui-scope :is(.secondary,.button.secondary,.head-link,.quick-link,.action,.edit-link,.print-button,.pager button,.reset-btn){background:#fff;color:var(--ui-accent);border-color:var(--ui-line);box-shadow:0 1px 2px #12372e06}
+.app-ui .ui-scope :is(.secondary,.head-link,.quick-link,.action,.edit-link,.print-button,.pager button,.reset-btn):hover:not(:disabled){background:var(--ui-accent-soft);color:var(--ui-accent-hover);border-color:#b8d7ca}
+.app-ui .ui-scope :is(.primary,.action.primary,.button.primary){background:var(--ui-accent);color:#fff}
+.app-ui .ui-scope :is(.danger,.remove,.remove-btn,.delete-btn){min-height:34px;padding:7px 10px;background:#fff1f2;color:var(--ui-red);border-color:#f1d4d9;box-shadow:none}
+.app-ui .ui-scope :is(.danger,.remove,.remove-btn,.delete-btn):hover{background:#fbe4e8;color:#932b40}
+.app-ui .ui-scope :is(button,input[type=submit]):disabled{opacity:.45;cursor:not-allowed;transform:none}
+.app-ui .ui-scope :is(button,a,summary):focus-visible{outline:3px solid #83b9a7;outline-offset:3px}
+.app-ui .ui-scope :is(.actions,.head-actions,.page-actions,.hero-actions,.quick-links,.form-footer,.links){display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.app-ui .ui-scope :is(.switch-link,.back-link,.return-link,.ledger-link,.account-job-link){color:var(--ui-accent);font-size:13px;font-weight:650;text-decoration:none}
+.app-ui .ui-scope :is(.switch-link,.back-link,.return-link,.ledger-link,.account-job-link):hover{text-decoration:underline}
+.app-ui .ui-scope :is(.table-wrap,.table-wrapper,.table-container,.mini-wrapper){border:1px solid var(--ui-line);border-radius:9px;background:#fff;overflow-x:auto}
+.app-ui .ui-scope table{width:100%;margin:0;border-collapse:separate;border-spacing:0;color:var(--ui-ink);font-size:13px}
+.app-ui .ui-scope th{padding:13px 16px;border:0;border-bottom:1px solid var(--ui-line);background:#f5f7f9;color:#627584;font-size:10px;font-weight:750;letter-spacing:.055em;text-align:left;text-transform:uppercase;white-space:nowrap}
+.app-ui .ui-scope td{padding:14px 16px;border:0;border-bottom:1px solid #eaf0f3;color:var(--ui-ink);font-size:13px;line-height:1.5;vertical-align:top}
+.app-ui .ui-scope tbody tr:last-child>td{border-bottom:0}
+.app-ui .ui-scope tbody tr:hover>td{background:#f7faf9}
+.app-ui .ui-scope td.number{font-weight:700;font-size:15px;font-variant-numeric:tabular-nums}
+.app-ui .ui-scope :is(td.given,.job-figure.given strong,.total:not(td).given strong){color:var(--ui-blue)}
+.app-ui .ui-scope :is(td.returned,.job-figure.returned strong,.total:not(td).returned strong){color:var(--ui-accent)}
+.app-ui .ui-scope :is(td.balance,.job-figure.balance strong,.total:not(td).remaining strong){color:var(--ui-amber)}
+.app-ui .ui-scope :is(.account-total,.total-row)>td{background:#edf5f1;color:#274e44;font-weight:750}
+.app-ui .ui-scope :is(.metrics,.totals,.facts){gap:16px}
+.app-ui .ui-scope :is(.metric,.total:not(td)){padding:22px 24px;box-shadow:var(--ui-shadow);background:#fff;border-color:var(--ui-line);color:var(--ui-ink);transition:border-color .15s;transform:none}
+.app-ui .ui-scope a.metric:hover{border-color:#a9cabd;transform:none;box-shadow:var(--ui-shadow)}
+.app-ui .ui-scope :is(.metric-value,.metric strong,.total:not(td) strong){font-size:clamp(26px,2.5vw,35px);font-weight:750;letter-spacing:-.035em;line-height:1.2;font-variant-numeric:tabular-nums;color:var(--ui-ink)}
+.app-ui .ui-scope :is(.metric-label,.total:not(td)>span,.metric>span,.fact>span){font-size:10px;letter-spacing:.07em;text-transform:uppercase;font-weight:700;color:var(--ui-muted)}
+.app-ui .ui-scope :is(.metric.given,.total:not(td).given){border-top:3px solid #8bb3d0}
+.app-ui .ui-scope :is(.metric.returned,.total:not(td).returned){border-top:3px solid #86b6a0}
+.app-ui .ui-scope :is(.metric.balance,.metric.amber,.total:not(td).remaining){border-top:3px solid #d6b77b}
+.app-ui .ui-scope .metric-icon{background:#edf3f8;color:var(--ui-blue);border-radius:8px}
+.app-ui .ui-scope .green .metric-icon{background:#e9f4ed;color:var(--ui-accent)}
+.app-ui .ui-scope .orange .metric-icon{background:#fff4e5;color:var(--ui-amber)}
+.app-ui .ui-scope :is(.metric-foot,.metric small){font-size:11px;color:var(--ui-muted)}
+.app-ui .ui-scope :is(.pending-banner,.job-info-bar){padding:18px 20px;border-radius:9px;background:#f4f8f6;border:1px solid #d8e6de;color:#3c5e52}
+.app-ui .ui-scope :is(.notice,.message,.flash,.alert){margin:0 0 20px;padding:13px 16px;border:1px solid #e4d8b7;border-radius:8px;background:#fffaf0;color:#816026;font-size:13px;line-height:1.6;box-shadow:none}
+.app-ui .ui-scope :is(.notice.success,.message.success,.alert-success){background:#edf7f0;color:#286545;border-color:#c9e2d0}
+.app-ui .ui-scope :is(.notice.danger,.message.danger,.message.error,.alert-danger){background:#fff1f2;color:var(--ui-red);border-color:#f0d1d8}
+.app-ui .ui-scope .message.hidden{display:none}
+.app-ui .ui-scope :is(.status,.tag,.card-badge,.card-kicker,.ledger-event,.stats-badge){border-radius:5px;padding:5px 9px;background:#edf5f0;color:#36664f;font-size:10px;font-weight:750;text-transform:none;letter-spacing:.02em;box-shadow:none}
+.app-ui .ui-scope :is(.status.open,.tag.warn){background:#fff4df;color:#946b25}
+.app-ui .ui-scope .status.check{background:#fcecef;color:var(--ui-red)}
+.app-ui .ui-scope .empty{border:1px dashed #d4dee4;background:#fafcfd;border-radius:10px;padding:40px 24px;color:var(--ui-muted);font-size:14px}
+.app-ui .ui-scope :is(.hero,.guide-card,.side-card){padding:28px;background:#edf4f1;border:1px solid #d5e5dc;border-radius:12px;color:var(--ui-ink);box-shadow:none}
+.app-ui .ui-scope :is(.hero,.guide-card,.side-card)::after{display:none}
+.app-ui .ui-scope :is(.hero,.guide-card,.side-card) :is(h1,h2,h3,strong,.master){color:var(--ui-ink)}
+.app-ui .ui-scope :is(.hero,.guide-card,.side-card) :is(p,.lead,.event-sub,.steps span:last-child,.features li){color:#5b7368}
+.app-ui .ui-scope :is(.step-number,.feature-icon){background:#fff;border-color:#cbded1;color:var(--ui-accent);border-radius:7px}
+.app-ui .ui-scope :is(.steps li,.features li){border-color:#d2e1d7}
+.app-ui .ui-scope :is(.lookup-card,.search-card){padding:32px;background:#fff}
+.app-ui .ui-scope .number-input{min-height:60px;font-size:25px;font-weight:650;background:#fbfcfd;border-width:1px}
+.app-ui .ui-scope .open-button{width:100%;margin-top:20px;min-height:46px}
+.app-ui .ui-scope :is(.product-totals>summary,.job-card>summary){background:#fff;border-color:var(--ui-line);border-radius:9px;padding:18px 20px;color:var(--ui-ink)}
+.app-ui .ui-scope :is(.product-totals[open]>summary,.job-card[open]>summary){background:#f5f8f7}
+.app-ui .ui-scope :is(.detail-panel,.breakdown-row,.product-balance,.event-breakdown span){border-color:var(--ui-line);border-radius:7px;background:#f5f8f9}
+.app-ui .ui-scope :is(.job-title strong,.job-figure strong){font-size:18px}
+.app-ui .ui-scope :is(.job-body,.account-section){padding:24px}
+.app-ui .ui-scope :is(.unassigned,.review){background:#fffdf7;border-color:#e5dbb9}
+.app-ui .ui-scope .review{background:#fbfdfc;border-color:#abcbbb}
+.app-ui .ui-scope :is(.entry,.event){border-color:var(--ui-line);border-radius:9px;background:#fff;box-shadow:none}
+.app-ui .ui-scope .entry:hover{background:#f4f8f6;border-color:#a4c8b8}
+.app-ui .ui-scope .entry-list{gap:12px;padding:3px;max-height:none}
+.app-ui .ui-scope .entry-details{color:var(--ui-muted)}
+.app-ui .ui-scope .links{border-top:1px solid var(--ui-line);padding-top:18px;margin-top:24px;font-size:13px}
+.app-ui .ui-scope :is(.toolbar,.table-card,.chart-card){padding:20px}
+.app-ui .ui-scope .toolbar{margin-bottom:20px}
+.app-ui .ui-scope .product-jobs summary{padding:8px 0;color:var(--ui-accent)}
+.app-ui .ui-scope .balance-detail{border-color:var(--ui-line)}
+.app-ui .ui-scope kbd{display:inline-block;padding:2px 6px;border:1px solid #d4dee5;border-bottom-width:2px;border-radius:4px;background:#f9fbfc;color:#5b6f7e;font:500 11px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace}
+.app-ui .ui-scope code{font-size:11px;line-height:1.6;color:#526678;white-space:pre-wrap;overflow-wrap:anywhere}
+.app-ui .ui-scope hr{border:0;border-top:1px solid var(--ui-line);margin:22px 0}
+/* Entry workspaces */
+.app-ui .ui-scope :is(.bill-card,.manual-workspace){max-width:none;max-height:none;height:auto;overflow:visible;margin:0;padding:26px;background:#fff;border:1px solid var(--ui-line);border-radius:12px;box-shadow:var(--ui-shadow)}
+.app-ui .ui-scope .form-header{position:relative;top:auto;z-index:5;margin:0 0 24px;padding:0 0 24px;grid-template-columns:minmax(0,2fr) minmax(180px,1fr);background:#fff;border-color:var(--ui-line)}
+.app-ui .ui-scope :is(.form-header,.fields,.grid,.filter-form){gap:18px}
+.app-ui .ui-scope .form-header input{margin-top:7px}
+.app-ui .ui-scope .table-wrapper:has(#billTable){overflow:visible}
+.app-ui .ui-scope .suggestions{border:1px solid var(--ui-line);border-radius:8px;background:#fff;box-shadow:0 12px 28px #19374616}
+.app-ui .ui-scope .suggestions div:is(:hover,.active){background:var(--ui-accent-soft);color:var(--ui-accent)}
+.app-ui .ui-scope .ui-entry-footer{display:flex;gap:20px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:20px 0 0;margin:24px 0 0;border-top:1px solid var(--ui-line)}
+.app-ui .ui-scope .ui-inline-guide{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:13px 16px;margin:0 0 24px;border:1px solid #dbe7df;border-radius:7px;background:#f3f8f5;font-size:12px;color:#617a6c}
+.app-ui .ui-scope .ui-inline-guide b{color:#355e48;font-size:11px;text-transform:uppercase;letter-spacing:.04em}
+.app-ui .ui-scope .ui-inline-guide details{margin-left:auto;max-width:100%}.app-ui .ui-scope .ui-inline-guide summary{cursor:pointer;color:var(--ui-accent);font-weight:650}
+.app-ui .ui-scope .ui-inline-guide details[open]{flex-basis:100%;margin-left:0}
+.app-ui .ui-scope .ui-inline-guide details p{max-width:850px;margin-bottom:0}
+.app-ui .ui-scope .card-header{background:#fff;color:var(--ui-ink)}
+.app-ui .ui-scope .card-header :is(h1,h2,p){color:inherit}
+.app-ui .ui-scope .manual-workspace>.actions{justify-content:space-between;margin:18px 0;color:var(--ui-ink)}
+.app-ui .ui-scope .ui-entry-footer .shortcut-help{margin:0}
+.app-ui .ui-scope .ui-entry-footer button kbd{color:#e6f4ee;background:#ffffff15;border-color:#ffffff40;font-size:10px}
+.app-ui .ui-scope .ui-entry-footer #submitManual{width:auto;margin:0;min-height:42px;padding:11px 18px;font-size:13px}
+.app-ui .ui-scope td.total{padding:14px 16px;background:#f5f8fa;border:0;border-bottom:1px solid var(--ui-line);border-radius:0;box-shadow:none;color:var(--ui-ink);font-size:13px;white-space:nowrap}
+.app-ui .ui-scope button.danger,.app-ui .ui-scope button.remove{min-height:34px;padding:6px 11px;background:#fff1f2;color:var(--ui-red);border:1px solid #f1d4d9;box-shadow:none}
+.app-ui .ui-scope .ui-totals-bar{display:flex;justify-content:flex-end;gap:24px;flex-wrap:wrap;background:#f5f8fa;border:1px solid var(--ui-line);border-radius:8px;margin:18px 0;padding:16px 20px;color:var(--ui-muted);font-size:12px}
+.app-ui .ui-scope .ui-totals-bar strong{color:var(--ui-ink);font-size:19px;font-variant-numeric:tabular-nums;margin-left:7px}
+.app-ui .ui-scope #summaryBox{padding:20px!important;background:#fafcfd!important;border:1px solid var(--ui-line)!important;border-radius:9px!important}
+.app-ui .ui-scope .summary{padding:20px;background:#fafcfd;border:1px solid var(--ui-line);border-radius:9px}
+.app-ui .ui-scope .summary h2{font-size:16px;margin-top:0}
+.app-ui .ui-scope .summary:empty{display:none}
+.app-ui .ui-scope .shortcut-help{margin:12px 0 0;font-size:12px;color:var(--ui-muted)}
+/* Generic setup forms and sign in */
+.app-ui .ui-form-layout{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(240px,.7fr);gap:24px;align-items:start;max-width:1150px}
+.app-ui .ui-scope .form-container{width:100%;padding:28px;background:#fff;border:1px solid var(--ui-line);border-radius:12px;box-shadow:var(--ui-shadow);text-align:left}
+.app-ui .ui-scope .form-container>h2{margin:0 0 24px;font-size:18px;text-align:left}
+.app-ui .ui-scope .form-container form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+.app-ui .ui-scope .form-container .mb-3{display:block;margin:0;min-width:0}
+.app-ui .ui-scope .form-container :is(.form-label,.form-group>label){display:block;width:auto;margin:0 0 6px}
+.app-ui .ui-scope .form-container form>.btn{grid-column:1/-1;justify-self:start;min-width:160px}
+.app-ui .ui-scope .form-container .form-check{display:flex;gap:10px;align-items:center}
+.app-ui .ui-scope .form-help{padding:24px;background:#edf3f0;border:1px solid #d7e3dc;border-radius:12px}
+.app-ui .ui-scope .form-help h2{margin:0 0 10px;font-size:16px}
+.app-ui .ui-scope .form-help p{margin:0 0 18px;font-size:13px;color:#5f776a}
+.app-ui .ui-scope .form-help ul{display:grid;gap:14px;padding:0;list-style:none;font-size:12px;color:#5f776a}
+.app-ui .ui-scope .form-help li{padding-top:13px;border-top:1px solid #d5e2d8}
+.app-ui .ui-scope .form-help strong{display:block;margin-bottom:4px;color:#335346;font-size:13px}
+.app-ui .ui-scope .item-directory{margin-top:24px;border:1px solid var(--ui-line);border-radius:10px;background:#fff;padding:18px}
+.app-ui .ui-scope .item-directory summary{cursor:pointer;font-weight:700}
+.app-ui .ui-scope .item-directory-list{max-height:300px;overflow:auto;margin-top:14px}
+.app-ui .ui-scope .item-link{padding:12px 2px;border-bottom:1px solid var(--ui-line)}
+.app-ui .ui-scope .item-link small{color:var(--ui-muted)}
+.app-ui.is-guest{background:#edf2f1}
+.app-ui.is-guest .ui-shell{max-width:1160px;padding-top:clamp(28px,9vh,110px)}
+.app-ui .ui-auth{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,.9fr);border:1px solid #d8e2dc;background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 24px 70px #1b44370b}
+.app-ui .ui-auth-brand{padding:54px 44px;background:#e7eee8;display:flex;flex-direction:column;justify-content:space-between;gap:46px}
+.app-ui .ui-auth-brand img{width:160px;height:60px;object-fit:contain;object-position:left center}
+.app-ui .ui-auth-brand h1{max-width:360px;font-size:clamp(29px,3.2vw,42px);line-height:1.18;color:#234638}
+.app-ui .ui-auth-brand p{color:#587263;font-size:14px;max-width:340px;margin:16px 0 0}
+.app-ui .ui-auth-brand small{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#64816d}
+.app-ui .ui-auth .form-container{padding:54px 40px;border:0;border-radius:0;box-shadow:none;align-self:center}
+.app-ui .ui-auth .form-container form{grid-template-columns:1fr}
+.app-ui .ui-auth .form-container h2{font-size:25px;margin:0 0 8px}
+.app-ui .ui-auth .form-container .ui-description{margin:0 0 28px;font-size:13px}
+.app-ui .ui-auth .form-container form>.btn{width:100%;margin-top:4px}
+/* Reports and embedded analytical tools */
+.app-ui .ui-scope .report-filter form{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:18px;align-items:end}
+.app-ui .ui-scope .report-filter .mb-3{margin:0}
+.app-ui .ui-scope .report-filter form>.btn{min-height:44px}
+.app-ui .ui-scope .report-fragment{margin-top:24px;min-width:0}
+.app-ui .ui-scope .report-fragment :is(.dashboard,.combined-container,.supplier-section,.app-container){max-width:none;width:100%;margin:0;padding:0;background:transparent;border:0;border-radius:0;box-shadow:none}
+.app-ui .ui-scope .report-fragment .supplier-section{padding:24px;background:#fff;border:1px solid var(--ui-line);border-radius:12px}
+.app-ui .ui-scope .report-fragment :is(.balance-section,.table-card,.chart-card,.card,.old-balance-panel){border-color:var(--ui-line);border-radius:12px;box-shadow:var(--ui-shadow);background:#fff;padding:20px}
+.app-ui .ui-scope .report-fragment :is(.table-header,.card-header,.section-header,.chart-header){padding:0 0 16px;margin:0 0 16px;background:transparent;border-bottom:1px solid var(--ui-line)}
+.app-ui .ui-scope .report-fragment :is(.filter-bar,.global-filters,.selector-panel,.global-meter-row,.cost-panel){padding:18px;border:1px solid var(--ui-line);border-radius:9px;background:#f8fafb;margin-bottom:20px}
+.app-ui .ui-scope .report-fragment .table-grid-3{display:grid;grid-template-columns:1fr;gap:20px}
+.app-ui .ui-scope .report-fragment .table-card{min-width:0}
+.app-ui .ui-scope .flow-count{border-radius:5px;background:#edf4f0;color:#436c56;padding:5px 8px}
+.app-ui .ui-scope .flow-panel.out .flow-count{background:#fbf3e6;color:#927244}
+.app-ui .ui-scope .bar-fill{background:#8cb6a0}
+.app-ui .ui-scope .flow-panel.out .bar-fill{background:#c4ac84}
+.app-ui .ui-scope .report-filter .section-head,.app-ui .ui-scope .panel>.section-head:first-child{margin-top:0}
+.app-ui .ui-scope .report-fragment :is(.section-title i,.section-header i,.title-block>i,.title-section>i){font-size:17px;padding:9px;border-radius:7px;background:#edf3f6;color:#567487;box-shadow:none}
+.app-ui .ui-scope .report-fragment :is(.section-title>span,.info-badge,.date-badge,.days-chip,.badge-small){padding:5px 9px;border-radius:5px;background:#f0f5f3;color:#5e786b;font-size:11px;box-shadow:none}
+.app-ui .ui-scope .report-fragment .section-title>span i{padding:0;background:none;font-size:12px;margin-right:4px}
+.app-ui .ui-scope .report-fragment .master-grid{grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.app-ui .ui-scope .report-fragment .master-card{max-width:520px}
+.app-ui .ui-scope .report-fragment .master-card:hover{transform:none;border-color:#a4c7b6;box-shadow:none}
+.app-ui .ui-scope .report-fragment .master-name{border-bottom:1px solid var(--ui-line);padding-bottom:14px;margin-bottom:15px;gap:10px}
+.app-ui .ui-scope .report-fragment .master-name i{font-size:15px;padding:7px;border-radius:6px;background:#edf4f0;color:var(--ui-accent);box-shadow:none}
+.app-ui .ui-scope .report-fragment .master-name h3{font-size:15px;overflow-wrap:anywhere}
+.app-ui .ui-scope .report-fragment .balance-row{padding:11px 12px;border-radius:6px;background:#f6f8fa;font-size:13px}
+.app-ui .ui-scope .report-fragment .balance-row .label{font-size:12px;color:var(--ui-muted)}
+.app-ui .ui-scope .report-fragment .balance-row .value{font-size:18px;font-weight:700;color:var(--ui-ink);font-variant-numeric:tabular-nums}
+.app-ui .ui-scope .report-fragment .given-bal{background:#fcf7ed}
+.app-ui .ui-scope .report-fragment .taken-bal{background:#eef6f0}
+.app-ui .ui-scope .report-fragment .net-bal{padding:14px 12px;background:#eef5f2;border:1px solid #cfded5;border-radius:7px}
+.app-ui .ui-scope .report-fragment .wage-card{padding:20px;border:1px solid var(--ui-line);border-radius:10px;background:#fff;box-shadow:none}
+.app-ui .ui-scope .report-fragment :is(.wage-input-group label,.wage-display){font-size:13px;color:var(--ui-muted)}
+.app-ui .ui-scope .report-fragment .wage-input-group input{width:140px;font-size:16px;border-width:1px;border-radius:7px}
+.app-ui .ui-scope .report-fragment .wage-display strong{font-size:24px;color:var(--ui-ink)}
+.app-ui .ui-scope button.history-toggle{min-height:32px;padding:5px 0;margin-top:8px;background:transparent;color:var(--ui-accent);border:0;box-shadow:none;font-size:12px;justify-content:start}
+.app-ui .ui-scope button.history-toggle:hover{background:transparent;color:var(--ui-accent-hover);box-shadow:none;text-decoration:underline}
+.app-ui .ui-scope button.remove-calc-btn{min-height:30px;padding:4px 9px;background:#fff1f2;color:var(--ui-red);border:1px solid #f1d4d9;box-shadow:none}
+.app-ui .ui-scope button.apply-calc-btn{min-height:32px;padding:6px 12px;background:#eaf4ef;border:1px solid #cde0d5;color:var(--ui-accent);font-size:12px;box-shadow:none}
+.app-ui .ui-scope .calc-input input{width:62px;min-height:36px;font-size:13px;text-align:center}
+.app-ui .ui-scope .calculator{padding:13px;border-radius:8px;border-color:var(--ui-line)}
+.app-ui .ui-autocomplete{border:1px solid var(--ui-line);border-radius:7px;box-shadow:0 12px 28px #19374616;font-family:inherit;font-size:14px}
+.app-ui .ui-autocomplete .ui-state-active{background:var(--ui-accent-soft);color:var(--ui-accent);font-weight:600}
+.app-ui .ui-scope .report-fragment :is(.stats-badge,.header-badge,.product-tag,.total-production-box){background:#edf4f1;color:#375f4b;border-radius:6px;padding:8px 12px;box-shadow:none}
+.app-ui .ui-scope .report-fragment :is(.master-card,.summary-item,.stat-card){padding:18px;border:1px solid var(--ui-line);border-radius:9px;background:#fff;box-shadow:none}
+.app-ui .ui-scope .report-fragment :is(.level-option,.toggle-btn){padding:9px 14px;border:1px solid var(--ui-line);border-radius:6px;background:#fff;color:var(--ui-muted);font-size:12px}
+.app-ui .ui-scope .report-fragment :is(.level-option.active,.toggle-btn.active){background:var(--ui-accent-soft);color:var(--ui-accent);border-color:#a7cebb}
+.app-ui .ui-scope #inventory-app-root :is(.inv-sidebar,.inv-sidebar-container){background:#fff;color:var(--ui-ink)}
+.app-ui .ui-scope #inventory-app-root .inv-sidebar-header h2{font-size:20px}
+.app-ui .ui-scope #inventory-app-root :is(.inv-card,.inv-product-card){border-radius:9px;border-color:var(--ui-line);box-shadow:none}
+@media(min-width:1650px){body.app-ui .ui-shell{padding-top:40px}}
+@media(max-width:1050px){.app-ui .ui-form-layout{grid-template-columns:minmax(0,1fr) 260px}.app-ui .ui-scope .filter-panel{align-items:stretch;flex-direction:column}.app-ui .ui-scope .date-form{justify-content:start}}
+@media(max-width:800px){body.app-ui .ui-shell{padding:24px 18px 46px}.app-ui .ui-form-layout{grid-template-columns:1fr}.app-ui .ui-scope .form-help{order:2}.app-ui .ui-auth{grid-template-columns:1fr}.app-ui .ui-auth-brand{padding:30px;gap:24px}.app-ui .ui-auth-brand img{width:48px;height:48px}.app-ui .ui-auth-brand h1{font-size:29px;max-width:none}.app-ui .ui-auth-brand small{display:none}.app-ui .ui-auth .form-container{padding:30px}.app-ui .ui-scope :is(.hero,.lookup-card,.search-card,.guide-card,.side-card){padding:24px}.app-ui .ui-scope .table-wrapper:has(#billTable){overflow-x:auto}.app-ui .ui-scope .report-fragment .grid-main{grid-template-columns:1fr}.app-ui .ui-scope :is(.card,.panel,.job-card){border-radius:10px}}
+@media(max-width:600px){.app-ui .ui-scope :is(.page-head,.page-top,.pay-head,.ui-heading){margin-bottom:22px;padding-bottom:20px;gap:16px}.app-ui .ui-scope :is(.panel,.ui-panel,.job-body,.account-section,.form-container,.bill-card,.manual-workspace){padding:18px}.app-ui .ui-scope .form-container form{grid-template-columns:1fr}.app-ui .ui-scope :is(.metrics,.facts,.totals){gap:10px}.app-ui .ui-scope :is(.metric,.total:not(td)){padding:17px}.app-ui .ui-scope :is(.metric-value,.metric strong,.total:not(td) strong){font-size:26px}.app-ui .ui-scope .form-header{grid-template-columns:1fr}.app-ui .ui-scope :is(input,select,textarea){font-size:16px}.app-ui .ui-scope :is(.head-actions,.page-actions,.actions){gap:8px}.app-ui .ui-scope :is(.head-link,.quick-link){font-size:12px;padding:9px 12px}.app-ui .ui-scope .ui-entry-footer{align-items:stretch}.app-ui .ui-scope .ui-entry-footer>button{width:100%}.app-ui .ui-scope .report-fragment .charts-section{grid-template-columns:1fr}.app-ui .ui-scope .report-fragment .filter-bar{align-items:stretch;flex-direction:column}}
+@media(prefers-reduced-motion:reduce){.ui-wave{animation:none}.ui-scope *{scroll-behavior:auto!important;transition:none!important}}
+@media(max-width:600px){.app-ui .ui-scope .job-info-bar{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:14px}.app-ui .ui-scope .job-info-bar .info-group{min-width:0;padding:12px}.app-ui .ui-scope .job-info-bar label{font-size:10px}.app-ui .ui-scope .job-info-bar .info-group>span{font-size:13px;overflow-wrap:anywhere}.app-ui .ui-scope .ui-inline-guide{gap:8px}.app-ui .ui-scope .ui-inline-guide>span{order:3;flex-basis:100%;font-size:11px}.app-ui .ui-scope .ui-inline-guide>b{order:1}.app-ui .ui-scope .ui-inline-guide>details{order:2;margin-left:auto}}
+.app-ui .ui-scope #masterMatch:empty{display:none}
+@media print{.app-ui .page-manual-jobcard>.ui-heading{display:none!important}}
+@media print{body.app-ui{background:#fff;color:#111}.app-navbar,.app-nav-offset,.app-drawer,.app-drawer-overlay,.ui-waves,.ui-skip,.app-ui .no-print{display:none!important}body.app-ui .ui-shell{width:100%;max-width:none;margin:0;padding:0}.app-ui .ui-scope :is(.panel,.card,.job-card,.metric,.total:not(td),.fact){box-shadow:none;border-color:#ccc;break-inside:avoid}.app-ui .ui-scope :is(.page-head,.page-top,.pay-head,.ui-heading){padding-bottom:14px;margin-bottom:20px}.app-ui .ui-scope .table-wrap{overflow:visible}.app-ui .ui-scope table{min-width:0}.app-ui .ui-scope :is(th,td){padding:8px;font-size:10px}.app-ui .ui-scope .hero{padding:18px;background:#fff}.app-ui .ui-scope .product-totals>.table-wrap{display:block!important}.app-ui .ui-scope .product-totals{content-visibility:visible}.app-ui .ui-scope .form-help{display:none}}

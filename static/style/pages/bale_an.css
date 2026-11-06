@@ -1,0 +1,446 @@
+.ui-scope.supplier-section,
+.ui-scope .supplier-section{
+        max-width: 1600px;
+        width: 100%;
+        background: white;
+        border-radius: 40px;
+        padding: 2rem;
+        box-shadow: 0 25px 50px -12px #00285640;
+      }
+.ui-scope.section-header,
+.ui-scope .section-header{
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+      }
+.ui-scope.section-header i,
+.ui-scope .section-header i{
+        font-size: 2.2rem;
+        color: #1e4a7a;
+        background: #e8f0fe;
+        padding: 0.8rem;
+        border-radius: 24px;
+      }
+.ui-scope.section-header h2,
+.ui-scope .section-header h2{
+        font-weight: 650;
+        color: #0b2b4a;
+        font-size: 1.8rem;
+      }
+.ui-scope.header-badge,
+.ui-scope .header-badge{
+        background: #e2ecfc;
+        padding: 0.4rem 2rem;
+        border-radius: 60px;
+        font-weight: 500;
+        margin-left: auto;
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+      }
+.ui-scope.global-meter-row,
+.ui-scope .global-meter-row{
+        background: linear-gradient(145deg, #e3efff, #d4e7fc);
+        border-radius: 60px;
+        padding: 1.2rem 2rem;
+        margin-bottom: 2rem;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 2.5rem;
+        border: 1px solid #9bbdf0;
+      }
+.ui-scope.global-product-input,
+.ui-scope .global-product-input{
+        display: flex;
+        align-items: center;
+        gap: 1.2rem;
+      }
+.ui-scope.global-product-input label,
+.ui-scope .global-product-input label{
+        font-weight: 700;
+        color: #00337a;
+        font-size: 1.1rem;
+      }
+.ui-scope.global-product-input select,
+.ui-scope .global-product-input select,
+.ui-scope.global-product-input input,
+.ui-scope .global-product-input input{
+        background: white;
+        border: 2px solid #3b82f6;
+        border-radius: 40px;
+        padding: 0.6rem 1.5rem;
+        font-weight: 600;
+        color: #10345e;
+        font-size: 1rem;
+        outline: none;
+      }
+.ui-scope.global-product-input input,
+.ui-scope .global-product-input input{
+        width: 130px;
+        border-color: #b8d1f0;
+      }
+.ui-scope.global-stats,
+.ui-scope .global-stats{
+        display: flex;
+        gap: 2rem;
+        margin-left: auto;
+      }
+.ui-scope.stat-card,
+.ui-scope .stat-card{
+        background: white;
+        border-radius: 50px;
+        padding: 0.4rem 1.8rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        box-shadow: 0 4px 12px #b9d2f0;
+      }
+.ui-scope.stat-label,
+.ui-scope .stat-label{
+        font-size: 0.8rem;
+        color: #2f4d73;
+      }
+.ui-scope.stat-value,
+.ui-scope .stat-value{
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #00337a;
+        line-height: 1.2;
+      }
+.ui-scope.supplier-card,
+.ui-scope .supplier-card{
+        background: #f9fcff;
+        border-radius: 36px;
+        padding: 1.5rem;
+        border: 1px solid #d9e8fc;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 25px -15px #002856;
+      }
+.ui-scope.supplier-header,
+.ui-scope .supplier-header{
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        border-bottom: 3px solid #cddff5;
+        padding-bottom: 1rem;
+        margin-bottom: 1.5rem;
+        cursor: pointer;
+      }
+.ui-scope.supplier-header i,
+.ui-scope .supplier-header i{
+        font-size: 2rem;
+        color: #1e4a7a;
+        background: white;
+        padding: 0.6rem;
+        border-radius: 20px;
+        transition: transform 0.2s;
+      }
+.ui-scope.supplier-header h3,
+.ui-scope .supplier-header h3{
+        font-size: 1.8rem;
+        font-weight: 650;
+      }
+.ui-scope.supplier-header .collapse-icon,
+.ui-scope .supplier-header .collapse-icon{
+        margin-left: auto;
+        font-size: 1.6rem;
+        color: #2563eb;
+      }
+.ui-scope.supplier-summary,
+.ui-scope .supplier-summary{
+        background: #e3efff;
+        border-radius: 50px;
+        padding: 1rem 1.8rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 2rem;
+        align-items: center;
+        font-size: 0.95rem;
+        border: 1px solid #9bbdf0;
+      }
+.ui-scope.supplier-summary span,
+.ui-scope .supplier-summary span{
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+      }
+.ui-scope.supplier-summary i,
+.ui-scope .supplier-summary i{
+        color: #1e4a7a;
+        width: 1.4rem;
+        font-size: 1.1rem;
+      }
+.ui-scope.supplier-summary .summary-value,
+.ui-scope .supplier-summary .summary-value{
+        font-weight: 700;
+        color: #00337a;
+        margin-left: 0.2rem;
+        font-size: 1.1rem;
+      }
+.ui-scope.lot-grid,
+.ui-scope .lot-grid{
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
+        gap: 1.5rem;
+      }
+.ui-scope.lot-card,
+.ui-scope .lot-card{
+        background: white;
+        border-radius: 28px;
+        padding: 1.2rem;
+        border: 1px solid #b9d2f0;
+        box-shadow: 0 6px 14px #d6e4fd;
+      }
+.ui-scope.lot-header,
+.ui-scope .lot-header{
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        border-bottom: 2px dashed #a0bde0;
+        padding-bottom: 0.8rem;
+        margin-bottom: 1rem;
+        cursor: pointer;
+      }
+.ui-scope.lot-header i,
+.ui-scope .lot-header i{
+        font-size: 1.4rem;
+        color: #1d4a89;
+        background: #ecf3fa;
+        padding: 0.4rem;
+        border-radius: 14px;
+      }
+.ui-scope.lot-header h4,
+.ui-scope .lot-header h4{
+        font-size: 1.2rem;
+        font-weight: 600;
+      }
+.ui-scope.lot-badge,
+.ui-scope .lot-badge{
+        background: #1e3b64;
+        color: white;
+        padding: 0.2rem 1.2rem;
+        border-radius: 40px;
+        font-size: 0.9rem;
+        margin-left: auto;
+      }
+.ui-scope.lot-summary,
+.ui-scope .lot-summary{
+        background: #ecf7ff;
+        border-radius: 40px;
+        padding: 0.8rem 1.2rem;
+        margin-bottom: 1rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.2rem;
+        align-items: center;
+        font-size: 0.95rem;
+      }
+.ui-scope.lot-summary span,
+.ui-scope .lot-summary span{
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+      }
+.ui-scope.lot-summary i,
+.ui-scope .lot-summary i{
+        color: #2563eb;
+        width: 1.2rem;
+      }
+.ui-scope.lot-summary .avg-value,
+.ui-scope .lot-summary .avg-value{
+        font-weight: 700;
+        color: #00337a;
+        margin-left: 0.2rem;
+      }
+.ui-scope.bale-grid,
+.ui-scope .bale-grid{
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+.ui-scope.bale-card,
+.ui-scope .bale-card{
+        background: #f2f9fc;
+        border-radius: 24px;
+        padding: 1rem;
+        border-left: 6px solid #3b82f6;
+      }
+.ui-scope.bale-title,
+.ui-scope .bale-title{
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        flex-wrap: wrap;
+        border-bottom: 1px dashed #a0bde0;
+        padding-bottom: 0.6rem;
+        margin-bottom: 0.8rem;
+      }
+.ui-scope.bale-title .bale-no,
+.ui-scope .bale-title .bale-no{
+        font-weight: 700;
+        color: #00337a;
+        background: white;
+        padding: 0.2rem 1.2rem;
+        border-radius: 30px;
+      }
+.ui-scope.bale-title .packing-date,
+.ui-scope .bale-title .packing-date{
+        background: #d9e8fc;
+        padding: 0.2rem 1.2rem;
+        border-radius: 30px;
+        font-size: 0.85rem;
+      }
+.ui-scope.bale-title .packing-slip,
+.ui-scope .bale-title .packing-slip{
+        background: #1e3b64;
+        color: white;
+        padding: 0.2rem 1rem;
+        border-radius: 40px;
+        font-size: 0.8rem;
+        margin-left: auto;
+      }
+.ui-scope.bale-stats,
+.ui-scope .bale-stats{
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        background: #ecf7ff;
+        border-radius: 40px;
+        padding: 0.6rem 1rem;
+        margin: 0.8rem 0;
+        align-items: center;
+      }
+.ui-scope.bale-stat-item,
+.ui-scope .bale-stat-item{
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-size: 0.9rem;
+      }
+.ui-scope.bale-stat-item i,
+.ui-scope .bale-stat-item i{
+        color: #2563eb;
+        width: 1.2rem;
+      }
+.ui-scope.bale-stat-item .val,
+.ui-scope .bale-stat-item .val{
+        font-weight: 700;
+        color: #00337a;
+      }
+.ui-scope.lump-item,
+.ui-scope .lump-item{
+        background: white;
+        border-radius: 18px;
+        padding: 0.8rem;
+        margin: 0.8rem 0;
+        border: 1px solid #b9d2f0;
+      }
+.ui-scope.lump-header,
+.ui-scope .lump-header{
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        flex-wrap: wrap;
+      }
+.ui-scope.lump-name,
+.ui-scope .lump-name{
+        font-weight: 600;
+        color: #00337a;
+      }
+.ui-scope.meter-row,
+.ui-scope .meter-row{
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-top: 0.5rem;
+        flex-wrap: wrap;
+      }
+.ui-scope.meter-input-group input,
+.ui-scope .meter-input-group input{
+        border: 2px solid #b8d1f0;
+        border-radius: 40px;
+        padding: 0.3rem 1rem;
+        width: 80px;
+      }
+.ui-scope.lump-stats,
+.ui-scope .lump-stats{
+        display: flex;
+        gap: 1rem;
+        margin-left: auto;
+      }
+.ui-scope.stat-pill,
+.ui-scope .stat-pill{
+        background: #ecf3fa;
+        padding: 0.2rem 1rem;
+        border-radius: 40px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+.ui-scope.stat-pill .big,
+.ui-scope .stat-pill .big{
+        font-weight: 700;
+        color: #00337a;
+      }
+.ui-scope.bundle-table,
+.ui-scope .bundle-table{
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.8rem;
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        margin-top: 0.8rem;
+      }
+.ui-scope.bundle-table th,
+.ui-scope .bundle-table th{
+        background: #e2edfe;
+        padding: 0.3rem;
+      }
+.ui-scope.bundle-table td,
+.ui-scope .bundle-table td{
+        padding: 0.3rem;
+        border-bottom: 1px solid #d9e5f5;
+        text-align: center;
+      }
+.ui-scope.status-badge,
+.ui-scope .status-badge{
+        background: #dcfce7;
+        color: #166534;
+        padding: 0.2rem 0.6rem;
+        border-radius: 40px;
+        font-size: 0.7rem;
+      }
+.ui-scope.global-footer,
+.ui-scope .global-footer{
+        margin-top: 2rem;
+        background: #e3efff;
+        border-radius: 60px;
+        padding: 1.2rem 2rem;
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 1rem;
+      }
+.ui-scope.footer-item,
+.ui-scope .footer-item{
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+      }
+.ui-scope.footer-item strong,
+.ui-scope .footer-item strong{
+        font-size: 1.3rem;
+        color: #002856;
+        margin-left: 0.3rem;
+      }
+.ui-scope.collapsed .lot-content,
+.ui-scope .collapsed .lot-content,
+.ui-scope.collapsed .supplier-content,
+.ui-scope .collapsed .supplier-content{
+        display: none;
+      }

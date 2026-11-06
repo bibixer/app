@@ -1,0 +1,92 @@
+{% extends "app_base.html" %}
+{% block title %}Outworker Job Ledger · BH Manufacturing{% endblock %}
+{% block page_css %}<link rel="stylesheet" href="{{ url_for('static', filename='style/pages/outworker_job_report.css') }}">{% endblock %}
+{% block main_class %}report-shell page-outworker-job-report{% endblock %}
+{% block content %}
+<header class="page-head"><div><p class="eyebrow">Outworker accounts</p><h1>Job card ledger</h1><p class="lead">See every selected job card as an account: what was given, what came back, and what remains with the outworker.</p></div><div class="head-actions"><a class="head-link" href="{{ url_for('outworker_payroll') }}">Advances & payroll →</a><a class="head-link" href="{{ url_for('jobcard_ledger_lookup') }}">Open by job number →</a><a class="head-link" href="{{ url_for('admin_dashord') }}">Dashboard ↗</a></div></header>
+    {% for category, message in get_flashed_messages(with_categories=true) %}<div class="notice" role="alert">{{ message }}</div>{% endfor %}
+    <section class="panel filters" aria-labelledby="filter-title"><div class="filters-head"><div><h2 id="filter-title">Choose outworker and account dates</h2><p>The product account uses movement dates and brings forward older job balances. The job accounts below show cards issued in this range with their full linked history.</p></div></div>
+      <form method="post" action="{{ url_for('outworker_report') }}" class="filter-form">
+        {{ current_form.hidden_tag() }}
+        <label class="filter-field master-field">Outworker name{{ current_form.name(list='outworkerOptions', autocomplete='off', placeholder='Select an outworker', required=true) }}<datalist id="outworkerOptions">{% for name in names %}<option value="{{ name }}"></option>{% endfor %}</datalist></label>
+        <label class="filter-field">From date{{ current_form.date_from(required=true) }}</label>
+        <label class="filter-field">To date{{ current_form.date_to(required=true) }}</label>
+        {{ current_form.submit(class_='run-button', value='Show job ledger') }}
+      </form>
+    </section>
+    {% if report %}
+      <div class="report-head"><div><p class="eyebrow">Selected account</p><h2>{{ report.name }}</h2><p>{{ report.date_from.strftime('%d %b %Y') }} to {{ report.date_to.strftime('%d %b %Y') }}</p></div><button class="print-button" type="button" onclick="document.querySelectorAll('.job-card,.product-detail,.product-jobs,.product-totals').forEach(item => item.open=true); window.print()">Print ledger</button></div>
+      {% set account = report.account %}{% set totals = account.totals %}
+      <section class="panel account-section" aria-labelledby="piece-account-title">
+        <p class="eyebrow">Accounting in pieces</p><h2 id="piece-account-title">Product account & carried balance</h2>
+        <p>Balance b/f is the quantity outstanding before {{ report.date_from.strftime('%d %b %Y') }}. Given and returned are movements during the selected dates, including older jobs. Balance c/f is the quantity outstanding at the end of {{ report.date_to.strftime('%d %b %Y') }}.</p>
+        <div class="metrics" aria-label="Period piece account">
+          <div class="metric"><span class="metric-label">Balance b/f</span><strong class="metric-value">{{ totals.opening }}</strong><span class="metric-foot">pieces brought forward</span></div>
+          <div class="metric given"><span class="metric-label">Given in period</span><strong class="metric-value">{{ totals.given }}</strong><span class="metric-foot">pieces sent out</span></div>
+          <div class="metric returned"><span class="metric-label">Returned in period</span><strong class="metric-value">{{ totals.returned }}</strong><span class="metric-foot">pieces received back</span></div>
+          <div class="metric balance"><span class="metric-label">Balance c/f</span><strong class="metric-value">{{ totals.closing }}</strong><span class="metric-foot">b/f + given − returned</span></div>
+        </div>
+        <div class="pending-banner"><span><strong>{{ totals.incomplete_jobs }}</strong> incomplete jobs</span><span><strong>{{ totals.pieces_left }}</strong> pieces left as of {{ report.date_to.strftime('%d %b %Y') }}</span></div>
+        <details class="product-totals">
+        <summary><h3>Product totals</h3></summary>
+        <div class="table-wrap"><table><thead><tr><th>Product</th><th>Type</th><th>Balance b/f</th><th>Given</th><th>Returned</th><th>Balance c/f</th><th>Incomplete jobs</th><th>Pieces left</th></tr></thead><tbody>
+          {% for product in account.products %}<tr><td class="product-name">{{ product.name }}</td><td>{{ product.type }}</td><td class="number">{{ product.opening }}</td><td class="number given">{{ product.given }}</td><td class="number returned">{{ product.returned }}</td><td class="number balance">{{ product.closing }}</td><td class="number">{{ product.incomplete_jobs }}</td><td class="number balance">{{ product.pieces_left }}</td></tr>
+          <tr class="product-detail-row"><td colspan="8"><details class="product-jobs"><summary>Job breakdown · {{ product.name }} / {{ product.type }}</summary>
+            {% for job in product.jobs %}<div class="balance-detail"><span><a class="account-job-link" href="{{ url_for('jobcard_ledger', jobcard_id=job.id) }}">Job #{{ job.id }} →</a> · issued {{ job.date.strftime('%d %b %Y') }}</span><span>Given {{ job.given }} · Returned {{ job.returned }} · <b>{{ job.remaining }} remaining</b>{% if job.remaining < 0 %} · Check balance{% elif job.remaining == 0 %} · Complete{% endif %}</span></div>{% endfor %}
+          </details></td></tr>{% else %}<tr><td colspan="8">No linked product movements through this date.</td></tr>{% endfor %}
+          <tr class="account-total"><td colspan="2">Total pieces</td><td class="number">{{ totals.opening }}</td><td class="number given">{{ totals.given }}</td><td class="number returned">{{ totals.returned }}</td><td class="number balance">{{ totals.closing }}</td><td class="number">{{ totals.incomplete_jobs }}</td><td class="number balance">{{ totals.pieces_left }}</td></tr>
+        </tbody></table></div>
+        </details>
+        <div class="subhead"><h3>Incomplete jobs · remaining by job card</h3><p>All jobs with pieces left at the period end</p></div>
+        <div class="table-wrap"><table><thead><tr><th>Job card / issued</th><th>Given to date</th><th>Returned to date</th><th>Pieces left</th><th>Product balances</th></tr></thead><tbody>
+          {% for job in account.outstanding_jobs %}<tr><td><a class="account-job-link" href="{{ url_for('jobcard_ledger', jobcard_id=job.id) }}">Job #{{ job.id }} →</a><br><span class="ledger-ref">{{ job.date.strftime('%d %b %Y') }}</span></td><td class="number given">{{ job.given }}</td><td class="number returned">{{ job.returned }}</td><td class="number balance">{{ job.pieces_left }}</td><td>{% for product in job.products %}<div class="balance-detail"><span>{{ product.name }} · {{ product.type }}</span><b>{{ product.remaining }} remaining{% if product.remaining < 0 %} · Check balance{% endif %}</b></div>{% endfor %}</td></tr>{% else %}<tr><td colspan="5">No incomplete jobs at the end of the selected period.</td></tr>{% endfor %}
+        </tbody></table></div>
+        <p class="report-note">Pieces left counts positive product balances; negative balances are shown for review and do not cancel outstanding pieces on another product. Each incomplete job is counted once in the total. Returns without a job card number appear below for assignment.</p>
+      </section>
+      <div class="section-title"><h2>Jobs issued in the selected dates</h2><span>Full history, including linked returns after the period</span></div>
+      <section class="metrics" aria-label="Account totals">
+        <div class="metric"><span class="metric-label">Job cards</span><strong class="metric-value">{{ report.summary.jobs }}</strong><span class="metric-foot">{{ report.summary.open_jobs }} open · {{ report.summary.completed_jobs }} complete</span></div>
+        <div class="metric given"><span class="metric-label">Given to outworker</span><strong class="metric-value">{{ report.summary.given }}</strong><span class="metric-foot">pieces across selected jobs</span></div>
+        <div class="metric returned"><span class="metric-label">Returned</span><strong class="metric-value">{{ report.summary.returned }}</strong><span class="metric-foot">pieces linked to these jobs</span></div>
+        <div class="metric balance"><span class="metric-label">Still with outworker</span><strong class="metric-value">{{ report.summary.remaining }}</strong><span class="metric-foot">pieces remaining on selected jobs</span></div>
+      </section>
+      <div class="section-title"><h2>Job accounts</h2><span>Open a job to inspect products and dated movements</span></div>
+      {% if report.jobs %}<div class="jobs">
+        {% for job in report.jobs %}<details class="job-card" {% if loop.first %}open{% endif %}>
+          <summary><div><div class="job-title"><strong>Job #{{ job.id }}</strong><span class="status {% if job.status == 'Open' %}open{% elif job.status == 'Check balance' %}check{% endif %}">{{ job.status }}</span></div><span class="job-date">Issued {{ job.date.strftime('%d %b %Y') }}</span></div><div class="job-figure given"><span>Given</span><strong>{{ job.given }}</strong></div><div class="job-figure returned"><span>Returned</span><strong>{{ job.returned }}</strong></div><div class="job-figure balance"><span>Remaining</span><strong>{{ job.remaining }}</strong></div><span class="summary-chevron" aria-hidden="true">⌄</span></summary>
+          <div class="job-body"><div class="job-meta"><span>Given by {{ job.given_by }}</span><span>Last activity {{ job.last_activity.strftime('%d %b %Y, %H:%M') }}</span><span>{{ job.products|length }} product types</span><a class="ledger-link" href="{{ url_for('jobcard_ledger', jobcard_id=job.id) }}">Open full job ledger →</a>{% if job.remaining > 0 %}<a class="return-link" href="{{ url_for('job_retun', jobcard_id=job.id) }}">Record return →</a>{% endif %}</div>
+            {% if job.payroll_id %}<div class="job-meta"><a class="account-job-link" href="{{ url_for('payroll_receipt', payroll_id=job.payroll_id) }}">Paid · view payroll #{{ job.payroll_id }} →</a></div>{% elif job.status == 'Complete' %}<div class="job-meta"><a class="account-job-link" href="{{ url_for('payroll_for_job', jobcard_id=job.id) }}">Calculate & pay completed job →</a></div>{% endif %}
+            <div class="subhead"><h3>Product balances</h3><p>Given − returned = remaining</p></div>
+            <div class="table-wrap"><table><thead><tr><th>Product</th><th>Type</th><th>Given</th><th>Returned</th><th>Remaining</th></tr></thead><tbody>
+              {% for product in job.products %}<tr><td class="product-name">{{ product.name }}</td><td>{{ product.type }}</td><td class="number given">{{ product.given }}</td><td class="number returned">{{ product.returned }}</td><td class="number balance">{{ product.remaining }}</td></tr><tr class="product-detail-row"><td colspan="5"><details class="product-detail"><summary>View given and return breakdown for {{ product.name }}</summary><div class="detail-columns"><div class="detail-panel"><strong>Given: {{ product.given }} pieces</strong>{% if product.given_patterns %}{% for line in product.given_patterns %}<div class="line"><span>{{ line.pieces }} × {{ line.count }}</span><b>{{ line.pieces * line.count }}</b></div>{% endfor %}{% else %}<p>Bundle breakdown was not recorded.</p>{% endif %}</div><div class="detail-panel"><strong>Returns: {{ product.returned }} pieces</strong>{% for entry in product.returns %}<p>{{ entry.date }} {{ entry.time }} · {{ entry.returned }} pieces · {{ entry.entered_by }}</p>{% if entry.calculation_rows %}{% for line in entry.calculation_rows %}<div class="line"><span>{{ line.pieces }} × {{ line.count }}</span><b>{{ line.pieces * line.count }}</b></div>{% endfor %}{% elif entry.entry_method == 'direct' %}<p>Direct entry</p>{% else %}<p>Older entry · calculation not recorded</p>{% endif %}{% else %}<p>No returns yet.</p>{% endfor %}</div></div></details></td></tr>{% else %}<tr><td colspan="5">No linked product movements on this job card.</td></tr>{% endfor %}
+            </tbody></table></div>
+            <div class="subhead"><h3>Movement ledger</h3><p>Running balance is for this job card</p></div>
+            <div class="table-wrap"><table class="ledger-table"><thead><tr><th>Date & time</th><th>Entry</th><th>Product</th><th>Type</th><th>Reference / calculation</th><th>Given</th><th>Returned</th><th>Job balance</th><th>Entered by</th></tr></thead><tbody>
+              {% for entry in job.ledger %}<tr><td>{{ entry.date.strftime('%d %b %Y') }}<br><span class="ledger-ref">{{ entry.date.strftime('%H:%M') }}</span></td><td><span class="ledger-event {% if entry.returned %}in{% endif %}">{{ 'Return' if entry.returned else 'Given' }}</span></td><td class="product-name">{{ entry.product }}</td><td>{{ entry.type }}</td><td class="ledger-ref">{% if entry.bundle %}Bundle #{{ entry.bundle }}{% elif entry.calculation_rows %}{% for line in entry.calculation_rows %}{{ line.pieces }} × {{ line.count }}{% if not loop.last %}, {% endif %}{% endfor %}{% elif entry.returned and entry.method == 'direct' %}Direct entry{% elif entry.returned %}Older return{% else %}Manual job card{% endif %}</td><td class="number given">{{ entry.given if entry.given else '—' }}</td><td class="number returned">{{ entry.returned if entry.returned else '—' }}</td><td class="number balance">{{ entry.balance }}</td><td>{{ entry.entered_by }}</td></tr>{% else %}<tr><td colspan="9">No linked movements found.</td></tr>{% endfor %}
+            </tbody></table></div>
+          </div>
+        </details>{% endfor %}
+      </div>{% else %}<section class="panel empty"><h2>No job cards in this date range</h2><p>Try a wider range to see this outworker's job accounts.</p></section>{% endif %}
+      {% if pending_returns %}
+      <section class="panel unassigned" aria-labelledby="unassigned-title">
+        <h2 id="unassigned-title">Older returns awaiting a job card · {{ pending_returns|length }}</h2>
+        <p>These returns belong to {{ report.name }} but have no job card number. Review the original entry and select its job to include it in the job balance. This list covers all dates; matching jobs may be outside the selected report dates.</p>
+        <div class="table-wrap"><table><thead><tr><th>Return date / entry</th><th>Product / type</th><th>Pieces</th><th>Recorded by</th><th>Assign to job card</th></tr></thead><tbody>
+          {% for pending in pending_returns %}{% set entry = pending.movement %}
+          <tr><td>{{ entry.date.strftime('%d %b %Y, %H:%M') }}<br><span class="ledger-ref">Entry #{{ entry.id }} · {{ entry.partculer }}</span></td><td class="product-name">{{ entry.product_name }}<br><span class="ledger-ref">{{ entry.type_B }}</span></td><td class="number returned">{{ entry.inflow }}</td><td>{{ entry.enter_user }}</td><td>
+            {% if pending.jobs %}<form method="post" action="{{ url_for('outworker_report') }}" class="assign-form">
+              {{ current_form.csrf_token }}
+              <input type="hidden" name="action" value="assign_return">
+              <input type="hidden" name="movement_id" value="{{ entry.id }}">
+              <input type="hidden" name="name" value="{{ report.name }}">
+              <input type="hidden" name="date_from" value="{{ report.date_from.isoformat() }}">
+              <input type="hidden" name="date_to" value="{{ report.date_to.isoformat() }}">
+              <select name="card_id" required aria-label="Job card for return {{ entry.id }}"><option value="">Select original job</option>{% for candidate in pending.jobs %}<option value="{{ candidate.id }}">Job #{{ candidate.id }} · {{ candidate.date.strftime('%d %b %Y') }} · {{ candidate.remaining }} left</option>{% endfor %}</select>
+              <button class="run-button" type="submit">Link return</button>
+            </form>{% else %}<span class="ledger-ref">No matching job with enough remaining pieces. Review this return and its job records.</span>{% endif %}
+          </td></tr>{% endfor %}
+        </tbody></table></div>
+      </section>{% endif %}
+      <p class="report-note">Job balances include returns linked by job card number. Assigning an older return preserves its original date, quantity and recorder, and adds an edit log showing who linked it.</p>
+    {% else %}<section class="panel empty"><h2>Select an outworker to open the ledger</h2><p>Choose a name and job date range, then select “Show job ledger.”</p></section>{% endif %}
+{% endblock %}

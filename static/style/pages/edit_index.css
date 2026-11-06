@@ -1,0 +1,50 @@
+.ui-scope [hidden]{display:none!important}
+.ui-scope.box,
+.ui-scope .box{max-width:1040px;margin:auto;background:#fff;padding:28px;border-radius:16px;box-shadow:0 8px 30px #18315318}
+.ui-scope h1{margin:0 0 7px}
+.ui-scope.hint,
+.ui-scope .hint{color:#64748b;margin:0 0 24px}
+.ui-scope.toolbar,
+.ui-scope .toolbar{display:grid;grid-template-columns:minmax(220px,1fr) minmax(260px,2fr);gap:16px;align-items:end}
+.ui-scope label{display:block;font-weight:700}
+.ui-scope input,
+.ui-scope select,
+.ui-scope button{font:inherit}
+.ui-scope input,
+.ui-scope select{width:100%;padding:11px;margin-top:7px;border:1px solid #bac7d8;border-radius:9px;background:#fff}
+.ui-scope input:focus,
+.ui-scope select:focus{outline:2px solid #b5c7ff;border-color:#4164d9}
+.ui-scope.list-head,
+.ui-scope .list-head{display:flex;justify-content:space-between;gap:12px;margin:22px 0 10px;color:#64748b;font-size:14px}
+.ui-scope.entry-list,
+.ui-scope .entry-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:10px;max-height:65vh;overflow:auto;padding:2px}
+.ui-scope.entry,
+.ui-scope .entry{display:flex;justify-content:space-between;align-items:center;gap:12px;border:1px solid #dce4ef;border-radius:11px;padding:13px;background:#fff}
+.ui-scope.entry:hover,
+.ui-scope .entry:hover{border-color:#9ab1f5;background:#f8faff}
+.ui-scope.entry-title,
+.ui-scope .entry-title{font-weight:700;overflow-wrap:anywhere}
+.ui-scope.entry-details,
+.ui-scope .entry-details{color:#64748b;font-size:12px;margin-top:5px;overflow-wrap:anywhere}
+.ui-scope.edit-link,
+.ui-scope .edit-link{white-space:nowrap;padding:8px 11px;border-radius:8px;background:#e9efff;color:#2449b7;text-decoration:none;font-weight:700}
+.ui-scope.edit-link:hover,
+.ui-scope .edit-link:hover{background:#dbe5ff}
+.ui-scope.empty,
+.ui-scope .empty{padding:24px;text-align:center;color:#64748b;border:1px dashed #cbd5e1;border-radius:11px}
+.ui-scope.pager,
+.ui-scope .pager{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:17px}
+.ui-scope.pager button,
+.ui-scope .pager button{padding:9px 15px;background:#e9efff;color:#2449b7;border:0;border-radius:8px;font-weight:700;cursor:pointer}
+.ui-scope.pager button:disabled,
+.ui-scope .pager button:disabled{opacity:.45;cursor:not-allowed}
+.ui-scope.links,
+.ui-scope .links{margin-top:24px;display:flex;gap:16px;flex-wrap:wrap}
+.ui-scope.links a,
+.ui-scope .links a{color:#2449b7}
+@media(max-width:650px){.ui-scope.box,
+.ui-scope .box{padding:18px}
+.ui-scope.toolbar,
+.ui-scope .toolbar{grid-template-columns:1fr}
+.ui-scope.entry-list,
+.ui-scope .entry-list{grid-template-columns:1fr;max-height:none}}

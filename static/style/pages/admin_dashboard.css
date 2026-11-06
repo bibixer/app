@@ -1,0 +1,146 @@
+.ui-scope.dashboard,
+.ui-scope .dashboard{ width:min(1480px,100%); margin:0 auto; padding:30px clamp(16px,3vw,42px) 48px; }
+.ui-scope.page-head,
+.ui-scope .page-head{ display:flex; justify-content:space-between; align-items:flex-end; gap:20px; margin-bottom:24px; }
+.ui-scope.eyebrow,
+.ui-scope .eyebrow{ margin:0 0 7px; color:#5b58c7; font-size:12px; font-weight:800; letter-spacing:.11em; text-transform:uppercase; }
+.ui-scope h1{ margin:0; font-size:clamp(28px,3.2vw,42px); line-height:1.15; letter-spacing:-.04em; }
+.ui-scope.lead,
+.ui-scope .lead{ margin:9px 0 0; color:var(--muted); font-size:14px; line-height:1.5; }
+.ui-scope.head-link,
+.ui-scope .head-link{ display:inline-flex; align-items:center; gap:8px; padding:10px 14px; border:1px solid #d9def8; border-radius:10px; background:#fff; color:#4338ca; text-decoration:none; font-size:13px; font-weight:750; white-space:nowrap; }
+.ui-scope.head-link:hover,
+.ui-scope .head-link:hover{ background:#eef2ff; }
+.ui-scope.panel,
+.ui-scope .panel{ min-width:0; background:var(--surface); border:1px solid var(--line); border-radius:18px; box-shadow:0 8px 28px rgba(30,41,59,.045); }
+.ui-scope.filter-panel,
+.ui-scope .filter-panel{ display:flex; align-items:center; justify-content:space-between; gap:18px; padding:20px 24px; margin-bottom:22px; }
+.ui-scope.filter-copy h2,
+.ui-scope .filter-copy h2,
+.ui-scope.section-head h2,
+.ui-scope .section-head h2{ margin:0; font-size:17px; letter-spacing:-.02em; }
+.ui-scope.filter-copy p,
+.ui-scope .filter-copy p,
+.ui-scope.section-head p,
+.ui-scope .section-head p{ margin:5px 0 0; color:var(--muted); font-size:12px; line-height:1.45; }
+.ui-scope.date-form,
+.ui-scope .date-form{ display:flex; align-items:end; justify-content:flex-end; flex-wrap:wrap; gap:10px; }
+.ui-scope.date-field,
+.ui-scope .date-field{ display:flex; flex-direction:column; gap:6px; color:#475569; font-size:12px; font-weight:700; }
+.ui-scope.date-field input,
+.ui-scope .date-field input{ height:41px; min-width:150px; padding:0 11px; border:1px solid #d7dfeb; border-radius:9px; background:#fff; color:var(--ink); font:inherit; font-size:13px; }
+.ui-scope.date-field input:focus-visible,
+.ui-scope .date-field input:focus-visible,
+.ui-scope.apply-button:focus-visible,
+.ui-scope .apply-button:focus-visible,
+.ui-scope.head-link:focus-visible,
+.ui-scope .head-link:focus-visible,
+.ui-scope.metric:focus-visible,
+.ui-scope .metric:focus-visible,
+.ui-scope.quick-link:focus-visible,
+.ui-scope .quick-link:focus-visible{ outline:3px solid #a5b4fc; outline-offset:2px; }
+.ui-scope.apply-button,
+.ui-scope .apply-button{ height:41px; padding:0 18px; border:0; border-radius:9px; background:var(--blue); color:#fff; font-family:inherit; font-size:13px; font-weight:700; cursor:pointer; }
+.ui-scope.apply-button:hover,
+.ui-scope .apply-button:hover{ background:#4338ca; }
+.ui-scope.notice,
+.ui-scope .notice{ margin:0 0 18px; padding:12px 16px; border-radius:10px; background:#fff0f0; border:1px solid #fecaca; color:#991b1b; font-size:13px; }
+.ui-scope.section-head,
+.ui-scope .section-head{ display:flex; align-items:flex-end; justify-content:space-between; gap:12px; margin:28px 0 12px; }
+.ui-scope.section-head:first-of-type,
+.ui-scope .section-head:first-of-type{ margin-top:0; }
+.ui-scope.section-note,
+.ui-scope .section-note{ color:var(--muted); font-size:12px; }
+.ui-scope.metrics,
+.ui-scope .metrics{ display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:15px; }
+.ui-scope.metric,
+.ui-scope .metric{ display:block; min-width:0; padding:20px; color:inherit; text-decoration:none; transition:transform .18s,box-shadow .18s; }
+.ui-scope a.metric:hover{ transform:translateY(-2px); box-shadow:0 14px 30px rgba(30,41,59,.1); }
+.ui-scope.metric-top,
+.ui-scope .metric-top{ display:flex; align-items:center; justify-content:space-between; gap:8px; }
+.ui-scope.metric-label,
+.ui-scope .metric-label{ color:#526176; font-size:12px; font-weight:750; text-transform:uppercase; letter-spacing:.045em; }
+.ui-scope.metric-icon,
+.ui-scope .metric-icon{ width:32px; height:32px; display:grid; place-items:center; border-radius:9px; background:#eef2ff; color:#4f46e5; font-size:17px; }
+.ui-scope.metric.green .metric-icon,
+.ui-scope .metric.green .metric-icon{ background:#dcfce7; color:#15803d; }
+.ui-scope.metric.orange .metric-icon,
+.ui-scope .metric.orange .metric-icon{ background:#ffedd5; color:#c2410c; }
+.ui-scope.metric.cyan .metric-icon,
+.ui-scope .metric.cyan .metric-icon{ background:#cffafe; color:#0e7490; }
+.ui-scope.metric-value,
+.ui-scope .metric-value{ margin:14px 0 3px; font-size:clamp(25px,2.8vw,36px); font-weight:800; letter-spacing:-.045em; line-height:1.15; font-variant-numeric:tabular-nums; }
+.ui-scope.metric-foot,
+.ui-scope .metric-foot{ margin:0; color:var(--muted); font-size:12px; }
+.ui-scope.flow-grid,
+.ui-scope .flow-grid{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; }
+.ui-scope.flow-panel,
+.ui-scope .flow-panel{ padding:22px; }
+.ui-scope.flow-heading,
+.ui-scope .flow-heading{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:6px; }
+.ui-scope.flow-heading h3,
+.ui-scope .flow-heading h3{ margin:0; font-size:16px; }
+.ui-scope.flow-count,
+.ui-scope .flow-count{ padding:5px 8px; border-radius:7px; background:#eef2ff; color:#4338ca; font-size:11px; font-weight:700; white-space:nowrap; }
+.ui-scope.flow-panel.out .flow-count,
+.ui-scope .flow-panel.out .flow-count{ background:#fff1e6; color:#c2410c; }
+.ui-scope.flow-description,
+.ui-scope .flow-description{ margin:0 0 18px; color:var(--muted); font-size:12px; }
+.ui-scope.flow-list,
+.ui-scope .flow-list{ display:grid; gap:15px; max-height:420px; overflow:auto; padding-right:5px; }
+.ui-scope.flow-row,
+.ui-scope .flow-row{ min-width:0; }
+.ui-scope.flow-row-head,
+.ui-scope .flow-row-head{ display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin-bottom:6px; font-size:12px; }
+.ui-scope.flow-name,
+.ui-scope .flow-name{ min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:650; }
+.ui-scope.flow-quantity,
+.ui-scope .flow-quantity{ flex:none; color:#475569; font-variant-numeric:tabular-nums; }
+.ui-scope.bar-track,
+.ui-scope .bar-track{ height:9px; overflow:hidden; border-radius:999px; background:#edf1f7; }
+.ui-scope.bar-fill,
+.ui-scope .bar-fill{ width:var(--bar-width); height:100%; border-radius:inherit; background:linear-gradient(90deg,#818cf8,#4f46e5); }
+.ui-scope.flow-panel.out .bar-fill,
+.ui-scope .flow-panel.out .bar-fill{ background:linear-gradient(90deg,#fdba74,#f97316); }
+.ui-scope.empty-flow,
+.ui-scope .empty-flow{ padding:38px 14px; border:1px dashed #d9e2ee; border-radius:11px; color:var(--muted); text-align:center; font-size:13px; }
+.ui-scope.quick-links,
+.ui-scope .quick-links{ display:flex; flex-wrap:wrap; gap:9px; margin-top:22px; }
+.ui-scope.quick-link,
+.ui-scope .quick-link{ display:inline-flex; align-items:center; min-height:38px; padding:8px 13px; border:1px solid #dfe5ef; border-radius:9px; background:#fff; color:#334155; text-decoration:none; font-size:12px; font-weight:700; }
+.ui-scope.quick-link:hover,
+.ui-scope .quick-link:hover{ color:#4338ca; border-color:#c7d2fe; background:#f8faff; }
+@media(max-width:1100px){.ui-scope.metrics,
+.ui-scope .metrics{ grid-template-columns:repeat(2,minmax(0,1fr)); }
+.ui-scope.filter-panel,
+.ui-scope .filter-panel{ align-items:flex-start; flex-direction:column; }
+.ui-scope.date-form,
+.ui-scope .date-form{ justify-content:flex-start; }}
+@media(max-width:700px){.ui-scope.dashboard,
+.ui-scope .dashboard{ padding-top:20px; }
+.ui-scope.page-head,
+.ui-scope .page-head{ align-items:flex-start; flex-direction:column; }
+.ui-scope.flow-grid,
+.ui-scope .flow-grid{ grid-template-columns:1fr; }
+.ui-scope.filter-panel,
+.ui-scope .filter-panel,
+.ui-scope.flow-panel,
+.ui-scope .flow-panel{ padding:18px; }}
+@media(max-width:460px){.ui-scope.metrics,
+.ui-scope .metrics{ gap:10px; }
+.ui-scope.metric,
+.ui-scope .metric{ padding:15px; }
+.ui-scope.metric-label,
+.ui-scope .metric-label{ font-size:10px; }
+.ui-scope.metric-value,
+.ui-scope .metric-value{ font-size:24px; }
+.ui-scope.date-form,
+.ui-scope .date-form{ width:100%; }
+.ui-scope.date-field,
+.ui-scope .date-field{ flex:1 1 130px; }
+.ui-scope.date-field input,
+.ui-scope .date-field input{ width:100%; min-width:0; }
+.ui-scope.apply-button,
+.ui-scope .apply-button{ width:100%; }}
+@media(prefers-reduced-motion:reduce){.ui-scope.metric,
+.ui-scope .metric{ transition:none; }}

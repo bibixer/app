@@ -1,0 +1,122 @@
+@keyframes gradient{0%{background-position:0 0}50%{background-position:100% 100%}100%{background-position:0 0}}
+.ui-scope.wave,
+.ui-scope .wave{position:fixed;bottom:0;left:0;width:200%;height:12em;border-radius:1000% 1000% 0 0;background:rgb(255 255 255 / 25%);opacity:.8;pointer-events:none;z-index:0;animation:wave 10s -3s linear infinite}
+.ui-scope.wave:nth-of-type(2),
+.ui-scope .wave:nth-of-type(2){bottom:-1.25em;opacity:.8;animation:wave 18s linear reverse infinite}
+.ui-scope.wave:nth-of-type(3),
+.ui-scope .wave:nth-of-type(3){bottom:-2.5em;opacity:.9;animation:wave 20s -1s reverse infinite}
+@keyframes wave{0%,100%{transform:translateX(0)}50%{transform:translateX(-50%)}}
+.ui-scope.card,
+.ui-scope .card{position:relative;z-index:1;max-width:1400px;width:100%;margin:0 auto;background:#fff;border-radius:24px;padding:32px;box-shadow:0 24px 55px rgba(15,23,42,.22);max-height:calc(100vh - 112px);overflow:auto;scroll-behavior:smooth}
+.ui-scope.card-header,
+.ui-scope .card-header{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.ui-scope h1{font-size:1.5rem;letter-spacing:-.025em;margin:0 0 8px}
+.ui-scope.hint,
+.ui-scope .hint{color:var(--muted);margin:0 0 24px;line-height:1.5}
+.ui-scope.switch-link,
+.ui-scope .switch-link{color:var(--primary-hover);font-size:14px;font-weight:700;text-decoration:none;white-space:nowrap}
+.ui-scope.switch-link:hover,
+.ui-scope .switch-link:hover{text-decoration:underline}
+.ui-scope.form-header,
+.ui-scope .form-header{display:grid;grid-template-columns:2fr 1fr;gap:20px;position:sticky;top:-32px;z-index:5;padding:16px 0;margin:0 0 24px;background:#fff;border-bottom:1px solid var(--border)}
+.ui-scope.field,
+.ui-scope .field{display:block;font-size:.875rem;font-weight:600;color:var(--muted)}
+.ui-scope input,
+.ui-scope select,
+.ui-scope button{font:inherit;border-radius:8px}
+.ui-scope input,
+.ui-scope select{width:100%;padding:10px 14px;margin-top:6px;border:1px solid var(--border);font-size:14px;color:var(--ink);background:#fff;transition:border-color .2s,box-shadow .2s}
+.ui-scope input:focus,
+.ui-scope select:focus{border-color:var(--primary);outline:none;box-shadow:0 0 0 4px rgba(79,70,229,.1)}
+.ui-scope input[readonly]{background:#f8fafc;color:var(--muted)}
+.ui-scope#masterMatch,
+.ui-scope #masterMatch{display:block;min-height:18px;margin-top:6px;color:var(--primary-hover);font-size:12px;font-weight:500}
+.ui-scope.table-wrap,
+.ui-scope .table-wrap{border:1px solid var(--border);border-radius:12px;overflow:auto}
+.ui-scope table{width:100%;min-width:760px;border-collapse:collapse}
+.ui-scope th,
+.ui-scope td{text-align:left}
+.ui-scope th{padding:12px 16px;background:#f8fafc;border-bottom:1px solid var(--border);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.ui-scope td{padding:10px 16px;border-bottom:1px solid #f1f5f9;background:#fff}
+.ui-scope tbody tr:last-child td{border-bottom:0}
+.ui-scope.product,
+.ui-scope .product{min-width:220px}
+.ui-scope.pieces,
+.ui-scope .pieces,
+.ui-scope.count,
+.ui-scope .count{min-width:95px}
+.ui-scope.bundle-type,
+.ui-scope .bundle-type{min-width:170px;cursor:pointer}
+.ui-scope button{border:0;padding:11px 17px;font-weight:700;cursor:pointer;transition:background .2s,transform .2s}
+.ui-scope button:hover:not(:disabled){transform:translateY(-1px)}
+.ui-scope button:disabled{opacity:.55;cursor:not-allowed}
+.ui-scope.primary,
+.ui-scope .primary{background:var(--primary);color:#fff}
+.ui-scope.primary:hover:not(:disabled),
+.ui-scope .primary:hover:not(:disabled){background:var(--primary-hover)}
+.ui-scope.secondary,
+.ui-scope .secondary{background:#eef2ff;color:var(--primary-hover)}
+.ui-scope.secondary:hover,
+.ui-scope .secondary:hover{background:#e0e7ff}
+.ui-scope.danger,
+.ui-scope .danger{background:#fee2e2;color:#dc2626;width:30px;height:30px;display:grid;place-items:center;padding:0;font-size:20px}
+.ui-scope.actions,
+.ui-scope .actions{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:18px}
+.ui-scope.total,
+.ui-scope .total,
+.ui-scope#grandTotal,
+.ui-scope #grandTotal{font-weight:700;white-space:nowrap}
+.ui-scope#grandTotal,
+.ui-scope #grandTotal{color:var(--ink)}
+.ui-scope#submitManual,
+.ui-scope #submitManual{display:block;width:100%;margin-top:24px;padding:14px;border-radius:10px;font-size:16px;box-shadow:0 4px 6px -1px rgba(79,70,229,.2)}
+.ui-scope.shortcut-help,
+.ui-scope .shortcut-help{margin:13px 0 0;text-align:center;color:var(--muted);font-size:13px}
+.ui-scope.shortcut-help a,
+.ui-scope .shortcut-help a{color:var(--primary-hover);font-weight:700;text-decoration:none}
+.ui-scope kbd{display:inline-block;padding:2px 5px;border:1px solid var(--border);border-radius:5px;background:#f8fafc;color:var(--ink);font-family:inherit;font-size:11px;font-weight:600;line-height:1.2}
+.ui-scope.message,
+.ui-scope .message{padding:13px;border-radius:9px;margin-top:16px;white-space:pre-wrap}
+.ui-scope.error,
+.ui-scope .error{background:#fee2e2;color:#991b1b}
+.ui-scope.success,
+.ui-scope .success{background:#dcfce7;color:#166534}
+.ui-scope.result,
+.ui-scope .result{margin-top:25px;border:1px solid var(--border);border-radius:12px;padding:18px}
+.ui-scope.result-head,
+.ui-scope .result-head{display:flex;justify-content:space-between;gap:15px}
+.ui-scope.hidden,
+.ui-scope .hidden{display:none}
+@media(max-width:760px){.ui-scope.card,
+.ui-scope .card{padding:18px;border-radius:16px;max-height:none}
+.ui-scope.form-header,
+.ui-scope .form-header{grid-template-columns:1fr;top:-18px}
+.ui-scope.card-header,
+.ui-scope .card-header{display:block}
+.ui-scope.switch-link,
+.ui-scope .switch-link{display:inline-block;margin-bottom:14px}
+.ui-scope.result-head,
+.ui-scope .result-head{display:block}}
+@media(prefers-reduced-motion:reduce){.ui-scope.wave,
+.ui-scope .wave{animation:none}
+.ui-scope button{transition:none}}
+@media print{.ui-scope.wave,
+.ui-scope .wave,
+.ui-scope.card-header,
+.ui-scope .card-header,
+.ui-scope.card>.hint,
+.ui-scope .card>.hint,
+.ui-scope.entry-area,
+.ui-scope .entry-area,
+.ui-scope.message,
+.ui-scope .message,
+.ui-scope.menu-print-hide,
+.ui-scope .menu-print-hide,
+.ui-scope.cross-dot,
+.ui-scope .cross-dot,
+.ui-scope.uni-wrapper,
+.ui-scope .uni-wrapper{display:none!important}
+.ui-scope.card,
+.ui-scope .card{max-height:none;overflow:visible;box-shadow:none;padding:0}
+.ui-scope.result,
+.ui-scope .result{display:block!important;border:0;margin:0}}

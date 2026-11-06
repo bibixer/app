@@ -1,0 +1,103 @@
+{% extends "app_base.html" %}
+{% block title %}Edit center{% endblock %}
+{% block page_css %}<link rel="stylesheet" href="{{ url_for('static', filename='style/pages/edit_index.css') }}">{% endblock %}
+{% block main_class %}page-edit-index{% endblock %}
+{% block content %}
+<header class="ui-heading"><div><p class="ui-kicker">Administration / Records</p><h1>Edit center</h1><p class="ui-description">Find any entry by name, alias or number. Every change keeps a permanent edit history.</p></div><a class="head-link" href="{{ url_for('edit_logs') }}">View edit history →</a></header>
+  <div class="toolbar">
+    <label>Entry type
+      <select id="entityType">
+        {% for key, config in entities.items() %}<option value="{{ key }}" {% if key == 'product' %}selected{% endif %}>{{ config.title }}</option>{% endfor %}
+      </select>
+    </label>
+    <label>Search entries
+      <input id="entrySearch" type="search" placeholder="Name, alias, number, date, or ID" autocomplete="off">
+    </label>
+  </div>
+  <section>
+    <div class="list-head"><span id="listTitle"></span><span id="resultCount" aria-live="polite"></span></div>
+    <div id="entryList" class="entry-list"></div>
+    <p id="noResults" class="empty" hidden>No matching entries. Try another search.</p>
+    <div id="pager" class="pager" hidden>
+      <button id="prevPage" type="button">Previous</button>
+      <span id="pageLabel"></span>
+      <button id="nextPage" type="button">Next</button>
+    </div>
+  </section>
+  <div class="links"><a href="{{ url_for('find_edit') }}">Find bale/lump/bundle</a><a href="{{ url_for('edit_logs') }}">View edit history</a></div>
+
+<script>
+const entityType = document.getElementById('entityType');
+const searchInput = document.getElementById('entrySearch');
+const entryList = document.getElementById('entryList');
+const searchUrl = {{ url_for('edit_search')|tojson }};
+let currentPage = 1;
+let totalPages = 1;
+let requestSerial = 0;
+let searchTimer;
+
+function renderEntries(items, type) {
+  entryList.replaceChildren();
+  for (const item of items) {
+    const card = document.createElement('article');
+    card.className = 'entry';
+    const info = document.createElement('div');
+    const title = document.createElement('div');
+    title.className = 'entry-title';
+    title.textContent = item.title;
+    const details = document.createElement('div');
+    details.className = 'entry-details';
+    details.textContent = `#${item.id} · ${item.details || ''}`;
+    const link = document.createElement('a');
+    link.className = 'edit-link';
+    link.href = `/edit/${encodeURIComponent(type)}/${item.id}`;
+    link.textContent = 'Edit';
+    link.setAttribute('aria-label', `Edit ${item.title}`);
+    info.append(title, details);
+    card.append(info, link);
+    entryList.append(card);
+  }
+}
+
+async function refreshEntries(page = 1) {
+  const serial = ++requestSerial;
+  const type = entityType.value;
+  const params = new URLSearchParams({type, q: searchInput.value.trim(), page: String(page)});
+  document.getElementById('listTitle').textContent = entityType.selectedOptions[0].textContent + ' entries';
+  document.getElementById('resultCount').textContent = 'Loading…';
+  document.getElementById('pager').hidden = true;
+  document.getElementById('noResults').hidden = true;
+  document.getElementById('noResults').textContent = 'No matching entries. Try another search.';
+  try {
+    const response = await fetch(`${searchUrl}?${params}`);
+    if (!response.ok) throw new Error('Search failed');
+    const data = await response.json();
+    if (serial !== requestSerial) return;
+    currentPage = data.page;
+    totalPages = data.pages;
+    renderEntries(data.items, type);
+    document.getElementById('resultCount').textContent = `${data.total} found`;
+    document.getElementById('noResults').hidden = data.total !== 0;
+    document.getElementById('pager').hidden = data.total === 0;
+    document.getElementById('pageLabel').textContent = `Page ${currentPage} of ${totalPages}`;
+    document.getElementById('prevPage').disabled = currentPage <= 1;
+    document.getElementById('nextPage').disabled = currentPage >= totalPages;
+  } catch (error) {
+    if (serial !== requestSerial) return;
+    entryList.replaceChildren();
+    document.getElementById('resultCount').textContent = 'Could not load entries';
+    document.getElementById('noResults').textContent = 'Search could not be loaded. Please refresh and try again.';
+    document.getElementById('noResults').hidden = false;
+  }
+}
+entityType.addEventListener('change', () => { clearTimeout(searchTimer); searchInput.value = ''; refreshEntries(); });
+searchInput.addEventListener('input', () => {
+  clearTimeout(searchTimer);
+  requestSerial++;
+  searchTimer = setTimeout(() => refreshEntries(), 250);
+});
+document.getElementById('prevPage').addEventListener('click', () => refreshEntries(currentPage - 1));
+document.getElementById('nextPage').addEventListener('click', () => refreshEntries(currentPage + 1));
+refreshEntries();
+</script>
+{% endblock %}

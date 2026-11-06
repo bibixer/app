@@ -1,0 +1,90 @@
+{% extends "app_base.html" %}
+{% block title %}Production Dashboard · BH Manufacturing{% endblock %}
+{% block page_css %}<link rel="stylesheet" href="{{ url_for('static', filename='style/pages/admin_dashboard.css') }}">{% endblock %}
+{% block main_class %}dashboard page-admin-dashboard{% endblock %}
+{% block content %}
+<header class="page-head">
+      <div>
+        <p class="eyebrow">Operations overview</p>
+        <h1>Production dashboard</h1>
+        <p class="lead">Inventory at a glance, plus product movement for your selected dates.</p>
+      </div>
+      <a class="head-link" href="{{ url_for('product_report') }}">View product report <span aria-hidden="true">↗</span></a>
+    </header>
+
+    {% for category, message in get_flashed_messages(with_categories=true) %}
+      <div class="notice" role="alert">{{ message }}</div>
+    {% endfor %}
+
+    <section class="panel filter-panel" aria-labelledby="date-title">
+      <div class="filter-copy">
+        <h2 id="date-title">Movement date range</h2>
+        <p>Changes the inflow, outflow, and product breakdown below. Inventory cards show current stock.</p>
+      </div>
+      <form class="date-form" method="post" action="{{ url_for('admin_dashord') }}">
+        {{ date_from.hidden_tag() }}
+        <label class="date-field">From {{ date_from.date_from() }}</label>
+        <label class="date-field">To {{ date_from.date_to() }}</label>
+        <button class="apply-button" type="submit">Apply dates</button>
+      </form>
+    </section>
+
+    <section aria-labelledby="metrics-title">
+      <div class="section-head">
+        <div><h2 id="metrics-title">Key figures</h2><p>Ready and given bundles are current totals; movements use the selected dates.</p></div>
+        <span class="section-note">Pieces shown throughout</span>
+      </div>
+      <div class="metrics">
+        <a class="panel metric" href="{{ url_for('product_report') }}#redyPro">
+          <div class="metric-top"><span class="metric-label">Ready stock</span><span class="metric-icon" aria-hidden="true">▣</span></div>
+          <p class="metric-value">{{ dash_bord_data.redy.split(':')[1] }}</p>
+          <p class="metric-foot">{{ dash_bord_data.redy.split(':')[0] }} ready bundles · current</p>
+        </a>
+        <div class="panel metric cyan">
+          <div class="metric-top"><span class="metric-label">Given out</span><span class="metric-icon" aria-hidden="true">⇢</span></div>
+          <p class="metric-value">{{ dash_bord_data.given.split(':')[1] }}</p>
+          <p class="metric-foot">{{ dash_bord_data.given.split(':')[0] }} given bundles · current</p>
+        </div>
+        <a class="panel metric green" href="{{ url_for('product_report') }}#in_flow">
+          <div class="metric-top"><span class="metric-label">Inflow</span><span class="metric-icon" aria-hidden="true">↘</span></div>
+          <p class="metric-value">{{ dash_bord_data.inflow_total }}</p>
+          <p class="metric-foot">Pieces received · selected period</p>
+        </a>
+        <a class="panel metric orange" href="{{ url_for('product_report') }}#out_flow">
+          <div class="metric-top"><span class="metric-label">Outflow</span><span class="metric-icon" aria-hidden="true">↗</span></div>
+          <p class="metric-value">{{ dash_bord_data.outflow_total }}</p>
+          <p class="metric-foot">Pieces issued · selected period</p>
+        </a>
+      </div>
+    </section>
+
+    <section aria-labelledby="flow-title">
+      <div class="section-head"><div><h2 id="flow-title">Product movement</h2><p>Products are ordered by pieces moved. Bars show relative volume within each list.</p></div></div>
+      <div class="flow-grid">
+        <article class="panel flow-panel" aria-labelledby="inflow-title">
+          <div class="flow-heading"><h3 id="inflow-title">Inflow by product</h3><span class="flow-count">{{ inflow_points|length }} products</span></div>
+          <p class="flow-description">Pieces received during this date range</p>
+          {% if inflow_points %}<div class="flow-list">
+            {% for point in inflow_points %}
+              <div class="flow-row"><div class="flow-row-head"><span class="flow-name" title="{{ point.item_name }}">{{ point.item_name or 'Unnamed product' }}</span><span class="flow-quantity">{{ point.quantity }} pcs</span></div><div class="bar-track"><div class="bar-fill" style="--bar-width:{{ (point.quantity / max_inflow * 100)|round(1) }}%"></div></div></div>
+            {% endfor %}
+          </div>{% else %}<div class="empty-flow">No inflow recorded for these dates.</div>{% endif %}
+        </article>
+        <article class="panel flow-panel out" aria-labelledby="outflow-title">
+          <div class="flow-heading"><h3 id="outflow-title">Outflow by product</h3><span class="flow-count">{{ outflow_points|length }} products</span></div>
+          <p class="flow-description">Pieces issued during this date range</p>
+          {% if outflow_points %}<div class="flow-list">
+            {% for point in outflow_points %}
+              <div class="flow-row"><div class="flow-row-head"><span class="flow-name" title="{{ point.item_name }}">{{ point.item_name or 'Unnamed product' }}</span><span class="flow-quantity">{{ point.quantity }} pcs</span></div><div class="bar-track"><div class="bar-fill" style="--bar-width:{{ (point.quantity / max_outflow * 100)|round(1) }}%"></div></div></div>
+            {% endfor %}
+          </div>{% else %}<div class="empty-flow">No outflow recorded for these dates.</div>{% endif %}
+        </article>
+      </div>
+    </section>
+
+    <nav class="quick-links" aria-label="Related reports">
+      <a class="quick-link" href="{{ url_for('cutter_report') }}">Cutter report →</a>
+      <a class="quick-link" href="{{ url_for('outworker_report') }}">Outworker report →</a>
+      <a class="quick-link" href="{{ url_for('product_report') }}">Product report →</a>
+    </nav>
+{% endblock %}

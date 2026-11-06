@@ -1,0 +1,7 @@
+.ui-scope.box,
+.ui-scope .box{max-width:1200px;margin:auto;background:#fff;padding:24px;border-radius:16px;overflow:auto}
+.ui-scope table{width:100%;border-collapse:collapse}
+.ui-scope th,
+.ui-scope td{padding:10px;border-bottom:1px solid #dfe6ef;text-align:left;vertical-align:top}
+.ui-scope code{white-space:pre-wrap;font-size:12px}
+.ui-scope a{color:#1769e0}

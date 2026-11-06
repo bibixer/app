@@ -1,0 +1,155 @@
+.ui-scope main.pay-shell{max-width:1450px;margin:auto;padding:28px clamp(16px,3vw,40px) 60px}
+.ui-scope.pay-head,
+.ui-scope .pay-head{display:flex;justify-content:space-between;align-items:end;gap:18px;flex-wrap:wrap;margin-bottom:24px}
+.ui-scope h1{font-size:clamp(28px,3vw,40px);letter-spacing:-.035em;margin:0}
+.ui-scope h2{font-size:21px;margin:0 0 10px}
+.ui-scope h3{font-size:17px;margin:0 0 8px}
+.ui-scope.eyebrow,
+.ui-scope .eyebrow{margin:0 0 5px;text-transform:uppercase;letter-spacing:.12em;color:var(--teal);font-size:11px;font-weight:850}
+.ui-scope.lead,
+.ui-scope .lead,
+.ui-scope.muted,
+.ui-scope .muted{color:var(--muted)}
+.ui-scope.lead,
+.ui-scope .lead{margin:8px 0 0;max-width:770px;font-size:14px}
+.ui-scope a{color:var(--teal)}
+.ui-scope.actions,
+.ui-scope .actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.ui-scope.button,
+.ui-scope .button,
+.ui-scope button{display:inline-flex;align-items:center;justify-content:center;padding:10px 16px;border:1px solid var(--teal);border-radius:9px;background:var(--teal);color:white;text-decoration:none;font:750 14px/1.4 Inter,system-ui,sans-serif;cursor:pointer;min-height:42px}
+.ui-scope.button.secondary,
+.ui-scope .button.secondary,
+.ui-scope button.secondary{color:var(--teal);background:white;border-color:var(--line)}
+.ui-scope button.danger{background:white;color:#a53343;border-color:#e6bfca}
+.ui-scope button:disabled{opacity:.5;cursor:not-allowed}
+.ui-scope.panel,
+.ui-scope .panel{padding:24px;margin-bottom:22px;border:1px solid var(--line);border-radius:16px;background:white;box-shadow:0 7px 24px #19333d07}
+.ui-scope.section-head,
+.ui-scope .section-head{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:16px}
+.ui-scope.section-head h2,
+.ui-scope .section-head h2{margin:0}
+.ui-scope.section-head p,
+.ui-scope .section-head p{margin:4px 0 0;font-size:13px;color:var(--muted)}
+.ui-scope.fields,
+.ui-scope .fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:14px 0}
+.ui-scope.field,
+.ui-scope .field{display:grid;gap:6px;font-size:13px;font-weight:750}
+.ui-scope.field.full,
+.ui-scope .field.full{grid-column:1/-1}
+.ui-scope input:not([type=checkbox]),
+.ui-scope select,
+.ui-scope textarea{width:100%;padding:11px 12px;border:1px solid #bfd3d1;border-radius:8px;background:white;color:var(--ink);font:400 15px/1.4 Inter,system-ui,sans-serif}
+.ui-scope textarea{min-height:78px;resize:vertical}
+.ui-scope input[type=checkbox]{width:19px;height:19px;accent-color:var(--teal)}
+.ui-scope input:focus,
+.ui-scope select:focus,
+.ui-scope textarea:focus{outline:3px solid #8bd0c280;border-color:var(--teal)}
+.ui-scope button:focus-visible,
+.ui-scope a:focus-visible,
+.ui-scope summary:focus-visible{outline:3px solid #8bd0c2;outline-offset:3px}
+.ui-scope.filter-form,
+.ui-scope .filter-form{display:flex;gap:12px;align-items:end;flex-wrap:wrap}
+.ui-scope.filter-form .field,
+.ui-scope .filter-form .field{flex:1;min-width:240px}
+.ui-scope.metrics,
+.ui-scope .metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:22px}
+.ui-scope.metric,
+.ui-scope .metric{padding:20px;border:1px solid var(--line);border-radius:13px;background:white}
+.ui-scope.metric span,
+.ui-scope .metric span{display:block;color:var(--muted);font-size:11px;letter-spacing:.04em;text-transform:uppercase;font-weight:800}
+.ui-scope.metric strong,
+.ui-scope .metric strong{display:block;margin-top:8px;font-size:27px;color:var(--teal);font-variant-numeric:tabular-nums}
+.ui-scope.metric small,
+.ui-scope .metric small{display:block;margin-top:5px;color:var(--muted)}
+.ui-scope.metric.amber,
+.ui-scope .metric.amber{background:#fff9ec;border-color:#eed5a6}
+.ui-scope.metric.amber strong,
+.ui-scope .metric.amber strong{color:#955f11}
+.ui-scope.table-wrap,
+.ui-scope .table-wrap{overflow:auto;border:1px solid var(--line);border-radius:10px}
+.ui-scope table{width:100%;border-collapse:collapse;min-width:720px}
+.ui-scope th,
+.ui-scope td{padding:13px;text-align:left;border-bottom:1px solid #e3eceb;vertical-align:top;font-size:13px}
+.ui-scope th{background:#f2f7f6;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.04em}
+.ui-scope tr:last-child td{border-bottom:0}
+.ui-scope.number,
+.ui-scope .number{font-size:15px;font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap}
+.ui-scope.right,
+.ui-scope .right{text-align:right}
+.ui-scope.total-row td,
+.ui-scope .total-row td{font-weight:850;background:#eef7f3}
+.ui-scope.tag,
+.ui-scope .tag{display:inline-block;padding:4px 8px;background:#e8f5ee;color:#16694e;border-radius:6px;font-size:11px;font-weight:800}
+.ui-scope.tag.warn,
+.ui-scope .tag.warn{background:#fff1d8;color:#8d5b14}
+.ui-scope.small,
+.ui-scope .small{font-size:12px}
+.ui-scope.empty,
+.ui-scope .empty{color:var(--muted);padding:22px;text-align:center}
+.ui-scope.notice,
+.ui-scope .notice{padding:12px 16px;background:#fff0f1;border:1px solid #efc5ca;color:#9f2340;border-radius:10px;margin-bottom:18px}
+.ui-scope.notice.success,
+.ui-scope .notice.success{background:#edf9f0;border-color:#bee4c8;color:#166b46}
+.ui-scope.hint,
+.ui-scope .hint{font-size:12px;color:var(--muted);margin:9px 0}
+.ui-scope.two-columns,
+.ui-scope .two-columns{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(300px,1fr);gap:22px;align-items:start}
+.ui-scope.review,
+.ui-scope .review{border-color:#8cc7b6;background:#fbfefc}
+.ui-scope.rate-row,
+.ui-scope .rate-row{display:grid;grid-template-columns:minmax(180px,1.1fr) minmax(140px,1fr) auto;gap:18px;align-items:center;padding:18px 0;border-top:1px solid var(--line)}
+.ui-scope.rate-row:first-of-type,
+.ui-scope .rate-row:first-of-type{border-top:0}
+.ui-scope.rate-row p,
+.ui-scope .rate-row p{margin:3px 0}
+.ui-scope.rate-row .field,
+.ui-scope .rate-row .field{margin:0}
+.ui-scope.rate-row input,
+.ui-scope .rate-row input{max-width:250px}
+.ui-scope.rate-row .actions,
+.ui-scope .rate-row .actions{justify-content:end}
+.ui-scope.payment-details,
+.ui-scope .payment-details{display:flex;gap:20px;flex-wrap:wrap;padding:14px 0}
+.ui-scope.payment-details span,
+.ui-scope .payment-details span{color:var(--muted);font-size:12px;display:block}
+.ui-scope.payment-details strong,
+.ui-scope .payment-details strong{font-size:14px}
+.ui-scope.receipt-job,
+.ui-scope .receipt-job{margin:22px 0}
+@media(max-width:950px){.ui-scope.two-columns,
+.ui-scope .two-columns{grid-template-columns:1fr}
+.ui-scope.metrics,
+.ui-scope .metrics{grid-template-columns:repeat(2,minmax(0,1fr))}
+.ui-scope.rate-row,
+.ui-scope .rate-row{grid-template-columns:1fr 1fr}
+.ui-scope.rate-row .actions,
+.ui-scope .rate-row .actions{grid-column:1/-1;justify-content:start}}
+@media(max-width:600px){.ui-scope.panel,
+.ui-scope .panel{padding:17px}
+.ui-scope.fields,
+.ui-scope .fields{grid-template-columns:1fr}
+.ui-scope.metric,
+.ui-scope .metric{padding:15px}
+.ui-scope.metric strong,
+.ui-scope .metric strong{font-size:23px}
+.ui-scope.rate-row,
+.ui-scope .rate-row{grid-template-columns:1fr}
+.ui-scope.rate-row .actions,
+.ui-scope .rate-row .actions{grid-column:auto}
+.ui-scope.pay-head .actions,
+.ui-scope .pay-head .actions{width:100%}}
+@media print{.ui-scope.no-print,
+.ui-scope .no-print{display:none!important}
+.ui-scope main.pay-shell{max-width:none;padding:0}
+.ui-scope.panel,
+.ui-scope .panel,
+.ui-scope.metric,
+.ui-scope .metric{box-shadow:none;break-inside:avoid}
+.ui-scope.table-wrap,
+.ui-scope .table-wrap{overflow:visible}
+.ui-scope table{min-width:0}
+.ui-scope.pay-head,
+.ui-scope .pay-head{margin-bottom:12px}
+.ui-scope.metrics,
+.ui-scope .metrics{grid-template-columns:repeat(3,1fr)}}

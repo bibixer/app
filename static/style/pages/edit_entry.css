@@ -1,0 +1,15 @@
+.ui-scope.box,
+.ui-scope .box{max-width:820px;margin:auto;background:#fff;padding:28px;border-radius:16px;box-shadow:0 8px 30px #18315318}
+.ui-scope.grid,
+.ui-scope .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.ui-scope label{font-weight:700;display:block}
+.ui-scope input,
+.ui-scope select,
+.ui-scope textarea{width:100%;box-sizing:border-box;padding:10px;margin-top:6px;border:1px solid #bac7d8;border-radius:8px}
+.ui-scope small{display:block;margin-top:6px;font-weight:400;color:#64748b}
+.ui-scope button{padding:12px 22px;background:#1769e0;color:#fff;border:0;border-radius:9px;font-weight:700;cursor:pointer;margin-top:20px}
+.ui-scope.flash,
+.ui-scope .flash{padding:12px;background:#fff4c2;border-radius:8px;margin-bottom:15px}
+.ui-scope.links,
+.ui-scope .links{margin-top:18px}
+.ui-scope a{color:#1769e0}

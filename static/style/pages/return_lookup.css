@@ -1,0 +1,139 @@
+@keyframes gradient{0%{background-position:0 0}50%{background-position:100% 100%}100%{background-position:0 0}}
+.ui-scope.wave-layer,
+.ui-scope .wave-layer{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+.ui-scope.wave,
+.ui-scope .wave{position:absolute;bottom:-.5em;left:0;width:200%;height:11em;border-radius:1000% 1000% 0 0;background:rgb(144 226 213 / 12%);animation:wave 14s -3s ease-in-out infinite}
+.ui-scope.wave:nth-child(2),
+.ui-scope .wave:nth-child(2){bottom:-2em;background:rgb(255 255 255 / 10%);animation:wave 20s linear reverse infinite}
+.ui-scope.wave:nth-child(3),
+.ui-scope .wave:nth-child(3){bottom:-3.5em;background:rgb(244 177 107 / 8%);animation:wave 26s -1s linear infinite}
+@keyframes wave{0%,100%{transform:translateX(0)}50%{transform:translateX(-50%)}}
+.ui-scope.page-shell,
+.ui-scope .page-shell{position:relative;z-index:1;width:min(1120px,100%);margin:0 auto;padding:clamp(38px,6vw,76px) clamp(16px,3vw,36px) 56px}
+.ui-scope.page-head,
+.ui-scope .page-head{margin-bottom:34px}
+.ui-scope.eyebrow,
+.ui-scope .eyebrow{margin:0 0 8px;color:#ffc98d;font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
+.ui-scope h1{margin:0;color:#fff;font-size:clamp(32px,4vw,46px);line-height:1.12;letter-spacing:-.045em}
+.ui-scope.lead,
+.ui-scope .lead{max-width:650px;margin:11px 0 0;color:#d4e9e8;font-size:14px;line-height:1.55}
+.ui-scope.layout,
+.ui-scope .layout{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(260px,.85fr);gap:20px;align-items:stretch}
+.ui-scope.card,
+.ui-scope .card{background:#fff;border:1px solid rgba(255,255,255,.7);border-radius:20px;box-shadow:0 24px 60px rgba(7,14,39,.23)}
+.ui-scope.lookup-card,
+.ui-scope .lookup-card{position:relative;overflow:hidden;padding:clamp(28px,4vw,46px);background:linear-gradient(145deg,#fffefa,#f8fbfa)}
+.ui-scope.lookup-card::before,
+.ui-scope .lookup-card::before{content:"";position:absolute;inset:0 0 auto;height:5px;background:linear-gradient(90deg,#0f766e,#38b7a5,#f0ad68)}
+.ui-scope.card-kicker,
+.ui-scope .card-kicker{display:inline-flex;align-items:center;gap:7px;padding:6px 9px;border-radius:999px;background:#e7f5f0;color:#0b625b;font-size:11px;font-weight:800}
+.ui-scope.card-kicker::before,
+.ui-scope .card-kicker::before{content:"↩";font-size:15px;line-height:1}
+.ui-scope h2{margin:18px 0 6px;font-size:22px;letter-spacing:-.025em}
+.ui-scope.card-copy,
+.ui-scope .card-copy{margin:0;color:var(--muted);font-size:13px;line-height:1.55}
+.ui-scope label{display:block;margin:28px 0 8px;font-size:12px;font-weight:800;letter-spacing:.025em}
+.ui-scope.number-input,
+.ui-scope .number-input{display:block;width:100%;min-height:64px;padding:13px 18px;border:2px solid #bfcecb;border-radius:12px;background:#fff;color:var(--ink);font-family:inherit;font-size:25px;font-weight:750;font-variant-numeric:tabular-nums;box-shadow:inset 0 1px 2px #19313b08}
+.ui-scope.number-input::placeholder,
+.ui-scope .number-input::placeholder{color:#9aa8bc;font-size:16px;font-weight:500}
+.ui-scope.number-input:focus,
+.ui-scope .number-input:focus{outline:3px solid #a9ddd4;border-color:var(--primary)}
+.ui-scope.field-hint,
+.ui-scope .field-hint{margin:8px 0 0;color:var(--muted);font-size:12px}
+.ui-scope.field-error,
+.ui-scope .field-error{margin:7px 0 0;color:#b91c1c;font-size:12px}
+.ui-scope.open-button,
+.ui-scope .open-button{display:block;width:100%;min-height:52px;margin-top:22px;padding:11px 18px;border:0;border-radius:11px;background:linear-gradient(105deg,#0f766e,#109284);color:#fff;font-family:inherit;font-size:14px;font-weight:800;cursor:pointer;box-shadow:0 10px 22px rgba(79,70,229,.25);transition:transform .15s,box-shadow .15s}
+.ui-scope.open-button:hover,
+.ui-scope .open-button:hover{transform:translateY(-1px);box-shadow:0 14px 26px rgba(79,70,229,.31)}
+.ui-scope.open-button:focus-visible,
+.ui-scope .open-button:focus-visible,
+.ui-scope.back-link:focus-visible,
+.ui-scope .back-link:focus-visible,
+.ui-scope.quick-link:focus-visible,
+.ui-scope .quick-link:focus-visible{outline:3px solid #81cfc2;outline-offset:2px}
+.ui-scope.form-footer,
+.ui-scope .form-footer{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:18px}
+.ui-scope.back-link,
+.ui-scope .back-link{color:#0b625b;text-decoration:none;font-size:12px;font-weight:750}
+.ui-scope.back-link:hover,
+.ui-scope .back-link:hover{text-decoration:underline}
+.ui-scope.key-hint,
+.ui-scope .key-hint{color:var(--muted);font-size:11px}
+.ui-scope kbd{display:inline-block;padding:2px 5px;border:1px solid #a9ddd4;border-radius:5px;background:#e7f5f0;color:#0b625b;font-family:inherit;font-size:10px;font-weight:800}
+.ui-scope.guide-card,
+.ui-scope .guide-card{position:relative;overflow:hidden;padding:30px;background:linear-gradient(155deg,#174652,#10303e 72%,#0d4950);border-color:rgba(255,255,255,.25);color:#fff}
+.ui-scope.guide-card::after,
+.ui-scope .guide-card::after{content:"";position:absolute;right:-75px;top:-75px;width:220px;height:220px;border:1px solid rgba(255,255,255,.15);border-radius:50%;box-shadow:0 0 0 38px rgba(255,255,255,.035),0 0 0 80px rgba(255,255,255,.025);pointer-events:none}
+.ui-scope.guide-card h2,
+.ui-scope .guide-card h2{position:relative;margin:0 0 5px;font-size:19px}
+.ui-scope.guide-card>p,
+.ui-scope .guide-card>p{position:relative;margin:0;color:#c1dcda;font-size:12px;line-height:1.55}
+.ui-scope.steps,
+.ui-scope .steps{display:grid;gap:18px;margin:25px 0 0;padding:0;list-style:none}
+.ui-scope.steps li,
+.ui-scope .steps li{position:relative;display:flex;gap:12px;align-items:flex-start;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,.14)}
+.ui-scope.steps li:last-child,
+.ui-scope .steps li:last-child{padding-bottom:0;border-bottom:0}
+.ui-scope.step-number,
+.ui-scope .step-number{flex:none;display:grid;place-items:center;width:32px;height:32px;border:1px solid rgba(255,255,255,.23);border-radius:10px;background:rgba(255,255,255,.13);color:#d9f9f4;font-size:11px;font-weight:800}
+.ui-scope.steps strong,
+.ui-scope .steps strong{display:block;margin:1px 0 3px;font-size:12px}
+.ui-scope.steps span:last-child,
+.ui-scope .steps span:last-child{color:#c1dcda;font-size:12px;line-height:1.45}
+.ui-scope.quick-links,
+.ui-scope .quick-links{display:flex;flex-wrap:wrap;gap:9px;margin-top:20px}
+.ui-scope.lookup-card form,
+.ui-scope .lookup-card form{margin-top:30px;padding-top:2px;border-top:1px solid #e0ebe8}
+.ui-scope.lookup-card form label,
+.ui-scope .lookup-card form label{margin-top:26px}
+.ui-scope.number-input,
+.ui-scope .number-input{background:#fbfefd}
+.ui-scope.open-button,
+.ui-scope .open-button{letter-spacing:.01em}
+.ui-scope.steps strong,
+.ui-scope .steps strong{font-size:13px}
+.ui-scope.quick-link,
+.ui-scope .quick-link{display:inline-flex;align-items:center;min-height:36px;padding:7px 12px;border:1px solid rgba(255,255,255,.28);border-radius:9px;background:rgba(255,255,255,.13);color:#fff;text-decoration:none;font-size:11px;font-weight:750;backdrop-filter:blur(8px)}
+.ui-scope.quick-link:hover,
+.ui-scope .quick-link:hover{background:rgba(255,255,255,.23);border-color:rgba(255,255,255,.52)}
+.ui-scope.message,
+.ui-scope .message{display:flex;align-items:center;gap:9px;margin:0 0 18px;padding:13px 16px;border:1px solid #fcd4d4;border-radius:10px;background:#fff1f2;color:#9f1239;font-size:13px;line-height:1.5}
+.ui-scope.message.success,
+.ui-scope .message.success{border-color:#bbf7d0;background:#f0fdf4;color:#116953}
+.ui-scope.message.warning,
+.ui-scope .message.warning{border-color:#fcd34d;background:#fffbeb;color:#92400e}
+@media(max-width:760px){.ui-scope.layout,
+.ui-scope .layout{grid-template-columns:1fr}
+.ui-scope.guide-card,
+.ui-scope .guide-card{padding:21px}
+.ui-scope.steps,
+.ui-scope .steps{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.ui-scope.steps li,
+.ui-scope .steps li{display:block}
+.ui-scope.step-number,
+.ui-scope .step-number{margin-bottom:8px}}
+@media(max-width:520px){.ui-scope.page-shell,
+.ui-scope .page-shell{padding-top:25px}
+.ui-scope.lookup-card,
+.ui-scope .lookup-card{padding:22px}
+.ui-scope.steps,
+.ui-scope .steps{grid-template-columns:1fr;gap:16px}
+.ui-scope.steps li,
+.ui-scope .steps li{display:flex}
+.ui-scope.step-number,
+.ui-scope .step-number{margin:0}
+.ui-scope.guide-card,
+.ui-scope .guide-card{padding:22px}}
+@media(prefers-reduced-motion:reduce){.ui-scope.wave,
+.ui-scope .wave{animation:none}
+.ui-scope.open-button,
+.ui-scope .open-button{transition:none}}
+@media print{.ui-scope.wave-layer,
+.ui-scope .wave-layer{display:none}
+.ui-scope.eyebrow,
+.ui-scope .eyebrow,
+.ui-scope h1,
+.ui-scope.lead,
+.ui-scope .lead{color:var(--ink);text-shadow:none}}

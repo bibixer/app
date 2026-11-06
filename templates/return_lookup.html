@@ -1,0 +1,33 @@
+{% extends "app_base.html" %}
+{% block title %}Find Job Card · BH Manufacturing{% endblock %}
+{% block page_css %}<link rel="stylesheet" href="{{ url_for('static', filename='style/pages/return_lookup.css') }}">{% endblock %}
+{% block main_class %}page-shell page-return-lookup{% endblock %}
+{% block content %}
+<header class="page-head"><p class="eyebrow">Production · Returns</p><h1>Find a job card</h1><p class="lead">Enter a job-card number to open its products, remaining pieces, and return history.</p></header>
+    {% for category, message in get_flashed_messages(with_categories=true) %}<div class="message {{ category if category in ['success', 'warning', 'danger'] else '' }}" role="alert">{{ message }}</div>{% endfor %}
+    <div class="layout">
+      <section class="card lookup-card" aria-labelledby="lookup-title">
+        <span class="card-kicker">Job Return</span>
+        <h2 id="lookup-title">Open a job card</h2>
+        <p class="card-copy">Use the number printed on the job card. The master and returnable items will load automatically.</p>
+        <form method="post" action="{{ url_for('retune_product') }}">
+          {{ current_form.hidden_tag() }}
+          <label for="jobcard_id">Job card number</label>
+          {{ current_form.jobcard_id(class_='number-input', autofocus=true, required=true, inputmode='numeric', step='1', aria_describedby='number-hint') }}
+          <p id="number-hint" class="field-hint">Numbers only · for example, 123</p>
+          {% for error in current_form.jobcard_id.errors %}<p class="field-error" role="alert">{{ error }}</p>{% endfor %}
+          {{ current_form.submit(class_='open-button', value='Open job card →') }}
+        </form>
+        <div class="form-footer"><a class="back-link" href="{{ url_for('job_card') }}">← Back to job cards</a><span class="key-hint">Press <kbd>Enter</kbd> to open</span></div>
+      </section>
+      <aside class="card guide-card" aria-label="Return steps">
+        <h2>How returns work</h2><p>Everything stays linked to the job-card number you enter.</p>
+        <ol class="steps">
+          <li><span class="step-number">01</span><div><strong>Enter the number</strong><span>Find the job card you want to return against.</span></div></li>
+          <li><span class="step-number">02</span><div><strong>Review the balance</strong><span>Check its master, items, and remaining pieces.</span></div></li>
+          <li><span class="step-number">03</span><div><strong>Record the return</strong><span>Enter quantities or use Quick Calc, then confirm.</span></div></li>
+        </ol>
+      </aside>
+    </div>
+    <nav class="quick-links" aria-label="Related actions"><a class="quick-link" href="{{ url_for('job_card') }}">Scan job card →</a><a class="quick-link" href="{{ url_for('manual_job_card') }}">Manual job card →</a><a class="quick-link" href="{{ url_for('jobcard_ledger_lookup') }}">View job ledger →</a></nav>
+{% endblock %}

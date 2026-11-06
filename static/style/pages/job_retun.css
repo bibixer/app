@@ -1,0 +1,348 @@
+@keyframes gradient{0%{background-position:0 0}50%{background-position:100% 100%}100%{background-position:0 0}}
+.ui-scope.wave-layer,
+.ui-scope .wave-layer{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+.ui-scope.wave,
+.ui-scope .wave{position:absolute;bottom:-.5em;left:0;width:200%;height:11em;border-radius:1000% 1000% 0 0;background:rgb(144 226 213 / 12%);animation:wave 14s -3s ease-in-out infinite}
+.ui-scope.wave:nth-child(2),
+.ui-scope .wave:nth-child(2){bottom:-2em;background:rgb(255 255 255 / 10%);animation:wave 20s linear reverse infinite}
+.ui-scope.wave:nth-child(3),
+.ui-scope .wave:nth-child(3){bottom:-3.5em;background:rgb(244 177 107 / 8%);animation:wave 26s -1s linear infinite}
+@keyframes wave{0%,100%{transform:translateX(0)}50%{transform:translateX(-50%)}}
+.ui-scope button,
+.ui-scope input{font:inherit}
+.ui-scope.page-shell,
+.ui-scope .page-shell{position:relative;z-index:1;width:min(1480px,100%);margin:0 auto;padding:28px clamp(14px,3vw,42px) 48px}
+.ui-scope.page-top,
+.ui-scope .page-top{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:22px}
+.ui-scope.page-actions,
+.ui-scope .page-actions{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.ui-scope.eyebrow,
+.ui-scope .eyebrow{margin:0 0 8px;color:#ffc98d;font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
+.ui-scope h1{margin:0;color:#fff;font-size:clamp(28px,3vw,40px);line-height:1.13;letter-spacing:-.04em}
+.ui-scope.page-subtitle,
+.ui-scope .page-subtitle{margin:10px 0 0;color:#d4e9e8;font-size:14px;line-height:1.5}
+.ui-scope.back-link,
+.ui-scope .back-link{display:inline-flex;align-items:center;gap:8px;padding:10px 13px;border:1px solid rgba(255,255,255,.32);border-radius:10px;background:rgba(255,255,255,.14);color:#fff;text-decoration:none;font-size:13px;font-weight:700;white-space:nowrap;backdrop-filter:blur(8px)}
+.ui-scope.back-link:hover,
+.ui-scope .back-link:hover{background:rgba(255,255,255,.24)}
+.ui-scope.card,
+.ui-scope .card{overflow:hidden;background:var(--white);border:1px solid rgba(255,255,255,.7);border-radius:20px;box-shadow:0 24px 60px rgba(7,14,39,.23)}
+.ui-scope.card-header,
+.ui-scope .card-header{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:25px 28px;border-bottom:1px solid var(--line);background:linear-gradient(110deg,#fffefa,#f5faf8)}
+.ui-scope.card-header h2,
+.ui-scope .card-header h2{margin:0;font-size:19px;letter-spacing:-.02em}
+.ui-scope.card-header p,
+.ui-scope .card-header p{margin:5px 0 0;color:var(--muted);font-size:12px}
+.ui-scope.card-badge,
+.ui-scope .card-badge{padding:8px 13px;border-radius:999px;background:linear-gradient(110deg,#0f766e,#178d80);color:#fff;font-size:12px;font-weight:800;white-space:nowrap;box-shadow:0 5px 11px #0f766e30}
+.ui-scope.job-info-bar,
+.ui-scope .job-info-bar{display:grid;grid-template-columns:1fr 2fr 1fr 1fr;gap:12px;padding:18px 26px;background:#f5f9f8;border-bottom:1px solid var(--line)}
+.ui-scope.info-group,
+.ui-scope .info-group{min-width:0;padding:15px 17px;border:1px solid #dce8e4;border-radius:12px;background:#fff;box-shadow:0 3px 10px rgba(26,39,77,.03)}
+.ui-scope.info-group:last-child,
+.ui-scope .info-group:last-child{border-color:#a9d9d1;background:linear-gradient(145deg,#f0fbf7,#e6f5ef)}
+.ui-scope.info-group:last-child span,
+.ui-scope .info-group:last-child span{color:#0e705f}
+.ui-scope.info-group label,
+.ui-scope .info-group label{display:block;margin-bottom:6px;color:var(--muted);font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase}
+.ui-scope.info-group span,
+.ui-scope .info-group span{display:block;overflow-wrap:anywhere;font-size:15px;font-weight:700;font-variant-numeric:tabular-nums}
+.ui-scope.legacy-note,
+.ui-scope .legacy-note{display:flex;align-items:flex-start;gap:9px;margin:0;padding:11px 26px;background:#fffbeb;border-bottom:1px solid #fce9b0;color:#92400e;font-size:12px;line-height:1.5}
+.ui-scope.legacy-note::before,
+.ui-scope .legacy-note::before{content:"!";flex:none;display:grid;place-items:center;width:18px;height:18px;border-radius:50%;background:#fef3c7;font-weight:800}
+.ui-scope.input-guide,
+.ui-scope .input-guide{padding:17px 26px;border-bottom:1px solid var(--line);background:#fffefa}
+.ui-scope.guide-head,
+.ui-scope .guide-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+.ui-scope.guide-head h3,
+.ui-scope .guide-head h3{margin:0;font-size:13px}
+.ui-scope.guide-head p,
+.ui-scope .guide-head p{margin:0;color:var(--muted);font-size:11px}
+.ui-scope.input-guide-list,
+.ui-scope .input-guide-list{display:flex;flex-wrap:wrap;gap:7px}
+.ui-scope.guide-step,
+.ui-scope .guide-step{display:inline-flex;align-items:center;gap:6px;padding:6px 9px;border:1px solid #dce8e4;border-radius:8px;background:#f2faf6;color:#526176;font-size:11px;line-height:1.3}
+.ui-scope.input-guide kbd,
+.ui-scope .input-guide kbd{display:inline-block;padding:2px 5px;border:1px solid #a9ddd4;border-radius:5px;background:#e7f5f0;color:#0b625b;font-family:inherit;font-size:11px;font-weight:800;white-space:nowrap}
+.ui-scope.table-container,
+.ui-scope .table-container{overflow-x:auto;padding:10px 18px 20px;background:#fff}
+.ui-scope table{width:100%;min-width:930px;border-collapse:separate;border-spacing:0 9px}
+.ui-scope th{text-align:left;padding:10px 12px;color:#60757b;font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+.ui-scope td{padding:16px 12px;vertical-align:top;background:#f8fbfa;border-top:1px solid #e3eeeb;border-bottom:1px solid #e3eeeb;transition:background .15s}
+.ui-scope td:first-child{border-left:1px solid #e3eeeb;border-radius:11px 0 0 11px}
+.ui-scope td:last-child{border-right:1px solid #e3eeeb;border-radius:0 11px 11px 0}
+.ui-scope tr.active-row td,
+.ui-scope tr:focus-within td{background:#e9f7f2;border-color:#a9d9d1}
+.ui-scope.id-badge,
+.ui-scope .id-badge{display:inline-grid;place-items:center;min-width:30px;height:30px;padding:0 6px;border-radius:8px;background:#e0f3ec;color:#0b625b;font-size:12px;font-weight:800}
+.ui-scope.name-badge>div:first-child,
+.ui-scope .name-badge>div:first-child{overflow-wrap:anywhere;font-size:13px;font-weight:700}
+.ui-scope.item-colour,
+.ui-scope .item-colour{color:#475569;font-size:13px;font-weight:600}
+.ui-scope.remaining-badge,
+.ui-scope .remaining-badge{display:inline-flex;align-items:center;padding:6px 10px;border-radius:999px;background:#dcfce7;color:#116953;font-size:12px;font-weight:800;white-space:nowrap}
+.ui-scope.given-badge,
+.ui-scope .given-badge{display:inline-flex;align-items:center;padding:6px 10px;border-radius:999px;background:#e7f1fa;color:#24547b;font-size:12px;font-weight:800;white-space:nowrap}
+.ui-scope.remaining-badge.low,
+.ui-scope .remaining-badge.low{background:#fee2e2;color:#991b1b}
+.ui-scope.return-input,
+.ui-scope .return-input{width:100%;max-width:120px;min-height:42px;padding:9px 11px;border:1px solid #bfcecb;border-radius:8px;background:#fff;color:var(--ink);font-size:15px;font-weight:700;font-variant-numeric:tabular-nums}
+.ui-scope.return-input:focus,
+.ui-scope .return-input:focus,
+.ui-scope.calc-input input:focus,
+.ui-scope .calc-input input:focus{outline:3px solid #a9ddd4;border-color:var(--primary)}
+.ui-scope.calculator,
+.ui-scope .calculator{padding:11px 12px;border:1px solid #cfe2dd;border-radius:10px;background:#fff}
+.ui-scope.calculator-title,
+.ui-scope .calculator-title{margin-bottom:10px;color:#0f766e;font-size:11px;font-weight:750}
+.ui-scope.calc-rows-container,
+.ui-scope .calc-rows-container{max-height:205px;overflow-y:auto}
+.ui-scope.calc-row,
+.ui-scope .calc-row{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:7px;padding:6px 8px;border:1px solid #dce8e4;border-radius:8px;background:#f8fbfa}
+.ui-scope.calc-row:focus-within,
+.ui-scope .calc-row:focus-within{border-color:#81cfc2;background:#f2faf6}
+.ui-scope.calc-input,
+.ui-scope .calc-input{display:flex;align-items:center;gap:5px}
+.ui-scope.calc-input label,
+.ui-scope .calc-input label{color:var(--muted);font-size:11px;font-weight:700}
+.ui-scope.calc-input input,
+.ui-scope .calc-input input{width:60px;padding:5px;border:1px solid #bfcecb;border-radius:5px;background:#fff;text-align:center;font-size:12px}
+.ui-scope.calc-total,
+.ui-scope .calc-total{min-width:38px;color:#0b625b;font-size:12px;font-weight:800}
+.ui-scope.remove-calc-btn,
+.ui-scope .remove-calc-btn{margin-left:auto;padding:4px 8px;border:0;border-radius:5px;background:#fee2e2;color:#b91c1c;font-size:14px;font-weight:700;cursor:pointer}
+.ui-scope.remove-calc-btn:hover,
+.ui-scope .remove-calc-btn:hover{background:#fecaca}
+.ui-scope.calc-summary,
+.ui-scope .calc-summary{display:flex;justify-content:space-between;align-items:center;gap:10px;padding-top:9px;border-top:1px solid var(--line);font-size:12px;font-weight:700}
+.ui-scope.apply-calc-btn,
+.ui-scope .apply-calc-btn{padding:5px 10px;border:0;border-radius:6px;background:#d5f3e8;color:#0e705f;font-size:11px;font-weight:800;cursor:pointer}
+.ui-scope.apply-calc-btn:hover,
+.ui-scope .apply-calc-btn:hover{background:#a7f3d0}
+.ui-scope.history-toggle,
+.ui-scope .history-toggle{display:inline-flex;align-items:center;gap:4px;margin-top:9px;padding:0;border:0;background:transparent;color:#0f766e;font-size:11px;font-weight:700;cursor:pointer}
+.ui-scope.history-toggle:hover,
+.ui-scope .history-toggle:hover{text-decoration:underline}
+.ui-scope.history-content,
+.ui-scope .history-content{display:none;margin-top:8px;padding:9px 10px;border-left:3px solid #4fb2a4;border-radius:6px;background:#fff;font-size:11px}
+.ui-scope.history-item,
+.ui-scope .history-item{padding:3px 0;color:var(--muted)}
+.ui-scope.history-item b,
+.ui-scope .history-item b{color:var(--ink)}
+.ui-scope.history-entry,
+.ui-scope .history-entry{padding:11px 0;border-bottom:1px solid #dce8e4}
+.ui-scope.given-entry,
+.ui-scope .given-entry{margin-bottom:4px;padding:10px;border:1px solid #bcd9e9;border-radius:8px;background:#f1f8fc}
+.ui-scope.given-entry .history-entry-head strong,
+.ui-scope .given-entry .history-entry-head strong{color:#24547b}
+.ui-scope.history-entry:last-child,
+.ui-scope .history-entry:last-child{border-bottom:0}
+.ui-scope.history-entry-head,
+.ui-scope .history-entry-head{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:11px;color:var(--muted)}
+.ui-scope.history-entry-head strong,
+.ui-scope .history-entry-head strong{color:#0b625b;font-size:12px}
+.ui-scope.history-lines,
+.ui-scope .history-lines{display:grid;gap:5px;margin:9px 0;padding:9px 10px;border-radius:8px;background:#f2faf6}
+.ui-scope.history-lines>div,
+.ui-scope .history-lines>div{display:flex;justify-content:space-between;gap:10px;font-size:11px}
+.ui-scope.history-lines strong,
+.ui-scope .history-lines strong{color:#0b625b}
+.ui-scope.history-method,
+.ui-scope .history-method,
+.ui-scope.history-empty,
+.ui-scope .history-empty{margin:8px 0;color:var(--muted);font-size:11px}
+.ui-scope.history-user,
+.ui-scope .history-user{display:block;margin-top:8px;color:var(--muted);font-size:10px}
+.ui-scope.completed-history,
+.ui-scope .completed-history{padding:18px 26px 24px;border-top:1px solid var(--line);background:#f8fbfa}
+.ui-scope.completed-history[hidden],
+.ui-scope .completed-history[hidden]{display:none}
+.ui-scope.completed-history h3,
+.ui-scope .completed-history h3{margin:0 0 5px;font-size:15px}
+.ui-scope.completed-history>p,
+.ui-scope .completed-history>p{margin:0 0 13px;color:var(--muted);font-size:12px}
+.ui-scope.completed-list,
+.ui-scope .completed-list{display:grid;gap:8px}
+.ui-scope.completed-item,
+.ui-scope .completed-item{border:1px solid var(--line);border-radius:10px;background:#fff}
+.ui-scope.completed-item summary,
+.ui-scope .completed-item summary{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:13px 15px;cursor:pointer;font-size:12px;font-weight:700}
+.ui-scope.completed-item summary small,
+.ui-scope .completed-item summary small{margin-left:7px;color:var(--muted);font-weight:500}
+.ui-scope.completed-status,
+.ui-scope .completed-status{color:#0e705f;font-size:11px;white-space:nowrap}
+.ui-scope.completed-content,
+.ui-scope .completed-content{display:block;margin:0 15px 12px;padding:4px 12px;border-left:3px solid #4fb2a4;background:#f8fbfa}
+.ui-scope.name-badge>div:first-child,
+.ui-scope .name-badge>div:first-child{font-size:15px;line-height:1.4}
+.ui-scope.given-badge,
+.ui-scope .given-badge,
+.ui-scope.remaining-badge,
+.ui-scope .remaining-badge{min-height:40px;padding:8px 12px;font-size:16px;line-height:1;font-variant-numeric:tabular-nums}
+.ui-scope.return-input,
+.ui-scope .return-input{max-width:145px;min-height:50px;padding:10px 13px;border-width:2px;font-size:18px}
+.ui-scope.history-toggle,
+.ui-scope .history-toggle{min-height:34px;margin-top:10px;font-size:13px;text-align:left}
+.ui-scope.history-row[hidden],
+.ui-scope .history-row[hidden]{display:none}
+.ui-scope tr.history-row td.history-row-cell{padding:4px 14px 14px;border:0;background:#fff}
+.ui-scope tr.history-row:focus-within td.history-row-cell{background:#fff;border:0}
+.ui-scope.history-content,
+.ui-scope .history-content{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:18px;margin:0;padding:0;border:0;background:transparent;font-size:14px}
+.ui-scope.history-given-panel,
+.ui-scope .history-given-panel,
+.ui-scope.history-return-panel,
+.ui-scope .history-return-panel{min-width:0;padding:20px;border:1px solid #dce8e4;border-radius:14px;background:#f8fbfa}
+.ui-scope.history-given-panel,
+.ui-scope .history-given-panel{border-color:#bcd9e9;background:#f1f8fc}
+.ui-scope.history-given-panel h3,
+.ui-scope .history-given-panel h3,
+.ui-scope.history-return-panel h3,
+.ui-scope .history-return-panel h3{margin:0 0 13px;font-size:17px;line-height:1.25;color:#19313b}
+.ui-scope.history-entry,
+.ui-scope .history-entry{padding:14px 0}
+.ui-scope.given-entry,
+.ui-scope .given-entry{margin:0;padding:14px;border-radius:10px;background:#fff}
+.ui-scope.history-entry-head,
+.ui-scope .history-entry-head{align-items:center;font-size:13px;line-height:1.4}
+.ui-scope.history-entry-head strong,
+.ui-scope .history-entry-head strong{font-size:17px;line-height:1.2}
+.ui-scope.history-lines,
+.ui-scope .history-lines{gap:8px;margin:14px 0;padding:14px;border-radius:10px;background:#eaf5f0}
+.ui-scope.given-entry .history-lines,
+.ui-scope .given-entry .history-lines{background:#e7f1fa}
+.ui-scope.history-lines>div,
+.ui-scope .history-lines>div{align-items:baseline;font-size:16px;line-height:1.35;font-variant-numeric:tabular-nums}
+.ui-scope.history-lines strong,
+.ui-scope .history-lines strong{font-size:16px;white-space:nowrap}
+.ui-scope.history-method,
+.ui-scope .history-method,
+.ui-scope.history-empty,
+.ui-scope .history-empty{font-size:13px;line-height:1.45}
+.ui-scope.history-user,
+.ui-scope .history-user{font-size:12px}
+.ui-scope.completed-history h3,
+.ui-scope .completed-history h3{font-size:18px}
+.ui-scope.completed-item summary,
+.ui-scope .completed-item summary{min-height:56px;padding:15px 18px;font-size:15px}
+.ui-scope.completed-item summary small,
+.ui-scope .completed-item summary small{font-size:13px}
+.ui-scope.completed-status,
+.ui-scope .completed-status{font-size:13px}
+.ui-scope.completed-content,
+.ui-scope .completed-content{display:grid;margin:0 15px 15px;padding:0;border:0;background:transparent}
+.ui-scope.chevron,
+.ui-scope .chevron{display:inline-block;transition:transform .15s}
+.ui-scope.chevron.open,
+.ui-scope .chevron.open{transform:rotate(90deg)}
+.ui-scope.card-footer,
+.ui-scope .card-footer{display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap;padding:18px 26px;border-top:1px solid var(--line);background:#f7fbf8}
+.ui-scope.footer-note,
+.ui-scope .footer-note{margin:0;color:var(--muted);font-size:12px}
+.ui-scope.btn-submit,
+.ui-scope .btn-submit{min-height:44px;padding:10px 22px;border:0;border-radius:10px;background:linear-gradient(105deg,#0f766e,#109284);color:#fff;font-size:13px;font-weight:800;cursor:pointer;box-shadow:0 9px 18px #0f766e40;transition:transform .15s,box-shadow .15s}
+.ui-scope.btn-submit:hover,
+.ui-scope .btn-submit:hover{transform:translateY(-1px);box-shadow:0 13px 22px #0f766e4d}
+.ui-scope.btn-submit:focus-visible,
+.ui-scope .btn-submit:focus-visible,
+.ui-scope.back-link:focus-visible,
+.ui-scope .back-link:focus-visible,
+.ui-scope.history-toggle:focus-visible,
+.ui-scope .history-toggle:focus-visible,
+.ui-scope.remove-calc-btn:focus-visible,
+.ui-scope .remove-calc-btn:focus-visible,
+.ui-scope.apply-calc-btn:focus-visible,
+.ui-scope .apply-calc-btn:focus-visible{outline:3px solid #81cfc2;outline-offset:2px}
+@media(max-width:1050px){.ui-scope.job-info-bar,
+.ui-scope .job-info-bar{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:700px){.ui-scope.page-shell,
+.ui-scope .page-shell{padding-top:18px}
+.ui-scope.card,
+.ui-scope .card{border-radius:15px}
+.ui-scope.card-header,
+.ui-scope .card-header,
+.ui-scope.input-guide,
+.ui-scope .input-guide,
+.ui-scope.card-footer,
+.ui-scope .card-footer{padding:17px}
+.ui-scope.legacy-note,
+.ui-scope .legacy-note{padding:10px 17px}
+.ui-scope.job-info-bar,
+.ui-scope .job-info-bar{grid-template-columns:repeat(2,minmax(0,1fr))}
+.ui-scope.info-group,
+.ui-scope .info-group{padding:14px 17px}
+.ui-scope.table-container,
+.ui-scope .table-container{padding:0 12px 14px;overflow-x:visible}
+.ui-scope table{display:block;min-width:0;border-spacing:0}
+.ui-scope thead{display:none}
+.ui-scope tbody{display:grid;gap:12px}
+.ui-scope tr{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0;padding:8px 12px;border:1px solid var(--line);border-radius:12px;background:#fafbfe}
+.ui-scope tr.active-row,
+.ui-scope tr:focus-within{border-color:#81cfc2;background:#e9f7f2}
+.ui-scope td,
+.ui-scope td:first-child,
+.ui-scope td:last-child{display:block;min-width:0;padding:9px 5px;border:0;border-radius:0;background:transparent}
+.ui-scope tr.active-row td,
+.ui-scope tr:focus-within td{background:transparent;border:0}
+.ui-scope td::before{content:attr(data-label);display:block;margin-bottom:5px;color:var(--muted);font-size:10px;font-weight:800;letter-spacing:.04em;text-transform:uppercase}
+.ui-scope td.calculator-cell{grid-column:1/-1}
+.ui-scope.calculator,
+.ui-scope .calculator{margin-top:3px}
+.ui-scope.return-input,
+.ui-scope .return-input{max-width:none}
+.ui-scope.card-footer,
+.ui-scope .card-footer{align-items:stretch}
+.ui-scope.btn-submit,
+.ui-scope .btn-submit{width:100%}}
+@media(max-width:420px){.ui-scope.page-top,
+.ui-scope .page-top{align-items:flex-start}
+.ui-scope.job-info-bar,
+.ui-scope .job-info-bar{grid-template-columns:1fr}
+.ui-scope.guide-step,
+.ui-scope .guide-step{width:100%}}
+@media(max-width:900px){.ui-scope.history-content,
+.ui-scope .history-content{grid-template-columns:1fr}
+.ui-scope.history-given-panel,
+.ui-scope .history-given-panel,
+.ui-scope.history-return-panel,
+.ui-scope .history-return-panel{padding:17px}}
+@media(max-width:700px){.ui-scope tr.history-row{display:block;grid-column:1/-1;padding:0;border:0;background:transparent}
+.ui-scope tr.history-row td.history-row-cell{display:block;padding:0;border:0;background:transparent}
+.ui-scope tr.history-row td.history-row-cell::before{display:none}
+.ui-scope.history-content,
+.ui-scope .history-content{grid-template-columns:1fr}
+.ui-scope.given-badge,
+.ui-scope .given-badge,
+.ui-scope.remaining-badge,
+.ui-scope .remaining-badge{font-size:15px}
+.ui-scope.return-input,
+.ui-scope .return-input{max-width:none}
+.ui-scope.completed-item summary,
+.ui-scope .completed-item summary{flex-wrap:wrap}
+.ui-scope.completed-content,
+.ui-scope .completed-content{margin:0 12px 12px}}
+@media(prefers-reduced-motion:reduce){.ui-scope.wave,
+.ui-scope .wave{animation:none}}
+@media print{.ui-scope.wave-layer,
+.ui-scope .wave-layer,
+.ui-scope.back-link,
+.ui-scope .back-link,
+.ui-scope.input-guide,
+.ui-scope .input-guide,
+.ui-scope.legacy-note,
+.ui-scope .legacy-note,
+.ui-scope.card-footer,
+.ui-scope .card-footer{display:none!important}
+.ui-scope.eyebrow,
+.ui-scope .eyebrow,
+.ui-scope h1,
+.ui-scope.page-subtitle,
+.ui-scope .page-subtitle{color:var(--ink);text-shadow:none}
+.ui-scope.page-shell,
+.ui-scope .page-shell{padding:0}
+.ui-scope.card,
+.ui-scope .card{box-shadow:none;border:0}
+.ui-scope.table-container,
+.ui-scope .table-container{overflow:visible}
+.ui-scope table{min-width:0}}

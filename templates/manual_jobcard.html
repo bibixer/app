@@ -1,0 +1,336 @@
+{% extends "app_base.html" %}
+{% block title %}Manual Bulk Job Card{% endblock %}
+{% block page_css %}<link rel="stylesheet" href="{{ url_for('static', filename='style/pages/manual_jobcard.css') }}">{% endblock %}
+{% block main_class %}page-manual-jobcard{% endblock %}
+{% block content %}
+  <header class="ui-heading"><div><p class="ui-kicker">Production / Job cards</p><h1>Manual job card</h1><p class="ui-description">Create a job from bundle patterns, with full product names or their aliases.</p></div><a class="head-link" href="{{ url_for('job_card') }}">Switch to scanning →</a></header>
+
+  <section class="entry-area manual-workspace">
+    <div class="ui-inline-guide"><b>Quick entry</b><span>Master → Item → Pieces → Bundles → Type → Next item</span><details><summary>Keyboard guide</summary><p>Enter a master name, alias or ID. Enter moves through each field. An alias fills the full product name. Press Enter on an empty new item to reach Create Job Card; press Backspace in an empty field to return to the previous field.</p></details></div>
+    <div class="form-header">
+    <label class="field">Master Name, alias, or ID
+      <input id="masterName" list="masterOptions" placeholder="Enter master name, alias, or ID" autocomplete="off" autofocus>
+      <small id="masterMatch"></small>
+      <datalist id="masterOptions">
+        {% for option in master_options %}<option value="{{ option.value }}" label="{{ option.label }}"></option>{% endfor %}
+      </datalist>
+    </label>
+    <label class="field">Billing Date<input id="manualDate" type="date" readonly></label>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Item name or alias</th><th>Pieces per bundle</th><th>Bundle count</th><th>Total pieces</th><th>Type</th><th></th></tr></thead>
+        <tbody id="manualRows"></tbody>
+      </table>
+    </div>
+    <datalist id="productOptions"></datalist>
+    <div class="actions">
+      <button type="button" class="secondary" id="addRow">+ Add pattern</button>
+      <strong id="grandTotal">Total: 0 pieces</strong>
+    </div>
+    <div class="ui-entry-footer"><p class="shortcut-help"><kbd>Enter</kbd> next field · <kbd>Backspace</kbd> previous empty field · <a href="{{ url_for('retune_product') }}"><kbd>Ctrl+I</kbd> Job Return</a></p><button type="button" class="primary" id="submitManual">Create job card <kbd>Ctrl+M</kbd></button></div>
+  </section>
+  <div id="message" class="message hidden"></div>
+  <section id="result" class="result hidden"></section>
+
+
+<script>
+const knownMasters = new Set({{ data.outworker|map(attribute='full')|list|tojson }});
+const masterAliasMap = {{ master_alias_map|tojson }};
+const products = {{ product_names|tojson }};
+const productAliasMap = {{ product_alias_map|tojson }};
+const types = {{ bundle_type_choices|tojson }};
+const rowsBody = document.getElementById('manualRows');
+const message = document.getElementById('message');
+let requestId = crypto.randomUUID();
+let submitting = false;
+let rowEnterTarget = null;
+
+document.getElementById('productOptions').innerHTML = products.map(value => `<option value="${escapeHtml(value)}"></option>`).join('');
+
+function escapeHtml(value) {
+  return String(value ?? '').replace(/[&<>'"]/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
+}
+
+function normalizeProduct(value) {
+  return String(value || '').trim().replace(/\s+/g, ' ').toUpperCase();
+}
+
+function fillFullItemName(input) {
+  const fullName = productAliasMap[normalizeProduct(input.value)];
+  if (fullName) input.value = fullName;
+  return fullName;
+}
+
+function fillFullMasterName(input) {
+  const fullName = masterAliasMap[normalizeProduct(input.value)];
+  if (fullName) input.value = fullName;
+}
+
+function addRow(values = {}) {
+  const row = document.createElement('tr');
+  const selectedType = types.some(([value]) => value === values.type) ? values.type : types[0][0];
+  const typeOptions = types.map(([value, label]) => `<option value="${escapeHtml(value)}"${value === selectedType ? ' selected' : ''}>${escapeHtml(label)}</option>`).join('');
+  row.innerHTML = `
+    <td><input class="product" list="productOptions" value="${escapeHtml(values.product || '')}" placeholder="VIMAL 1 2MTR"></td>
+    <td><input class="pieces" type="number" min="1" value="${values.pieces || ''}" placeholder="36"></td>
+    <td><input class="count" type="number" min="1" max="500" value="${values.count || ''}" placeholder="1"></td>
+    <td class="total">0</td>
+    <td><select class="bundle-type" aria-label="Bundle type">${typeOptions}</select></td>
+    <td class="remove-cell"><button type="button" class="danger remove">×</button></td>`;
+  row.querySelectorAll('input,select').forEach(input => input.addEventListener('input', updateTotals));
+  const productInput = row.querySelector('.product');
+  productInput.addEventListener('change', () => fillFullItemName(productInput));
+  productInput.addEventListener('blur', () => fillFullItemName(productInput));
+  row.querySelectorAll('input,select').forEach(input => input.addEventListener('keydown', handleRowKeydown));
+  row.querySelectorAll('input,select').forEach(input => input.addEventListener('keyup', handleRowKeydown));
+  const typeInput = row.querySelector('.bundle-type');
+  let browsingTypes = false;
+  typeInput.addEventListener('keydown', event => {
+    if (['ArrowUp', 'ArrowDown', 'Home', 'End', 'PageUp', 'PageDown'].includes(event.key)) browsingTypes = true;
+  });
+  typeInput.addEventListener('keyup', () => { browsingTypes = false; });
+  typeInput.addEventListener('blur', () => { browsingTypes = false; });
+  typeInput.addEventListener('change', () => {
+    if (!browsingTypes && types.some(([value]) => value === typeInput.value)) nextItemRow(row);
+  });
+  row.querySelector('.remove').addEventListener('click', () => {
+    if (rowsBody.children.length > 1) row.remove();
+    updateTotals();
+  });
+  rowsBody.appendChild(row);
+  updateTotals();
+  return row;
+}
+
+function validPositiveInteger(input, maximum = Infinity) {
+  const value = Number(input.value);
+  return input.value.trim() !== '' && Number.isInteger(value) && value > 0 && value <= maximum;
+}
+
+function emptyRow(row) {
+  return !row.querySelector('.product').value.trim()
+    && !row.querySelector('.pieces').value.trim()
+    && !row.querySelector('.count').value.trim();
+}
+
+function previousInput(input) {
+  const row = input.closest('tr');
+  if (input.classList.contains('product')) {
+    const previousRow = row.previousElementSibling;
+    return previousRow ? previousRow.querySelector('.bundle-type') : document.getElementById('masterName');
+  }
+  if (input.classList.contains('pieces')) return row.querySelector('.product');
+  if (input.classList.contains('count')) return row.querySelector('.pieces');
+  return row.querySelector('.count');
+}
+
+function nextItemRow(row) {
+  const next = row.nextElementSibling || addRow({type: row.querySelector('.bundle-type').value || 'lump'});
+  next.querySelector('.product').focus();
+}
+
+function handleRowKeydown(event) {
+  const input = event.currentTarget;
+  const row = input.closest('tr');
+  if (event.type === 'keydown' && event.key === 'Enter') {
+    rowEnterTarget = input;
+    if (input.classList.contains('bundle-type')) event.preventDefault();
+    return;
+  }
+  if (event.type === 'keydown' && event.key === 'Backspace' && input.classList.contains('bundle-type')) {
+    event.preventDefault();
+    row.querySelector('.count').focus();
+    return;
+  }
+  if (event.type === 'keydown' && event.key === 'Backspace' && input.value === '') {
+    const previous = previousInput(input);
+    if (previous) {
+      event.preventDefault();
+      previous.focus();
+    }
+    return;
+  }
+  if (event.type !== 'keyup' || event.key !== 'Enter') return;
+  // A select's change event may already have moved focus to the next item.
+  if (rowEnterTarget !== input) return;
+  rowEnterTarget = null;
+  if (input.classList.contains('product')) {
+    if (!input.value.trim()) {
+      if (row === rowsBody.lastElementChild && rowsBody.rows.length > 1 && emptyRow(row)) {
+        document.getElementById('submitManual').focus();
+      } else {
+        showMessage('Enter an item name or alias before continuing.');
+        input.focus();
+      }
+      return;
+    }
+    if (!fillFullItemName(input)) {
+      showMessage(`"${input.value.trim()}" is not an added product or alias. Select an item from the list or add it in Item Setup.`);
+      input.focus();
+      return;
+    }
+    row.querySelector('.pieces').focus();
+  } else if (input.classList.contains('pieces')) {
+    if (!validPositiveInteger(input)) {
+      showMessage('Pieces per bundle must be a whole number greater than zero.');
+      return;
+    }
+    row.querySelector('.count').focus();
+  } else if (input.classList.contains('count')) {
+    if (!validPositiveInteger(input, 500)) {
+      showMessage('Bundle count must be a whole number from 1 to 500.');
+      return;
+    }
+    const typeInput = row.querySelector('.bundle-type');
+    typeInput.focus();
+  } else if (input.classList.contains('bundle-type')) {
+    if (!types.some(([value]) => value === input.value)) {
+      showMessage('Select a bundle type from the list.');
+      return;
+    }
+    nextItemRow(row);
+  }
+}
+
+function updateTotals() {
+  let grand = 0;
+  [...rowsBody.rows].forEach(row => {
+    const pieces = Number(row.querySelector('.pieces').value) || 0;
+    const count = Number(row.querySelector('.count').value) || 0;
+    const total = pieces * count;
+    row.querySelector('.total').textContent = `${pieces} × ${count} = ${total}`;
+    grand += total;
+  });
+  document.getElementById('grandTotal').textContent = `Total: ${grand} pieces`;
+}
+
+function readRows() {
+  const activeRows = [...rowsBody.rows];
+  while (activeRows.length && emptyRow(activeRows[activeRows.length - 1])) {
+    activeRows.pop();
+  }
+  rowsBody.querySelectorAll('.product').forEach(fillFullItemName);
+  return activeRows.map(row => ({
+    product: row.querySelector('.product').value.trim(),
+    type: row.querySelector('.bundle-type').value.trim(),
+    pieces: Number(row.querySelector('.pieces').value),
+    count: Number(row.querySelector('.count').value),
+  }));
+}
+
+function showMessage(text, isError = true) {
+  message.textContent = text;
+  message.className = `message ${isError ? 'error' : 'success'}`;
+}
+
+function renderJobCard(job) {
+  const grouped = new Map();
+  for (const item of job.items) {
+    const pieces = item.pieces_per_bundle || item.qty;
+    const count = item.bundle_count || 1;
+    const key = `${item.name_of_prduct}\u0000${item.type}\u0000${pieces}`;
+    if (!grouped.has(key)) grouped.set(key, {name:item.name_of_prduct,type:item.type,pieces,count:0});
+    grouped.get(key).count += count;
+  }
+  const lines = [...grouped.values()].map(group => `<tr><td>${escapeHtml(group.name)}</td><td>${escapeHtml(group.type)}</td><td><strong>${group.pieces} × ${group.count}</strong> = ${group.pieces * group.count}</td></tr>`).join('');
+  const total = job.items.reduce((sum,item) => sum + Number(item.qty), 0);
+  const result = document.getElementById('result');
+  result.innerHTML = `<div class="result-head"><div><h2>Job Card #${job.jobId}</h2><p><strong>Master:</strong> ${escapeHtml(job.party)}</p></div><div><strong>${escapeHtml(job.date)}</strong><br>Given by ${escapeHtml(job.username)}</div></div><table><thead><tr><th>Item</th><th>Type</th><th>Pattern</th></tr></thead><tbody>${lines}</tbody><tfoot><tr><th colspan="2">Grand total</th><th>${total} pieces</th></tr></tfoot></table><div class="actions menu-print-hide"><button class="primary" onclick="window.print()">Print Job Card</button><button class="secondary" onclick="location.reload()">Create Another</button></div>`;
+  result.classList.remove('hidden');
+}
+
+async function submitManual() {
+  if (submitting) return;
+  const masterInput = document.getElementById('masterName');
+  fillFullMasterName(masterInput);
+  const customer = masterInput.value.trim();
+  const rows = readRows();
+  if (!knownMasters.has(customer)) {
+    document.getElementById('masterName').focus();
+    return showMessage('Select a valid master from the list.');
+  }
+  if (!rows.length || rows.some(row => !row.product || !types.some(([value]) => value === row.type) || !Number.isInteger(row.pieces) || row.pieces <= 0 || !Number.isInteger(row.count) || row.count <= 0 || row.count > 500)) {
+    return showMessage('Complete every row with item, a listed bundle type, pieces, and bundle count.');
+  }
+  const unknownIndex = rows.findIndex(row => !productAliasMap[normalizeProduct(row.product)]);
+  if (unknownIndex !== -1) {
+    const input = rowsBody.rows[unknownIndex].querySelector('.product');
+    input.focus();
+    return showMessage(`"${rows[unknownIndex].product}" is not an added product or alias. Select an item from the list or add it in Item Setup.`);
+  }
+  submitting = true;
+  document.getElementById('submitManual').disabled = true;
+  try {
+    const response = await fetch('/submit-manual-jobcard', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({customer, rows, request_id:requestId}),
+    });
+    const result = await response.json();
+    if (result.duplicate) {
+      showMessage(result.message, false);
+      return;
+    }
+    if (!result.success) {
+      showMessage(result.message || 'Could not create job card.');
+      submitting = false;
+      document.getElementById('submitManual').disabled = false;
+      return;
+    }
+    requestId = crypto.randomUUID();
+    showMessage(`Job card #${result.jobData.jobId} created successfully.`, false);
+    renderJobCard(result.jobData);
+  } catch (error) {
+    showMessage('Network error. Your request key is preserved; press Create Job Card to retry safely.');
+    submitting = false;
+    document.getElementById('submitManual').disabled = false;
+  }
+}
+
+document.getElementById('masterName').addEventListener('keydown', event => {
+  if (event.key !== 'Enter') return;
+  const typed = event.currentTarget.value.trim();
+  if (!/^\d+$/.test(typed)) return;
+  const fullName = masterAliasMap[typed];
+  if (!fullName) return;
+  event.preventDefault();
+  event.currentTarget.value = fullName;
+});
+
+document.getElementById('masterName').addEventListener('keyup', event => {
+  if (event.key !== 'Enter') return;
+  fillFullMasterName(event.currentTarget);
+  if (!knownMasters.has(event.currentTarget.value.trim())) {
+    showMessage('Select a valid master from the list.');
+    return;
+  }
+  message.className = 'message hidden';
+  rowsBody.querySelector('.product').focus();
+});
+document.getElementById('addRow').addEventListener('click', () => {
+  addRow().querySelector('.product').focus();
+});
+document.getElementById('masterName').addEventListener('input', event => {
+  const typed = event.currentTarget.value.trim();
+  const fullName = /^\d+$/.test(typed) ? masterAliasMap[typed] : null;
+  document.getElementById('masterMatch').textContent = fullName ? `Master #${typed}: ${fullName}` : '';
+});
+document.getElementById('submitManual').addEventListener('click', submitManual);
+document.getElementById('masterName').addEventListener('change', event => fillFullMasterName(event.currentTarget));
+document.getElementById('masterName').addEventListener('blur', event => fillFullMasterName(event.currentTarget));
+document.addEventListener('keydown', event => {
+  if (!(event.ctrlKey || event.metaKey)) return;
+  if (event.key.toLowerCase() === 'm') {
+    event.preventDefault();
+    submitManual();
+  } else if (event.key.toLowerCase() === 'i') {
+    event.preventDefault();
+    window.location.href = {{ url_for('retune_product')|tojson }};
+  }
+});
+const today = new Date();
+document.getElementById('manualDate').value = new Date(today.getTime() - today.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+addRow();
+</script>
+{% endblock %}
