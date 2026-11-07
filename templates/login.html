@@ -1,0 +1,16 @@
+{% extends 'app_base.html' %}
+{% from 'bootstrap5/form.html' import render_form %}
+{% block title %}Login · BH Manufacturing{% endblock %}
+{% block head %}<link rel="stylesheet" href="{{ url_for('static', filename='style/login.css', v='20261108-center') }}">{% endblock %}
+{% block main_class %}login-shell{% endblock %}
+{% block content %}
+<div class="legacy-login">
+  <div class="header-box"><img src="{{ url_for('static', filename='images/BH.svg') }}" alt="BH Manufacturing"></div>
+  <section class="form-container" aria-labelledby="login-title">
+    <h1 id="login-title">Login</h1>
+    {% for category,message in get_flashed_messages(with_categories=true) %}<div class="notice {{ category }}" role="alert">{{ message }}</div>{% endfor %}
+    {{ render_form(current_form, novalidate=True) }}
+  </section>
+</div>
+{% include 'inputjs.html' %}
+{% endblock %}

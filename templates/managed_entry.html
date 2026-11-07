@@ -1,0 +1,6 @@
+{% extends 'app_base.html' %}
+{% block title %}System managed record · BH Manufacturing{% endblock %}
+{% block content %}
+<header class="ui-heading"><div><p class="ui-kicker">Production / Record controls</p><h1>This record is managed by the app</h1><p class="ui-description">Movement records update automatically when an administrator corrects the job card. Edit the given items or recorded returns there.</p></div></header>
+<section class="ui-panel"><h2>Open the original job card</h2><p>Direct changes to movement records are disabled to keep stock, returns and balances consistent.</p>{% if jobcard_id %}<a class="head-link" href="{{ url_for('edit_entry',entity_type='jobcard',entity_id=jobcard_id|int) }}">Edit job card #{{ jobcard_id }} →</a>{% else %}<a class="head-link" href="{{ url_for('edit_index') }}">Open edit center →</a>{% endif %}</section>
+{% endblock %}

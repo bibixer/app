@@ -1,0 +1,17 @@
+/* Original black logo header, white login card and green pill button. */
+body.app-ui.is-guest .login-shell{display:grid;grid-template-columns:minmax(0,1fr);place-items:center;min-height:100svh;max-width:none;padding:28px 18px}
+.app-ui .legacy-login{width:490px;min-width:0;max-width:100%;margin:auto;text-align:center}
+.app-ui .legacy-login .header-box{padding:30px 35px;background:#000;border-radius:15px 15px 0 0}
+.app-ui .legacy-login .header-box img{display:block;height:150px;width:auto;max-width:100%;margin:auto;object-fit:contain}
+.app-ui .ui-scope .legacy-login .form-container{width:100%;padding:25px 35px;margin:0;background:#fff;border:0;border-radius:0 0 15px 15px;box-shadow:0 8px 30px #0004}
+.app-ui .ui-scope .legacy-login h1{margin:0 0 25px;text-align:center;color:#222;font-size:24px;letter-spacing:0}
+.app-ui .legacy-login .form-container form{display:block}
+.app-ui .legacy-login .form-container .mb-3{display:flex;align-items:center;gap:12px;margin:0 0 14px;flex-wrap:wrap}
+.app-ui .legacy-login .form-container .form-label{flex:0 0 118px;margin:0;text-align:left;color:#333;font-size:14px;font-weight:400}
+.app-ui .legacy-login .form-container input:not([type=hidden]):not([type=submit]){flex:1;min-width:0;width:0;margin:0;padding:10px;border:1px solid #bbb;border-radius:8px;font-size:14px}
+.app-ui .legacy-login .form-container .invalid-feedback{flex-basis:100%;text-align:left}
+.app-ui .legacy-login .form-container input[type=submit]{display:block;min-height:0;padding:1.3em 3em;margin:10px auto 0;border:0;border-radius:45px;background:#23c483;color:#fff;box-shadow:0 8px 15px #0000001a;font-size:12px;font-weight:500;letter-spacing:2.5px;text-transform:uppercase;transition:background .3s,color .3s,box-shadow .3s,transform .3s}
+.app-ui .legacy-login .form-container input[type=submit]:hover:not(:disabled){background:#fff;color:#000;box-shadow:0 15px 20px #2ee59d66;transform:translateY(-7px)}
+.app-ui .legacy-login .form-container input[type=submit]:active{transform:translateY(-1px)}
+.app-ui .legacy-login .notice{text-align:left}
+@media(max-width:480px){.app-ui .legacy-login .header-box{padding:24px}.app-ui .legacy-login .header-box img{height:125px}.app-ui .ui-scope .legacy-login .form-container{padding:25px 22px}.app-ui .legacy-login .form-container .mb-3{display:block}.app-ui .legacy-login .form-container .form-label{display:block;margin-bottom:7px}.app-ui .legacy-login .form-container input:not([type=hidden]):not([type=submit]){width:100%}}
