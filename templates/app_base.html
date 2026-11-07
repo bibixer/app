@@ -6,12 +6,12 @@
   <meta name="theme-color" content="#0f172a">
   <title>{% block title %}BH Manufacturing{% endblock %}</title>
   {% block page_css %}{% endblock %}
-  <link rel="stylesheet" href="{{ url_for('static', filename='style/app.css', v='20261107') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style/app.css', v='20261108-waves') }}">
   {% block head %}{% endblock %}
 </head>
 <body class="app-ui {% if not current_user.is_authenticated %}is-guest{% endif %} {% block body_class %}{% endblock %}">
   <a class="ui-skip" href="#main-content">Skip to content</a>
-  {% if current_user.is_authenticated %}{% set id = current_user.role %}{% include 'menu_bar.html' %}{% endif %}
+  {% if current_user.is_authenticated and not embedded %}{% set id = current_user.role %}{% include 'menu_bar.html' %}{% endif %}
   <div class="ui-waves" aria-hidden="true"><div class="ui-wave"></div><div class="ui-wave"></div><div class="ui-wave"></div></div>
   <main id="main-content" class="ui-scope ui-shell {% block main_class %}{% endblock %}" tabindex="-1">
     {% block notifications %}{% endblock %}

@@ -1,4 +1,4 @@
-"""Admin screens for piece rates, advances and completed-job payroll."""
+"""Admin screens for piece rates, advances and returned-piece payroll."""
 
 from flask import render_template, request, redirect, url_for, flash, abort
 from flask_login import login_required, current_user

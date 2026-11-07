@@ -297,8 +297,11 @@ def outworker_job_ledger(name, date_from, date_to, jobcard_id=None):
         return {"name": name, "date_from": date_from, "date_to": date_to, "summary": summary, "jobs": []}
 
     card_ids = {str(card.id) for card in cards}
-    paid_jobs = {row.jobcard_id: row.payroll_id for row in OutworkerPayrollJob.query.filter(
-        OutworkerPayrollJob.jobcard_id.in_([card.id for card in cards])).all()}
+    paid_jobs = defaultdict(list)
+    for row in OutworkerPayrollJob.query.filter(
+            OutworkerPayrollJob.jobcard_id.in_([card.id for card in cards])).order_by(OutworkerPayrollJob.id).all():
+        paid_jobs[row.jobcard_id].append({"payroll_id": row.payroll_id, "pieces": row.pieces,
+                                         "amount_paise": row.amount_paise})
     movements = (Jobmovement.query.filter(Jobmovement.jobcard.in_(card_ids))
                  .order_by(Jobmovement.date, Jobmovement.id).all())
     movement_ids = [movement.id for movement in movements if movement.flow_type == "IN"]
@@ -388,9 +391,14 @@ def outworker_job_ledger(name, date_from, date_to, jobcard_id=None):
         status = ("Check balance" if any(balance < 0 for balance in product_balances.values())
                   else "Open" if any(balance > 0 for balance in product_balances.values())
                   else "Complete" if given_total else "No movements")
+        payments = paid_jobs[card.id]
+        paid_pieces = sum(payment['pieces'] for payment in payments)
         jobs.append({
             "id": card.id, "date": card.date, "given_by": card.given_by,
-            "payroll_id": paid_jobs.get(card.id),
+            "payroll_id": payments[-1]['payroll_id'] if payments else None,
+            "payrolls": payments, "paid_pieces": paid_pieces,
+            "payable_pieces": max(0, returned_total - paid_pieces),
+            "unpaid_pieces": max(0, given_total - paid_pieces),
             "last_activity": card_movements[-1].date if card_movements else card.date,
             "given": given_total, "returned": returned_total, "remaining": remaining_total,
             "status": status, "products": products, "ledger": ledger,

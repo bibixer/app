@@ -2,6 +2,8 @@
 {% block title %}Job Card #{{ data.jobcard_id }} Return · BH Manufacturing{% endblock %}
 {% block page_css %}<link rel="stylesheet" href="{{ url_for('static', filename='style/pages/job_retun.css') }}">{% endblock %}
 {% block main_class %}page-shell page-job-retun{% endblock %}
+{% block body_class %}{% if embedded %}return-embedded{% endif %}{% endblock %}
+{% block head %}<link rel="stylesheet" href="{{ url_for('static',filename='style/return-workspace.css',v='20261108') }}">{% endblock %}
 {% block content %}
 <header class="page-top">
       <div><p class="eyebrow">Production · Returns</p><h1>Job Card Return</h1><p class="page-subtitle">Review the balance and record pieces returned against this job card.</p></div>
@@ -36,6 +38,7 @@
       {% if data['items'] %}<div class="card-footer"><p class="footer-note">Check quantities before confirming this return against job card #{{ data.jobcard_id }}.</p><button type="button" onclick="submitReturn()" class="btn-submit">✓ Confirm Return (Ctrl+M)</button></div>{% endif %}
     </section>
 
-  <script>const JOB_CARD = {{ data | tojson }};</script>
+  <script>const JOB_CARD = {{ data | tojson }}; window.RETURN_EMBEDDED = {{ embedded|default(false)|tojson }};</script>
   <script src="{{ url_for('static', filename='js/retun.js') }}"></script>
+  {% if embedded %}<script defer src="{{ url_for('static',filename='js/embedded-returns.js',v='20261108') }}"></script>{% endif %}
 {% endblock %}

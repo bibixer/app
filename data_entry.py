@@ -458,11 +458,12 @@ def add_manual_jobcard(data, current_user, request_key):
             "items": items, "username": current_user.username,
         },
     }
-    if not current_app.config.get('SIMPLE_WORKFLOW'):
-        try:
-            job_cade_print(result)
-        except Exception:
-            logging.exception("Manual job card %s saved, but CSV printing failed", job_card.id)
+    try:
+        outputs = job_cade_print(result)
+        result['label_csvs'] = [output['filename'] for output in outputs] if isinstance(outputs, list) else []
+    except Exception:
+        logging.exception("Manual job card %s saved, but CSV printing failed", job_card.id)
+        result['print_warning'] = 'Job card saved, but label CSV export failed. Check the server print folder before printing.'
     return result
 def add_job_movemet_out(data,job_id,current_user):
     for item in data['items']:

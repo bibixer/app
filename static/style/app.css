@@ -1,9 +1,9 @@
 /* BH Manufacturing · shared application design. Navigation owns its own styles. */
 body.app-ui {
-  --ui-bg:#f3f5f7; --ui-surface:#fff; --ui-ink:#192e3d; --ui-muted:#657786;
-  --ui-accent:#116d63; --ui-accent-hover:#0b554e; --ui-accent-soft:#eaf4f0;
-  --ui-line:#dfe6eb; --ui-blue:#326b95; --ui-amber:#9b681b; --ui-red:#aa3b4d;
-  --ui-shadow:0 2px 6px #18334503,0 10px 28px #18334504;
+  --ui-bg:#315d99; --ui-surface:#fff; --ui-ink:#202b46; --ui-muted:#64748b;
+  --ui-accent:#4f46e5; --ui-accent-hover:#4338ca; --ui-accent-soft:#eef2ff;
+  --ui-line:#dfe5f2; --ui-blue:#2563eb; --ui-amber:#a86513; --ui-red:#b33853;
+  --ui-shadow:0 4px 12px #1325500a,0 18px 44px #101f4b1c;
   --primary:var(--ui-accent); --primary-hover:var(--ui-accent-hover); --ink:var(--ui-ink);
   --muted:var(--ui-muted); --line:var(--ui-line); --border:var(--ui-line); --blue:var(--ui-blue);
   --teal:var(--ui-accent); --paper:#fff; --surface:#fff; --white:#fff; --bg:var(--ui-bg);
@@ -17,11 +17,12 @@ body.app-ui {
 .ui-scope,.ui-scope *,.ui-scope *::before,.ui-scope *::after{box-sizing:border-box}
 .ui-skip{position:fixed;top:8px;left:10px;z-index:200000;transform:translateY(-160%);padding:10px 18px;background:#fff;color:#116d63;border-radius:6px;font-weight:700}.ui-skip:focus{transform:translateY(0)}
 body.app-ui .ui-shell{position:relative;z-index:1;width:min(1536px,100%);max-width:1536px;height:auto;max-height:none;overflow:visible;margin:0 auto;padding:34px clamp(18px,3vw,44px) 64px;outline:none}
-.ui-waves{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:0}
-.ui-wave{position:absolute;left:-10%;bottom:-140px;width:220%;height:240px;border-radius:50% 50% 0 0;background:#dcebe6;opacity:.28;animation:ui-wave 24s -3s ease-in-out infinite}
-.ui-wave:nth-child(2){bottom:-165px;background:#dce6ed;animation:ui-wave 31s linear reverse infinite;opacity:.3}
-.ui-wave:nth-child(3){bottom:-180px;background:#e7eee3;animation:ui-wave 37s -8s ease-in-out infinite;opacity:.4}
-@keyframes ui-wave{0%,100%{transform:translateX(0)}50%{transform:translateX(-30%)}}
+.ui-waves{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:0;background:linear-gradient(315deg,#65005e 3%,#3c84ce 38%,#30eee2 68%,#ff1919 98%);background-size:400% 400%;animation:ui-gradient 15s ease infinite}
+.ui-wave{position:absolute;left:0;bottom:0;width:200%;height:12em;border-radius:1000% 1000% 0 0;background:rgb(255 255 255 / 25%);opacity:.8;animation:ui-wave 10s -3s linear infinite;transform:translate3d(0,0,0)}
+.ui-wave:nth-child(2){bottom:-1.25em;animation:ui-wave 18s linear reverse infinite}
+.ui-wave:nth-child(3){bottom:-2.5em;opacity:.9;animation:ui-wave 20s -1s reverse infinite}
+@keyframes ui-wave{0%,100%{transform:translate3d(0,0,0)}50%{transform:translate3d(-50%,0,0)}}
+@keyframes ui-gradient{0%,100%{background-position:0% 0%}50%{background-position:100% 100%}}
 .app-ui .ui-scope h1{margin:0;font-size:clamp(26px,2.5vw,34px);line-height:1.2;font-weight:750;letter-spacing:-.035em;color:var(--ui-ink)}
 .app-ui .ui-scope h2{font-size:19px;font-weight:720;line-height:1.35;letter-spacing:-.025em;color:var(--ui-ink)}
 .app-ui .ui-scope h3{font-size:16px;font-weight:700;line-height:1.4;letter-spacing:-.015em;color:var(--ui-ink)}
@@ -239,7 +240,29 @@ body.app-ui .ui-shell{position:relative;z-index:1;width:min(1536px,100%);max-wid
 @media(max-width:1050px){.app-ui .ui-form-layout{grid-template-columns:minmax(0,1fr) 260px}.app-ui .ui-scope .filter-panel{align-items:stretch;flex-direction:column}.app-ui .ui-scope .date-form{justify-content:start}}
 @media(max-width:800px){body.app-ui .ui-shell{padding:24px 18px 46px}.app-ui .ui-form-layout{grid-template-columns:1fr}.app-ui .ui-scope .form-help{order:2}.app-ui .ui-auth{grid-template-columns:1fr}.app-ui .ui-auth-brand{padding:30px;gap:24px}.app-ui .ui-auth-brand img{width:48px;height:48px}.app-ui .ui-auth-brand h1{font-size:29px;max-width:none}.app-ui .ui-auth-brand small{display:none}.app-ui .ui-auth .form-container{padding:30px}.app-ui .ui-scope :is(.hero,.lookup-card,.search-card,.guide-card,.side-card){padding:24px}.app-ui .ui-scope .table-wrapper:has(#billTable){overflow-x:auto}.app-ui .ui-scope .report-fragment .grid-main{grid-template-columns:1fr}.app-ui .ui-scope :is(.card,.panel,.job-card){border-radius:10px}}
 @media(max-width:600px){.app-ui .ui-scope :is(.page-head,.page-top,.pay-head,.ui-heading){margin-bottom:22px;padding-bottom:20px;gap:16px}.app-ui .ui-scope :is(.panel,.ui-panel,.job-body,.account-section,.form-container,.bill-card,.manual-workspace){padding:18px}.app-ui .ui-scope .form-container form{grid-template-columns:1fr}.app-ui .ui-scope :is(.metrics,.facts,.totals){gap:10px}.app-ui .ui-scope :is(.metric,.total:not(td)){padding:17px}.app-ui .ui-scope :is(.metric-value,.metric strong,.total:not(td) strong){font-size:26px}.app-ui .ui-scope .form-header{grid-template-columns:1fr}.app-ui .ui-scope :is(input,select,textarea){font-size:16px}.app-ui .ui-scope :is(.head-actions,.page-actions,.actions){gap:8px}.app-ui .ui-scope :is(.head-link,.quick-link){font-size:12px;padding:9px 12px}.app-ui .ui-scope .ui-entry-footer{align-items:stretch}.app-ui .ui-scope .ui-entry-footer>button{width:100%}.app-ui .ui-scope .report-fragment .charts-section{grid-template-columns:1fr}.app-ui .ui-scope .report-fragment .filter-bar{align-items:stretch;flex-direction:column}}
-@media(prefers-reduced-motion:reduce){.ui-wave{animation:none}.ui-scope *{scroll-behavior:auto!important;transition:none!important}}
+@media(prefers-reduced-motion:reduce){.ui-waves,.ui-wave{animation:none}.ui-scope *{scroll-behavior:auto!important;transition:none!important}}
+/* Restore the original animated backdrop, with clear surfaces above the color. */
+@media screen {
+  .app-ui .ui-scope>:is(.page-head,.page-top,.pay-head,.ui-heading,.section-head){padding:26px 28px;border:1px solid #ffffffb3;border-left:4px solid #8b7ff3;border-radius:18px;background:rgb(255 255 255 / 94%);box-shadow:0 12px 36px #10245b1c;backdrop-filter:blur(12px)}
+  .app-ui .ui-scope>:is(.page-head,.page-top,.pay-head,.ui-heading) h1{color:#292756}
+  .app-ui .ui-scope :is(.panel,.card,.job-card,.ui-panel,.manual-workspace,.form-container){border-radius:18px;border-color:#ffffffad;box-shadow:var(--ui-shadow)}
+  .app-ui .ui-scope :is(.primary,.button.primary,input[type=submit],.open-button,.apply-button){background:linear-gradient(115deg,#4f46e5,#7356db);box-shadow:0 6px 16px #4f46e52e;border-color:transparent}
+  .app-ui .ui-scope :is(.primary,.button.primary,input[type=submit],.open-button,.apply-button):hover:not(:disabled){background:linear-gradient(115deg,#4338ca,#6343cb);box-shadow:0 8px 20px #4f46e53b}
+  .app-ui .ui-scope :is(input,select,textarea):focus{border-color:#7167e8;box-shadow:0 0 0 3px #635be522}
+  .app-ui .ui-scope :is(button,a,summary):focus-visible{outline-color:#aaa2ff}
+  .app-ui .ui-scope th{background:#eef1fb;color:#515f80}
+  .app-ui .ui-scope .metrics>.metric{border-top:3px solid #8b7ff3;background:linear-gradient(145deg,#fff,#f1efff)}
+  .app-ui .ui-scope .metrics>.metric:nth-child(2){border-top-color:#46b9cf;background:linear-gradient(145deg,#fff,#e9f8fc)}
+  .app-ui .ui-scope .metrics>.metric:nth-child(3){border-top-color:#e7ad63;background:linear-gradient(145deg,#fff,#fff5e6)}
+  .app-ui .ui-scope .metrics>.metric:nth-child(4){border-top-color:#75a4ef;background:linear-gradient(145deg,#fff,#edf4ff)}
+  .app-ui .ui-scope :is(.form-help,.ui-auth-brand){background:linear-gradient(145deg,#242b54,#354077 60%,#42668d);border-color:#ffffff40;box-shadow:var(--ui-shadow)}
+  .app-ui .ui-scope :is(.form-help,.ui-auth-brand) :is(h1,h2,strong){color:#fff}
+  .app-ui .ui-scope :is(.form-help,.ui-auth-brand) :is(p,li,small){color:#e0e6fa}
+  .app-ui .ui-scope :is(.form-help,.ui-auth-brand) .ui-kicker{color:#aeece7}
+  .app-ui .ui-scope .form-help li{border-color:#ffffff26}
+  .app-ui .ui-scope>.links{padding:18px;background:#fffffff2;border-radius:12px;box-shadow:var(--ui-shadow)}
+  @media(max-width:600px){.app-ui .ui-scope>:is(.page-head,.page-top,.pay-head,.ui-heading,.section-head){padding:20px;border-radius:14px}}
+}
 @media(max-width:600px){.app-ui .ui-scope .job-info-bar{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:14px}.app-ui .ui-scope .job-info-bar .info-group{min-width:0;padding:12px}.app-ui .ui-scope .job-info-bar label{font-size:10px}.app-ui .ui-scope .job-info-bar .info-group>span{font-size:13px;overflow-wrap:anywhere}.app-ui .ui-scope .ui-inline-guide{gap:8px}.app-ui .ui-scope .ui-inline-guide>span{order:3;flex-basis:100%;font-size:11px}.app-ui .ui-scope .ui-inline-guide>b{order:1}.app-ui .ui-scope .ui-inline-guide>details{order:2;margin-left:auto}}
 .app-ui .ui-scope #masterMatch:empty{display:none}
 .app-ui .ui-scope .job-edit-table{min-width:1060px}

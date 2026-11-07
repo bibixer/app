@@ -3,7 +3,7 @@
 {% block page_css %}<link rel="stylesheet" href="{{ url_for('static', filename='style/pages/return_lookup.css') }}">{% endblock %}
 {% block main_class %}page-shell page-return-lookup{% endblock %}
 {% block content %}
-<header class="page-head"><p class="eyebrow">Production · Returns</p><h1>Find a job card</h1><p class="lead">Enter a job-card number to open its products, remaining pieces, and return history.</p></header>
+<header class="page-head"><p class="eyebrow">Production · Returns</p><h1>Find a job or outworker</h1><p class="lead">Open a single job card, or enter returns across all incomplete jobs for one outworker.</p></header>
     {% for category, message in get_flashed_messages(with_categories=true) %}<div class="message {{ category if category in ['success', 'warning', 'danger'] else '' }}" role="alert">{{ message }}</div>{% endfor %}
     <div class="layout">
       <section class="card lookup-card" aria-labelledby="lookup-title">
@@ -21,6 +21,7 @@
         <div class="form-footer"><a class="back-link" href="{{ url_for('manual_job_card' if config.SIMPLE_WORKFLOW else 'job_card') }}">← Back to job cards</a><span class="key-hint">Press <kbd>Enter</kbd> to open</span></div>
       </section>
       <aside class="card guide-card" aria-label="Return steps">
+        <h2>Return across open jobs</h2><p>Select an outworker to see every incomplete job with its own return fields, calculator, and history.</p><form method="get" action="{{ url_for('outworker_returns') }}"><label for="return-worker">Outworker name, alias, or ID</label><input id="return-worker" name="worker" list="return-worker-options" required autocomplete="off" placeholder="Enter outworker or ID"><datalist id="return-worker-options">{% for option in master_options %}<option value="{{ option.value }}" label="{{ option.label }}"></option>{% endfor %}</datalist><button type="submit">Open all incomplete jobs →</button></form><hr>
         <h2>How returns work</h2><p>Everything stays linked to the job-card number you enter.</p>
         <ol class="steps">
           <li><span class="step-number">01</span><div><strong>Enter the number</strong><span>Find the job card you want to return against.</span></div></li>

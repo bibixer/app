@@ -432,13 +432,13 @@ const payload = {
           console.log(data_R);
           if (data_R.duplicate) {
             alert(data_R.message);
-            window.location.replace("/retune_product?ok=101");
+            window.location.replace(window.RETURN_EMBEDDED ? `/job_retun?jobcard_id=${encodeURIComponent(JOB_CARD.jobcard_id)}&embedded=1` : "/retune_product?ok=101");
             return;
           }
           if (data_R.success) {
             activeReturnRequestId = crypto.randomUUID();
             generateAndPrintHTML(data_R.jobData.jobData);
-            window.location.replace("/retune_product?ok=101");
+            window.location.replace(window.RETURN_EMBEDDED ? `/job_retun?jobcard_id=${encodeURIComponent(JOB_CARD.jobcard_id)}&embedded=1` : "/retune_product?ok=101");
           } else {
             returnSubmitInFlight = false;
             alert(data_R.message || "Return could not be saved. Refresh this job card to see its latest balance.");
@@ -704,7 +704,7 @@ const payload = {
 
         // Auto-focus first input
         const first = getInputs()[0];
-        if (first) focusAtEnd(first);
+        if (first && !window.RETURN_EMBEDDED) focusAtEnd(first);
 
         // Keyboard Navigation Logic for Return Inputs
         document.addEventListener("keydown", (e) => {

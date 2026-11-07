@@ -1,16 +1,17 @@
 from functools import wraps
 from flask import flash, render_template, redirect, url_for,session,request, jsonify
 from form import SimpleProductForm
-from simple_workflow import CORE_ENTITIES, register_simple_workflow, job_overview
+from simple_workflow import CORE_ENTITIES, register_simple_workflow, dashboard_period, dashboard_movement_details
 from form import Lump_data, bundle_invadata, Item_data, Outworker_form, Cutter_form, Return_form, Login_form, Date_form, Date_form_with_name,bale_data_form,party_name,Find_and_edit,EditEntryForm
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from data_entry import add_cutter,add_items,add_outworker_db,add_jobcard,add_manual_jobcard,in_move_entery,bale_data_entry,add_party
 from data_Process import get_serch_data, get_job_card_data_creation, get_jobcard_return_data, get_jobcard_ledger, \
     get_current_week_range, home_dashboard,get_cutter_report_data,outworker_name,outworker_job_ledger,product_data,find_edit_data
-from modes import User, Jobcard, Jobmovement, Item_data as ProductModel
+from modes import User, Jobcard, Jobmovement, Item_data as ProductModel, Outworker
 from edit_service import ENTITY_CONFIG, edit_context, save_entry, audit_logs, search_entries
 from item_aliases import resolve_item_name, item_name_mapping
-from master_aliases import master_name_mapping, master_name_options
+from master_aliases import master_name_mapping, master_name_options, resolve_master_name
+from return_workspace import open_outworker_jobs
 from bundle_types import BUNDLE_TYPE_CHOICES
 from return_reconciliation import unassigned_returns, assign_return
 from data_Process import outworker_period_account
@@ -311,7 +312,8 @@ def register_routes(app,db):
         )
         if isinstance(result, dict):
             if result.get("code") == 101:
-                return jsonify(success=True, message="Manual job card saved", jobData=result["jobData"])
+                return jsonify(success=True, message="Manual job card saved", jobData=result["jobData"],
+                               label_csvs=result.get('label_csvs', []), print_warning=result.get('print_warning'))
         if result == 401:
             return jsonify(success=False, code=401, message="Master name was not found."), 400
         if result == 405:
@@ -481,7 +483,23 @@ def register_routes(app,db):
             if current_form.jobcard_id.data and current_form.jobcard_id.data > 0:
                 return redirect(url_for("job_retun", jobcard_id=current_form.jobcard_id.data))
             flash("Enter a valid job card number.", "danger")
-        return render_template("return_lookup.html", current_form=current_form, id=current_user.role)
+        return render_template("return_lookup.html", current_form=current_form, id=current_user.role,
+                               master_options=master_name_options())
+
+    @app.route('/returns/outworker')
+    @login_required
+    @job_operator
+    def outworker_returns():
+        raw = request.args.get('worker_id') or request.args.get('worker', '')
+        name = resolve_master_name(raw) if raw else None
+        worker_id = record_id(name.split('***', 1)[0]) if name else None
+        worker = db.session.get(Outworker, worker_id) if worker_id else None
+        if raw and worker is None:
+            flash('Select a valid outworker name, alias, or ID.', 'danger')
+            return redirect(url_for('retune_product'))
+        jobs = open_outworker_jobs(worker) if worker else []
+        return render_template('outworker_returns.html', id=current_user.role, worker=worker,
+                               jobs=jobs, master_options=master_name_options())
     @app.route("/job_retun", methods=["GET", "POST"])
     @login_required
     @job_operator
@@ -497,7 +515,8 @@ def register_routes(app,db):
         if not data["items"] and not data["completed_items"]:
             flash(f"Job card #{jobcard_id} has no returnable items or return history.", "warning")
             return redirect(url_for("retune_product"))
-        return render_template("job_retun.html",data=data,id=current_user.role)
+        return render_template("job_retun.html",data=data,id=current_user.role,
+                               embedded=request.args.get('embedded') == '1')
     @app.route("/jobcard/ledger")
     @login_required
     @job_operator
@@ -556,7 +575,12 @@ def register_routes(app,db):
     @oly_admin
     def admin_dashord():
         if app.config.get('SIMPLE_WORKFLOW'):
-            return render_template('simple_dashboard.html', id=current_user.role, overview=job_overview())
+            try:
+                overview = dashboard_period(request.args)
+            except (ValueError, OverflowError):
+                flash('Choose valid From and To dates, with From on or before To.', 'danger')
+                return redirect(url_for('admin_dashord'))
+            return render_template('simple_dashboard.html', id=current_user.role, overview=overview)
         range_data = get_current_week_range()
         date_from = Date_form()
         # Pre-fill form with current week range on GET
@@ -585,6 +609,20 @@ def register_routes(app,db):
             max_inflow=max((point["quantity"] for point in inflow_points), default=1),
             max_outflow=max((point["quantity"] for point in outflow_points), default=1),
         )
+    @app.route('/dashboard/movements')
+    @login_required
+    @oly_admin
+    def dashboard_movements():
+        try:
+            overview = dashboard_period(request.args)
+            kind = request.args.get('kind', 'all')
+            entries = dashboard_movement_details(overview, kind)
+        except (ValueError, OverflowError):
+            flash('Choose a valid date range and movement type.', 'danger')
+            return redirect(url_for('admin_dashord'))
+        return render_template('dashboard_movements.html', id=current_user.role,
+                               overview=overview, kind=kind, entries=entries)
+
     @app.route("/cutter_report",methods=["GET", "POST"])
     @login_required
     @oly_admin
@@ -665,6 +703,7 @@ def register_routes(app,db):
             "outworker_job_report.html", id=current_user.role,
             current_form=name_data_form, names=outworker_name_data, report=report,
             pending_returns=pending_returns,
+            selected_worker_id=record_id(report['name'].split('***', 1)[0]) if report else None,
         )
 
     @app.route("/product_report", methods=["GET", "POST"])
@@ -712,7 +751,7 @@ def register_routes(app,db):
             else:
                 flash("Enter both a username and password.", "warning")
 
-        return render_template('user.html', form_name="Login",
+        return render_template('login.html', form_name="Login",
             current_form=name_from)
 
     @app.route('/logout')

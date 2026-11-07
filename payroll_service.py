@@ -180,10 +180,14 @@ def payable_job_quotes(worker):
             continue
         paid_groups = defaultdict(int)
         for payment in paid[card.id]:
-            if not isinstance(payment.lines, list) or sum(line.get("pieces", 0) for line in payment.lines) != payment.pieces:
+            if not isinstance(payment.lines, list) or not payment.lines:
                 invalid = True
                 break
+            payment_pieces = 0
             for line in payment.lines:
+                if not isinstance(line, dict):
+                    invalid = True
+                    break
                 item = items.get(normalize_name(line.get("product", "")))
                 product_id = line.get("product_id") or (item.id if item else None)
                 key = (product_id or normalize_name(line.get("product", "")), line.get("type"))
@@ -192,6 +196,10 @@ def payable_job_quotes(worker):
                     invalid = True
                     break
                 paid_groups[key] += quantity
+                payment_pieces += quantity
+            if payment_pieces != payment.pieces:
+                invalid = True
+                break
         current_keys = {(items[normalize_name(name)].id if normalize_name(name) in items else normalize_name(name), kind)
                         for name, kind in groups}
         if invalid or any(key not in current_keys for key in paid_groups):

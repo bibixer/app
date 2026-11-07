@@ -1,4 +1,4 @@
-"""Money is calculated once per completed job and advances cannot be reused."""
+"""Returned pieces can be paid in batches; quantities and advances cannot be reused."""
 
 import os
 import tempfile
@@ -117,14 +117,16 @@ class PayrollTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             payroll_preview(self.worker.id, [card.id], "0")
 
-    def test_rejects_incomplete_mismatched_and_already_paid_jobs(self):
+    def test_accepts_partial_but_rejects_mismatched_and_already_paid_jobs(self):
         self.rate()
         partial = self.card((("lump", 100, 99),))
         # Net total is zero, but one type is over-returned and another is short.
         mismatched = self.card((("lump", 100, 90), ("good_cut", 50, 60)))
-        for card in (partial, mismatched):
-            with self.assertRaises(ValueError):
-                self.pay([card.id], token=f"pay-{card.id}")
+        quote = payroll_preview(self.worker.id, [partial.id], '0')
+        self.assertEqual(quote['pieces'], 99)
+        self.assertEqual(quote['jobs'][0]['pending_return'], 1)
+        with self.assertRaises(ValueError):
+            self.pay([mismatched.id], token=f"pay-{mismatched.id}")
         complete = self.card()
         self.pay([complete.id])
         for token in ("pay", "another-browser"):

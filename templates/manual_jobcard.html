@@ -279,7 +279,7 @@ async function submitManual() {
       return;
     }
     requestId = crypto.randomUUID();
-    showMessage(`Job card #${result.jobData.jobId} created successfully.`, false);
+    showMessage(result.print_warning || `Job card #${result.jobData.jobId} created successfully. Label CSV saved to the server print folder.`, Boolean(result.print_warning));
     renderJobCard(result.jobData);
   } catch (error) {
     showMessage('Network error. Your request key is preserved; press Create Job Card to retry safely.');

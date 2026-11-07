@@ -20,6 +20,7 @@ def create_app(test_config=None):
         'users': os.environ.get("USERS_DATABASE_URI", "sqlite:///users.db")
     }
     app.config['SIMPLE_WORKFLOW'] = True
+    app.config['LABEL_PRINT_ROOT'] = os.environ.get('LABEL_PRINT_ROOT')
     if test_config:
         app.config.update(test_config)
 

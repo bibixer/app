@@ -1,12 +1,16 @@
 import pandas as pd
 import re
 from pathlib import Path
+import os
+import tempfile
+from flask import current_app, has_app_context
 
 PRINT_ROOT = Path(__file__).resolve().parent / "to_print"
 
 
 def _output_path(kind, filename):
-    directory = PRINT_ROOT / kind
+    configured = current_app.config.get('LABEL_PRINT_ROOT') if has_app_context() else None
+    directory = Path(configured or PRINT_ROOT) / kind
     directory.mkdir(parents=True, exist_ok=True)
     return directory / filename
 ##### OUTWORKER OR
@@ -42,7 +46,24 @@ def buldel_qr_print(data):
 
 ######## jobCARD
 def job_cade_print(data):
-    build_custom_csvs_pandas(data)
+    return build_custom_csvs_pandas(data)
+
+
+def _write_label_csv(filename, csv_string):
+    """Publish complete files so the label watcher never reads a partial CSV."""
+    target = _output_path('jobcard', filename)
+    temporary = None
+    try:
+        with tempfile.NamedTemporaryFile(mode='w', encoding='utf-8', newline='',
+                                         prefix='.', suffix='.tmp', dir=target.parent, delete=False) as output:
+            temporary = Path(output.name)
+            output.write(csv_string)
+            output.flush()
+            os.fsync(output.fileno())
+        temporary.replace(target)
+    finally:
+        if temporary is not None:
+            temporary.unlink(missing_ok=True)
 
 
 def clean_text(text):
@@ -156,7 +177,7 @@ def build_custom_csvs_pandas(data):
             out_df = pd.DataFrame([row])
             filename = f"{job_id}_{party}_{username}_{date}_page_{page_index}.csv"
             csv_string = out_df.to_csv(index=False)
-            _output_path("jobcard", filename).write_text(csv_string, encoding="utf-8")
+            _write_label_csv(filename, csv_string)
 
 
 
