@@ -1,4 +1,4 @@
-"""Product rates, advance balances, and immutable completed-job payment records."""
+"""Product rates, advance balances, and immutable payments for returned job pieces."""
 
 import hashlib
 import json
@@ -11,6 +11,7 @@ from sqlalchemy.exc import IntegrityError
 from bundle_types import BUNDLE_TYPE_VALUES
 from data_entry import claim_write
 from item_aliases import normalize_name
+from validation import record_id
 from modes import (db, Item_data, Outworker, Jobcard, Jobmovement, EditLog,
                    OutworkerRate, OutworkerAdvance, OutworkerPayroll, OutworkerPayrollJob)
 
@@ -74,7 +75,7 @@ def rate_version(row):
 def save_rate(product_id, bundle_type, value, expected_version, token, user, remove=False):
     try:
         username = _claim(token, "outworker_rate", user)
-        if not db.session.get(Item_data, product_id):
+        if record_id(product_id) is None or not db.session.get(Item_data, product_id):
             raise ValueError("Select an existing product.")
         if bundle_type and bundle_type not in BUNDLE_TYPE_VALUES:
             raise ValueError("Select a listed bundle type or the base rate.")
@@ -123,7 +124,7 @@ def advance_balance(worker_id):
 def record_advance(worker_id, amount, method, reference, note, token, user):
     try:
         username = _claim(token, "outworker_advance", user)
-        worker = db.session.get(Outworker, worker_id)
+        worker = db.session.get(Outworker, worker_id) if record_id(worker_id) else None
         if not worker:
             raise ValueError("Select an existing outworker.")
         amount = parse_money(amount)
@@ -143,13 +144,15 @@ def record_advance(worker_id, amount, method, reference, note, token, user):
         raise
 
 
-def completed_job_quotes(worker):
-    """Require every product/type to balance, rather than only the job total."""
+def payable_job_quotes(worker):
+    """Quote only returned pieces that have not appeared on an issued payroll."""
     cards = Jobcard.query.filter_by(given_to=worker_label(worker)).order_by(Jobcard.id).all()
     if not cards:
         return []
-    paid = {row.jobcard_id: row.payroll_id for row in OutworkerPayrollJob.query.filter(
-        OutworkerPayrollJob.jobcard_id.in_([card.id for card in cards])).all()}
+    paid = defaultdict(list)
+    for payment in OutworkerPayrollJob.query.filter(
+            OutworkerPayrollJob.jobcard_id.in_([card.id for card in cards])).all():
+        paid[payment.jobcard_id].append(payment)
     by_card = defaultdict(list)
     for row in Jobmovement.query.filter(Jobmovement.jobcard.in_([str(card.id) for card in cards])).all():
         by_card[row.jobcard].append(row)
@@ -158,8 +161,6 @@ def completed_job_quotes(worker):
     rates = {(row.product_id, row.bundle_type): row for row in OutworkerRate.query.all()}
     quotes = []
     for card in cards:
-        if card.id in paid:
-            continue
         groups = defaultdict(lambda: {"given": 0, "returned": 0})
         invalid = False
         for row in by_card[str(card.id)]:
@@ -172,50 +173,89 @@ def completed_job_quotes(worker):
             group = groups[(row.product_name, row.type_B)]
             group["given"] += (row.outflow or 0) if row.flow_type == "OUT" else 0
             group["returned"] += (row.inflow or 0) if row.flow_type == "IN" else 0
+        groups = {key: group for key, group in groups.items() if group["given"] or group["returned"]}
         if invalid or not groups or any(
-            group["given"] <= 0 or group["given"] != group["returned"] for group in groups.values()
+            group["given"] <= 0 or group["returned"] > group["given"] for group in groups.values()
         ):
+            continue
+        paid_groups = defaultdict(int)
+        for payment in paid[card.id]:
+            if not isinstance(payment.lines, list) or sum(line.get("pieces", 0) for line in payment.lines) != payment.pieces:
+                invalid = True
+                break
+            for line in payment.lines:
+                item = items.get(normalize_name(line.get("product", "")))
+                product_id = line.get("product_id") or (item.id if item else None)
+                key = (product_id or normalize_name(line.get("product", "")), line.get("type"))
+                quantity = line.get("pieces")
+                if not isinstance(quantity, int) or isinstance(quantity, bool) or quantity <= 0:
+                    invalid = True
+                    break
+                paid_groups[key] += quantity
+        current_keys = {(items[normalize_name(name)].id if normalize_name(name) in items else normalize_name(name), kind)
+                        for name, kind in groups}
+        if invalid or any(key not in current_keys for key in paid_groups):
             continue
         lines, errors = [], []
         for (name, type_name), group in sorted(groups.items()):
             item = items.get(normalize_name(name))
+            paid_quantity = paid_groups[(item.id if item else normalize_name(name), type_name)]
+            if paid_quantity > group["returned"]:
+                invalid = True
+                break
+            quantity = group["returned"] - paid_quantity
+            if quantity == 0:
+                continue
             override = rates.get((item.id, type_name)) if item else None
             rate = override or (rates.get((item.id, "")) if item else None)
             if not item:
                 errors.append(f"{name}: product is not in Item Setup.")
             elif not rate:
                 errors.append(f"Set a base or {type_name} rate for {name}.")
-            quantity = group["given"]
             paise = int((Decimal(quantity) * rate.rate_units / 100).quantize(
                 Decimal("1"), rounding=ROUND_HALF_UP)) if rate else None
             lines.append({
                 "product_id": item.id if item else None, "product": name, "type": type_name,
-                "pieces": quantity, "rate": rate_text(rate.rate_units) if rate else None,
+                "pieces": quantity, "given": group["given"], "returned": group["returned"],
+                "already_paid": paid_quantity,
+                "rate": rate_text(rate.rate_units) if rate else None,
                 "rate_source": "Type override" if override else "Base rate",
                 "amount_paise": paise,
             })
+        if invalid or not lines:
+            continue
         gross = sum(line["amount_paise"] or 0 for line in lines)
         if gross > MAX_PAISE:
             errors.append("Job amount exceeds the supported payment limit.")
         quotes.append({"id": card.id, "date": card.date, "lines": lines,
+                       "given": sum(group["given"] for group in groups.values()),
+                       "returned": sum(group["returned"] for group in groups.values()),
+                       "already_paid": sum(paid_groups.values()),
+                       "pending_return": sum(group["given"] - group["returned"] for group in groups.values()),
                        "pieces": sum(line["pieces"] for line in lines),
                        "gross_paise": gross, "errors": errors})
     return quotes
 
 
+# Compatibility for existing callers; eligibility now includes partially returned jobs.
+completed_job_quotes = payable_job_quotes
+
+
 def payroll_preview(worker_id, job_ids, deduction):
-    worker = db.session.get(Outworker, worker_id)
+    worker = db.session.get(Outworker, worker_id) if record_id(worker_id) else None
     if not worker:
         raise ValueError("Select an existing outworker.")
     try:
-        ids = sorted({int(value) for value in job_ids})
+        ids = sorted({record_id(value) for value in job_ids})
+        if any(value is None for value in ids):
+            raise ValueError
     except (TypeError, ValueError):
         raise ValueError("Select valid job cards.") from None
     if not ids:
-        raise ValueError("Select at least one completed job.")
-    quotes = {quote["id"]: quote for quote in completed_job_quotes(worker)}
+        raise ValueError("Select at least one job with returned, unpaid pieces.")
+    quotes = {quote["id"]: quote for quote in payable_job_quotes(worker)}
     if any(card_id not in quotes for card_id in ids):
-        raise ValueError("A selected job is incomplete, already paid, or belongs to another outworker.")
+        raise ValueError("A selected job has no returned unpaid pieces, has an invalid balance, or belongs to another outworker.")
     jobs = [quotes[card_id] for card_id in ids]
     errors = [error for job in jobs for error in job["errors"]]
     if errors:
@@ -229,7 +269,8 @@ def payroll_preview(worker_id, job_ids, deduction):
         raise ValueError("Advance deduction cannot exceed the available advance or gross payroll.")
     # Check quantities, rates, worker and advance balance again at final save.
     version_data = {"worker": worker_label(worker), "available": available,
-                    "jobs": [{"id": job["id"], "lines": job["lines"]} for job in jobs],
+                    "jobs": [{"id": job["id"], "lines": job["lines"], "given": job["given"],
+                              "returned": job["returned"], "already_paid": job["already_paid"]} for job in jobs],
                     "deduction": deduction}
     version = hashlib.sha256(json.dumps(version_data, sort_keys=True).encode()).hexdigest()
     return {"worker": worker, "worker_name": worker_label(worker), "jobs": jobs,
@@ -262,7 +303,7 @@ def issue_payroll(worker_id, job_ids, deduction, expected_version, method, refer
         return payroll
     except IntegrityError:
         db.session.rollback()
-        raise ValueError("A selected job has already been paid. Refresh the account.") from None
+        raise ValueError("This payroll conflicts with a saved payment. Refresh the account.") from None
     except Exception:
         db.session.rollback()
         raise

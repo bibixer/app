@@ -3,7 +3,7 @@
 {% block page_css %}<link rel="stylesheet" href="{{ url_for('static', filename='style/pages/manual_jobcard.css') }}">{% endblock %}
 {% block main_class %}page-manual-jobcard{% endblock %}
 {% block content %}
-  <header class="ui-heading"><div><p class="ui-kicker">Production / Job cards</p><h1>Manual job card</h1><p class="ui-description">Create a job from bundle patterns, with full product names or their aliases.</p></div><a class="head-link" href="{{ url_for('job_card') }}">Switch to scanning →</a></header>
+  <header class="ui-heading"><div><p class="ui-kicker">Production / Job cards</p><h1>Manual job card</h1><p class="ui-description">Create a job from bundle patterns, with full product names or their aliases.</p></div>{% if not config.SIMPLE_WORKFLOW %}<a class="head-link" href="{{ url_for('job_card') }}">Switch to scanning →</a>{% endif %}</header>
 
   <section class="entry-area manual-workspace">
     <div class="ui-inline-guide"><b>Quick entry</b><span>Master → Item → Pieces → Bundles → Type → Next item</span><details><summary>Keyboard guide</summary><p>Enter a master name, alias or ID. Enter moves through each field. An alias fills the full product name. Press Enter on an empty new item to reach Create Job Card; press Backspace in an empty field to return to the previous field.</p></details></div>

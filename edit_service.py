@@ -1,5 +1,6 @@
 import hashlib
 import json
+import math
 from datetime import datetime
 from math import ceil
 from sqlalchemy import String, cast, or_
@@ -9,10 +10,12 @@ from sqlalchemy.orm import selectinload
 
 from modes import (
     db, Bale_date, Lump, Bundle, Jobcard, Jobmovement, Cuter, Item_data, ItemAlias, OutworkerAlias,
-    Outworker, Party, EditLog, RequestDedup, OutworkerPayrollJob,
+    Outworker, Party, EditLog, RequestDedup, OutworkerPayrollJob, ReturnBreakdown,
 )
 from master_aliases import validate_master_aliases
 from item_aliases import normalize_name, parse_aliases, validate_names
+from entry_integrity import validate_update, validate_affected_jobs
+from validation import MAX_DATABASE_INTEGER, record_id
 
 
 ENTITY_CONFIG = {
@@ -98,9 +101,17 @@ def _parse(value, kind):
         return None
     base_kind = kind.removeprefix("optional_")
     if base_kind == "int":
-        return int(value)
+        if isinstance(value, bool) or not isinstance(value, (int, str)):
+            raise ValueError("Enter a whole number.")
+        parsed = int(value)
+        if abs(parsed) > MAX_DATABASE_INTEGER:
+            raise ValueError("This number is too large to save.")
+        return parsed
     if base_kind == "float":
-        return float(value)
+        parsed = float(value)
+        if not math.isfinite(parsed):
+            raise ValueError("Enter a finite number.")
+        return parsed
     if base_kind == "datetime":
         return datetime.fromisoformat(value)
     if base_kind == "status":
@@ -120,12 +131,17 @@ def _parse(value, kind):
 
 def get_entry(entity_type, entity_id):
     config = ENTITY_CONFIG.get(entity_type)
-    if not config:
+    if not config or record_id(entity_id) is None:
         return None, None
     return config, db.session.get(config["model"], entity_id)
 
 
 def edit_context(entity_type, entity_id):
+    if entity_type == "movement":
+        return None
+    if entity_type == "jobcard":
+        from jobcard_edit import jobcard_edit_context
+        return jobcard_edit_context(entity_id)
     config, obj = get_entry(entity_type, entity_id)
     if not config or not obj:
         return None
@@ -187,17 +203,18 @@ def _sync_related(entity_type, obj, changed, username, old):
             updates["product"] = obj.product
         if updates:
             for lump in Lump.query.filter_by(bale_id=obj.id).all():
+                previous = snapshot(lump, updates)
                 _logged_update("lump", lump, updates, username)
-                if "product" in updates:
-                    for bundle in Bundle.query.filter_by(lump_id=lump.id).all():
-                        _logged_update("bundle", bundle, {"product": obj.product}, username)
+                _sync_related("lump", lump, list(updates), username, previous)
 
     elif entity_type == "lump":
         mapping = {"product": "product", "color": "color", "bundle_type": "type_B"}
         updates = {target: getattr(obj, source) for source, target in mapping.items() if source in changed}
         if updates:
             for bundle in Bundle.query.filter_by(lump_id=obj.id).all():
+                previous = snapshot(bundle, updates)
                 _logged_update("bundle", bundle, updates, username)
+                _sync_related("bundle", bundle, list(updates), username, previous)
 
     elif entity_type == "bundle":
         movement_updates = {}
@@ -226,7 +243,7 @@ def _sync_related(entity_type, obj, changed, username, old):
                                  {"product_list": new_list}, username, "CASCADE_UPDATE")
 
     elif entity_type == "jobcard" and "given_to" in changed:
-        for movement in Jobmovement.query.filter_by(jobcard=str(obj.id), flow_type="OUT").all():
+        for movement in Jobmovement.query.filter_by(jobcard=str(obj.id)).all():
             _logged_update("movement", movement, {"name_of_mater": str(obj.given_to)}, username)
             if movement.bundle:
                 bundle = db.session.get(Bundle, int(movement.bundle))
@@ -296,9 +313,17 @@ def _sync_related(entity_type, obj, changed, username, old):
 
 
 def save_entry(entity_type, entity_id, form_data, expected_version, request_key, username):
+    if entity_type == "movement":
+        return "invalid", "Movement records are system-managed. Correct the job card instead."
+    if entity_type == "jobcard":
+        from jobcard_edit import save_jobcard_edit
+        return save_jobcard_edit(entity_id, form_data, expected_version, request_key, username)
     config = ENTITY_CONFIG.get(entity_type)
     if not config:
         return "not_found", None
+    if not isinstance(request_key, str) or not request_key.strip() or len(request_key) > 128:
+        return "invalid", "A valid submission token is required. Reload the form."
+    request_key = hashlib.sha256(f"{username}:edit:{entity_type}:{entity_id}:{request_key}".encode()).hexdigest()
 
     try:
         db.session.add(RequestDedup(
@@ -328,7 +353,7 @@ def save_entry(entity_type, entity_id, form_data, expected_version, request_key,
         if entity_type in {"cutter", "product", "outworker", "party"} and "name" in updates:
             updates["name"] = normalize_name(updates["name"])
         non_negative = {"meters", "size", "pieces", "kg", "outflow", "inflow"}
-        positive = {"lot_count", "bale_number", "number_of_bundlie", "bale_id"}
+        positive = {"lot_number", "lot_count", "bale_number", "number_of_bundlie", "bale_id", "number", "s_no"}
         if any(updates.get(field, 0) < 0 for field in non_negative & updates.keys()):
             raise ValueError("Quantity, weight, size, and meter values cannot be negative")
         if any(updates.get(field, 0) <= 0 for field in positive & updates.keys()):
@@ -343,6 +368,7 @@ def save_entry(entity_type, entity_id, form_data, expected_version, request_key,
                 validate_names(updates["name"], aliases, obj.id)
             else:
                 validate_master_aliases(updates["name"], aliases, obj.id)
+        validate_update(entity_type, obj, updates, old)
         for field, value in updates.items():
             if field == "aliases":
                 continue
@@ -377,6 +403,7 @@ def save_entry(entity_type, entity_id, form_data, expected_version, request_key,
                 raise ValueError("This entry belongs to an issued payroll. Its paid job data cannot be edited.")
         _add_log(entity_type, obj, old, new, username)
         _sync_related(entity_type, obj, changed, username, old)
+        validate_affected_jobs(entity_type, obj, old)
         db.session.commit()
         return "saved", changed
     except IntegrityError:
@@ -436,8 +463,16 @@ def _entry_preview(entity_type, row):
 def search_entries(entity_type, search="", page=1, page_size=40):
     """Search every editable type and return one bounded page of results."""
     config = ENTITY_CONFIG.get(entity_type)
-    if not config:
+    if not config or entity_type == "movement":
         return None
+    try:
+        page_size = max(1, min(int(page_size), 100))
+    except (TypeError, ValueError, OverflowError):
+        page_size = 40
+    try:
+        page = max(1, int(page or 1))
+    except (TypeError, ValueError, OverflowError):
+        page = 1
     model = config["model"]
     query = model.query
     search = (search or "").strip()[:100]

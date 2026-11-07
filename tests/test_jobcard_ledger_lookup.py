@@ -18,7 +18,7 @@ class JobcardLedgerLookupTest(unittest.TestCase):
         self.previous_users_database = os.environ.get("USERS_DATABASE_URI")
         os.environ["DATABASE_URI"] = f"sqlite:///{root / 'main.db'}"
         os.environ["USERS_DATABASE_URI"] = f"sqlite:///{root / 'users.db'}"
-        self.app = create_app()
+        self.app = create_app({"SIMPLE_WORKFLOW": False})
         self.app.config["WTF_CSRF_ENABLED"] = False
         with self.app.app_context():
             user = User("admin", "test-password", 1)

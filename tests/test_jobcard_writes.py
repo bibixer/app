@@ -5,7 +5,7 @@ from unittest.mock import patch
 
 from data_entry import (add_jobcard, add_manual_jobcard, validate_payload_structure,
                         validate_manual_jobcard, in_move_entery)
-from data_Process import get_jobcard_return_data
+from data_Process import get_jobcard_return_data, get_jobcard_ledger
 from modes import db, Jobcard, Jobmovement, Bundle, ItemAlias, RequestDedup, ReturnBreakdown
 from support import AppTestCase
 
@@ -84,6 +84,7 @@ class JobcardWriteTest(AppTestCase):
         movement = Jobmovement.query.filter_by(flow_type="IN").one()
         self.assertEqual(movement.product_name, "VIMAL_X")
         self.assertEqual(get_jobcard_return_data(card_id)["items"][0]["issued"], 90)
+        self.assertEqual(get_jobcard_ledger(card_id)["job"]["products"][0]["name"], "VIMAL_X")
 
     def test_return_rejects_coerced_row_ids_and_duplicate_lines(self):
         card_id = add_manual_jobcard(self.manual_payload(), self.admin, "manual")["jobData"]["jobId"]
@@ -115,3 +116,12 @@ class JobcardWriteTest(AppTestCase):
         self.assertEqual(result["code"], 101)
         self.assertEqual(Jobcard.query.count(), 1)
         self.assertEqual(add_manual_jobcard(self.manual_payload(), self.admin, "print-failure"), 409)
+
+    def test_return_failure_rolls_back_every_row_and_allows_retry(self):
+        card_id = add_manual_jobcard(self.manual_payload(), self.admin, "manual")["jobData"]["jobId"]
+        data = self.return_payload(card_id, 30)
+        with patch("data_entry.ReturnBreakdown", side_effect=RuntimeError("simulated failure")):
+            with self.assertLogs(level="ERROR"):
+                self.assertEqual(in_move_entery(data, self.admin, "retryable-return"), 500)
+        self.assertEqual(Jobmovement.query.filter_by(flow_type="IN").count(), 0)
+        self.assertEqual(in_move_entery(data, self.admin, "retryable-return")["code"], 101)

@@ -6,9 +6,9 @@
 {% block main_class %}setup-shell{% endblock %}
 {% block content %}
 {% if current_user.is_authenticated %}
-<header class="ui-heading"><div><p class="ui-kicker">Production workspace / Data entry</p><h1>{{ display_title }}</h1><p class="ui-description">Enter the details below to keep your production records up to date.{% if '(' in form_name %} <span class="tag">Step {{ form_name.split('(',1)[1].replace(')','') }}</span>{% endif %}</p></div>{% if current_user.role == 1 %}<a class="head-link" href="{{ url_for('edit_index') }}">Open edit center →</a>{% endif %}</header>
+<header class="ui-heading"><div><p class="ui-kicker">Production workspace / Setup</p><h1>{{ display_title }}</h1><p class="ui-description">Enter the details below to keep your production records up to date.{% if '(' in form_name %} <span class="tag">Step {{ form_name.split('(',1)[1].replace(')','') }}</span>{% endif %}</p></div>{% if current_user.role == 1 %}<a class="head-link" href="{{ url_for('edit_index') }}">Open edit center →</a>{% endif %}</header>
 {% endif %}
-{% if not current_user.is_authenticated %}<div class="ui-auth"><aside class="ui-auth-brand"><img src="{{ url_for('static', filename='images/BH.svg') }}" alt="BH Manufacturing"><div><p class="ui-kicker">BH Manufacturing</p><h1>Your production,<br>in one place.</h1><p>From the first bale to the final payment. A clear view of every job, every return and every piece.</p></div><small>Production & inventory management</small></aside>{% else %}<div class="ui-form-layout">{% endif %}
+{% if not current_user.is_authenticated %}<div class="ui-auth"><aside class="ui-auth-brand"><img src="{{ url_for('static', filename='images/BH.svg') }}" alt="BH Manufacturing"><div><p class="ui-kicker">BH Manufacturing</p><h1>Your production,<br>in one place.</h1><p>From job assignment to the final payment. A clear view of every job, every return and every piece.</p></div><small>Jobs, returns & outworker accounts</small></aside>{% else %}<div class="ui-form-layout">{% endif %}
 <section class="form-container" aria-labelledby="entry-form-title">
   <h2 id="entry-form-title">{{ 'Welcome back' if not current_user.is_authenticated else 'Entry details' }}</h2>
   {% if not current_user.is_authenticated %}<p class="ui-description">Sign in with your account to continue.</p>{% endif %}
@@ -17,7 +17,7 @@
   {% if ret %}<p class="shortcut-help">Continue to Job Card with <kbd>Ctrl+I</kbd>.</p>{% endif %}
   {% if item_rows is defined %}
   <details class="item-directory"><summary>Edit an existing item</summary><label for="itemSearch" class="field">Find a product or alias</label><input id="itemSearch" type="search" placeholder="Search your product list"><div class="item-directory-list">
-  {% for item in item_rows %}<div class="item-link" data-search="{{ (item.name ~ ' ' ~ (item.alias_rows|map(attribute='alias')|join(' ')))|lower }}"><a href="{{ url_for('edit_entry', entity_type='product', entity_id=item.id) }}">{{ item.name }}</a>{% if item.alias_rows %}<br><small>{{ item.alias_rows|map(attribute='alias')|join(', ') }}</small>{% endif %}</div>{% endfor %}
+  {% for item in item_rows %}<div class="item-link" data-search="{{ (item.name ~ ' ' ~ (item.alias_rows|map(attribute='alias')|join(' ')))|lower }}"><a href="{{ url_for('edit_entry', entity_type='product', entity_id=item.id) }}">{{ item.name }}</a>{% if item.alias_rows %}<br><small>{{ item.alias_rows|map(attribute='alias')|join(', ') }}</small>{% endif %}{% if config.SIMPLE_WORKFLOW %} · <a href="{{ url_for('payroll_rates', product_id=item.id) }}">Set rates</a>{% endif %}</div>{% endfor %}
   </div></details>
   <script>document.getElementById('itemSearch').addEventListener('input', e => document.querySelectorAll('.item-link').forEach(row => row.hidden = !row.dataset.search.includes(e.target.value.toLowerCase().trim())));</script>
   {% endif %}
@@ -25,6 +25,6 @@
 {% if current_user.is_authenticated %}<aside class="form-help"><p class="ui-kicker">Entry guide</p><h2>Keep the work moving</h2><p>Use the keyboard to enter records without losing your place.</p><ul><li><strong>Enter to continue</strong>Move to the next field after completing the current one.</li><li><strong>Backspace to go back</strong>When a field is empty, move to the previous field.</li><li><strong>One record, one save</strong>Check the details, then submit. A confirmation appears when the entry is saved.</li></ul></aside>{% endif %}
 </div>
 {% include "inputjs.html" %}
-{% if current_user.is_authenticated %}{% include "scarch.html" %}{% endif %}
+{% if current_user.is_authenticated and not config.SIMPLE_WORKFLOW %}{% include "scarch.html" %}{% endif %}
 {% if ret %}<script>document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='i'){e.preventDefault();window.location.replace('/jobcard')}});</script>{% endif %}
 {% endblock %}

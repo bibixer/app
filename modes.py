@@ -1,6 +1,7 @@
 from  flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
+from datetime import datetime
 
 db =  SQLAlchemy()
 
@@ -182,6 +183,19 @@ class User(UserMixin, db.Model):
     def check_password(self,password):
         return check_password_hash(self.password,password)
 
+class UserAccessLog(db.Model):
+    __bind_key__ = 'users'
+    __tablename__ = 'user_access_log'
+    id = db.Column(db.Integer, primary_key=True)
+    request_key = db.Column(db.String(64), nullable=False, unique=True)
+    changed_at = db.Column(db.DateTime, nullable=False, default=datetime.now)
+    actor = db.Column(db.String(100), nullable=False)
+    user_id = db.Column(db.Integer, nullable=False)
+    action = db.Column(db.String(30), nullable=False)
+    old_role = db.Column(db.Integer)
+    new_role = db.Column(db.Integer, nullable=False)
+
+
 class Bale_date(db.Model):
     __tablename__ = "BaleDate"
     id = db.Column(db.Integer, primary_key=True)
@@ -282,10 +296,11 @@ class OutworkerPayrollJob(db.Model):
     __tablename__ = "outworker_payroll_job"
     id = db.Column(db.Integer, primary_key=True)
     payroll_id = db.Column(db.Integer, db.ForeignKey("outworker_payroll.id"), nullable=False, index=True)
-    jobcard_id = db.Column(db.Integer, db.ForeignKey("JobcardData.id"), nullable=False, unique=True)
+    jobcard_id = db.Column(db.Integer, db.ForeignKey("JobcardData.id"), nullable=False, index=True)
     pieces = db.Column(db.Integer, nullable=False)
     amount_paise = db.Column(db.BigInteger, nullable=False)
     lines = db.Column(db.JSON, nullable=False)
+    __table_args__ = (db.UniqueConstraint('payroll_id', 'jobcard_id'),)
 
 
 

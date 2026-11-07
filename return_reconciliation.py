@@ -6,7 +6,7 @@ from datetime import datetime
 from sqlalchemy import or_, func
 
 from data_entry import claim_write
-from modes import db, Jobcard, Jobmovement, EditLog
+from modes import db, Jobcard, Jobmovement, EditLog, OutworkerPayrollJob
 
 
 def _unassigned():
@@ -20,6 +20,7 @@ def matching_jobs(movement):
     cards = Jobcard.query.filter(
         Jobcard.given_to == movement.name_of_mater,
         Jobcard.date <= movement.date,
+        ~Jobcard.id.in_(db.session.query(OutworkerPayrollJob.jobcard_id)),
     ).order_by(Jobcard.date, Jobcard.id).all()
     if not cards:
         return []
@@ -31,16 +32,29 @@ def matching_jobs(movement):
     ).all()
     balances = defaultdict(int)
     issued_before_return = defaultdict(int)
+    by_card = defaultdict(list)
     for row in rows:
+        by_card[row.jobcard].append(row)
         if row.flow_type == "OUT":
             balances[row.jobcard] += row.outflow or 0
             if row.date <= movement.date:
                 issued_before_return[row.jobcard] += row.outflow or 0
         elif row.flow_type == "IN":
             balances[row.jobcard] -= row.inflow or 0
+            if row.date <= movement.date:
+                issued_before_return[row.jobcard] -= row.inflow or 0
+    chronological = set()
+    for card in cards:
+        running = 0
+        for row in sorted([*by_card[str(card.id)], movement], key=lambda row: (row.date, row.id)):
+            running += (row.outflow or 0) if row.flow_type == "OUT" else -(row.inflow or 0)
+            if running < 0:
+                break
+        else:
+            chronological.add(card.id)
     return [{"id": card.id, "date": card.date, "remaining": balances[str(card.id)]}
             for card in cards
-            if balances[str(card.id)] >= movement.inflow
+            if card.id in chronological and balances[str(card.id)] >= movement.inflow
             and issued_before_return[str(card.id)] >= movement.inflow]
 
 

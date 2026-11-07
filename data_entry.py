@@ -1,9 +1,12 @@
 from modes import db, Bundle, Lump, Cuter, Item_data, Outworker, OutworkerAlias,Jobcard,Jobmovement,ReturnBreakdown,Bale_date,Party,RequestDedup
 import logging
+from flask import current_app
 from datetime import datetime
 import hashlib
+from functools import wraps
 from sqlalchemy.exc import IntegrityError
-from item_aliases import normalize_name, parse_aliases, validate_names, resolve_item_name
+from item_aliases import normalize_name, parse_aliases, validate_names, resolve_item_name, item_name_mapping
+from validation import positive_integer, finite_number, record_id, MAX_DATABASE_INTEGER
 from modes import ItemAlias
 from master_aliases import validate_master_aliases, resolve_master_name
 from bundle_types import BUNDLE_TYPE_VALUES
@@ -18,7 +21,7 @@ def add_data_to_database(data):
 
 def claim_write(request_key, endpoint, current_user):
     """Atomically claim a browser submission before changing business data."""
-    if not isinstance(request_key, str) or not request_key or len(request_key) > 128:
+    if not isinstance(request_key, str) or not request_key.strip() or len(request_key) > 128:
         return False
     stable_key = hashlib.sha256(
         f"{current_user.username}:{endpoint}:{request_key}".encode("utf-8")
@@ -31,12 +34,55 @@ def claim_write(request_key, endpoint, current_user):
             created_at=datetime.now(),
         ))
         db.session.flush()
+        db.session.expire_all()
         return True
     except IntegrityError:
         db.session.rollback()
         return False
 
 
+def transactional_write(func):
+    """A failed write must release both its data changes and its request claim."""
+    @wraps(func)
+    def wrapped(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except Exception:
+            db.session.rollback()
+            raise
+    return wrapped
+
+
+def _inventory_payload(data):
+    if not isinstance(data, dict) or any(not isinstance(data.get(key), dict) for key in ("bale_data", "main", "bundles")):
+        raise ValueError("Invalid inventory payload.")
+    bale, main = dict(data["bale_data"]), dict(data["main"])
+    bundles = data["bundles"]
+    if (not positive_integer(main.get("numbers_of_bundles"), 20)
+            or len(bundles) != main["numbers_of_bundles"]
+            or main.get("bundle_type") not in BUNDLE_TYPE_VALUES
+            or not finite_number(main.get("meters")) or main["meters"] <= 0
+            or not finite_number(main.get("meters_add_remove"), minimum=-MAX_DATABASE_INTEGER)
+            or main["meters"] + main["meters_add_remove"] <= 0):
+        raise ValueError("Invalid lump quantities or bundle type.")
+    if any(not positive_integer(bale.get(field)) for field in ("lot_number", "lot_count", "bale_number")):
+        raise ValueError("Lot and bale numbers must be positive integers.")
+    for bundle in bundles.values():
+        if (not isinstance(bundle, dict) or not positive_integer(bundle.get("no_of_pics"))
+                or not positive_integer(bundle.get("no_of_so")) or not finite_number(bundle.get("kg_of_bundle"))):
+            raise ValueError("Invalid bundle quantity or weight.")
+    product = resolve_item_name(main.get("product_name"))
+    if (not product or resolve_item_name(bale.get("product_name")) != product
+            or main.get("cuter_name") != bale.get("cuter_name")
+            or not Cuter.query.filter_by(name=bale.get("cuter_name")).first()
+            or not Party.query.filter_by(name=bale.get("party_name")).first()):
+        raise ValueError("Select the product, cutter and supplier from Setup.")
+    bale["product_name"] = main["product_name"] = product
+    bale["packing_date"] = datetime.strptime(bale["packing_date"], "%a, %d %b %Y")
+    return {"bale_data": bale, "main": main, "bundles": bundles}
+
+
+@transactional_write
 def bale_data_entry(data,current_user,request_key):
     # if current_user.is_authenticated:
     #     if current_user.role != 1:
@@ -45,10 +91,14 @@ def bale_data_entry(data,current_user,request_key):
         return 404
     if not claim_write(request_key, "lump_workflow", current_user):
         return 409
+    try:
+        data = _inventory_payload(data)
+    except (ValueError, TypeError, KeyError):
+        db.session.rollback()
+        return 405
 
 
-    bale_data =  data['bale_data']
-    bale_data['packing_date'] = datetime.strptime(bale_data['packing_date'],"%a, %d %b %Y")
+    bale_data = dict(data['bale_data'])
     # check for cuuter date =
     old_date =  Bale_date.query.filter_by(
         part_name=bale_data['party_name'],
@@ -131,6 +181,7 @@ def add_bundle(data,lump_id,type,cuter):
         fulldata_list.append(bundle.to_dict(cuter=cuter,no_of_so=b['no_of_so']))
     return fulldata_list
 def error_hendle(func):
+    @wraps(func)
     def eror(*args, **kwargs):
         try:
             return func(*args, **kwargs)
@@ -142,7 +193,10 @@ def error_hendle(func):
 def add_cutter(data,current_user,request_key):
         if not claim_write(request_key, "add_cutter", current_user):
             return 409
-        cuuter = Cuter(name=data["name"].upper(),
+        name = normalize_name(data["name"])
+        if not name or len(name) > 50:
+            raise ValueError("Cutter name must be between 1 and 50 characters.")
+        cuuter = Cuter(name=name,
                        enter_user=current_user.username)
         return add_data_to_database(cuuter)
 
@@ -150,7 +204,10 @@ def add_cutter(data,current_user,request_key):
 def add_party(data,current_user,request_key):
        if not claim_write(request_key, "add_party", current_user):
            return 409
-       paty = Party(name=data["name"].upper(),
+       name = normalize_name(data["name"])
+       if not name or len(name) > 50 or any(normalize_name(row.name) == name for row in Party.query.all()):
+           raise ValueError("Enter a unique supplier name of at most 50 characters.")
+       paty = Party(name=name,
                        enter_user=current_user.username)
        return add_data_to_database(paty)
 
@@ -161,6 +218,8 @@ def add_items(data,current_user,request_key):
     name = normalize_name(data["name"])
     aliases = parse_aliases(data.get("aliases"))
     validate_names(name, aliases)
+    if not finite_number(data.get("size")) or not finite_number(data.get("meter")):
+        raise ValueError("Product size and meters must be finite, non-negative numbers.")
     item =  Item_data(name=name
     ,size = data["size"]
     ,meters = data["meter"],
@@ -177,8 +236,14 @@ def add_outworker_db(data,current_user,request_key):
     name = normalize_name(data["name"])
     aliases = parse_aliases(data.get("aliases"))
     validate_master_aliases(name, aliases)
+    address = str(data.get("address") or "").strip()
+    if not address or len(address) > 50 or not positive_integer(data.get("number")):
+        raise ValueError("Enter an address of at most 50 characters and a positive contact number.")
+    if any(normalize_name(row.name) == name and normalize_name(row.adders) == normalize_name(address)
+           and row.number == data["number"] for row in Outworker.query.all()):
+        raise ValueError("This outworker with the same address and contact number already exists.")
     outworker = Outworker(name=name,
-                          adders= data["address"],
+                          adders=address,
                           number = data["number"],
                           enter_user=current_user.username
                           )
@@ -186,13 +251,14 @@ def add_outworker_db(data,current_user,request_key):
     db.session.flush()
     db.session.add_all(OutworkerAlias(worker_id=outworker.id, alias=alias) for alias in aliases)
     OUT=add_data_to_database(outworker)
-    if OUT == 101:
+    if OUT == 101 and not current_app.config.get('SIMPLE_WORKFLOW'):
         try:
             if outworker_qr_print(outworker) != 101:
                 logging.error("Outworker %s saved, but QR printing did not succeed", outworker.id)
         except Exception:
             logging.exception("Outworker %s saved, but QR printing failed", outworker.id)
         return 101
+    return OUT
 # @error_hendle
 def check_name_master(data):
     all_data = outworker_name(oly_full_name=True)
@@ -204,7 +270,9 @@ def check_name_master(data):
         return False
 # 101 ok 401 name 403 falt on itetem
 def check_product(data):
-    item_ids = [item["item_id"] for item in data["items"]]
+    item_ids = [record_id(item["item_id"]) for item in data["items"]]
+    if any(item_id is None for item_id in item_ids):
+        return False
     if len(item_ids) != len(set(item_ids)):
         return False
 
@@ -213,7 +281,7 @@ def check_product(data):
     bundle_map = {b.id: b for b in bundles}
     for item in data["items"]:
 
-        bundle = bundle_map.get(int(item["item_id"]))
+        bundle = bundle_map.get(record_id(item["item_id"]))
 
         if not bundle:
             return False
@@ -241,7 +309,7 @@ def validate_payload_structure(data):
     if "customer" not in data or not isinstance(data["customer"], str) or not data["customer"].strip():
         return False
     # items check
-    if "items" not in data or not isinstance(data["items"], list) or len(data["items"]) == 0:
+    if not isinstance(data.get("items"), list) or not 1 <= len(data["items"]) <= 1000:
         return False
 
     for item in data["items"]:
@@ -253,21 +321,22 @@ def validate_payload_structure(data):
             if field not in item:
                 return False
 
-        if not isinstance(item["item_id"], str) or not item["item_id"].isdigit():
+        if not isinstance(item["item_id"], str) or record_id(item["item_id"]) is None:
             return False
-        if not isinstance(item["type"], str):
-            return False
-
-        if not isinstance(item["name_of_prduct"], str):
+        if not isinstance(item["type"], str) or item["type"] not in BUNDLE_TYPE_VALUES:
             return False
 
-        if not isinstance(item["qty"], (int, float)) or item["qty"] <= 0:
+        if not isinstance(item["name_of_prduct"], str) or not item["name_of_prduct"].strip():
             return False
 
-        if not isinstance(item["kg"], (int, float)) or item["kg"] < 0:
+        if not positive_integer(item["qty"]):
+            return False
+
+        if not finite_number(item["kg"]):
             return False
 
     return True
+@transactional_write
 def add_jobcard(data,current_user,request_key):
     if not validate_payload_structure(data):
         return 405
@@ -329,22 +398,25 @@ def validate_manual_jobcard(data):
             return False
         pieces = row.get("pieces")
         count = row.get("count")
-        if isinstance(pieces, bool) or not isinstance(pieces, int) or pieces <= 0:
+        if not positive_integer(pieces):
             return False
-        if isinstance(count, bool) or not isinstance(count, int) or count <= 0 or count > 500:
+        if not positive_integer(count, maximum=500) or pieces * count > MAX_DATABASE_INTEGER:
             return False
-    return True
+    return sum(row["pieces"] * row["count"] for row in rows) <= MAX_DATABASE_INTEGER
 
 
+@transactional_write
 def add_manual_jobcard(data, current_user, request_key):
     """Create a job card directly from manual patterns, without inventory bundles."""
     if not validate_manual_jobcard(data):
         return 405
-    product_names = [resolve_item_name(row["product"]) for row in data["rows"]]
-    if any(name is None for name in product_names):
-        return 406
     if not claim_write(request_key, "add_manual_jobcard", current_user):
         return 409
+    product_map = item_name_mapping()
+    product_names = [product_map.get(normalize_name(row["product"])) for row in data["rows"]]
+    if any(name is None for name in product_names):
+        db.session.rollback()
+        return 406
     master_name = resolve_master_name(data["customer"])
     if not master_name:
         db.session.rollback()
@@ -386,10 +458,11 @@ def add_manual_jobcard(data, current_user, request_key):
             "items": items, "username": current_user.username,
         },
     }
-    try:
-        job_cade_print(result)
-    except Exception:
-        logging.exception("Manual job card %s saved, but CSV printing failed", job_card.id)
+    if not current_app.config.get('SIMPLE_WORKFLOW'):
+        try:
+            job_cade_print(result)
+        except Exception:
+            logging.exception("Manual job card %s saved, but CSV printing failed", job_card.id)
     return result
 def add_job_movemet_out(data,job_id,current_user):
     for item in data['items']:
@@ -417,7 +490,7 @@ def update_bundle(data,current_user):
         bunld.given_to = data["customer"]
         bunld.given_by = str(current_user.username)
 def check_return_item(data):
-    if not isinstance(data, dict) or not isinstance(data.get("jobcard_id"), int) or isinstance(data.get("jobcard_id"), bool) or data["jobcard_id"] < 1:
+    if not isinstance(data, dict) or not positive_integer(data.get("jobcard_id")):
         return 405
     if not isinstance(data.get("items"), list) or not data["items"]:
         return 405
@@ -432,14 +505,13 @@ def check_return_item(data):
     seen_ids = set()
     for item in data["items"]:
         try:
-            item_id = int(item["item_id"])
+            item_id = record_id(item["item_id"])
             returned_qty = item["returned"]
             token_name = item["name_of_product"]
             type_B = item['type']
         except (KeyError, TypeError, ValueError):
             return 405
-        if (item_id in seen_ids or isinstance(returned_qty, bool)
-                or not isinstance(returned_qty, int) or returned_qty <= 0):
+        if item_id is None or item_id in seen_ids or not positive_integer(returned_qty):
             return 405
         seen_ids.add(item_id)
         # print(item)
@@ -477,9 +549,7 @@ def check_return_item(data):
                 if not isinstance(row, dict):
                     return 405
                 pieces, count = row.get("pieces"), row.get("count")
-                if (isinstance(pieces, bool) or isinstance(count, bool)
-                        or not isinstance(pieces, int) or not isinstance(count, int)
-                        or pieces <= 0 or count <= 0):
+                if not positive_integer(pieces) or not positive_integer(count) or pieces * count > MAX_DATABASE_INTEGER:
                     return 405
                 calculated_total += pieces * count
             if calculated_total != returned_qty:
@@ -498,16 +568,20 @@ def in_move_entery(data,current_user,request_key):
         if check_i is not True:
             db.session.rollback()
             return check_i
+        canonical_items = {item["item_id"]: item["product_name"]
+                           for item in get_jobcard_return_data(data["jobcard_id"])["items"]}
+        result_items = []
         for item in data['items']:
             rows = item.get("calculation_rows", [])
             method = item.get("entry_method", "direct")
             note = ", ".join(f'{row["pieces"]}X{row["count"]}' for row in rows) if method == "calculator" else ""
-            item["note"] = note
+            product_name = canonical_items[record_id(item["item_id"])]
+            result_items.append({**item, "note": note, "name_of_product": product_name})
             job_movement = Jobmovement(
                 date=datetime.now(),
                 jobcard=str(data["jobcard_id"]),
                 partculer=f"Return card {data['jobcard_id']} {note}"[:50],
-                product_name = item["name_of_product"].replace("_"," "),
+                product_name = product_name,
                 name_of_mater = data['name'],
                 enter_user = current_user.username,
                 flow_type = "IN",
@@ -529,11 +603,12 @@ def in_move_entery(data,current_user,request_key):
             "jobcard_id": data["jobcard_id"],
             "party": data['name'],
             "date": datetime.now().strftime("%d-%m-%Y"),
-            "items": data['items'],
+            "items": result_items,
             "username":current_user.username
         }
     }
 
     except Exception:
         db.session.rollback()
-        return 404
+        logging.exception("Return save failed")
+        return 500

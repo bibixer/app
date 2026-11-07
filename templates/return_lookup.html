@@ -18,7 +18,7 @@
           {% for error in current_form.jobcard_id.errors %}<p class="field-error" role="alert">{{ error }}</p>{% endfor %}
           {{ current_form.submit(class_='open-button', value='Open job card →') }}
         </form>
-        <div class="form-footer"><a class="back-link" href="{{ url_for('job_card') }}">← Back to job cards</a><span class="key-hint">Press <kbd>Enter</kbd> to open</span></div>
+        <div class="form-footer"><a class="back-link" href="{{ url_for('manual_job_card' if config.SIMPLE_WORKFLOW else 'job_card') }}">← Back to job cards</a><span class="key-hint">Press <kbd>Enter</kbd> to open</span></div>
       </section>
       <aside class="card guide-card" aria-label="Return steps">
         <h2>How returns work</h2><p>Everything stays linked to the job-card number you enter.</p>
@@ -29,5 +29,5 @@
         </ol>
       </aside>
     </div>
-    <nav class="quick-links" aria-label="Related actions"><a class="quick-link" href="{{ url_for('job_card') }}">Scan job card →</a><a class="quick-link" href="{{ url_for('manual_job_card') }}">Manual job card →</a><a class="quick-link" href="{{ url_for('jobcard_ledger_lookup') }}">View job ledger →</a></nav>
+    <nav class="quick-links" aria-label="Related actions">{% if not config.SIMPLE_WORKFLOW %}<a class="quick-link" href="{{ url_for('job_card') }}">Scan job card →</a>{% endif %}<a class="quick-link" href="{{ url_for('manual_job_card') }}">Manual job card →</a><a class="quick-link" href="{{ url_for('jobcard_ledger_lookup') }}">View job ledger →</a></nav>
 {% endblock %}

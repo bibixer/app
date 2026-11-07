@@ -24,7 +24,7 @@ class PayrollTest(unittest.TestCase):
         self.previous = {name: os.environ.get(name) for name in ("DATABASE_URI", "USERS_DATABASE_URI")}
         os.environ["DATABASE_URI"] = f"sqlite:///{root / 'main.db'}"
         os.environ["USERS_DATABASE_URI"] = f"sqlite:///{root / 'users.db'}"
-        self.app = create_app()
+        self.app = create_app({"SIMPLE_WORKFLOW": False})
         self.app.config.update(TESTING=True, WTF_CSRF_ENABLED=False)
         self.context = self.app.app_context()
         self.context.push()
@@ -283,13 +283,13 @@ class PayrollTest(unittest.TestCase):
         card = self.card()
         self.pay([card.id])
         movement = Jobmovement.query.filter_by(jobcard=str(card.id), flow_type="OUT").one()
-        context = edit_context("movement", movement.id)
+        self.assertIsNone(edit_context("movement", movement.id))
         values = {field: str(getattr(movement, field) or "") for field in (
             "jobcard", "bundle", "partculer", "product_name", "name_of_mater", "type_B", "flow_type")}
         values.update(date=movement.date.isoformat(), outflow="101", inflow="0")
-        status, message = save_entry("movement", movement.id, values, context["version"], "paid-edit", "admin")
+        status, message = save_entry("movement", movement.id, values, "unused", "paid-edit", "admin")
         self.assertEqual(status, "invalid")
-        self.assertIn("issued payroll", message)
+        self.assertIn("system-managed", message)
         self.assertEqual(db.session.get(Jobmovement, movement.id).outflow, 100)
 
 

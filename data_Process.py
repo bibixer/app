@@ -6,6 +6,7 @@ from datetime import datetime,timedelta,time
 from collections import defaultdict
 from sqlalchemy import func
 from modes import db
+from validation import record_id
 
 
 
@@ -186,7 +187,7 @@ def get_movemet_data(master_name):
 
 def get_jobcard_return_data(jobcard_id):
     """Given and returned quantities for one card, excluding unlinked legacy returns."""
-    card = db.session.get(Jobcard, jobcard_id)
+    card = db.session.get(Jobcard, jobcard_id) if record_id(jobcard_id) else None
     if card is None:
         return None
     movements = Jobmovement.query.filter_by(jobcard=str(card.id)).order_by(Jobmovement.id).all()
@@ -202,7 +203,7 @@ def _build_jobcard_return_data(card, movements, breakdowns):
     """Share one card's given patterns and return history with reports and entry."""
 
     def product_key(name, type_name):
-        return (str(name).replace("_", " ").strip().casefold(), str(type_name).strip().casefold())
+        return (str(name).strip().casefold(), str(type_name).strip().casefold())
 
     given_patterns = defaultdict(dict)
     pattern_totals = defaultdict(int)
@@ -259,6 +260,7 @@ def _build_jobcard_return_data(card, movements, breakdowns):
             items.append({
                 "item_id": len(items) + 1,
                 "name": name.replace(" ", "_"),
+                "product_name": name,
                 "colour": type_name,
                 "issued": balance,
                 "given": given,
@@ -267,6 +269,7 @@ def _build_jobcard_return_data(card, movements, breakdowns):
         elif group["issued_total"] > 0 and group["history"]:
             completed_items.append({
                 "name": name.replace(" ", "_"),
+                "product_name": name,
                 "colour": type_name,
                 "given": given,
                 "history": group["history"],
@@ -317,7 +320,7 @@ def outworker_job_ledger(name, date_from, date_to, jobcard_id=None):
             given = item["given"]["total"]
             returned = sum(entry["returned"] for entry in item["history"])
             products.append({
-                "name": item["name"].replace("_", " "), "type": item["colour"],
+                "name": item.get("product_name", item["name"]), "type": item["colour"],
                 "given": given, "returned": returned, "remaining": given - returned,
                 "given_patterns": item["given"]["calculation_rows"],
                 "returns": item["history"],
@@ -347,8 +350,8 @@ def outworker_job_ledger(name, date_from, date_to, jobcard_id=None):
                 for index, source in enumerate(source_rows):
                     if index in used_source_rows or not isinstance(source, dict):
                         continue
-                    source_name = str(source.get("name_of_prduct", "")).replace("_", " ").strip().casefold()
-                    movement_name = movement.product_name.replace("_", " ").strip().casefold()
+                    source_name = str(source.get("name_of_prduct", "")).strip().casefold()
+                    movement_name = movement.product_name.strip().casefold()
                     if (source_name != movement_name or source.get("type") != movement.type_B
                             or source.get("qty") != given_qty):
                         continue
@@ -373,6 +376,7 @@ def outworker_job_ledger(name, date_from, date_to, jobcard_id=None):
                     calculation_rows = [{"pieces": given_qty, "count": 1}]
             ledger.append({
                 "id": movement.id, "date": movement.date, "product": movement.product_name,
+                "flow_type": movement.flow_type,
                 "type": movement.type_B, "given": given_qty, "returned": returned_qty,
                 "balance": running_balance, "product_balance": product_balances[product_key],
                 "bundle": movement.bundle if movement.flow_type == "OUT" else None,
@@ -418,7 +422,7 @@ def outworker_period_account(name, date_from, date_to):
     for row in rows:
         key = (row.product_name, row.type_B)
         product = products.setdefault(key, {
-            "name": row.product_name.replace("_", " "), "type": row.type_B,
+            "name": row.product_name, "type": row.type_B,
             "opening": 0, "given": 0, "returned": 0, "closing": 0,
             "pieces_left": 0, "incomplete_jobs": 0, "jobs": [],
         })
@@ -473,7 +477,7 @@ def outworker_period_account(name, date_from, date_to):
 
 def get_jobcard_ledger(jobcard_id):
     """Full linked movement history for one job card, independent of report dates."""
-    card = db.session.get(Jobcard, jobcard_id)
+    card = db.session.get(Jobcard, jobcard_id) if record_id(jobcard_id) else None
     if card is None:
         return None
     report = outworker_job_ledger(card.given_to, card.date.date(), card.date.date(), jobcard_id=card.id)

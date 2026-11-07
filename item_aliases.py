@@ -44,11 +44,7 @@ def validate_names(name, aliases, item_id=None):
 
 def resolve_item_name(value):
     name = normalize_name(value)
-    item = Item_data.query.filter(func.upper(Item_data.name) == name).first()
-    if item:
-        return item.name
-    alias = ItemAlias.query.filter_by(alias=name).first()
-    return alias.item.name if alias else None
+    return item_name_mapping().get(name)
 
 
 def item_name_suggestions():

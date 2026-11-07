@@ -1,11 +1,13 @@
 from functools import wraps
 from flask import flash, render_template, redirect, url_for,session,request, jsonify
+from form import SimpleProductForm
+from simple_workflow import CORE_ENTITIES, register_simple_workflow, job_overview
 from form import Lump_data, bundle_invadata, Item_data, Outworker_form, Cutter_form, Return_form, Login_form, Date_form, Date_form_with_name,bale_data_form,party_name,Find_and_edit,EditEntryForm
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from data_entry import add_cutter,add_items,add_outworker_db,add_jobcard,add_manual_jobcard,in_move_entery,bale_data_entry,add_party
 from data_Process import get_serch_data, get_job_card_data_creation, get_jobcard_return_data, get_jobcard_ledger, \
     get_current_week_range, home_dashboard,get_cutter_report_data,outworker_name,outworker_job_ledger,product_data,find_edit_data
-from modes import User, Jobcard, Item_data as ProductModel
+from modes import User, Jobcard, Jobmovement, Item_data as ProductModel
 from edit_service import ENTITY_CONFIG, edit_context, save_entry, audit_logs, search_entries
 from item_aliases import resolve_item_name, item_name_mapping
 from master_aliases import master_name_mapping, master_name_options
@@ -13,6 +15,20 @@ from bundle_types import BUNDLE_TYPE_CHOICES
 from return_reconciliation import unassigned_returns, assign_return
 from data_Process import outworker_period_account
 from payroll_routes import register_payroll_routes
+from validation import record_id
+
+JSON_ENDPOINTS = {"submit_jobcard", "submit_manual_jobcard", "summit_retune", "edit_search"}
+
+
+def _write_json():
+    data = request.get_json(silent=True)
+    key = data.get("request_id") if isinstance(data, dict) else None
+    if not isinstance(key, str) or not key.strip() or len(key) > 128:
+        return None, (jsonify(success=False, code=405,
+                              message="A valid request ID and JSON data are required. Reload the page."), 400)
+    return data, None
+
+
 def reset_session(flow:int):
     # remove all bale lever1
     # remove all lump  vevel
@@ -31,31 +47,48 @@ def register_routes(app,db):
     login_manager = LoginManager(app)
     login_manager.login_view = 'login'
 
+    @login_manager.unauthorized_handler
+    def authentication_required():
+        if request.endpoint in JSON_ENDPOINTS:
+            return jsonify(success=False, message="Login required.", code=401), 401
+        return redirect(url_for("login", next=request.path))
+
     def oly_admin(func):
         @wraps(func)
         def admin_(*args, **kwargs):
-            try:
-                if not current_user.is_authenticated:
-                    flash("Login required")
-                    return redirect(url_for("login"))  # change to your login route name
-
-                if current_user.role != 1:
-                    flash("Admin access only")
-                    return redirect(url_for("home"))  # change to your home route name
-
-                return func(*args, **kwargs)
-
-            except Exception as e:
-                print("Admin decorator error:", e)
+            if not current_user.is_authenticated:
+                return authentication_required()
+            if current_user.role != 1:
+                if request.endpoint in JSON_ENDPOINTS:
+                    return jsonify(success=False, code=403, message="Admin access only."), 403
+                flash("Admin access only")
                 return redirect(url_for("home"))
+            return func(*args, **kwargs)
 
         return admin_
 
+    @app.errorhandler(500)
+    def server_error(error):
+        db.session.rollback()
+        if request.endpoint in JSON_ENDPOINTS:
+            return jsonify(success=False, code=500, message="The entry could not be saved. Retry with the same request ID."), 500
+        return error
+
     register_payroll_routes(app, oly_admin)
+    register_simple_workflow(app, oly_admin)
+
+    def job_operator(func):
+        @wraps(func)
+        def allowed(*args, **kwargs):
+            if app.config.get('SIMPLE_WORKFLOW') and current_user.role in (1, 2):
+                return func(*args, **kwargs)
+            return oly_admin(func)(*args, **kwargs)
+        return allowed
 
     @login_manager.user_loader
     def load_user(user_id):
-        return db.session.get(User, int(user_id))
+        parsed = record_id(user_id)
+        return db.session.get(User, parsed) if parsed else None
     @app.route("/bale_entery",methods=["GET", "POST"])
     @login_required
     def bale_entery():
@@ -113,6 +146,11 @@ def register_routes(app,db):
 
         form_name = f"lump entry ({current}/{total}) "
         current_form = Lump_data()
+        if request.method == "GET" and session.get("inventory_save_failed"):
+            for name, value in session.get("bundle_data", {}).items():
+                if name in current_form._fields and name not in {"csrf_token", "submission_token", "submit"}:
+                    current_form[name].data = value
+            current_form.submission_token.data = session.get("lump_workflow_id")
         # data to auto fill
         data_autofill = get_serch_data()
         if not current_form.validate_on_submit():
@@ -145,6 +183,7 @@ def register_routes(app,db):
 
                 # 🔄 reset any old flow
             reset_session(2)
+            session.pop("inventory_save_failed", None)
 
                 # 🚀 initialize bundle workflow
             session["bundle_data"] = data
@@ -174,6 +213,7 @@ def register_routes(app,db):
                 or "current_bundle" not in session
                 or "bundles" not in session
                 or "sno" not in session
+                or not session.get("lump_workflow_id")
         ):
             return redirect(url_for("lump_home"))
 
@@ -192,11 +232,13 @@ def register_routes(app,db):
 
             # print(all_data)
             result = bale_data_entry(all_data, current_user, session.get("lump_workflow_id"))
-            reset_session(2)
-            if result == 404:
-                flash("you do not have rights", "success")
+            if result not in (101, 409):
+                session["current_lump"] = max(1, int(session.get("current_lump", 2)) - 1)
+                session["inventory_save_failed"] = True
+                flash("Inventory was not saved. Your draft is retained; review the lump and bundle details and retry.", "danger")
                 return redirect(url_for("lump_home"))
-            elif result == 409:
+            reset_session(2)
+            if result == 409:
                 flash("This lump was already saved. Duplicate request ignored.", "warning")
                 return redirect(url_for("lump_home"))
             else:
@@ -235,14 +277,16 @@ def register_routes(app,db):
         )
     @app.route("/jobcard", methods=["GET", "POST"])
     @login_required
-    @oly_admin
+    @job_operator
     def job_card():
+        if app.config.get('SIMPLE_WORKFLOW'):
+            return redirect(url_for('manual_job_card'))
         job_card_data_c = get_job_card_data_creation()
         return render_template("jobcard.html",id=current_user.role,data = job_card_data_c)
 
     @app.route("/manual_jobcard")
     @login_required
-    @oly_admin
+    @job_operator
     def manual_job_card():
         job_card_data_c = {"outworker": outworker_name()}
         product_names = item_name_mapping()
@@ -256,9 +300,11 @@ def register_routes(app,db):
 
     @app.route("/submit-manual-jobcard", methods=["POST"])
     @login_required
-    @oly_admin
+    @job_operator
     def submit_manual_jobcard():
-        data = request.get_json()
+        data, error = _write_json()
+        if error:
+            return error
         result = add_manual_jobcard(
             data, current_user,
             data.get("request_id") if isinstance(data, dict) else None,
@@ -280,14 +326,19 @@ def register_routes(app,db):
     @oly_admin
     def add_item():
         form_name = "Item setup"
-        current_form = Item_data()
+        current_form = SimpleProductForm() if app.config.get('SIMPLE_WORKFLOW') else Item_data()
 
         if current_form.validate_on_submit():
             data = current_form.data.copy()
             token = data.pop("submission_token")
+            if app.config.get('SIMPLE_WORKFLOW'):
+                data.update(size=0, meter=0)
             items = add_items(data,current_user,token)
             if items == 101 :
                 flash(f"You have successfully added  {data['name']} .", "success")
+                if app.config.get('SIMPLE_WORKFLOW'):
+                    product = ProductModel.query.filter_by(name=resolve_item_name(data['name'])).one()
+                    return redirect(url_for('payroll_rates', product_id=product.id))
                 return redirect(url_for("add_item"))
             elif items == 409:
                 flash("Duplicate request ignored; this product was already submitted.", "warning")
@@ -386,24 +437,26 @@ def register_routes(app,db):
     @login_required
     @oly_admin
     def submit_jobcard():
-
-        data = request.get_json()
+        data, error = _write_json()
+        if error:
+            return error
         ok = add_jobcard(data,current_user,data.get("request_id") if isinstance(data, dict) else None)
         # print(ok)
         if type(ok) == dict:
             if ok["code"] == 101:
                 return jsonify(success=True, message="Data saved", jobData=ok["jobData"])
         elif ok ==401:
-            return jsonify(success=False, message="Master name not found. Check spelling or turn off Caps Lock (scanner), or enter manually. ")
+            return jsonify(success=False, code=401, message="Master name not found. Select an outworker from the list."), 400
         elif ok == 403:
-            return jsonify(success=False, message="product do not mach data base data base ")
+            return jsonify(success=False, code=403, message="A bundle was changed or already issued. Refresh the job card."), 409
         elif ok == 405:
-            return jsonify(success=False, message="send data not right ")
+            return jsonify(success=False, code=405, message="Job card data is invalid."), 400
         elif ok == 409:
             return jsonify(success=True, duplicate=True, message="Duplicate request ignored; job card already saved.")
+        return jsonify(success=False, code=500, message="Job card could not be saved."), 500
     @app.route("/retune_product", methods=["GET", "POST"])
     @login_required
-    @oly_admin
+    @job_operator
     def retune_product():
         current_form =  Return_form()
         ok =  request.args.get("ok",type=int)
@@ -431,7 +484,7 @@ def register_routes(app,db):
         return render_template("return_lookup.html", current_form=current_form, id=current_user.role)
     @app.route("/job_retun", methods=["GET", "POST"])
     @login_required
-    @oly_admin
+    @job_operator
     def job_retun():
         jobcard_id = request.args.get("jobcard_id", type=int)
         if not jobcard_id or jobcard_id < 1:
@@ -447,21 +500,22 @@ def register_routes(app,db):
         return render_template("job_retun.html",data=data,id=current_user.role)
     @app.route("/jobcard/ledger")
     @login_required
-    @oly_admin
+    @job_operator
     def jobcard_ledger_lookup():
         error = None
         if "jobcard_id" in request.args:
             raw_id = request.args.get("jobcard_id", "").strip()
-            if not raw_id.isdecimal() or int(raw_id) < 1:
+            parsed_id = record_id(raw_id)
+            if parsed_id is None:
                 error = "Enter a valid job card number."
-            elif db.session.get(Jobcard, int(raw_id)) is None:
+            elif db.session.get(Jobcard, parsed_id) is None:
                 error = f"Job card #{raw_id} was not found."
             else:
-                return redirect(url_for("jobcard_ledger", jobcard_id=int(raw_id)))
+                return redirect(url_for("jobcard_ledger", jobcard_id=parsed_id))
         return render_template("jobcard_ledger_lookup.html", id=current_user.role, error=error)
     @app.route("/jobcard/<int:jobcard_id>/ledger")
     @login_required
-    @oly_admin
+    @job_operator
     def jobcard_ledger(jobcard_id):
         detail = get_jobcard_ledger(jobcard_id)
         if detail is None:
@@ -469,9 +523,11 @@ def register_routes(app,db):
         return render_template("jobcard_ledger.html", detail=detail, id=current_user.role)
     @app.route("/summit-retune", methods=["POST"])
     @login_required
-    @oly_admin
+    @job_operator
     def summit_retune():
-        data = request.get_json()
+        data, error = _write_json()
+        if error:
+            return error
 
         res = in_move_entery(data,current_user,data.get("request_id") if isinstance(data, dict) else None)
         # print(res)
@@ -480,23 +536,27 @@ def register_routes(app,db):
              # print(res)
                 return jsonify(success=True, message="Data saved",jobData=res)
         elif res  == 404 :
-            return jsonify(success=False, message="Data not  saved iisue",code=404)
+            return jsonify(success=False, message="Job card not found or return could not be saved.",code=404), 404
+        elif res == 500:
+            return jsonify(success=False, code=500, message="Return could not be saved. Retry with the same request ID."), 500
         elif res == 401:
-            return jsonify(success=False, message="name of master not in data base ",code=401)
+            return jsonify(success=False, message="The outworker does not match this job card.",code=401), 400
         elif res == 403:
-            return jsonify(success=False, message="item do not macha base ",code=403)
+            return jsonify(success=False, message="The product does not match this job card.",code=403), 400
         elif res == 405:
-            return jsonify(success=False, message="send data not right ",code=405)
+            return jsonify(success=False, message="Return data is invalid.",code=405), 400
         elif res == 4033:
             return jsonify(success=False, message="Return exceeds the remaining balance on this job card. Refresh and try again.", code=4033), 409
         elif res == 409:
             return jsonify(success=True, duplicate=True, message="Duplicate return request ignored.", code=409)
         else:
-            return jsonify(success=False, message="item do not macha base ", code=res)
+            return jsonify(success=False, message="The return item or type no longer matches this job card. Refresh and try again.", code=res), 400
     @app.route("/admin_dashord", methods=["GET", "POST"])
     @login_required
     @oly_admin
     def admin_dashord():
+        if app.config.get('SIMPLE_WORKFLOW'):
+            return render_template('simple_dashboard.html', id=current_user.role, overview=job_overview())
         range_data = get_current_week_range()
         date_from = Date_form()
         # Pre-fill form with current week range on GET
@@ -629,6 +689,8 @@ def register_routes(app,db):
         if current_user.role == 1:
             return redirect("/admin_dashord")
         elif current_user.role == 2:
+            if app.config.get('SIMPLE_WORKFLOW'):
+                return redirect(url_for('manual_job_card'))
             return redirect(url_for("bale_entery"))
         else:
             return redirect(url_for("logout"))
@@ -645,7 +707,7 @@ def register_routes(app,db):
             else:
                 flash("Username or password is incorrect.", "danger")
         elif request.method == "POST":
-            if name_from.csrf_token.errors:
+            if getattr(name_from, "csrf_token", None) is not None and name_from.csrf_token.errors:
                 flash("This login form expired. Reload the page and try again.", "warning")
             else:
                 flash("Enter both a username and password.", "warning")
@@ -713,7 +775,8 @@ def register_routes(app,db):
     @oly_admin
     def edit_index():
         return render_template(
-            "edit_index.html", entities=ENTITY_CONFIG, id=current_user.role,
+            "edit_index.html", entities={key: value for key, value in ENTITY_CONFIG.items()
+                                         if key in CORE_ENTITIES or (not app.config.get('SIMPLE_WORKFLOW') and key != 'movement')}, id=current_user.role,
         )
 
     @app.route("/edit/search")
@@ -733,6 +796,10 @@ def register_routes(app,db):
     @login_required
     @oly_admin
     def edit_entry(entity_type, entity_id):
+        if entity_type == "movement":
+            movement = db.session.get(Jobmovement, entity_id) if record_id(entity_id) else None
+            return render_template("managed_entry.html", id=current_user.role,
+                                   jobcard_id=movement.jobcard if movement else None), 403
         context = edit_context(entity_type, entity_id)
         if not context:
             flash("Entry not found.", "danger")

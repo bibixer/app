@@ -7,6 +7,7 @@ from copy import deepcopy
 from datetime import datetime
 from pathlib import Path
 from unittest.mock import patch
+from flask import g
 
 from app import create_app
 from modes import (db, User, Item_data, ItemAlias, Outworker, OutworkerAlias,
@@ -25,8 +26,12 @@ class AppTestCase(unittest.TestCase):
         })
         environment.start()
         self.addCleanup(environment.stop)
-        self.app = create_app()
+        self.app = create_app({"SIMPLE_WORKFLOW": False})
         self.app.config.update(TESTING=True, WTF_CSRF_ENABLED=False)
+        @self.app.before_request
+        def clear_test_login_cache():
+            # Service tests hold an outer app context across otherwise independent requests.
+            g.pop("_login_user", None)
         self.context = self.app.app_context()
         self.context.push()
         self.addCleanup(self.close_database)
@@ -109,3 +114,15 @@ class AppTestCase(unittest.TestCase):
                   for field in context["fields"]}
         values.update(deepcopy(changes))
         return save_entry(entity_type, entity_id, values, version or context["version"], token, "admin")
+
+    def job_edit(self, card_id, changes=None, token="job-edit", version=None, username="admin"):
+        from jobcard_edit import jobcard_edit_context, save_jobcard_edit
+        context = jobcard_edit_context(card_id)
+        values = {field["name"]: field["value"] for field in context["fields"]}
+        values.update(edit_lines="1", edit_reason="Correcting an entry")
+        for row in context["given"] + context["returns"]:
+            for field in ("product", "type", "date", "quantity", "pieces", "count", "kg", "color"):
+                if field in row:
+                    values[f'line_{row["id"]}_{field}'] = row[field]
+        values.update(changes or {})
+        return save_jobcard_edit(card_id, values, version or context["version"], token, username)

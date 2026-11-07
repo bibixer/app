@@ -1,5 +1,14 @@
 import pandas as pd
 import re
+from pathlib import Path
+
+PRINT_ROOT = Path(__file__).resolve().parent / "to_print"
+
+
+def _output_path(kind, filename):
+    directory = PRINT_ROOT / kind
+    directory.mkdir(parents=True, exist_ok=True)
+    return directory / filename
 ##### OUTWORKER OR
 
 # need date in this format {
@@ -15,7 +24,7 @@ def outworker_qr_print(data):
         "address":data.adders,
         "qr_code":f"{data.id}***{data.name}--{data.adders}/-"
     }])
-    pd_data.to_csv(f"to_print/outworker/{data.id}.csv",index=False)
+    pd_data.to_csv(_output_path("outworker", f"{data.id}.csv"), index=False)
     return 101
 
 
@@ -26,7 +35,7 @@ def outworker_qr_print(data):
 def buldel_qr_print(data):
         for d in data:
             pd_data = pd.DataFrame([d])
-            pd_data.to_csv(f"to_print/bundle/{d['id']}.csv", index=False)
+            pd_data.to_csv(_output_path("bundle", f"{d['id']}.csv"), index=False)
         return 101
 
 
@@ -81,6 +90,7 @@ def build_custom_csvs_pandas(data):
 
             # 🔥 build pattern array
             pattern_arr = [f"{qty}x{count}" for qty, count in qty_counts.items()]
+            quantity_pairs = list(qty_counts.items())
 
             # total (optional)
             total = sum(qty * count for qty, count in qty_counts.items())
@@ -97,7 +107,7 @@ def build_custom_csvs_pandas(data):
                     "Type": typ,
                     "Line1": line1,
                     "Line2": line2,
-                    "Total": total
+                    "Total": sum(qty * count for qty, count in quantity_pairs[i:i + 10])
                 })
 
         final_df = pd.DataFrame(final_products)
@@ -145,7 +155,8 @@ def build_custom_csvs_pandas(data):
 
             out_df = pd.DataFrame([row])
             filename = f"{job_id}_{party}_{username}_{date}_page_{page_index}.csv"
-            csv_string = out_df.to_csv(f"to_print/jobcard/{filename}",index=False)
+            csv_string = out_df.to_csv(index=False)
+            _output_path("jobcard", filename).write_text(csv_string, encoding="utf-8")
 
 
 

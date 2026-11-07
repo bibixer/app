@@ -1,12 +1,23 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField, IntegerField, SubmitField, SelectField, FloatField, PasswordField, DateField, HiddenField
-from wtforms.validators import DataRequired,InputRequired
+from wtforms.validators import DataRequired,InputRequired,Length
 from datetime import date
 from uuid import uuid4
 from bundle_types import BUNDLE_TYPE_CHOICES
 
 class WriteForm(FlaskForm):
-    submission_token = HiddenField(default=lambda: uuid4().hex, validators=[DataRequired()])
+    submission_token = HiddenField(default=lambda: uuid4().hex, validators=[DataRequired(), Length(max=128)])
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.is_submitted() and not self.submission_token.raw_data:
+            self.submission_token.data = None
+
+
+class SimpleProductForm(WriteForm):
+    name = StringField('Product name', validators=[DataRequired(), Length(max=50)])
+    aliases = TextAreaField('Aliases (one per line or separated by commas)')
+    submit = SubmitField('Save product and set rates')
 
 
 class Lump_data(WriteForm):

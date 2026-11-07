@@ -2,11 +2,12 @@ from flask import Flask
 from flask_bootstrap import Bootstrap5
 from route import register_routes
 from modes import db,User
+from schema_updates import allow_job_payment_installments
 import logging
 from waitress import serve
 import os
 
-def create_app():
+def create_app(test_config=None):
     app = Flask(__name__)
     app.config['SECRET_KEY'] = os.environ.get(
         "APP_SECRET_KEY", "8BYkEfBA6O6donzWlSihBXox7C0sKR6b"
@@ -18,11 +19,15 @@ def create_app():
     app.config['SQLALCHEMY_BINDS'] = {
         'users': os.environ.get("USERS_DATABASE_URI", "sqlite:///users.db")
     }
+    app.config['SIMPLE_WORKFLOW'] = True
+    if test_config:
+        app.config.update(test_config)
 
     db.init_app(app)
     Bootstrap5(app)
     with app.app_context():
         db.create_all()
+        allow_job_payment_installments(db.engine)
     register_routes(app,db)
 
     return app

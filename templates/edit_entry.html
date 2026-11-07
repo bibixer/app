@@ -7,8 +7,12 @@
   {% for message in get_flashed_messages() %}<div class="flash">{{ message }}</div>{% endfor %}
   <section class="ui-panel"><h2>Record details</h2><form method="post" autocomplete="off">
     {{ form.hidden_tag() }}
+    <fieldset class="edit-fields" {% if entry.entity_type == 'jobcard' and entry.paid %}disabled{% endif %}>
     <div class="grid">
       {% for field in entry.fields %}
+      {% if config.SIMPLE_WORKFLOW and entry.entity_type == 'product' and field.name in ['meters','size'] %}
+      <input type="hidden" name="{{ field.name }}" value="{{ field.value }}">
+      {% else %}
       <label>{{ field.name.replace('_', ' ')|title }}
         {% if field.kind == 'status' %}
           <select name="{{ field.name }}"><option {% if field.value == 'READY' %}selected{% endif %}>READY</option><option {% if field.value == 'GIVEN' %}selected{% endif %}>GIVEN</option></select>
@@ -18,16 +22,20 @@
         {% elif field.kind == 'flow' %}
           <select name="{{ field.name }}"><option {% if field.value == 'IN' %}selected{% endif %}>IN</option><option {% if field.value == 'OUT' %}selected{% endif %}>OUT</option></select>
         {% elif 'datetime' in field.kind %}
-          <input type="datetime-local" name="{{ field.name }}" value="{{ field.value or '' }}" {% if not field.kind.startswith('optional') %}required{% endif %}>
+          <input type="datetime-local" step="any" name="{{ field.name }}" value="{{ field.value or '' }}" {% if not field.kind.startswith('optional') %}required{% endif %}>
         {% elif field.kind in ('int', 'float') %}
           <input type="number" {% if field.kind == 'float' %}step="any"{% endif %} name="{{ field.name }}" value="{{ field.value }}" required>
         {% else %}
           <input type="text" name="{{ field.name }}" value="{{ field.value or '' }}" {% if not field.kind.startswith('optional') %}required{% endif %}>
         {% endif %}
       </label>
+      {% endif %}
       {% endfor %}
     </div>
+    {% if entry.entity_type == 'jobcard' %}{% include 'jobcard_edit_fields.html' %}{% endif %}
     {{ form.submit() }}
+    </fieldset>
   </form></section>
   <div class="links"><a href="{{ url_for('edit_logs', entity_type=entry.entity_type, entity_id=entry.entity_id) }}">View this entry's history</a> · <a href="{{ url_for('edit_index') }}">Edit center</a></div>
 {% endblock %}
+{% block scripts %}{% if entry.entity_type == 'jobcard' %}<script defer src="{{ url_for('static', filename='js/jobcard-edit.js', v='20261107') }}"></script>{% endif %}{% endblock %}

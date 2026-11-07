@@ -242,5 +242,19 @@ body.app-ui .ui-shell{position:relative;z-index:1;width:min(1536px,100%);max-wid
 @media(prefers-reduced-motion:reduce){.ui-wave{animation:none}.ui-scope *{scroll-behavior:auto!important;transition:none!important}}
 @media(max-width:600px){.app-ui .ui-scope .job-info-bar{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:14px}.app-ui .ui-scope .job-info-bar .info-group{min-width:0;padding:12px}.app-ui .ui-scope .job-info-bar label{font-size:10px}.app-ui .ui-scope .job-info-bar .info-group>span{font-size:13px;overflow-wrap:anywhere}.app-ui .ui-scope .ui-inline-guide{gap:8px}.app-ui .ui-scope .ui-inline-guide>span{order:3;flex-basis:100%;font-size:11px}.app-ui .ui-scope .ui-inline-guide>b{order:1}.app-ui .ui-scope .ui-inline-guide>details{order:2;margin-left:auto}}
 .app-ui .ui-scope #masterMatch:empty{display:none}
+.app-ui .ui-scope .job-edit-table{min-width:1060px}
+.app-ui .ui-scope .edit-fields{border:0;padding:0;margin:0;min-width:0}
+.app-ui .ui-scope .job-edit-table td:first-child{min-width:210px}
+.app-ui .ui-scope .job-edit-table select{min-width:145px}
+.app-ui .ui-scope .job-edit-table input[type=datetime-local]{min-width:200px}
+.app-ui .ui-scope .job-edit-table input[type=number]{min-width:95px}
+.app-ui .ui-scope .restore-return{margin-top:10px;white-space:normal;text-align:left;font-size:12px;justify-content:start}
+.app-ui .ui-scope .restore-feedback{display:block;margin-top:8px;max-width:260px;color:var(--ui-accent);font-size:12px;font-weight:650}
+.app-ui .ui-scope .restore-feedback:empty{display:none}
 @media print{.app-ui .page-manual-jobcard>.ui-heading{display:none!important}}
 @media print{body.app-ui{background:#fff;color:#111}.app-navbar,.app-nav-offset,.app-drawer,.app-drawer-overlay,.ui-waves,.ui-skip,.app-ui .no-print{display:none!important}body.app-ui .ui-shell{width:100%;max-width:none;margin:0;padding:0}.app-ui .ui-scope :is(.panel,.card,.job-card,.metric,.total:not(td),.fact){box-shadow:none;border-color:#ccc;break-inside:avoid}.app-ui .ui-scope :is(.page-head,.page-top,.pay-head,.ui-heading){padding-bottom:14px;margin-bottom:20px}.app-ui .ui-scope .table-wrap{overflow:visible}.app-ui .ui-scope table{min-width:0}.app-ui .ui-scope :is(th,td){padding:8px;font-size:10px}.app-ui .ui-scope .hero{padding:18px;background:#fff}.app-ui .ui-scope .product-totals>.table-wrap{display:block!important}.app-ui .ui-scope .product-totals{content-visibility:visible}.app-ui .ui-scope .form-help{display:none}}
+/* Simple V2 account setup shares the app's existing form and panel styles. */
+.ui-scope .v2-account-form {display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) auto;gap:16px;align-items:end;padding:20px 0;border-bottom:1px solid #e2e8f0}
+.ui-scope .v2-account-form label {display:grid;gap:8px;min-width:0}
+.ui-scope .v2-account-form input,.ui-scope .v2-account-form select {width:100%;box-sizing:border-box}
+@media(max-width:760px){.ui-scope .v2-account-form {grid-template-columns:1fr;align-items:stretch}}

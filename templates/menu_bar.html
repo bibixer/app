@@ -14,6 +14,9 @@
 {% set report_endpoints = ['admin_dashord','cutter_report','outworker_report','product_report','outworker_payroll','payroll_receipt','payroll_for_job'] %}
 {% set manage_endpoints = ['find_edit','edit_index','edit_entry','edit_logs','add_item','add_outworker','add_cuter','add_suppy','payroll_rates'] %}
 
+{% if config.SIMPLE_WORKFLOW %}
+{% include 'simple_menu.html' %}
+{% else %}
 <nav class="app-navbar" aria-label="Main navigation">
   <a class="app-brand" href="{{ url_for('home') }}"><img src="{{ url_for('static',filename='images/BH.svg') }}" alt="BH"><span class="app-brand-copy"><span class="app-brand-title">BH Manufacturing</span><span class="app-brand-subtitle">Production Tracker</span></span></a>
   <div class="app-nav-links">
@@ -42,6 +45,7 @@
   <div class="app-drawer-group"><a class="app-logout" href="{{ url_for('logout') }}">⇥ Log out</a></div>
 </aside>
 
+{% endif %}
 <script>
 (()=>{const drawer=document.getElementById('appDrawer'),overlay=document.getElementById('appDrawerOverlay'),openButton=document.getElementById('appMenuOpen'),closeButton=document.getElementById('appMenuClose');if(!drawer||!overlay||!openButton||!closeButton)return;const setOpen=open=>{drawer.classList.toggle('open',open);overlay.classList.toggle('open',open);drawer.setAttribute('aria-hidden',String(!open));openButton.setAttribute('aria-expanded',String(open));document.documentElement.style.overflow=open?'hidden':''};openButton.addEventListener('click',()=>setOpen(true));closeButton.addEventListener('click',()=>setOpen(false));overlay.addEventListener('click',()=>setOpen(false));document.addEventListener('keydown',event=>{if(event.key==='Escape')setOpen(false)});document.querySelectorAll('.app-dropdown-button').forEach(button=>button.addEventListener('click',event=>{event.stopPropagation();const menu=button.closest('.app-dropdown');document.querySelectorAll('.app-dropdown.open').forEach(item=>{if(item!==menu)item.classList.remove('open')});menu.classList.toggle('open')}));document.addEventListener('click',()=>document.querySelectorAll('.app-dropdown.open').forEach(item=>item.classList.remove('open')))})();
 </script>

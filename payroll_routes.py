@@ -5,9 +5,10 @@ from flask_login import login_required, current_user
 
 from bundle_types import BUNDLE_TYPE_CHOICES
 from form import WriteForm
+from validation import record_id
 from modes import db, Outworker, Item_data, Jobcard, OutworkerRate, OutworkerPayroll, OutworkerPayrollJob
 from payroll_service import (PAYMENT_METHODS, worker_label, money, money_input, rate_text, rate_version,
-                             save_rate, record_advance, completed_job_quotes,
+                             save_rate, record_advance, payable_job_quotes,
                              payroll_preview, issue_payroll, payment_account)
 
 
@@ -22,7 +23,7 @@ def register_payroll_routes(app, admin_required):
         form = WriteForm()
         products = Item_data.query.order_by(Item_data.name).all()
         product_id = request.values.get("product_id", type=int)
-        product = db.session.get(Item_data, product_id) if product_id else (products[0] if products else None)
+        product = (db.session.get(Item_data, product_id) if record_id(product_id) else None) if product_id else (products[0] if products else None)
         if request.method == "POST":
             if not form.validate_on_submit():
                 flash("This form expired. Reload the page and try again.", "danger")
@@ -50,7 +51,7 @@ def register_payroll_routes(app, admin_required):
         form = WriteForm()
         workers = Outworker.query.order_by(Outworker.name).all()
         worker_id = request.values.get("worker_id", type=int)
-        worker = db.session.get(Outworker, worker_id) if worker_id else None
+        worker = db.session.get(Outworker, worker_id) if record_id(worker_id) else None
         preview = None
         selected_ids = request.form.getlist("job_ids") if request.method == "POST" else request.args.getlist("job_id")
         deduction = request.form.get("deduction", "0.00")
@@ -83,7 +84,7 @@ def register_payroll_routes(app, admin_required):
         return render_template(
             "outworker_payroll.html", id=current_user.role, form=form, workers=workers, worker=worker,
             worker_name=worker_label(worker) if worker else "", selected_ids=selected_ids,
-            jobs=completed_job_quotes(worker) if worker else [], preview=preview, deduction=deduction,
+            jobs=payable_job_quotes(worker) if worker else [], preview=preview, deduction=deduction,
             account=payment_account(worker.id) if worker else None, payment_methods=PAYMENT_METHODS,
         )
 
@@ -91,13 +92,11 @@ def register_payroll_routes(app, admin_required):
     @login_required
     @admin_required
     def payroll_for_job(jobcard_id):
-        card = db.session.get(Jobcard, jobcard_id)
+        card = db.session.get(Jobcard, jobcard_id) if record_id(jobcard_id) else None
         if card is not None:
-            paid = OutworkerPayrollJob.query.filter_by(jobcard_id=card.id).first()
-            if paid:
-                return redirect(url_for("payroll_receipt", payroll_id=paid.payroll_id))
             try:
-                worker = db.session.get(Outworker, int(card.given_to.split("***", 1)[0]))
+                worker_id = record_id(card.given_to.split("***", 1)[0])
+                worker = db.session.get(Outworker, worker_id) if worker_id else None
             except ValueError:
                 worker = None
             if worker and worker_label(worker) == card.given_to:
@@ -110,7 +109,7 @@ def register_payroll_routes(app, admin_required):
     def payroll_receipt(payroll_id):
         if current_user.role != 1:
             abort(403)
-        payroll = db.session.get(OutworkerPayroll, payroll_id)
+        payroll = db.session.get(OutworkerPayroll, payroll_id) if record_id(payroll_id) else None
         if payroll is None:
             abort(404)
         jobs = OutworkerPayrollJob.query.filter_by(payroll_id=payroll.id).order_by(OutworkerPayrollJob.jobcard_id).all()

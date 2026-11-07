@@ -213,6 +213,22 @@ class OutworkerJobLedgerTest(unittest.TestCase):
         self.assertIsNone(second.jobcard)
         self.assertEqual(get_jobcard_ledger(good.id)["job"]["remaining"], 20)
 
+    def test_older_return_cannot_use_pieces_issued_after_its_date(self):
+        card = self.add_card("RAM", datetime(2026, 10, 1), 100)
+        db.session.add_all([
+            Jobmovement(date=datetime(2026, 10, 2), jobcard=str(card.id), partculer="Earlier return",
+                        product_name="VIMAL", name_of_mater="RAM", enter_user="admin",
+                        type_B="lump", flow_type="IN", inflow=80),
+            Jobmovement(date=datetime(2026, 10, 10), jobcard=str(card.id), partculer="Later issue",
+                        product_name="VIMAL", name_of_mater="RAM", enter_user="admin",
+                        type_B="lump", flow_type="OUT", outflow=100),
+        ])
+        db.session.commit()
+        movement = self.add_unassigned_return("RAM", 50)
+        self.assertEqual(matching_jobs(movement), [])
+        with self.assertRaises(ValueError):
+            assign_return(movement.id, card.id, SimpleNamespace(username="admin"))
+
 
 if __name__ == "__main__":
     unittest.main()
