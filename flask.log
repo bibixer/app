@@ -6199,3 +6199,69 @@ INFO:werkzeug:127.0.0.1 - - [08/Nov/2026 02:36:10] "[36mGET /static/js/app-ui.j
 INFO:werkzeug:127.0.0.1 - - [08/Nov/2026 02:36:10] "[36mGET /static/js/retun.js HTTP/1.1[0m" 304 -
 INFO:root:Flask service starting
 INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:flask_wtf.csrf:The CSRF token is missing.
+INFO:flask_wtf.csrf:The CSRF token is missing.
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:flask_wtf.csrf:The CSRF token is missing.
+INFO:flask_wtf.csrf:The CSRF token is missing.
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:flask_wtf.csrf:The CSRF token is missing.
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:flask_wtf.csrf:The CSRF token is missing.
+INFO:flask_wtf.csrf:The CSRF token is missing.
+INFO:flask_wtf.csrf:The CSRF token is missing.
+INFO:flask_wtf.csrf:The CSRF token is missing.
+INFO:flask_wtf.csrf:The CSRF token is missing.
+INFO:flask_wtf.csrf:The CSRF token is missing.
+INFO:flask_wtf.csrf:The CSRF token is missing.
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:flask_wtf.csrf:The CSRF token is missing.
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:flask_wtf.csrf:The CSRF token is missing.
+INFO:flask_wtf.csrf:The CSRF token is missing.
+INFO:flask_wtf.csrf:The CSRF token is missing.
+INFO:flask_wtf.csrf:The CSRF token is missing.
+INFO:flask_wtf.csrf:The CSRF token is missing.
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:flask_wtf.csrf:The CSRF token is missing.
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000

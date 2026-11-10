@@ -3,6 +3,18 @@
 from sqlalchemy import inspect
 
 
+def ensure_user_active_column(engine):
+    """Add account enable/disable state to existing user databases."""
+    with engine.begin() as connection:
+        if 'users' not in inspect(connection).get_table_names():
+            return
+        columns = {column['name'] for column in inspect(connection).get_columns('users')}
+        if 'is_active' not in columns:
+            connection.exec_driver_sql(
+                'ALTER TABLE users ADD COLUMN is_active BOOLEAN NOT NULL DEFAULT TRUE'
+            )
+
+
 def allow_job_payment_installments(engine):
     """Replace the old one-payment-per-job constraint, preserving every receipt row."""
     if engine.dialect.name != 'sqlite':

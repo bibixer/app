@@ -39,6 +39,6 @@
     </section>
 
   <script>const JOB_CARD = {{ data | tojson }}; window.RETURN_EMBEDDED = {{ embedded|default(false)|tojson }};</script>
-  <script src="{{ url_for('static', filename='js/retun.js') }}"></script>
-  {% if embedded %}<script defer src="{{ url_for('static',filename='js/embedded-returns.js',v='20261108') }}"></script>{% endif %}
+  <script src="{{ url_for('static', filename='js/retun.js',v='20261108-workspace') }}"></script>
+  {% if embedded %}<script defer src="{{ url_for('static',filename='js/embedded-returns.js',v='20261108-balance') }}"></script>{% endif %}
 {% endblock %}

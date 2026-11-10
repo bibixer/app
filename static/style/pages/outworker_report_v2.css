@@ -1,0 +1,139 @@
+/* Outworker account presentation; shared waves and navigation stay in place. */
+.app-ui .ow-report .ow-hero{position:relative;overflow:hidden;display:grid;grid-template-columns:minmax(0,1.2fr) minmax(280px,.8fr);align-items:center;gap:36px;padding:36px 40px;margin-bottom:24px;border:1px solid #ffffff38;border-radius:25px;background:radial-gradient(ellipse at 100% 0,#8e75df30,transparent 60%),linear-gradient(120deg,#19253f,#30305e 75%,#42366c);box-shadow:0 18px 48px #17214332}
+.app-ui .ow-report .ow-eyebrow{display:flex;align-items:center;gap:9px;margin:0 0 18px;color:#c4c8e9;font-size:10px;font-weight:750;letter-spacing:.14em;text-transform:uppercase}
+.app-ui .ow-report .ow-eyebrow>span{width:7px;height:7px;border-radius:50%;background:#91e2cd;box-shadow:0 0 0 4px #91e2cd12}
+.app-ui .ow-report .ow-hero h1{color:#fff;font-size:clamp(29px,3.3vw,43px);font-weight:720;letter-spacing:-.04em;line-height:1.15}
+.app-ui .ow-report .ow-hero h1>span{color:#c0b4ff}
+.app-ui .ow-report .ow-hero .lead{max-width:560px;margin:17px 0 0;color:#c2cce1;font-size:13px;line-height:1.8}
+.app-ui .ow-report .ow-hero-caption{display:block;margin-top:22px;color:#aeb8d4;font-size:10px;letter-spacing:.025em}
+.app-ui .ow-report .ow-hero .head-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:22px;border:1px solid #ffffff1f;border-radius:18px;background:#ffffff05}
+.app-ui .ow-report .ow-hero .head-link{padding:12px 14px;min-height:46px;border:1px solid #ffffff29;border-radius:10px;background:#ffffff09;color:#e8e5ff;font-size:11px;text-align:center;white-space:normal;line-height:1.5;box-shadow:none}
+.app-ui .ow-report .ow-hero .head-link:first-child{background:#8672ee;border-color:transparent;color:#fff}
+.app-ui .ow-report .ow-hero .head-link:hover{background:#ffffff1c;border-color:#ffffff40;color:#fff}
+.app-ui .ow-report .ow-hero .head-link:first-child:hover{background:#9b87ff}
+.app-ui .ow-report .ow-overline{display:block;margin:0 0 7px;color:#77718c;font-size:9px;font-weight:750;letter-spacing:.14em;text-transform:uppercase}
+.app-ui .ow-report .panel.filters{padding:25px 28px;border-color:#ffffffa8;border-radius:21px;box-shadow:0 12px 32px #19204616}
+.app-ui .ow-report .filters-head{align-items:center;gap:16px;margin-bottom:22px}
+.app-ui .ow-report .filters-head h2{font-size:19px;color:#2b3651}
+.app-ui .ow-report .filters-head p{max-width:750px;margin:7px 0 0;color:#748096;font-size:12px}
+.app-ui .ow-report .ow-filter-tag{flex:none;padding:7px 10px;border:1px solid #e7e1f5;border-radius:8px;background:#f7f4fe;color:#7c6b9d;font-size:10px;font-weight:650}
+.app-ui .ow-report .filter-form{grid-template-columns:minmax(220px,1.6fr) repeat(2,minmax(145px,1fr)) auto;gap:16px}
+.app-ui .ow-report .filter-field{min-width:0;gap:5px;color:#67748e;font-size:11px;font-weight:650}
+.app-ui .ow-report .filter-field input{min-width:0;margin-top:0;min-height:47px;border-color:#dce2ee;border-radius:9px;background:#fcfdff;font-size:13px}
+.app-ui .ow-report input.run-button{min-height:47px;border-radius:10px;background:linear-gradient(120deg,#6553d9,#8b6de1);box-shadow:0 6px 15px #6653d826;font-size:12px;padding:12px 20px}
+.app-ui .ow-report .ow-identity{display:flex;justify-content:space-between;align-items:center;gap:20px;padding:24px 28px;margin:0 0 24px;background:#fffffff5;border:1px solid #ffffffa8;border-radius:20px;box-shadow:0 12px 32px #19204616}
+.app-ui .ow-report .ow-person{display:flex;align-items:center;gap:18px;min-width:0}
+.app-ui .ow-report .ow-person>div{min-width:0}
+.app-ui .ow-report .ow-avatar{display:grid;place-items:center;width:58px;height:58px;flex:none;border:1px solid #e1d9fb;border-radius:18px;background:linear-gradient(135deg,#f0eaff,#e4eaff);color:#8070bd;font-size:24px;font-weight:750}
+.app-ui .ow-report .ow-person h2{margin:0;font-size:23px;line-height:1.35;letter-spacing:-.025em;color:#293552;overflow-wrap:anywhere}
+.app-ui .ow-report .ow-person .ow-overline{margin:0 0 7px;color:#837795;font-size:9px}
+.app-ui .ow-report .ow-date-chip{display:flex;align-items:center;gap:12px;margin:8px 0 0;color:#75819a;font-size:11px;font-variant-numeric:tabular-nums}
+.app-ui .ow-report .ow-date-chip>span{color:#b4a4ce}
+.app-ui .ow-report .ow-identity .print-button{background:#f6f3fc;color:#796393;border:1px solid #e6dff2;border-radius:9px;padding:10px 16px;font-size:11px;white-space:nowrap}
+.app-ui .ow-report .panel.account-section{padding:28px;border:1px solid #ffffffb0;border-radius:23px;box-shadow:0 14px 36px #1820441a}
+.app-ui .ow-report .ow-account-heading{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.app-ui .ow-report .ow-account-heading h2{margin:0;font-size:22px;letter-spacing:-.03em;color:#2b3651}
+.app-ui .ow-report .ow-unit{display:grid;place-items:center;width:39px;height:39px;border:1px solid #e8e3f4;border-radius:11px;background:#f6f3fc;color:#9987b5;font-size:9px;font-weight:750;letter-spacing:.06em}
+.app-ui .ow-report .account-section>p{max-width:1080px;margin:12px 0 24px;font-size:12px;color:#687188;line-height:1.85}
+.app-ui .ow-report .account-section .ow-balances{gap:15px;margin-bottom:17px}
+.app-ui .ow-report .account-section .ow-balances>.metric{display:flex;flex-direction:column;gap:0;min-width:0;padding:21px 22px;border:1px solid #e7e0f6;border-radius:17px;background:linear-gradient(135deg,#fff,#f6f2ff);box-shadow:none}
+.app-ui .ow-report .account-section .ow-balances>.metric.given{border-color:#dee8f7;background:linear-gradient(135deg,#fff,#f0f6ff)}
+.app-ui .ow-report .account-section .ow-balances>.metric.returned{border-color:#dceee5;background:linear-gradient(135deg,#fff,#eff9f3)}
+.app-ui .ow-report .account-section .ow-balances>.metric.balance{border-color:#f0e3cd;background:linear-gradient(135deg,#fff,#fff7e9)}
+.app-ui .ow-report .ow-metric-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.app-ui .ow-report .ow-metric-head .metric-label{font-size:9px;color:#727a92;letter-spacing:.05em}
+.app-ui .ow-report .ow-metric-badge{display:grid;place-items:center;min-width:30px;height:29px;padding:0 6px;background:#eae3fa;border-radius:8px;color:#9280b6;font-size:8px;letter-spacing:.03em;font-weight:750}
+.app-ui .ow-report .given .ow-metric-badge{background:#e3edf9;color:#6d96c3}
+.app-ui .ow-report .returned .ow-metric-badge{background:#def1e7;color:#64a588}
+.app-ui .ow-report .balance .ow-metric-badge{background:#fff0d7;color:#c59a57}
+.app-ui .ow-report .ow-balances .metric-value{display:block;margin:20px 0 12px;color:#343b59;font-size:clamp(29px,3vw,42px);line-height:1.15;letter-spacing:-.045em;overflow-wrap:anywhere}
+.app-ui .ow-report .ow-balances .returned .metric-value{color:#258577}
+.app-ui .ow-report .ow-balances .balance .metric-value{color:#ad792e}
+.app-ui .ow-report .ow-balances .ow-negative{color:#b43d5b!important}
+.app-ui .ow-report .ow-balances .metric-foot{font-size:10px;color:#727b90}
+.app-ui .ow-report .ow-equation{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:10px 17px;padding:13px 18px;margin-bottom:18px;border:1px solid #ebe7f5;border-radius:11px;background:#f8f6fc;color:#756587;font-size:10px;line-height:1.7}
+.app-ui .ow-report .ow-equation i{font-style:normal;color:#b7adca}
+.app-ui .ow-report .ow-equation b{margin-left:5px;color:#695783;font-weight:650}
+.app-ui .ow-report .ow-equation-result{padding:4px 9px;background:#eeebf7;border-radius:6px}
+.app-ui .ow-report .pending-banner{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;padding:18px 22px;margin-bottom:24px;border:1px solid #eee0c7;border-radius:13px;background:linear-gradient(105deg,#fff9ee,#fffdf8);color:#886b3b;font-size:11px}
+.app-ui .ow-report .pending-banner strong{font-size:23px;margin-right:7px;color:#a97b35;font-weight:700;letter-spacing:-.025em}
+.app-ui .ow-report .product-totals{border:1px solid #e7e3f1;border-radius:13px;overflow:hidden;margin-bottom:28px}
+.app-ui .ow-report .product-totals>summary{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:19px 20px;border:0;border-radius:0;background:#faf8fe;cursor:pointer;list-style:none}
+.app-ui .ow-report .product-totals>summary::-webkit-details-marker{display:none}
+.app-ui .ow-report .product-totals h3{margin:0;color:#64577d;font-size:15px}
+.app-ui .ow-report .ow-details-note{display:block;margin-top:5px;color:#7b6d8f;font-size:10px}
+.app-ui .ow-report .ow-expand-icon{display:grid;place-items:center;width:28px;height:28px;border:1px solid #e6e0f3;border-radius:8px;color:#9c88b7;background:#fff;font-size:18px;flex:none}
+.app-ui .ow-report .product-totals[open]>.summary,.app-ui .ow-report .product-totals[open]>summary{background:#f3effa;border-bottom:1px solid #e7e1f1}
+.app-ui .ow-report .product-totals[open] .ow-expand-icon{transform:rotate(45deg)}
+.app-ui .ow-report .product-totals>.table-wrap{border:0;border-radius:0}
+.app-ui .ow-report .subhead{align-items:center;margin:25px 0 16px;gap:12px}
+.app-ui .ow-report .subhead h3{color:#394660;font-size:16px;letter-spacing:-.02em}
+.app-ui .ow-report .subhead p{font-size:11px;color:#758096}
+.app-ui .ow-report .table-wrap{border-color:#e7eaf2;border-radius:12px}
+.app-ui .ow-report th{padding:14px 16px;background:#f5f6fa;color:#727d93;font-size:9px;letter-spacing:.065em}
+.app-ui .ow-report td{padding:17px 16px;vertical-align:middle;border-color:#eef0f6;font-size:12px}
+.app-ui .ow-report td.number{font-size:16px;font-weight:650;text-align:right;font-variant-numeric:tabular-nums}
+.app-ui .ow-report td.number.given{color:#6a7fac}
+.app-ui .ow-report td.number.returned{color:#338c7b}
+.app-ui .ow-report td.number.balance{color:#ab813c}
+.app-ui .ow-report .product-name{font-weight:650;color:#44506b}
+.app-ui .ow-report tbody tr:hover>td{background:#fbfaff}
+.app-ui .ow-report .account-total>td{background:#f3eff9;border-top:1px solid #e6def0;color:#77618e}
+.app-ui .ow-report .report-note{font-size:10px;line-height:1.9;color:#74798e}
+.app-ui .ow-report>.report-note{padding:15px 20px;margin-top:20px;border-radius:12px;background:#ffffffed;color:#7b7892}
+.app-ui .ow-report>.section-title{padding:18px 22px;margin:25px 0 14px;border:1px solid #ffffffa6;border-radius:15px;background:#fffffff3;align-items:center;flex-wrap:wrap}
+.app-ui .ow-report>.section-title h2{font-size:18px;color:#3c3d5c}
+.app-ui .ow-report>.section-title>span{color:#746c8b;font-size:10px}
+.app-ui .ow-report .metrics.ow-job-stats{gap:15px;margin-bottom:24px}
+.app-ui .ow-report .metrics.ow-job-stats>.metric{padding:20px 22px;background:#fffffff5;border:1px solid #ffffffa6;border-radius:16px;box-shadow:0 8px 24px #1820440c}
+.app-ui .ow-report .ow-job-stats .metric-value{display:block;margin:10px 0;font-size:29px}
+.app-ui .ow-report .ow-job-stats .metric-label{font-size:9px}
+.app-ui .ow-report .ow-job-stats .metric-foot{font-size:10px}
+.app-ui .ow-report .jobs{gap:19px}
+.app-ui .ow-report .jobs details.job-card{border:1px solid #ffffffb0;border-radius:18px;box-shadow:0 12px 32px #18204416}
+.app-ui .ow-report .jobs .job-card>summary{min-height:105px;padding:23px 26px;background:#fff;border:0;border-radius:0;gap:18px;grid-template-columns:minmax(170px,1.5fr) repeat(3,minmax(85px,.6fr)) 28px}
+.app-ui .ow-report .jobs .job-card[open]>summary{background:linear-gradient(115deg,#fcfbff,#f5f3fc);border-bottom:1px solid #e8e3f3}
+.app-ui .ow-report .job-title strong{font-size:19px;color:#4f456d}
+.app-ui .ow-report .job-date{margin-top:8px;color:#7d728e;font-size:10px}
+.app-ui .ow-report .job-figure>span{color:#7c728a;font-size:9px;letter-spacing:.08em}
+.app-ui .ow-report .job-figure>strong{font-size:25px;line-height:1.3}
+.app-ui .ow-report .job-figure.given>strong{color:#6d80ad}
+.app-ui .ow-report .job-figure.returned>strong{color:#39917c}
+.app-ui .ow-report .job-figure.balance>strong{color:#b58a4c}
+.app-ui .ow-report .summary-chevron{display:grid;place-items:center;width:28px;height:28px;border:1px solid #e7dfef;border-radius:8px;background:#fff;color:#a08bb5;font-size:17px}
+.app-ui .ow-report .job-body{padding:25px 26px}
+.app-ui .ow-report .job-meta{gap:10px;margin-bottom:17px;color:#746c85;font-size:10px}
+.app-ui .ow-report .job-meta>span{padding:7px 10px;background:#f6f4f9;color:#7a6d8a;border-radius:7px}
+.app-ui .ow-report .job-meta a{font-size:11px}
+.app-ui .ow-report .ow-payment-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:20px 0;padding:17px 20px;border:1px solid #e9e5f1;border-radius:13px;background:#faf9fd}
+.app-ui .ow-report .ow-payment-strip>div{min-width:0;border-right:1px solid #e7e2ef;padding-right:12px}
+.app-ui .ow-report .ow-payment-strip>div:last-child{border-right:0}
+.app-ui .ow-report .ow-payment-strip span{display:block;color:#7b6c8c;font-size:9px;margin-bottom:8px;letter-spacing:.03em}
+.app-ui .ow-report .ow-payment-strip strong{font-size:21px;color:#77708f;font-weight:650;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.app-ui .ow-report .ow-payment-strip small{font-size:10px;font-weight:400;color:#81708f}
+.app-ui .ow-report .ow-payment-strip>div:first-child strong{color:#3d927e}
+.app-ui .ow-report .ow-payment-strip>div:nth-child(2) strong{color:#8b76b6}
+.app-ui .ow-report .ow-payment-strip>div:last-child strong{color:#b58b4a}
+.app-ui .ow-report .product-detail-row>td{padding:0 16px;background:#fcfbff}
+.app-ui .ow-report .product-detail>summary,.app-ui .ow-report .product-jobs>summary{font-size:10px;color:#816799;padding:12px 0}
+.app-ui .ow-report .detail-columns{gap:16px;padding-bottom:18px}
+.app-ui .ow-report .detail-panel{padding:18px;border-radius:12px;border-color:#e8e2f2;background:#f8f6fc}
+.app-ui .ow-report .detail-panel>strong{color:#867199;font-size:12px}
+.app-ui .ow-report .detail-panel p{color:#7a6b88;font-size:11px;line-height:1.8}
+.app-ui .ow-report .line{padding:9px 0;color:#8d839b;font-size:12px;border-color:#e9e2f0}
+.app-ui .ow-report .balance-detail{font-size:11px;gap:12px;padding:7px 0;color:#8490a2}
+.app-ui .ow-report .ledger-event{border-radius:6px;background:#eef1fb;color:#7e88ae;font-size:9px}
+.app-ui .ow-report .ledger-event.in{background:#ecf7f0;color:#6e9d84}
+.app-ui .ow-report .ledger-ref{font-size:10px;color:#787a91}
+.app-ui .ow-report .panel.unassigned{margin-top:25px;border-color:#eddfc3;background:#fffdf8;border-radius:20px}
+.app-ui .ow-report .panel.ow-welcome{padding:46px 24px;border:1px solid #ffffff99;border-radius:23px;background:radial-gradient(ellipse at 50% 0,#f1ebff,#fff 75%);text-align:center;box-shadow:0 16px 36px #1820441a}
+.app-ui .ow-report .ow-welcome-icon{display:grid;place-items:center;width:64px;height:64px;margin:0 auto 20px;border:1px solid #e1d8f7;border-radius:20px;background:#efe9fb;color:#a28ac9;font-size:30px}
+.app-ui .ow-report .ow-welcome h2{font-size:23px;margin:11px 0;color:#4a4267}
+.app-ui .ow-report .ow-welcome>p{font-size:12px;color:#796b89}
+.app-ui .ow-report .ow-welcome-features{display:flex;justify-content:center;flex-wrap:wrap;gap:10px;margin-top:23px}
+.app-ui .ow-report .ow-welcome-features span{padding:7px 12px;border:1px solid #e9e2f3;border-radius:8px;background:#fff;color:#856c9b;font-size:10px}
+.app-ui .ow-report .ow-welcome>.button{margin-top:25px}
+@media(max-width:1100px){.app-ui .ow-report .ow-hero{padding:29px;gap:25px;grid-template-columns:minmax(0,1fr) minmax(270px,.8fr)}.app-ui .ow-report .filter-form{grid-template-columns:minmax(220px,1.6fr) repeat(2,minmax(130px,1fr))}.app-ui .ow-report input.run-button{grid-column:1/-1}.app-ui .ow-report .account-section .ow-balances{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:800px){.app-ui .ow-report .ow-hero{grid-template-columns:1fr}.app-ui .ow-report .ow-hero .head-actions{padding:17px}.app-ui .ow-report .ow-identity{padding:21px}.app-ui .ow-report .panel.account-section{padding:22px}.app-ui .ow-report .jobs .job-card>summary{grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;padding:20px}.app-ui .ow-report .job-card>summary>div:first-child{grid-column:1/-1;padding-right:36px}.app-ui .ow-report .summary-chevron{position:absolute;right:20px;top:23px}.app-ui .ow-report .jobs .job-card>summary{position:relative}.app-ui .ow-report .job-body{padding:20px}.app-ui .ow-report .job-figure>strong{font-size:23px}.app-ui .ow-report .filter-form{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.app-ui .ow-report .master-field{grid-column:1/-1}.app-ui .ow-report .filter-form input.run-button{grid-column:1/-1}.app-ui .ow-report .pending-banner{padding:15px 17px}.app-ui .ow-report .pending-banner strong{font-size:20px}}
+@media(max-width:500px){.app-ui .ow-report .ow-hero{padding:25px 22px;border-radius:21px;gap:24px}.app-ui .ow-report .ow-hero h1{font-size:30px}.app-ui .ow-report .ow-eyebrow{font-size:9px}.app-ui .ow-report .ow-hero .lead{font-size:12px}.app-ui .ow-report .ow-hero .head-actions{gap:9px;padding:13px}.app-ui .ow-report .ow-hero .head-link{padding:10px;font-size:10px}.app-ui .ow-report .panel.filters{padding:21px 18px}.app-ui .ow-report .ow-filter-tag{display:none}.app-ui .ow-report .filters-head h2{font-size:17px}.app-ui .ow-report .ow-identity{flex-wrap:wrap;padding:20px 18px}.app-ui .ow-report .ow-avatar{width:45px;height:45px;border-radius:14px;font-size:20px}.app-ui .ow-report .ow-person{gap:12px}.app-ui .ow-report .ow-person h2{font-size:18px}.app-ui .ow-report .ow-date-chip{font-size:10px}.app-ui .ow-report .ow-person .ow-overline{font-size:8px}.app-ui .ow-report .ow-identity .print-button{width:100%}.app-ui .ow-report .panel.account-section{padding:22px 17px}.app-ui .ow-report .ow-account-heading h2{font-size:19px}.app-ui .ow-report .ow-unit{width:32px;height:32px;font-size:8px;flex:none}.app-ui .ow-report .account-section>p{font-size:11px}.app-ui .ow-report .account-section .ow-balances{gap:11px}.app-ui .ow-report .account-section .ow-balances>.metric{padding:16px 13px}.app-ui .ow-report .ow-balances .metric-value{font-size:29px;margin:16px 0 10px}.app-ui .ow-report .ow-metric-head{gap:4px}.app-ui .ow-report .ow-metric-head .metric-label{font-size:8px;letter-spacing:0}.app-ui .ow-report .ow-metric-badge{min-width:24px;height:24px;font-size:7px}.app-ui .ow-report .ow-balances .metric-foot{font-size:9px}.app-ui .ow-report .pending-banner{gap:12px}.app-ui .ow-report .pending-banner>span{flex-basis:100%;font-size:10px}.app-ui .ow-report .subhead{align-items:start;flex-direction:column;gap:6px}.app-ui .ow-report>.section-title{padding:17px 18px}.app-ui .ow-report>.section-title h2{font-size:16px}.app-ui .ow-report .metrics.ow-job-stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.app-ui .ow-report .metrics.ow-job-stats>.metric{padding:17px}.app-ui .ow-report .ow-job-stats .metric-value{font-size:26px}.app-ui .ow-report .ow-payment-strip{padding:14px 12px;gap:8px}.app-ui .ow-report .ow-payment-strip span{font-size:8px;line-height:1.6}.app-ui .ow-report .ow-payment-strip strong{font-size:18px}.app-ui .ow-report .ow-payment-strip small{font-size:8px}.app-ui .ow-report .panel.ow-welcome{padding:35px 20px}.app-ui .ow-report .ow-welcome h2{font-size:20px}.app-ui .ow-report .ow-welcome-features{gap:7px}}
+@media print{.app-ui .ow-report .ow-hero{display:none}.app-ui .ow-report .ow-identity,.app-ui .ow-report .panel.account-section,.app-ui .ow-report>.section-title,.app-ui .ow-report .jobs details.job-card{background:#fff;box-shadow:none;border-color:#ccc}.app-ui .ow-report .ow-identity{padding:12px}.app-ui .ow-report .ow-avatar,.app-ui .ow-report .ow-unit{display:none}.app-ui .ow-report .ow-person h2{font-size:20px;color:#111}.app-ui .ow-report .ow-balances .metric-value{color:#111;font-size:27px}.app-ui .ow-report .ow-equation,.app-ui .ow-report .pending-banner{background:#fff;border-color:#ccc;color:#111}.app-ui .ow-report .ow-payment-strip{background:#fff;color:#111}.app-ui .ow-report .account-section>p{color:#444}.app-ui .ow-report .ow-expand-icon{display:none}.app-ui .ow-report .table-wrap{overflow:visible}.app-ui .ow-report table{min-width:0}.app-ui .ow-report th,.app-ui .ow-report td{font-size:9px;padding:7px}.app-ui .ow-report .job-body{padding:13px}.app-ui .ow-report .product-totals>summary{padding:12px}.app-ui .ow-report .ow-payment-strip strong{font-size:15px}}

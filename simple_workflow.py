@@ -187,7 +187,15 @@ def dashboard_movement_details(report, kind):
 
 
 def user_version(user):
-    return hashlib.sha256(f'{user.id}:{user.username}:{user.role}:{user.password}'.encode()).hexdigest()
+    return hashlib.sha256(
+        f'{user.id}:{user.username}:{user.role}:{user.is_active}:{user.password}'.encode()
+    ).hexdigest()
+
+
+def _require_another_active_admin(target_id):
+    admins = User.query.filter_by(role=1, is_active=True).filter(User.id != target_id).count()
+    if admins == 0:
+        raise ValueError('Keep at least one other active administrator before changing this account.')
 
 
 def save_user_access(values, token, actor_id):
@@ -197,7 +205,7 @@ def save_user_access(values, token, actor_id):
         db.session.execute(update(User).where(User.id == actor_id).values(role=User.role))
         db.session.expire_all()
         actor = db.session.get(User, actor_id)
-        if actor is None or actor.role != 1:
+        if actor is None or actor.role != 1 or not actor.is_active:
             raise ValueError('Administrator access is required.')
         if not isinstance(token, str) or not token.strip() or len(token) > 128:
             raise ValueError('Reload this form before saving.')
@@ -205,15 +213,17 @@ def save_user_access(values, token, actor_id):
         if UserAccessLog.query.filter_by(request_key=key).first():
             db.session.rollback()
             return 'This account change was already saved.'
-        try:
-            role = int(values.get('role', ''))
-        except (ValueError, TypeError):
-            raise ValueError('Select Administrator or Operator.')
-        if role not in (1, 2):
-            raise ValueError('Select Administrator or Operator.')
         action = values.get('action')
         old_role = None
+        role = None
+        message = 'User account saved.'
         if action == 'create':
+            try:
+                role = int(values.get('role', ''))
+            except (ValueError, TypeError):
+                raise ValueError('Select Administrator or Operator.')
+            if role not in (1, 2):
+                raise ValueError('Select Administrator or Operator.')
             name = str(values.get('username', '')).strip().lower()
             password = values.get('password', '')
             if not name or len(name) > 100 or any(c.isspace() for c in name):
@@ -224,6 +234,12 @@ def save_user_access(values, token, actor_id):
             db.session.add(user)
             db.session.flush()
         elif action == 'update':
+            try:
+                role = int(values.get('role', ''))
+            except (ValueError, TypeError):
+                raise ValueError('Select Administrator or Operator.')
+            if role not in (1, 2):
+                raise ValueError('Select Administrator or Operator.')
             target_id = record_id(values.get('user_id'))
             user = db.session.get(User, target_id) if target_id else None
             if user is None:
@@ -233,20 +249,55 @@ def save_user_access(values, token, actor_id):
             if user.id == actor.id and role != 1:
                 raise ValueError('You cannot remove your own administrator access.')
             old_role = user.role
+            if user.is_active and user.role == 1 and role != 1:
+                _require_another_active_admin(user.id)
             user.role = role
             password = values.get('password', '')
             if password:
                 if len(password) < 8 or len(password) > 128:
                     raise ValueError('Use a password between 8 and 128 characters.')
                 user.password = generate_password_hash(password)
+        elif action in ('set_active', 'delete'):
+            target_id = record_id(values.get('user_id'))
+            user = db.session.get(User, target_id) if target_id else None
+            if user is None:
+                raise ValueError('User not found.')
+            if values.get('version') != user_version(user):
+                raise ValueError('This account changed. Reload and review before saving.')
+            if user.id == actor.id:
+                raise ValueError('You cannot disable or delete your own account.')
+            old_role = user.role
+            role = user.role
+            if action == 'set_active':
+                active_value = values.get('active')
+                if active_value not in ('0', '1'):
+                    raise ValueError('Choose whether the account should be enabled or disabled.')
+                is_active = active_value == '1'
+                if not is_active and user.is_active and user.role == 1:
+                    _require_another_active_admin(user.id)
+                user.is_active = is_active
+                action = 'enabled' if is_active else 'disabled'
+                message = 'User account enabled.' if is_active else 'User account disabled.'
+            else:
+                if user.is_active and user.role == 1:
+                    _require_another_active_admin(user.id)
+                action = 'deleted'
+                role = 0
+                message = 'User account deleted.'
+                db.session.add(UserAccessLog(
+                    request_key=key, changed_at=datetime.now(), actor=actor.username,
+                    user_id=user.id, action=action, old_role=old_role, new_role=role,
+                ))
+                db.session.delete(user)
         else:
             raise ValueError('Choose a valid account action.')
-        db.session.add(UserAccessLog(
-            request_key=key, changed_at=datetime.now(), actor=actor.username,
-            user_id=user.id, action=action, old_role=old_role, new_role=role,
-        ))
+        if action != 'deleted':
+            db.session.add(UserAccessLog(
+                request_key=key, changed_at=datetime.now(), actor=actor.username,
+                user_id=user.id, action=action, old_role=old_role, new_role=role,
+            ))
         db.session.commit()
-        return 'User account saved.'
+        return message
     except IntegrityError:
         db.session.rollback()
         raise ValueError('That username already exists. Reload and check the account list.')

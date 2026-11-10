@@ -13,7 +13,8 @@ from data_entry import claim_write
 from item_aliases import normalize_name
 from validation import record_id
 from modes import (db, Item_data, Outworker, Jobcard, Jobmovement, EditLog,
-                   OutworkerRate, OutworkerAdvance, OutworkerPayroll, OutworkerPayrollJob)
+                   OutworkerRate, OutworkerAdvance, OutworkerPayroll, OutworkerPayrollJob,
+                   OutworkerAdvanceRecovery, OutworkerAdvanceReceipt)
 
 MAX_PAISE = 99_999_999_999
 PAYMENT_METHODS = ("Cash", "Bank", "UPI", "Other")
@@ -118,7 +119,99 @@ def advance_balance(worker_id):
         OutworkerAdvance.worker_id == worker_id).scalar()
     deductions = db.session.query(db.func.coalesce(db.func.sum(OutworkerPayroll.deduction_paise), 0)).filter(
         OutworkerPayroll.worker_id == worker_id).scalar()
-    return int(advances) - int(deductions)
+    receipts = db.session.query(db.func.coalesce(db.func.sum(OutworkerAdvanceReceipt.amount_paise), 0)).filter(
+        OutworkerAdvanceReceipt.worker_id == worker_id).scalar()
+    return int(advances) - int(deductions) - int(receipts)
+
+
+def advance_entries(worker_id):
+    """Outstanding amounts; historical aggregate deductions consume oldest first.
+
+    New recoveries are permanently linked to individual advances. Older receipts
+    remain untouched, with their unallocated deductions accounted for FIFO.
+    """
+    rows = OutworkerAdvance.query.filter_by(worker_id=worker_id).order_by(
+        OutworkerAdvance.paid_at, OutworkerAdvance.id).all()
+    recovered = dict(db.session.query(
+        OutworkerAdvanceRecovery.advance_id, db.func.sum(OutworkerAdvanceRecovery.amount_paise)
+    ).join(OutworkerPayroll, OutworkerPayroll.id == OutworkerAdvanceRecovery.payroll_id).filter(
+        OutworkerPayroll.worker_id == worker_id).group_by(OutworkerAdvanceRecovery.advance_id).all())
+    total_deducted = db.session.query(db.func.coalesce(db.func.sum(OutworkerPayroll.deduction_paise), 0)).filter(
+        OutworkerPayroll.worker_id == worker_id).scalar()
+    legacy = int(total_deducted) - sum(recovered.values())
+    for advance_id, amount in db.session.query(
+            OutworkerAdvanceReceipt.advance_id, db.func.sum(OutworkerAdvanceReceipt.amount_paise)).filter(
+            OutworkerAdvanceReceipt.worker_id == worker_id).group_by(OutworkerAdvanceReceipt.advance_id).all():
+        recovered[advance_id] = recovered.get(advance_id, 0) + int(amount)
+    result = []
+    for row in rows:
+        left = row.amount_paise - recovered.get(row.id, 0)
+        historical = min(left, legacy)
+        legacy -= historical
+        result.append({"id": row.id, "date": row.paid_at, "method": row.method,
+                       "reference": row.reference, "amount_paise": row.amount_paise,
+                       "remaining_paise": left - historical})
+    return result
+
+
+def receive_advance(worker_id, advance_id, amount, expected_remaining, method, reference, note, token, user):
+    """Record a partial/full repayment under the same lock as payroll writes."""
+    try:
+        username = _claim(token, "outworker_advance_receipt", user)
+        worker = db.session.get(Outworker, worker_id) if record_id(worker_id) else None
+        if not worker:
+            raise ValueError("Select an existing outworker.")
+        entry = next((row for row in advance_entries(worker_id) if row['id'] == record_id(advance_id)), None)
+        if not entry or entry['remaining_paise'] <= 0:
+            raise ValueError("Select an outstanding advance belonging to this outworker.")
+        if not str(expected_remaining).isdigit() or int(expected_remaining) != entry['remaining_paise']:
+            raise ValueError("This advance balance changed. Reload the account before recording money received.")
+        amount = parse_money(amount)
+        if amount <= 0 or amount > entry['remaining_paise']:
+            raise ValueError("Money received must be greater than zero and cannot exceed this advance’s outstanding amount.")
+        reference, note = _details(method, reference, note)
+        receipt = OutworkerAdvanceReceipt(worker_id=worker.id, advance_id=entry['id'],
+            worker_name=worker_label(worker), amount_paise=amount, received_at=datetime.now(),
+            method=method, reference=reference, note=note, recorded_by=username)
+        db.session.add(receipt)
+        db.session.commit()
+        return receipt
+    except Exception:
+        db.session.rollback()
+        raise
+
+
+def receive_selected_advances(worker_id, advance_ids, expected_snapshot, expected_total,
+                              method, reference, note, token, user):
+    """Confirm the advance-only popup atomically, without issuing a payroll."""
+    try:
+        username = _claim(token, "outworker_advance_batch_receipt", user)
+        worker = db.session.get(Outworker, worker_id) if record_id(worker_id) else None
+        if not worker:
+            raise ValueError("Select an existing outworker.")
+        selected = {record_id(value) for value in advance_ids}
+        entries = [row for row in advance_entries(worker_id) if row['id'] in selected and row['remaining_paise'] > 0]
+        if not selected or None in selected or len(entries) != len(selected):
+            raise ValueError("Select outstanding advances belonging to this outworker.")
+        original = {row['id']: row['remaining_paise'] for row in expected_snapshot['advances']}
+        if (expected_snapshot['worker'] != worker_label(worker)
+                or expected_snapshot['available'] != advance_balance(worker_id)
+                or any(original.get(row['id']) != row['remaining_paise'] for row in entries)):
+            raise ValueError("Advance balances changed. Reload the account and review the money received again.")
+        total = sum(row['remaining_paise'] for row in entries)
+        if parse_money(expected_total) != total:
+            raise ValueError("The amount received does not match the selected advances. Calculate again.")
+        reference, note = _details(method, reference, note)
+        now = datetime.now()
+        for entry in entries:
+            db.session.add(OutworkerAdvanceReceipt(worker_id=worker.id, advance_id=entry['id'],
+                worker_name=worker_label(worker), amount_paise=entry['remaining_paise'], received_at=now,
+                method=method, reference=reference, note=note, recorded_by=username))
+        db.session.commit()
+        return total
+    except Exception:
+        db.session.rollback()
+        raise
 
 
 def record_advance(worker_id, amount, method, reference, note, token, user):
@@ -249,7 +342,7 @@ def payable_job_quotes(worker):
 completed_job_quotes = payable_job_quotes
 
 
-def payroll_preview(worker_id, job_ids, deduction):
+def payroll_preview(worker_id, job_ids, deduction, *, advance_ids=None):
     worker = db.session.get(Outworker, worker_id) if record_id(worker_id) else None
     if not worker:
         raise ValueError("Select an existing outworker.")
@@ -272,26 +365,69 @@ def payroll_preview(worker_id, job_ids, deduction):
     if gross > MAX_PAISE:
         raise ValueError("Payroll total exceeds the supported payment limit.")
     available = advance_balance(worker_id)
-    deduction = parse_money(deduction)
+    entries = [entry for entry in advance_entries(worker_id) if entry["remaining_paise"] > 0]
+    selected = None
+    if advance_ids is not None:
+        try:
+            selected = {record_id(value) for value in advance_ids}
+            if None in selected or not selected.issubset({entry["id"] for entry in entries}):
+                raise ValueError
+        except (ValueError, TypeError):
+            raise ValueError("Select available advances belonging to this outworker. Refresh the account.") from None
+        entries = [entry for entry in entries if entry["id"] in selected]
+        deduction = min(gross, sum(entry["remaining_paise"] for entry in entries))
+        deduction = money_input(deduction)
+    # Selection-based recovery: never deduct more than this payroll can cover.
+    deduction = min(available, gross) if deduction == "available" else parse_money(deduction)
     if deduction > available or deduction > gross:
         raise ValueError("Advance deduction cannot exceed the available advance or gross payroll.")
+    recoveries = []
+    to_recover = deduction
+    for entry in entries:
+        amount = min(to_recover, entry["remaining_paise"])
+        if amount:
+            recoveries.append({"advance_id": entry["id"], "amount_paise": amount})
+            to_recover -= amount
     # Check quantities, rates, worker and advance balance again at final save.
     version_data = {"worker": worker_label(worker), "available": available,
                     "jobs": [{"id": job["id"], "lines": job["lines"], "given": job["given"],
                               "returned": job["returned"], "already_paid": job["already_paid"]} for job in jobs],
                     "deduction": deduction}
+    if selected is not None:
+        version_data["advances"] = [{"id": entry["id"], "remaining": entry["remaining_paise"]} for entry in entries]
     version = hashlib.sha256(json.dumps(version_data, sort_keys=True).encode()).hexdigest()
     return {"worker": worker, "worker_name": worker_label(worker), "jobs": jobs,
             "gross_paise": gross, "deduction_paise": deduction, "net_paise": gross - deduction,
             "available_paise": available, "remaining_advance_paise": available - deduction,
-            "pieces": sum(job["pieces"] for job in jobs), "version": version}
+            "pieces": sum(job["pieces"] for job in jobs), "version": version,
+            "advance_recoveries": recoveries}
 
 
-def issue_payroll(worker_id, job_ids, deduction, expected_version, method, reference, note, token, user):
+def browser_payroll_snapshot(worker, jobs, advances, available):
+    """Signed page-load quote; dates are display-only and not needed for validation."""
+    return {"worker": worker_label(worker), "available": available,
+            "jobs": [{key: job[key] for key in (
+                "id", "given", "returned", "already_paid", "pending_return", "pieces",
+                "gross_paise", "lines", "errors")} for job in jobs],
+            "advances": [{"id": row["id"], "remaining_paise": row["remaining_paise"]} for row in advances]}
+
+
+def issue_payroll(worker_id, job_ids, deduction, expected_version, method, reference, note, token, user, *, advance_ids=None, expected_snapshot=None):
     try:
         username = _claim(token, "outworker_payroll", user)
-        preview = payroll_preview(worker_id, job_ids, deduction)
-        if preview["version"] != expected_version:
+        preview = payroll_preview(worker_id, job_ids, deduction, advance_ids=advance_ids)
+        valid = preview["version"] == expected_version
+        if expected_snapshot is not None:
+            current = browser_payroll_snapshot(preview["worker"], preview["jobs"],
+                                              advance_entries(worker_id), preview["available_paise"])
+            ids = {job["id"] for job in preview["jobs"]}
+            selected = {record_id(value) for value in (advance_ids or [])}
+            original = {**expected_snapshot,
+                        "jobs": [job for job in expected_snapshot["jobs"] if job["id"] in ids],
+                        "advances": [row for row in expected_snapshot["advances"] if row["id"] in selected]}
+            current["advances"] = [row for row in current["advances"] if row["id"] in selected]
+            valid = current == original and parse_money(deduction) == preview["deduction_paise"]
+        if not valid:
             raise ValueError("Rates, job quantities or advances changed. Calculate the payroll again before paying.")
         reference, note = _details(method, reference, note)
         payroll = OutworkerPayroll(
@@ -302,6 +438,8 @@ def issue_payroll(worker_id, job_ids, deduction, expected_version, method, refer
         )
         db.session.add(payroll)
         db.session.flush()
+        for recovery in preview["advance_recoveries"]:
+            db.session.add(OutworkerAdvanceRecovery(payroll_id=payroll.id, **recovery))
         for job in preview["jobs"]:
             db.session.add(OutworkerPayrollJob(
                 payroll_id=payroll.id, jobcard_id=job["id"], pieces=job["pieces"],
@@ -320,6 +458,7 @@ def issue_payroll(worker_id, job_ids, deduction, expected_version, method, refer
 def payment_account(worker_id):
     advances = OutworkerAdvance.query.filter_by(worker_id=worker_id).all()
     payrolls = OutworkerPayroll.query.filter_by(worker_id=worker_id).all()
+    receipts = OutworkerAdvanceReceipt.query.filter_by(worker_id=worker_id).all()
     events = [{"date": row.paid_at, "kind": "Advance", "id": row.id,
                "advance_paise": row.amount_paise, "deduction_paise": 0,
                "gross_paise": 0, "net_paise": row.amount_paise,
@@ -330,12 +469,18 @@ def payment_account(worker_id):
                    "gross_paise": row.gross_paise, "net_paise": row.net_paise,
                    "method": row.method, "reference": row.reference, "note": row.note,
                    "recorded_by": row.recorded_by} for row in payrolls)
+    events.extend({"date": row.received_at, "kind": "Recovery", "id": row.id,
+                   "advance_id": row.advance_id, "advance_paise": 0, "deduction_paise": 0,
+                   "received_paise": row.amount_paise, "gross_paise": 0, "net_paise": row.amount_paise,
+                   "method": row.method, "reference": row.reference, "note": row.note,
+                   "recorded_by": row.recorded_by} for row in receipts)
     events.sort(key=lambda event: (event["date"], event["kind"], event["id"]))
     balance = 0
     for event in events:
-        balance += event["advance_paise"] - event["deduction_paise"]
+        balance += event["advance_paise"] - event["deduction_paise"] - event.get("received_paise", 0)
         event["balance_paise"] = balance
     return {"events": events, "advance_paise": balance,
             "gross_paise": sum(row.gross_paise for row in payrolls),
             "deduction_paise": sum(row.deduction_paise for row in payrolls),
+            "direct_recovery_paise": sum(row.amount_paise for row in receipts),
             "net_paise": sum(row.net_paise for row in payrolls)}

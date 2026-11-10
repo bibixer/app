@@ -9,7 +9,13 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='style/app.css', v='20261108-waves') }}">
   {% block head %}{% endblock %}
 </head>
-<body class="app-ui {% if not current_user.is_authenticated %}is-guest{% endif %} {% block body_class %}{% endblock %}">
+<body class="app-ui {% if not current_user.is_authenticated %}is-guest{% endif %} {% block body_class %}{% endblock %}"
+  {% if current_user.is_authenticated %}
+  data-shortcut-job="{{ url_for('manual_job_card') }}"
+  data-shortcut-return="{{ url_for('retune_product') }}"
+  {% if request.endpoint == 'retune_product' %}data-shortcut-return-job-field="jobcard_id" data-shortcut-return-worker-field="return-worker"{% endif %}
+  {% if current_user.role == 1 %}data-shortcut-payroll="{{ url_for('outworker_payroll') }}"{% endif %}
+  {% endif %}>
   <a class="ui-skip" href="#main-content">Skip to content</a>
   {% if current_user.is_authenticated and not embedded %}{% set id = current_user.role %}{% include 'menu_bar.html' %}{% endif %}
   <div class="ui-waves" aria-hidden="true"><div class="ui-wave"></div><div class="ui-wave"></div><div class="ui-wave"></div></div>

@@ -1,10 +1,52 @@
 {% extends 'app_base.html' %}
 {% block title %}Users & roles · BH Manufacturing{% endblock %}
+{% block head %}
+<style>
+  .ui-scope .v2-user-card{padding:8px 0 14px;border-bottom:1px solid #e2e8f0}
+  .ui-scope .v2-user-card:last-child{border-bottom:0}
+  .ui-scope .v2-user-actions{display:flex;flex-wrap:wrap;gap:10px;padding:0 0 8px}
+  .ui-scope .v2-user-actions form{margin:0}
+  .ui-scope .account-state{margin-left:8px;color:#667085;font-size:12px;font-weight:600}
+  .ui-scope .v2-user-actions .danger-button{background:#fff;color:#a33b43;border:1px solid #e6c7ca}
+</style>
+{% endblock %}
 {% block content %}
 <header class="ui-heading"><div><p class="ui-kicker">Administration</p><h1>Users & roles</h1><p class="ui-description">Operators assign manual jobs and record returns. Administrators also manage setup, rates, payments, corrections, and accounts.</p></div></header>
 {% for category,message in get_flashed_messages(with_categories=true) %}<div class="notice {{ category }}" role="alert">{{ message }}</div>{% endfor %}
-<section class="ui-panel"><h2>Add user</h2><form method="post" class="v2-account-form">{{ form.hidden_tag() }}<input type="hidden" name="action" value="create"><label>Username<input name="username" maxlength="100" required autocomplete="off"></label><label>Password<input name="password" type="password" minlength="8" maxlength="128" required autocomplete="new-password"></label><label>Role<select name="role"><option value="2">Operator</option><option value="1">Administrator</option></select></label><button type="submit">Create account</button></form></section>
-<section class="ui-panel"><h2>Existing users</h2><p>Leave the password blank to keep it. You cannot remove your own administrator access.</p>
-{% for user in users %}<form method="post" class="v2-account-form">{{ form.hidden_tag() }}<input type="hidden" name="action" value="update"><input type="hidden" name="user_id" value="{{ user.id }}"><input type="hidden" name="version" value="{{ user_version(user) }}"><strong>{{ user.username }}</strong><label>Role<select name="role" aria-label="Role for {{ user.username }}"><option value="2" {% if user.role == 2 %}selected{% endif %}>Operator</option><option value="1" {% if user.role == 1 %}selected{% endif %}>Administrator</option></select></label><label>New password<input name="password" type="password" minlength="8" maxlength="128" autocomplete="new-password"></label><button type="submit">Save account</button></form>{% endfor %}</section>
-<section class="ui-panel"><h2>Account change history</h2><div class="table-wrap"><table><thead><tr><th>When</th><th>Changed by</th><th>User ID</th><th>Action</th><th>Previous role</th><th>New role</th></tr></thead><tbody>{% for log in access_logs %}<tr><td>{{ log.changed_at.strftime('%d %b %Y %H:%M') }}</td><td>{{ log.actor }}</td><td>#{{ log.user_id }}</td><td>{{ log.action }}</td><td>{{ ('Administrator' if log.old_role == 1 else 'Operator') if log.old_role else '—' }}</td><td>{{ 'Administrator' if log.new_role == 1 else 'Operator' }}</td></tr>{% else %}<tr><td colspan="6">No account changes recorded.</td></tr>{% endfor %}</tbody></table></div></section>
+<section class="ui-panel">
+  <h2>Add user</h2>
+  <form method="post" class="v2-account-form">{{ form.hidden_tag() }}<input type="hidden" name="action" value="create">
+    <label>Username<input name="username" maxlength="100" required autocomplete="off"></label>
+    <label>Password<input name="password" type="password" minlength="8" maxlength="128" required autocomplete="new-password"></label>
+    <label>Role<select name="role"><option value="2">Operator</option><option value="1">Administrator</option></select></label>
+    <button type="submit">Create account</button>
+  </form>
+</section>
+<section class="ui-panel">
+  <h2>Existing users</h2>
+  <p>Leave the password blank to keep it. You cannot disable or delete your own account, and at least one active administrator must remain.</p>
+  {% for user in users %}
+  <div class="v2-user-card">
+    <form method="post" class="v2-account-form">{{ form.hidden_tag() }}
+      <input type="hidden" name="action" value="update"><input type="hidden" name="user_id" value="{{ user.id }}"><input type="hidden" name="version" value="{{ user_version(user) }}">
+      <strong>{{ user.username }}<span class="account-state">{{ 'Enabled' if user.is_active else 'Disabled' }}</span></strong>
+      <label>Role<select name="role" aria-label="Role for {{ user.username }}"><option value="2" {% if user.role == 2 %}selected{% endif %}>Operator</option><option value="1" {% if user.role == 1 %}selected{% endif %}>Administrator</option></select></label>
+      <label>New password<input name="password" type="password" minlength="8" maxlength="128" autocomplete="new-password"></label>
+      <button type="submit">Save account</button>
+    </form>
+    {% if user.id != current_user.id %}
+    <div class="v2-user-actions">
+      <form method="post">{{ form.hidden_tag() }}<input type="hidden" name="action" value="set_active"><input type="hidden" name="user_id" value="{{ user.id }}"><input type="hidden" name="version" value="{{ user_version(user) }}"><input type="hidden" name="active" value="{{ '0' if user.is_active else '1' }}"><button type="submit">{{ 'Disable account' if user.is_active else 'Enable account' }}</button></form>
+      <form method="post" onsubmit="return confirm('Permanently delete this account? It cannot be restored.');">{{ form.hidden_tag() }}<input type="hidden" name="action" value="delete"><input type="hidden" name="user_id" value="{{ user.id }}"><input type="hidden" name="version" value="{{ user_version(user) }}"><button class="danger-button" type="submit">Delete account</button></form>
+    </div>
+    {% endif %}
+  </div>
+  {% else %}<p>No user accounts found.</p>{% endfor %}
+</section>
+<section class="ui-panel">
+  <h2>Account change history</h2>
+  <div class="table-wrap"><table><thead><tr><th>When</th><th>Changed by</th><th>User ID</th><th>Action</th><th>Previous role</th><th>New role / state</th></tr></thead><tbody>
+  {% for log in access_logs %}<tr><td>{{ log.changed_at.strftime('%d %b %Y %H:%M') }}</td><td>{{ log.actor }}</td><td>#{{ log.user_id }}</td><td>{{ log.action|title }}</td><td>{{ ('Administrator' if log.old_role == 1 else 'Operator') if log.old_role else '—' }}</td><td>{{ 'Deleted' if log.new_role == 0 else ('Administrator' if log.new_role == 1 else 'Operator') }}</td></tr>{% else %}<tr><td colspan="6">No account changes recorded.</td></tr>{% endfor %}
+  </tbody></table></div>
+</section>
 {% endblock %}

@@ -18,10 +18,10 @@
           {% for error in current_form.jobcard_id.errors %}<p class="field-error" role="alert">{{ error }}</p>{% endfor %}
           {{ current_form.submit(class_='open-button', value='Open job card →') }}
         </form>
-        <div class="form-footer"><a class="back-link" href="{{ url_for('manual_job_card' if config.SIMPLE_WORKFLOW else 'job_card') }}">← Back to job cards</a><span class="key-hint">Press <kbd>Enter</kbd> to open</span></div>
+        <div class="form-footer"><a class="back-link" href="{{ url_for('manual_job_card' if config.SIMPLE_WORKFLOW else 'job_card') }}">← Back to job cards</a><span class="key-hint"><kbd>Enter</kbd> Open job · <kbd>Tab</kbd> Switch field</span></div>
       </section>
       <aside class="card guide-card" aria-label="Return steps">
-        <h2>Return across open jobs</h2><p>Select an outworker to see every incomplete job with its own return fields, calculator, and history.</p><form method="get" action="{{ url_for('outworker_returns') }}"><label for="return-worker">Outworker name, alias, or ID</label><input id="return-worker" name="worker" list="return-worker-options" required autocomplete="off" placeholder="Enter outworker or ID"><datalist id="return-worker-options">{% for option in master_options %}<option value="{{ option.value }}" label="{{ option.label }}"></option>{% endfor %}</datalist><button type="submit">Open all incomplete jobs →</button></form><hr>
+        <h2>Return across open jobs</h2><p>Select an outworker to see every incomplete job with its own return fields, calculator, and history.</p><form method="get" action="{{ url_for('outworker_returns') }}"><label for="return-worker">Outworker name, alias, or ID</label><input id="return-worker" name="worker" list="return-worker-options" required autocomplete="off" placeholder="Enter outworker or ID"><datalist id="return-worker-options">{% for option in master_options %}<option value="{{ option.value }}" label="{{ option.label }}"></option>{% endfor %}</datalist><button type="submit">Open all incomplete jobs →</button><p class="field-hint"><kbd>Tab</kbd> Switch to job-card number</p></form><hr>
         <h2>How returns work</h2><p>Everything stays linked to the job-card number you enter.</p>
         <ol class="steps">
           <li><span class="step-number">01</span><div><strong>Enter the number</strong><span>Find the job card you want to return against.</span></div></li>

@@ -176,6 +176,7 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(128), nullable=False)
     role = db.Column(db.Integer, nullable=False, default=2)  # 'userT' userP userB or 'admin'
+    is_active = db.Column(db.Boolean, nullable=False, default=True, server_default='1')
     def __init__(self,username,password,role):
         self.username =  username
         self.password =  generate_password_hash(password)
@@ -290,6 +291,32 @@ class OutworkerPayroll(db.Model):
         db.CheckConstraint("gross_paise >= 0 AND deduction_paise >= 0 AND net_paise >= 0"),
         db.CheckConstraint("gross_paise = deduction_paise + net_paise"),
     )
+
+
+class OutworkerAdvanceReceipt(db.Model):
+    """Money actually received back, independent of a payroll deduction."""
+    __tablename__ = "outworker_advance_receipt"
+    id = db.Column(db.Integer, primary_key=True)
+    worker_id = db.Column(db.Integer, db.ForeignKey("OutworkData.id"), nullable=False, index=True)
+    advance_id = db.Column(db.Integer, db.ForeignKey("outworker_advance.id"), nullable=False, index=True)
+    worker_name = db.Column(db.String(100), nullable=False)
+    amount_paise = db.Column(db.BigInteger, nullable=False)
+    received_at = db.Column(db.DateTime, nullable=False)
+    method = db.Column(db.String(20), nullable=False)
+    reference = db.Column(db.String(100), nullable=False, default="")
+    note = db.Column(db.String(500), nullable=False, default="")
+    recorded_by = db.Column(db.String(100), nullable=False)
+    __table_args__ = (db.CheckConstraint("amount_paise > 0"),)
+
+
+class OutworkerAdvanceRecovery(db.Model):
+    __tablename__ = "outworker_advance_recovery"
+    id = db.Column(db.Integer, primary_key=True)
+    payroll_id = db.Column(db.Integer, db.ForeignKey("outworker_payroll.id"), nullable=False, index=True)
+    advance_id = db.Column(db.Integer, db.ForeignKey("outworker_advance.id"), nullable=False, index=True)
+    amount_paise = db.Column(db.BigInteger, nullable=False)
+    __table_args__ = (db.UniqueConstraint('payroll_id', 'advance_id'),
+                      db.CheckConstraint('amount_paise > 0'))
 
 
 class OutworkerPayrollJob(db.Model):

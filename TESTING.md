@@ -22,6 +22,10 @@ The app defaults to the V2 manual-only workflow (`SIMPLE_WORKFLOW=True`). `test_
 | Login, admin permissions, malformed requests, retries and retained inventory drafts | `test_http_workflows.py` |
 | Job ledgers, period balances, products, incomplete jobs and older return assignment | `test_outworker_job_ledger.py` |
 | Piece rates, type overrides, advances, payroll, paid-record locks and concurrent payments | `test_payroll.py` |
+| Individual advance selection, partial recovery, historical FIFO balances, selected IDs on confirmation and immutable receipt links | `test_individual_advances.py`, `test_payroll_advance_selection.py` |
+| Money received back directly, partial/full advance repayment, receipt ledger, stale forms, duplicate/concurrent saves, payroll-vs-repayment races and rollback | `test_advance_receipts.py`, `gjs tests/js/test_advance_receipt.js` |
+| Advance-only checkbox selection without jobs: signed confirmation, selected/all advances, atomic batch receipts, duplicates, partial balances and concurrent recovery | `test_selected_advance_receipts.py`, `test_payroll_frontend.py`, `gjs tests/js/test_payroll_calculator.js` |
+| Browser-only payroll calculations and review popup; live advance selection, close/back, signed page-load snapshot, tamper rejection and stale-rate/advance checks on payment | `test_payroll_frontend.py`, `gjs tests/js/test_payroll_calculator.js` |
 | Partial-job payments, later returns, selected jobs, per-type paid quantities, retries and concurrent installments | `test_partial_payroll.py` |
 | Existing payroll database upgrade, preserved receipts and transactional rollback | `test_schema_updates.py` |
 | Dashboard lifetime/product piece totals, older unlinked returns and per-job pending balances | `test_dashboard_totals.py` |
@@ -34,6 +38,10 @@ The app defaults to the V2 manual-only workflow (`SIMPLE_WORKFLOW=True`). `test_
 
 Firefox and geckodriver are needed for these optional tests. They start a temporary app on a random local port, with a temporary database and a fresh browser profile. They cover Enter/Backspace navigation, aliases, Type selection, job correction, partial-job payroll in two installments, calculator shortcuts, print expansion and phone layouts.
 
+Run `gjs tests/js/test_payroll_advances.js` to check individual ticks, Select all, Clear all and partial-selection state without a browser. Advance-to-payroll links are stored in the additive `outworker_advance_recovery` table (created at app startup). Earlier aggregate-only payroll deductions are attributed oldest-first for remaining advance balances; existing receipts are not rewritten.
+
+Direct repayments are stored separately in the additive `outworker_advance_receipt` table, created at app startup. Each receipt belongs to one worker and advance, and records amount, method, reference, notes, time and recorder. Both direct receipts and payroll deductions reduce the same outstanding advance; direct receipts do not count as payroll payments. Writes use the shared transaction lock plus request deduplication and a remaining-balance check.
+
 ```bash
 BH_RUN_BROWSER_TESTS=1 .venv/bin/python -m unittest discover -s tests -p test_browser_flows.py -v
 ```
@@ -45,3 +53,7 @@ All cases use `unittest` from Python's standard library. No additional Python te
 ## Manual job label output
 
 Saving a manual job exports the existing two-products-per-page label CSV format into `to_print/jobcard`. Set the server environment variable `LABEL_PRINT_ROOT` to change the root; job label files are placed in its `jobcard` subfolder. The external CSV label application watches that folder and prints the labels. CSV files are published atomically after the job commits, and duplicate job-save retries do not export another copy. If export fails, the job stays saved and the UI reports the export failure.
+
+## Local JavaScript checks
+
+When `gjs` (SpiderMonkey) is installed, run `gjs tests/js/test_return_workspace.js` from the app directory. These tests exercise the actual return scripts without a browser or network: saved-balance notifications, other-job draft preservation, message origin/source checks, receipt-print failures, and balance updates without a layout-height change. Full browser checks remain available with the Firefox command above.

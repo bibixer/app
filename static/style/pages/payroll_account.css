@@ -1,0 +1,161 @@
+.app-ui .payroll-account { --teal:#3159a7; --ink:#192940; --muted:#58677e; --line:#dce3ed; }
+.app-ui .payroll-account [hidden] { display:none!important; }
+.app-ui .payroll-account #payrollCalculationStatus { font-size:14px; color:#3c567d; line-height:1.6; }
+.app-ui.payroll-review-open { overflow:hidden; }
+.app-ui .payroll-account dialog.payroll-review-dialog { width:min(1100px,calc(100% - 32px)); max-width:none; max-height:calc(100dvh - 40px); margin:auto; padding:26px; overflow:auto; color:var(--ink); background:#fff; border:1px solid #c7d5e5; border-radius:24px; box-shadow:0 30px 100px #14243e55; }
+.app-ui .payroll-account .payroll-review-dialog::backdrop { background:#101f3ab8; backdrop-filter:blur(5px); }
+.app-ui .payroll-account .payroll-modal-head { position:sticky; top:-26px; z-index:2; padding:18px 0; margin-top:-8px; background:#fff; border-bottom:1px solid #dce3ed; }
+.app-ui .payroll-account .payroll-modal-head h2 { font-size:24px; }
+.app-ui .payroll-account .payroll-modal-advances { padding:20px; background:#f4f7fc; border:1px solid #dce4f1; border-radius:16px; margin:18px 0; }
+.app-ui .payroll-account .payroll-modal-advances input[type=checkbox] { width:22px; height:22px; accent-color:#4866ac; }
+.app-ui .payroll-account .payroll-modal-actions { display:flex; gap:12px; flex-wrap:wrap; justify-content:space-between; padding-top:16px; border-top:1px solid #dce3ed; }
+.app-ui .payroll-account #payrollModalStatus { color:#294e72; line-height:1.6; font-size:14px; }
+@media(max-width:600px) {
+  .app-ui .payroll-account dialog.payroll-review-dialog { padding:18px; width:calc(100% - 16px); max-height:calc(100dvh - 16px); border-radius:18px; }
+  .app-ui .payroll-account .payroll-modal-head { top:-18px; }
+  .app-ui .payroll-account .payroll-modal-head h2 { font-size:20px; }
+  .app-ui .payroll-account .payroll-modal-advances { padding:14px; }
+  .app-ui .payroll-account .payroll-modal-actions button { width:100%; }
+}
+.app-ui .payroll-account .pay-head { padding:clamp(24px,4vw,44px); border-radius:26px; background:linear-gradient(120deg,#162b4e,#353b79 65%,#66509c); box-shadow:0 20px 50px #15234d26; color:#fff; align-items:center; }
+.app-ui .payroll-account .pay-head h1 { color:#fff; }
+.app-ui .payroll-account .pay-head .eyebrow { color:#a9e7ec; }
+.app-ui .payroll-account .pay-head .lead { color:#e0e7f7; line-height:1.7; }
+.app-ui .payroll-account .pay-head .button { background:#ffffff12; border-color:#ffffff50; color:#fff; }
+.app-ui .payroll-account .panel { border-radius:22px; box-shadow:0 10px 35px #19294d0a; }
+.app-ui .payroll-account .payroll-lookup { border-top:4px solid #6c62b5; }
+.app-ui .payroll-account .filter-form { align-items:start; }
+.app-ui .payroll-account .filter-form .field { min-width:0; flex-basis:320px; }
+.app-ui .payroll-account .filter-form button { margin-top:25px; min-height:48px; }
+.app-ui .payroll-account #payrollWorker { min-height:48px; font-size:17px; background:#f8faff; }
+.app-ui .payroll-account #payrollWorkerMatch { min-height:18px; overflow-wrap:anywhere; }
+.app-ui .payroll-account .hint { line-height:1.7; }
+.app-ui .payroll-account .payroll-identity { padding:10px 4px 18px; }
+.app-ui .payroll-account .payroll-identity h2 { font-size:28px; }
+.app-ui .payroll-account .metric { border-radius:19px; padding:24px; box-shadow:0 8px 24px #15274d08; border-top:3px solid #6d86bd; }
+.app-ui .payroll-account .metric strong { font-size:clamp(23px,2.5vw,34px); overflow-wrap:anywhere; }
+.app-ui .payroll-account .metric.amber { border-top-color:#d7a348; }
+.app-ui .payroll-account .two-columns { grid-template-columns:minmax(0,2.2fr) minmax(280px,1fr); }
+.app-ui .payroll-account .two-columns > * { min-width:0; }
+.app-ui .payroll-account .two-columns .table-wrap table { min-width:660px; }
+.app-ui .payroll-account th { background:#f0f3fa; color:#53627a; padding:15px; }
+.app-ui .payroll-account td { padding:16px 14px; line-height:1.65; }
+.app-ui .payroll-account tbody tr:hover { background:#f8faff; }
+.app-ui .payroll-account .review { border:2px solid #7aa999; background:#fcfffd; }
+.app-ui .payroll-account .advance-entry { border:1px solid #cbdcd9; background:linear-gradient(120deg,#fff,#f1faf7); padding:clamp(20px,3vw,32px); }
+.app-ui .payroll-account .advance-entry .fields { grid-template-columns:repeat(4,minmax(0,1fr)); gap:18px; margin:22px 0; }
+.app-ui .payroll-account .advance-entry .field { min-width:0; }
+.app-ui .payroll-account .advance-entry input,.app-ui .payroll-account .advance-entry select { min-height:48px; }
+.app-ui .payroll-account .advance-balance { display:block; padding:14px 20px; border:1px solid #d8e4d8; border-radius:15px; background:#fff; color:#526950; font-size:12px; }
+.app-ui .payroll-account .advance-balance strong { display:block; font-size:26px; color:#285c49; font-variant-numeric:tabular-nums; }
+.app-ui .payroll-account .advance-recovery { margin:24px 0; padding:24px; border:1px solid #ddd9ef; border-radius:18px; background:linear-gradient(120deg,#f7f6ff,#f1f6fc); display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:14px 28px; align-items:center; }
+.app-ui .payroll-account .advance-recovery .hint { grid-column:1/-1; margin:0; }
+.app-ui .payroll-account .advance-recovery h3 { font-size:21px; }
+.app-ui .payroll-account .advance-tick { display:flex; align-items:center; gap:16px; padding:18px 22px; border:2px solid #cad2e3; background:white; border-radius:15px; cursor:pointer; }
+.app-ui .payroll-account .advance-tick:has(input:checked) { border-color:#4265ad; background:#eaf1ff; box-shadow:0 0 0 3px #4265ad12; }
+.app-ui .payroll-account .advance-tick:has(input:focus-visible) { outline:3px solid #8bd0c2; outline-offset:3px; }
+.app-ui .payroll-account .advance-tick:has(input:disabled) { opacity:.65; cursor:not-allowed; }
+.app-ui .payroll-account .advance-tick strong { display:block; font-size:28px; font-variant-numeric:tabular-nums; color:#294d92; }
+.app-ui .payroll-account .advance-tick small { display:block; margin-top:3px; color:#53627a; }
+.app-ui .payroll-account .advance-options { display:grid; gap:10px; min-width:0; }
+.app-ui .payroll-account .advance-select-all { display:flex; align-items:center; gap:12px; padding:10px; font-weight:700; cursor:pointer; }
+.app-ui .payroll-account .advance-review { padding:18px; background:#f1f6fc; border-radius:14px; margin:18px 0; }
+.app-ui .payroll-account .advance-review p { display:flex; gap:15px; justify-content:space-between; }
+.app-ui .payroll-account .advance-direct { border-left:4px solid #7189b6; background:linear-gradient(110deg,#fff,#f4f7fd); }
+.app-ui .payroll-account .payroll-jobs .small { font-size:14px; }
+.app-ui .payroll-account .payroll-jobs .number { font-size:17px; }
+.app-ui .payroll-account .payroll-jobs th { padding-top:18px; padding-bottom:18px; }
+.app-ui .payroll-account .payroll-jobs input[type=checkbox] { width:22px; height:22px; }
+@media(max-width:1000px) { .app-ui .payroll-account .advance-entry .fields { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media(max-width:600px) { .app-ui .payroll-account .advance-entry .fields,.app-ui .payroll-account .advance-recovery { grid-template-columns:minmax(0,1fr); } .app-ui .payroll-account .advance-recovery { padding:18px; } }
+.app-ui .payroll-account button:hover,.app-ui .payroll-account .button:hover { filter:brightness(.94); }
+@media(max-width:1050px) { .app-ui .payroll-account .two-columns { grid-template-columns:minmax(0,1fr); } }
+@media(max-width:600px) {
+  .app-ui .payroll-account .pay-head { padding:24px 20px; border-radius:21px; }
+  .app-ui .payroll-account .filter-form button { margin-top:0; width:100%; }
+  .app-ui .payroll-account .metric { padding:17px; }
+  .app-ui .payroll-account .payroll-identity { gap:12px; }
+}
+@media print { .app-ui .payroll-account .pay-head { background:white; color:#192940; box-shadow:none; } .app-ui .payroll-account .pay-head h1 { color:#192940; } .app-ui .payroll-account .payroll-lookup { display:none; } }
+
+/* Account workspace: distinct identity, quieter forms and generous reading space. */
+.app-ui .payroll-account { max-width:1480px; }
+.app-ui .payroll-account .pay-head { position:relative; background:radial-gradient(ellipse at 90% 0%,#7377bd70,transparent 56%),linear-gradient(115deg,#142843,#293d66 60%,#4b4178); padding:36px 38px; border:1px solid #ffffff38; margin-bottom:16px; }
+.app-ui .payroll-account .pay-head h1 { font-size:clamp(28px,3.2vw,42px); letter-spacing:-.045em; }
+.app-ui .payroll-account .pay-head .lead { max-width:740px; font-size:15px; }
+.app-ui .payroll-account .payroll-shortcuts { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:1px; background:#dde4ef; border:1px solid #dde4ef; border-radius:18px; overflow:hidden; margin-bottom:28px; }
+.app-ui .payroll-account .payroll-shortcuts a { display:grid; grid-template-columns:36px minmax(0,1fr); gap:3px 12px; padding:18px 22px; background:#fffffff5; color:#243951; text-decoration:none; font-size:14px; font-weight:750; }
+.app-ui .payroll-account .payroll-shortcuts a:hover { background:#eff4ff; }
+.app-ui .payroll-account .payroll-shortcuts span { grid-row:span 2; display:flex; align-items:center; justify-content:center; background:#edf0fa; color:#5366a5; border-radius:11px; font-variant-numeric:tabular-nums; }
+.app-ui .payroll-account .payroll-shortcuts small { color:#627086; font-size:12px; font-weight:400; }
+.app-ui .payroll-account .payroll-lookup { padding:22px 28px; border-top:1px solid #dce3ed; border-left:4px solid #7783bd; }
+.app-ui .payroll-account .payroll-lookup .section-head { margin-bottom:14px; }
+.app-ui .payroll-account .payroll-lookup h2 { font-size:19px; }
+.app-ui .payroll-account .payroll-lookup .hint { margin-bottom:0; font-size:12px; }
+.app-ui .payroll-account .payroll-identity { padding:26px 30px; border:1px solid #dce3ed; border-radius:22px; background:#fffffff5; margin:28px 0 14px; }
+.app-ui .payroll-account .payroll-person { display:flex; gap:17px; align-items:center; min-width:0; }
+.app-ui .payroll-account .payroll-person h2 { overflow-wrap:anywhere; font-size:30px; }
+.app-ui .payroll-account .payroll-avatar { flex-shrink:0; width:62px; height:62px; border-radius:20px; background:linear-gradient(140deg,#dfe6ff,#e8e2f5); display:grid; place-items:center; font-size:28px; font-weight:750; color:#3c4e89; border:1px solid #cfd8ef; }
+.app-ui .payroll-account .payroll-account-note { text-align:right; }
+.app-ui .payroll-account .payroll-account-note p { line-height:1.6; }
+.app-ui .payroll-account > .metrics { gap:14px; margin-bottom:32px; }
+.app-ui .payroll-account > .metrics .metric { border-top:0; border-radius:18px; background:linear-gradient(145deg,#fff,#f7f9ff); padding:22px 24px; }
+.app-ui .payroll-account > .metrics .metric.amber { background:linear-gradient(135deg,#fff8e9,#fffdf7); border-color:#e8d9b7; }
+.app-ui .payroll-account > .metrics .metric:last-child { background:linear-gradient(130deg,#1e3e5a,#2d5771); border-color:#31596e; }
+.app-ui .payroll-account > .metrics .metric:last-child span,.app-ui .payroll-account > .metrics .metric:last-child small { color:#d1e4ec; }
+.app-ui .payroll-account > .metrics .metric:last-child strong { color:#fff; }
+.app-ui .payroll-account .panel { margin-bottom:28px; padding:clamp(20px,2.6vw,32px); }
+.app-ui .payroll-account .panel[id] { scroll-margin-top:100px; }
+.app-ui .payroll-account #payroll-account-totals { scroll-margin-top:150px; }
+.app-ui .payroll-account .section-head p { max-width:800px; line-height:1.65; }
+.app-ui .payroll-account .advance-entry { border-left:4px solid #71a696; background:linear-gradient(110deg,#fff,#f6fbf9); }
+.app-ui .payroll-account input:not([type=checkbox]),.app-ui .payroll-account select,.app-ui .payroll-account textarea { border-radius:11px; border-color:#cdd7e4; min-height:46px; box-shadow:0 2px 3px #1e305003; }
+.app-ui .payroll-account .field { gap:8px; color:#3c4d65; font-size:13px; }
+.app-ui .payroll-account button,.app-ui .payroll-account .button { border-radius:11px; min-height:46px; padding:12px 20px; }
+.app-ui .payroll-account .payroll-ready { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1.1fr); gap:24px; padding:20px 24px; background:#f3f6fc; border:1px solid #e0e6f2; border-radius:15px; margin:22px 0; align-items:center; }
+.app-ui .payroll-account .payroll-ready span { display:block; font-size:12px; color:#5b6c83; }
+.app-ui .payroll-account .payroll-ready strong { display:block; font-size:25px; font-variant-numeric:tabular-nums; color:#294663; margin-top:5px; overflow-wrap:anywhere; }
+.app-ui .payroll-account .payroll-ready small { font-size:13px; font-weight:500; }
+.app-ui .payroll-account .payroll-ready p { margin:0; font-size:12px; line-height:1.7; color:#5c6b82; }
+.app-ui .payroll-account .table-wrap { border-radius:15px; border-color:#dfe5ee; }
+.app-ui .payroll-account th { background:#eff3f9; font-size:11px; letter-spacing:.055em; padding:17px; }
+.app-ui .payroll-account td { padding:20px 17px; }
+.app-ui .payroll-account .payroll-jobs tbody tr:has(input:checked) { background:#edf4ff; box-shadow:inset 3px 0 #4c6bb5; }
+.app-ui .payroll-account .payroll-jobs input[type=checkbox] { accent-color:#4866ac; cursor:pointer; }
+.app-ui .payroll-account .advance-recovery { grid-template-columns:minmax(200px,.7fr) minmax(0,1.3fr); background:linear-gradient(120deg,#f8f7fd,#f3f6fc); align-items:start; padding:26px; margin:28px 0; }
+.app-ui .payroll-account .advance-options { grid-template-columns:repeat(2,minmax(0,1fr)); align-items:start; gap:12px; }
+.app-ui .payroll-account .advance-select-all { grid-column:1/-1; padding:0 4px 5px; font-size:13px; }
+.app-ui .payroll-account .advance-tick { min-height:115px; padding:18px; border-width:1px; height:100%; }
+.app-ui .payroll-account .advance-tick span { min-width:0; overflow-wrap:anywhere; }
+.app-ui .payroll-account .advance-tick input { flex-shrink:0; }
+.app-ui .payroll-account .advance-tick strong { font-size:25px; }
+.app-ui .payroll-account .advance-tick small { line-height:1.55; }
+.app-ui .payroll-account .payroll-history tbody tr:nth-child(even) { background:#fafbfd; }
+.app-ui .payroll-account .payroll-history td:nth-child(6) { background:#f0f6f8; color:#244e60; }
+.app-ui .payroll-account .review { border-radius:24px; border-color:#8eb6a8; box-shadow:0 12px 35px #254c3510; }
+@media(max-width:1000px) {
+  .app-ui .payroll-account .payroll-shortcuts { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .app-ui .payroll-account .advance-recovery { grid-template-columns:minmax(0,1fr); }
+  .app-ui .payroll-account .payroll-shortcuts a { padding:16px 13px; }
+  .app-ui .payroll-account .payroll-ready { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .app-ui .payroll-account .payroll-ready p { grid-column:1/-1; }
+}
+@media(max-width:600px) {
+  .app-ui .payroll-account .payroll-shortcuts { grid-template-columns:minmax(0,1fr); gap:1px; }
+  .app-ui .payroll-account .payroll-shortcuts a { padding:13px 18px; }
+  .app-ui .payroll-account .payroll-identity { padding:20px; }
+  .app-ui .payroll-account .payroll-account-note { text-align:left; }
+  .app-ui .payroll-account .payroll-account-note p { display:none; }
+  .app-ui .payroll-account .payroll-avatar { width:48px; height:48px; border-radius:15px; }
+  .app-ui .payroll-account > .metrics .metric { padding:17px; }
+  .app-ui .payroll-account .advance-options { grid-template-columns:minmax(0,1fr); }
+  .app-ui .payroll-account .advance-recovery { padding:18px; }
+  .app-ui .payroll-account .payroll-ready { gap:16px; padding:17px; }
+  .app-ui .payroll-account .payroll-ready strong { font-size:22px; }
+  .app-ui .payroll-account .pay-head { padding:25px 22px; }
+}
+@media print {
+  .app-ui .payroll-account .payroll-shortcuts { display:none; }
+  .app-ui .payroll-account > .metrics .metric:last-child { background:white; }
+  .app-ui .payroll-account > .metrics .metric:last-child span,.app-ui .payroll-account > .metrics .metric:last-child small,.app-ui .payroll-account > .metrics .metric:last-child strong { color:#192940; }
+}

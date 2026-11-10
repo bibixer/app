@@ -134,3 +134,16 @@ class RangeAndReturnWorkspaceTest(AppTestCase):
         self.assertTrue(self.client.post('/submit-manual-jobcard',json=payload).json['duplicate'])
         self.assertEqual(Jobcard.query.count(),1)
         self.job_cade_print.assert_called_once()
+
+    def test_return_response_contains_authoritative_remaining_pieces(self):
+        card=self.card(pieces=10)
+        payload=self.return_payload(card.id,3)
+        response=self.client.post('/summit-retune',json=payload)
+        self.assertTrue(response.json['success'])
+        self.assertEqual(response.json['remaining'],7)
+        duplicate=self.client.post('/summit-retune',json=payload)
+        self.assertTrue(duplicate.json['duplicate'])
+        self.assertEqual(duplicate.json['remaining'],7)
+        response=self.client.post('/summit-retune',json=self.return_payload(card.id,7,key='remaining-return'))
+        self.assertTrue(response.json['success'])
+        self.assertEqual(response.json['remaining'],0)

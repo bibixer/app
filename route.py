@@ -89,7 +89,8 @@ def register_routes(app,db):
     @login_manager.user_loader
     def load_user(user_id):
         parsed = record_id(user_id)
-        return db.session.get(User, parsed) if parsed else None
+        user = db.session.get(User, parsed) if parsed else None
+        return user if user and user.is_active else None
     @app.route("/bale_entery",methods=["GET", "POST"])
     @login_required
     def bale_entery():
@@ -553,7 +554,9 @@ def register_routes(app,db):
         if type(res) == dict:
             if res["code"] == 101:
              # print(res)
-                return jsonify(success=True, message="Data saved",jobData=res)
+                latest = get_jobcard_return_data(data['jobcard_id'])
+                remaining = sum(item['issued'] for item in latest['items'])
+                return jsonify(success=True, message="Data saved",jobData=res,remaining=remaining)
         elif res  == 404 :
             return jsonify(success=False, message="Job card not found or return could not be saved.",code=404), 404
         elif res == 500:
@@ -567,7 +570,10 @@ def register_routes(app,db):
         elif res == 4033:
             return jsonify(success=False, message="Return exceeds the remaining balance on this job card. Refresh and try again.", code=4033), 409
         elif res == 409:
-            return jsonify(success=True, duplicate=True, message="Duplicate return request ignored.", code=409)
+            latest = get_jobcard_return_data(data.get('jobcard_id'))
+            remaining = sum(item['issued'] for item in latest['items']) if latest else None
+            return jsonify(success=True, duplicate=True, message="Duplicate return request ignored.", code=409,
+                           remaining=remaining)
         else:
             return jsonify(success=False, message="The return item or type no longer matches this job card. Refresh and try again.", code=res), 400
     @app.route("/admin_dashord", methods=["GET", "POST"])
@@ -741,8 +747,10 @@ def register_routes(app,db):
             username = name_from.user_name.data.strip().lower()
             user = User.query.filter_by(username=username).first()
             if user and user.check_password(name_from.password.data):
-                login_user(user)
-                return redirect("/")
+                if user.is_active:
+                    login_user(user)
+                    return redirect("/")
+                flash("This account is disabled. Contact an administrator.", "danger")
             else:
                 flash("Username or password is incorrect.", "danger")
         elif request.method == "POST":

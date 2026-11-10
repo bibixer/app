@@ -2,7 +2,7 @@ from flask import Flask
 from flask_bootstrap import Bootstrap5
 from route import register_routes
 from modes import db,User
-from schema_updates import allow_job_payment_installments
+from schema_updates import allow_job_payment_installments, ensure_user_active_column
 import logging
 from waitress import serve
 import os
@@ -29,6 +29,7 @@ def create_app(test_config=None):
     with app.app_context():
         db.create_all()
         allow_job_payment_installments(db.engine)
+        ensure_user_active_column(db.engines['users'])
     register_routes(app,db)
 
     return app

@@ -1,6 +1,12 @@
 // Store calculator data for each row
       let calculatorData = {};
 
+      function notifyReturnWorkspace(remaining) {
+        if (window.RETURN_EMBEDDED && window.parent !== window && Number.isSafeInteger(remaining)) {
+          window.parent.postMessage({type:'job-return-state',jobId:JOB_CARD.jobcard_id,remaining},window.location.origin);
+        }
+      }
+
       function positiveWholeNumber(value) {
         const number = Number(value);
         return Number.isSafeInteger(number) && number > 0 ? number : 0;
@@ -431,13 +437,20 @@ const payload = {
           const data_R = await response.json();
           console.log(data_R);
           if (data_R.duplicate) {
+            notifyReturnWorkspace(data_R.remaining);
             alert(data_R.message);
             window.location.replace(window.RETURN_EMBEDDED ? `/job_retun?jobcard_id=${encodeURIComponent(JOB_CARD.jobcard_id)}&embedded=1` : "/retune_product?ok=101");
             return;
           }
           if (data_R.success) {
             activeReturnRequestId = crypto.randomUUID();
-            generateAndPrintHTML(data_R.jobData.jobData);
+            notifyReturnWorkspace(data_R.remaining);
+            try {
+              generateAndPrintHTML(data_R.jobData.jobData);
+            } catch (printError) {
+              console.error('Return saved, but receipt printing failed:', printError);
+              alert('Return saved. The receipt could not be printed; open the job ledger to print it.');
+            }
             window.location.replace(window.RETURN_EMBEDDED ? `/job_retun?jobcard_id=${encodeURIComponent(JOB_CARD.jobcard_id)}&embedded=1` : "/retune_product?ok=101");
           } else {
             returnSubmitInFlight = false;
