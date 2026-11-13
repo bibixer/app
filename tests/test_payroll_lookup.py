@@ -36,7 +36,7 @@ class PayrollLookupTest(AppTestCase):
                 self.assertEqual(response.status_code, 200)
                 html = response.get_data(as_text=True)
                 self.assertIn(f'name="worker_id" value="{self.worker.id}"', html)
-                self.assertIn('Jobs with returned pieces to pay', html)
+                self.assertIn('Jobs with returned or kept pieces to pay', html)
 
     def test_unknown_blank_and_ambiguous_names_do_not_open_or_create(self):
         db.session.add(Outworker(name='RAM', adders='OTHER', number=555, enter_user='admin'))
@@ -47,7 +47,7 @@ class PayrollLookupTest(AppTestCase):
                     'worker_name': value, 'worker_id': self.worker.id,
                 })).get_data(as_text=True)
                 self.assertIn('Select an existing outworker by name, alias or ID.', html)
-                self.assertNotIn('Jobs with returned pieces to pay', html)
+                self.assertNotIn('Jobs with returned or kept pieces to pay', html)
         self.assertEqual(Outworker.query.count(), 2)
         self.assertEqual(OutworkerAdvance.query.count(), 0)
         self.assertEqual(OutworkerPayroll.query.count(), 0)
@@ -59,7 +59,7 @@ class PayrollLookupTest(AppTestCase):
         self.assertIn('RAM CITY', html)
         self.assertIn('payroll-worker.js', html)
         self.assertNotIn('<select name="worker_id"', html)
-        self.assertIn('Jobs with returned pieces to pay', html)
+        self.assertIn('Jobs with returned or kept pieces to pay', html)
 
     def test_lookup_does_not_replace_post_payment_worker_id(self):
         response = self.client.post('/payroll?worker_name=RAM', data={
@@ -74,4 +74,4 @@ class PayrollLookupTest(AppTestCase):
         self.login_as(self.operator)
         response = self.client.get('/payroll?worker_name=RAM')
         self.assertEqual(response.status_code, 302)
-        self.assertNotIn('Jobs with returned pieces to pay', response.get_data(as_text=True))
+        self.assertNotIn('Jobs with returned or kept pieces to pay', response.get_data(as_text=True))

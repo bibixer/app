@@ -57,6 +57,23 @@ async function run() {
   assert(!alerts.some(message=>message.includes('Error submitting')),'Receipt failure must not be reported as a failed save');
   assert(redirects.length===2,'A printing failure must still refresh the saved job');
 
+  // A retryable busy response must retain both the draft and request identity.
+  const retryRequests=[];
+  const redirectsBeforeRetry=redirects.length;
+  firstDraft.value='3';
+  const busySubmit=new Function('document','window','JOB_CARD','crypto','fetch','alert','console','Blob','URL',prefix+'\nreturn submitReturn;')(
+    {querySelectorAll:()=>[{}],getElementById:()=>firstDraft,createElement:()=>({click(){}})},
+    firstWindow,job,{randomUUID:()=>'preserved-return-key'},async(_url,options)=>{
+      retryRequests.push(JSON.parse(options.body));
+      return {json:async()=>retryRequests.length===1 ? {success:false,retryable:true,message:'Database busy; retry.'} : response};
+    },message=>alerts.push(message),{log(){},error(){}},class {},{createObjectURL:()=>'blob:test'});
+  await busySubmit();
+  assert(redirects.length===redirectsBeforeRetry && firstDraft.value==='3','Busy responses must retain the page and entered quantity');
+  await busySubmit();
+  assert(retryRequests.length===2,'The user must be able to retry after a busy response');
+  assert(retryRequests[0].request_id===retryRequests[1].request_id,'Retries must preserve the submission key');
+  assert(redirects.length===redirectsBeforeRetry+1,'A successful retry must refresh the saved job');
+
   // Balance updates must not depend on a change in layout height.
   let resize;
   const events=[];

@@ -1,9 +1,11 @@
 from functools import wraps
-from flask import flash, render_template, redirect, url_for,session,request, jsonify
-from form import SimpleProductForm
+from datetime import date
+from flask import flash, render_template, redirect, url_for,session,request, jsonify, g
+from form import SimpleProductForm, WriteForm
+from kept_products import record_kept_product
 from simple_workflow import CORE_ENTITIES, register_simple_workflow, dashboard_period, dashboard_movement_details
 from form import Lump_data, bundle_invadata, Item_data, Outworker_form, Cutter_form, Return_form, Login_form, Date_form, Date_form_with_name,bale_data_form,party_name,Find_and_edit,EditEntryForm
-from flask_login import LoginManager, login_user, login_required, logout_user, current_user
+from flask_login import LoginManager, login_user, login_required, logout_user, current_user, AnonymousUserMixin
 from data_entry import add_cutter,add_items,add_outworker_db,add_jobcard,add_manual_jobcard,in_move_entery,bale_data_entry,add_party
 from data_Process import get_serch_data, get_job_card_data_creation, get_jobcard_return_data, get_jobcard_ledger, \
     get_current_week_range, home_dashboard,get_cutter_report_data,outworker_name,outworker_job_ledger,product_data,find_edit_data
@@ -17,6 +19,9 @@ from return_reconciliation import unassigned_returns, assign_return
 from data_Process import outworker_period_account
 from payroll_routes import register_payroll_routes
 from validation import record_id
+from database_writes import DatabaseBusy, is_database_busy
+from data_entry import RequestConflict, saved_receipt
+from sqlalchemy.exc import OperationalError, TimeoutError as PoolTimeout
 
 JSON_ENDPOINTS = {"submit_jobcard", "submit_manual_jobcard", "summit_retune", "edit_search"}
 
@@ -47,6 +52,44 @@ def reset_session(flow:int):
 def register_routes(app,db):
     login_manager = LoginManager(app)
     login_manager.login_view = 'login'
+
+    @app.errorhandler(RequestConflict)
+    def request_conflict(error):
+        db.session.rollback()
+        if request.endpoint in JSON_ENDPOINTS:
+            return jsonify(success=False, code=409, message=str(error)), 409
+        return render_template('save_busy.html', message=str(error), heading='Entry needs review',
+                               guidance='Review the existing saved entry first. Reload the entry form only when you intend to create a new submission.'), 409
+
+    @app.errorhandler(DatabaseBusy)
+    @app.errorhandler(PoolTimeout)
+    def database_busy(error):
+        db.session.rollback()
+        # Flask-Login's template context processor also resolves current_user.
+        # Cache a request-local fallback without changing the login cookie.
+        g._login_user = AnonymousUserMixin()
+        message = 'The database is busy. Your save could not be confirmed. Please retry the same entry.'
+        if request.endpoint in JSON_ENDPOINTS:
+            response = jsonify(success=False, code=503, retryable=True, message=message)
+        else:
+            # Rendering a busy page must not acquire another user-DB connection.
+            response = app.make_response(render_template(
+                'save_busy.html', message=message, current_user=AnonymousUserMixin()))
+        response.status_code = 503
+        response.headers['Retry-After'] = '2'
+        return response
+
+    @app.errorhandler(OperationalError)
+    def database_operation_error(error):
+        if is_database_busy(error):
+            return database_busy(error)
+        db.session.rollback()
+        app.logger.error('Database operation failed', exc_info=error)
+        g._login_user = AnonymousUserMixin()
+        if request.endpoint in JSON_ENDPOINTS:
+            return jsonify(success=False, code=500, message='The save failed. Please retry the same entry.'), 500
+        return render_template('save_busy.html', message='The database operation failed. Return to your entry and retry.',
+                               current_user=AnonymousUserMixin()), 500
 
     @login_manager.unauthorized_handler
     def authentication_required():
@@ -88,8 +131,8 @@ def register_routes(app,db):
 
     @login_manager.user_loader
     def load_user(user_id):
-        parsed = record_id(user_id)
-        user = db.session.get(User, parsed) if parsed else None
+        user = (User.query.filter_by(auth_id=user_id).first()
+                if isinstance(user_id, str) and len(user_id) == 64 else None)
         return user if user and user.is_active else None
     @app.route("/bale_entery",methods=["GET", "POST"])
     @login_required
@@ -322,7 +365,8 @@ def register_routes(app,db):
         if result == 406:
             return jsonify(success=False, code=406, message="Item name or alias was not found. Add the product in Item Setup first."), 400
         if result == 409:
-            return jsonify(success=True, duplicate=True, message="Duplicate request ignored; job card already saved.")
+            receipt = saved_receipt(data['request_id'], 'add_manual_jobcard', current_user)
+            return jsonify(success=True, duplicate=True, message="Job card already saved; original receipt restored.", **receipt)
         return jsonify(success=False, code=500, message="Manual job card could not be saved."), 500
     @app.route("/add_items", methods=["GET", "POST"])
     @login_required
@@ -347,7 +391,7 @@ def register_routes(app,db):
                 flash("Duplicate request ignored; this product was already submitted.", "warning")
                 return redirect(url_for("add_item"))
             elif isinstance(items, dict) and items.get("or") is False:
-                message = str(items["exception"]) if isinstance(items["exception"], ValueError) else "Could not save item. Check for a duplicate name or alias."
+                message = str(items["exception"]) if isinstance(items["exception"], ValueError) else "Could not save item. Please retry; if it still fails, contact the administrator."
                 flash(message, "danger")
                 return redirect(url_for("add_item"))
 
@@ -401,7 +445,7 @@ def register_routes(app,db):
                 flash("Duplicate request ignored; this outworker was already submitted.", "warning")
                 return redirect(url_for("add_outworker"))
             elif isinstance(outworker, dict) and outworker.get("or") is False:
-                message = str(outworker["exception"]) if isinstance(outworker["exception"], ValueError) else "Could not save master. Check for a duplicate alias."
+                message = str(outworker["exception"]) if isinstance(outworker["exception"], ValueError) else "Could not save master. Please retry; if it still fails, contact the administrator."
                 flash(message, "danger")
                 return redirect(url_for("add_outworker"))
 
@@ -455,7 +499,8 @@ def register_routes(app,db):
         elif ok == 405:
             return jsonify(success=False, code=405, message="Job card data is invalid."), 400
         elif ok == 409:
-            return jsonify(success=True, duplicate=True, message="Duplicate request ignored; job card already saved.")
+            receipt = saved_receipt(data['request_id'], 'add_jobcard', current_user)
+            return jsonify(success=True, duplicate=True, message="Job card already saved; original receipt restored.", **receipt)
         return jsonify(success=False, code=500, message="Job card could not be saved."), 500
     @app.route("/retune_product", methods=["GET", "POST"])
     @login_required
@@ -516,8 +561,31 @@ def register_routes(app,db):
         if not data["items"] and not data["completed_items"]:
             flash(f"Job card #{jobcard_id} has no returnable items or return history.", "warning")
             return redirect(url_for("retune_product"))
-        return render_template("job_retun.html",data=data,id=current_user.role,
+        products = {row.name: row for row in ProductModel.query.all()}
+        kept_options = [{'item': item, 'product': products.get(item['product_name'])} for item in data['items']]
+        return render_template("job_retun.html",data=data,id=current_user.role, kept_form=WriteForm(), kept_options=kept_options,
+                               kept_only=request.args.get('kept_only') == '1',
                                embedded=request.args.get('embedded') == '1')
+
+    @app.route('/jobcard/<int:jobcard_id>/kept', methods=['POST'])
+    @login_required
+    @job_operator
+    def jobcard_kept(jobcard_id):
+        form = WriteForm()
+        if not form.validate_on_submit():
+            flash('This form expired. Reload and review the kept pieces.', 'danger')
+        else:
+            try:
+                row = record_kept_product(jobcard_id, request.form.get('product_id'), request.form.get('bundle_type'),
+                    request.form.get('pieces'), request.form.get('expected_value'), request.form.get('expected_remaining'),
+                    request.form.get('confirmed'), request.form.get('note'), form.submission_token.data, current_user)
+                flash(f'{row.pieces} kept pieces recorded. ₹{row.amount_paise / 100:.2f} added to amount to recover (Advance #{row.advance_id}).', 'success')
+            except ValueError as error:
+                flash(str(error), 'danger')
+        return redirect(url_for('job_retun', jobcard_id=jobcard_id,
+                                embedded='1' if request.form.get('embedded') == '1' else None,
+                                kept_only='1' if request.form.get('kept_only') == '1' else None,
+                                _anchor='kept-pieces'))
     @app.route("/jobcard/ledger")
     @login_required
     @job_operator
@@ -573,7 +641,7 @@ def register_routes(app,db):
             latest = get_jobcard_return_data(data.get('jobcard_id'))
             remaining = sum(item['issued'] for item in latest['items']) if latest else None
             return jsonify(success=True, duplicate=True, message="Duplicate return request ignored.", code=409,
-                           remaining=remaining)
+                           remaining=remaining, jobData=saved_receipt(data['request_id'], 'return_items', current_user))
         else:
             return jsonify(success=False, message="The return item or type no longer matches this job card. Refresh and try again.", code=res), 400
     @app.route("/admin_dashord", methods=["GET", "POST"])
@@ -667,6 +735,36 @@ def register_routes(app,db):
 
 
         return render_template("admin.html", date_from=name_data_form, type="CUTTER_Report",name=cuter_name)
+
+    @app.route('/outworker/jobs')
+    @login_required
+    @oly_admin
+    def outworker_jobs():
+        raw = request.args.get('worker_id') or request.args.get('worker', '')
+        name = resolve_master_name(raw) if raw else None
+        worker_id = record_id(name.split('***', 1)[0]) if name else None
+        worker = db.session.get(Outworker, worker_id) if worker_id else None
+        if raw and worker is None:
+            flash('Select a valid outworker name, alias, or ID.', 'danger')
+            return redirect(url_for('outworker_jobs'))
+        report = None
+        payment_filter = request.args.get('payment_status', 'all')
+        if payment_filter not in {'all', 'paid', 'partial', 'unpaid', 'ready', 'check'}:
+            payment_filter = 'all'
+        if worker:
+            cards = Jobcard.query.filter_by(given_to=name)
+            first = cards.order_by(Jobcard.date.asc()).first()
+            last = cards.order_by(Jobcard.date.desc()).first()
+            report = outworker_job_ledger(name, first.date.date() if first else date.today(),
+                                         last.date.date() if last else date.today())
+            report['all_job_count'] = len(report['jobs'])
+            if payment_filter == 'ready':
+                report['jobs'] = [job for job in report['jobs']
+                                  if job['payable_pieces'] > 0 and job['status'] != 'Check balance']
+            elif payment_filter != 'all':
+                report['jobs'] = [job for job in report['jobs'] if job['payment_status'] == payment_filter]
+        return render_template('outworker_jobs.html', id=current_user.role, worker=worker,
+                               report=report, master_options=master_name_options(), payment_filter=payment_filter)
 
     @app.route("/outworker_report", methods=["GET", "POST"])
     @login_required

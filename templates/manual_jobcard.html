@@ -268,7 +268,7 @@ async function submitManual() {
       body:JSON.stringify({customer, rows, request_id:requestId}),
     });
     const result = await response.json();
-    if (result.duplicate) {
+    if (result.duplicate && !result.jobData) {
       showMessage(result.message, false);
       return;
     }
@@ -279,7 +279,7 @@ async function submitManual() {
       return;
     }
     requestId = crypto.randomUUID();
-    showMessage(result.print_warning || `Job card #${result.jobData.jobId} created successfully. Label CSV saved to the server print folder.`, Boolean(result.print_warning));
+    showMessage(result.print_warning || (result.duplicate ? `Saved job card #${result.jobData.jobId} restored. CSV export was not repeated.` : `Job card #${result.jobData.jobId} created successfully. Label CSV saved to the server print folder.`), Boolean(result.print_warning));
     renderJobCard(result.jobData);
   } catch (error) {
     showMessage('Network error. Your request key is preserved; press Create Job Card to retry safely.');

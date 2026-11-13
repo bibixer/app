@@ -1,0 +1,33 @@
+{
+  "requests_per_wave": 1001,
+  "server_threads": 32,
+  "results": [
+    {
+      "name": "recover_batch",
+      "requests": 1001,
+      "statuses": {
+        "302": 1,
+        "200": 1000
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 32,
+      "seconds": 38.015,
+      "requests_per_second": 26.3,
+      "p50_seconds": 18.73,
+      "p95_seconds": 34.376,
+      "max_seconds": 37.014,
+      "database_invariant_ok": true,
+      "state": {
+        "balance": 0,
+        "receipts": 1
+      },
+      "sqlite_integrity": "ok",
+      "exception_counts": {},
+      "database_error_counts": {},
+      "exception_examples": [],
+      "form_warning_counts": {},
+      "errors": [],
+      "passed": true
+    }
+  ]
+}

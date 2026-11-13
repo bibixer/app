@@ -29,9 +29,10 @@ class JobcardLedgerLookupTest(unittest.TestCase):
             ))
             db.session.commit()
             self.user_id = user.id
+            self.auth_id = user.get_id()
         self.client = self.app.test_client()
         with self.client.session_transaction() as session:
-            session["_user_id"] = str(self.user_id)
+            session["_user_id"] = self.auth_id
             session["_fresh"] = True
 
     def tearDown(self):

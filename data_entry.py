@@ -3,15 +3,17 @@ import logging
 from flask import current_app
 from datetime import datetime
 import hashlib
+import json
 from functools import wraps
 from sqlalchemy.exc import IntegrityError
 from item_aliases import normalize_name, parse_aliases, validate_names, resolve_item_name, item_name_mapping
-from validation import positive_integer, finite_number, record_id, MAX_DATABASE_INTEGER
+from validation import positive_integer, finite_number, record_id, MAX_DATABASE_INTEGER, MAX_PIECES
 from modes import ItemAlias
 from master_aliases import validate_master_aliases, resolve_master_name
 from bundle_types import BUNDLE_TYPE_VALUES
 from data_Process import outworker_name,get_jobcard_return_data
 from data_print_format import outworker_qr_print,buldel_qr_print,job_cade_print
+from database_writes import begin_write, DatabaseBusy, is_database_busy
 
 def add_data_to_database(data):
     db.session.add(data)
@@ -19,26 +21,73 @@ def add_data_to_database(data):
     return 101
 
 
-def claim_write(request_key, endpoint, current_user):
+class RequestConflict(ValueError):
+    """A retry key is already committed to different (or unverifiable legacy) data."""
+
+
+def _request_key(request_key, endpoint, username):
+    return hashlib.sha256(f"{username}:{endpoint}:{request_key}".encode('utf-8')).hexdigest()
+
+
+def saved_receipt(request_key, endpoint, current_user):
+    claim = RequestDedup.query.filter_by(
+        request_key=_request_key(request_key, endpoint, current_user.username)).first()
+    return claim.receipt if claim and claim.receipt else {}
+
+
+def record_receipt(request_key, endpoint, current_user, result):
+    claim = RequestDedup.query.filter_by(
+        request_key=_request_key(request_key, endpoint, current_user.username)).one()
+    claim.receipt = result
+
+
+def claim_write(request_key, endpoint, current_user, payload=None):
     """Atomically claim a browser submission before changing business data."""
     if not isinstance(request_key, str) or not request_key.strip() or len(request_key) > 128:
         return False
-    stable_key = hashlib.sha256(
-        f"{current_user.username}:{endpoint}:{request_key}".encode("utf-8")
-    ).hexdigest()
+    username = current_user.username
+    stable_key = _request_key(request_key, endpoint, username)
+    body = {key: value for key, value in (payload or {}).items()
+            if key not in {'request_id', 'csrf_token', 'submission_token'}}
+    digest = hashlib.sha256(json.dumps(body, sort_keys=True, separators=(',', ':'),
+                                      default=str).encode()).hexdigest()
+
+    def replay(previous):
+        matches = (previous.payload_hash == digest and previous.username == username
+                   and previous.endpoint == endpoint)
+        db.session.rollback()
+        if not matches:
+            raise RequestConflict('This request ID belongs to different or older data. Review the saved entry before submitting a new request.')
+        return False
+
+    # Committed claims/receipts are immutable. Replaying one needs no writer
+    # lock; otherwise thousands of retries can starve the one genuine write.
+    # Do not autoflush caller-owned corrections before the write boundary.
+    if not (db.session.new or db.session.dirty or db.session.deleted):
+        previous = RequestDedup.query.filter_by(request_key=stable_key).first()
+        if previous:
+            return replay(previous)
+    begin_write(RequestDedup)
+    previous = RequestDedup.query.filter_by(request_key=stable_key).first()
+    if previous:
+        return replay(previous)
     try:
         db.session.add(RequestDedup(
             request_key=stable_key,
             endpoint=endpoint,
-            username=current_user.username,
+            username=username,
             created_at=datetime.now(),
+            payload_hash=digest,
         ))
         db.session.flush()
         db.session.expire_all()
         return True
     except IntegrityError:
         db.session.rollback()
-        return False
+        winner = RequestDedup.query.filter_by(request_key=stable_key).first()
+        if winner is None:
+            raise
+        return replay(winner)
 
 
 def transactional_write(func):
@@ -68,7 +117,7 @@ def _inventory_payload(data):
     if any(not positive_integer(bale.get(field)) for field in ("lot_number", "lot_count", "bale_number")):
         raise ValueError("Lot and bale numbers must be positive integers.")
     for bundle in bundles.values():
-        if (not isinstance(bundle, dict) or not positive_integer(bundle.get("no_of_pics"))
+        if (not isinstance(bundle, dict) or not positive_integer(bundle.get("no_of_pics"), MAX_PIECES)
                 or not positive_integer(bundle.get("no_of_so")) or not finite_number(bundle.get("kg_of_bundle"))):
             raise ValueError("Invalid bundle quantity or weight.")
     product = resolve_item_name(main.get("product_name"))
@@ -89,7 +138,7 @@ def bale_data_entry(data,current_user,request_key):
     #         return 404
     if not  current_user.is_authenticated:
         return 404
-    if not claim_write(request_key, "lump_workflow", current_user):
+    if not claim_write(request_key, "lump_workflow", current_user, data):
         return 409
     try:
         data = _inventory_payload(data)
@@ -185,13 +234,20 @@ def error_hendle(func):
     def eror(*args, **kwargs):
         try:
             return func(*args, **kwargs)
+        except (DatabaseBusy, RequestConflict):
+            db.session.rollback()
+            raise
         except Exception as e:
             db.session.rollback()
+            if is_database_busy(e):
+                raise DatabaseBusy('The database is busy. Retry the same submission.') from e
+            if not isinstance(e, ValueError):
+                logging.exception('Setup save failed')
             return {"or":False,"exception":e}
     return eror
 @error_hendle
 def add_cutter(data,current_user,request_key):
-        if not claim_write(request_key, "add_cutter", current_user):
+        if not claim_write(request_key, "add_cutter", current_user, data):
             return 409
         name = normalize_name(data["name"])
         if not name or len(name) > 50:
@@ -202,7 +258,7 @@ def add_cutter(data,current_user,request_key):
 
 @error_hendle
 def add_party(data,current_user,request_key):
-       if not claim_write(request_key, "add_party", current_user):
+       if not claim_write(request_key, "add_party", current_user, data):
            return 409
        name = normalize_name(data["name"])
        if not name or len(name) > 50 or any(normalize_name(row.name) == name for row in Party.query.all()):
@@ -213,7 +269,7 @@ def add_party(data,current_user,request_key):
 
 @error_hendle
 def add_items(data,current_user,request_key):
-    if not claim_write(request_key, "add_item", current_user):
+    if not claim_write(request_key, "add_item", current_user, data):
         return 409
     name = normalize_name(data["name"])
     aliases = parse_aliases(data.get("aliases"))
@@ -231,7 +287,7 @@ def add_items(data,current_user,request_key):
     return add_data_to_database(item)
 @error_hendle
 def add_outworker_db(data,current_user,request_key):
-    if not claim_write(request_key, "add_outworker", current_user):
+    if not claim_write(request_key, "add_outworker", current_user, data):
         return 409
     name = normalize_name(data["name"])
     aliases = parse_aliases(data.get("aliases"))
@@ -329,18 +385,18 @@ def validate_payload_structure(data):
         if not isinstance(item["name_of_prduct"], str) or not item["name_of_prduct"].strip():
             return False
 
-        if not positive_integer(item["qty"]):
+        if not positive_integer(item["qty"], MAX_PIECES):
             return False
 
         if not finite_number(item["kg"]):
             return False
 
-    return True
+    return sum(item['qty'] for item in data['items']) <= MAX_PIECES
 @transactional_write
 def add_jobcard(data,current_user,request_key):
     if not validate_payload_structure(data):
         return 405
-    if not claim_write(request_key, "add_jobcard", current_user):
+    if not claim_write(request_key, "add_jobcard", current_user, data):
         return 409
     if not check_name_master(data["customer"]):
         db.session.rollback()
@@ -348,10 +404,10 @@ def add_jobcard(data,current_user,request_key):
     if not check_product(data):
         db.session.rollback()
         return 403
-    return _persist_jobcard(data, current_user)
+    return _persist_jobcard(data, current_user, request_key)
 
 
-def _persist_jobcard(data, current_user):
+def _persist_jobcard(data, current_user, request_key):
     job_card = Jobcard(
     date = datetime.now(),
     given_to = data["customer"],
@@ -361,7 +417,6 @@ def _persist_jobcard(data, current_user):
     db.session.add(job_card)
     db.session.flush()
     add_job_movemet_out(data,job_card.id,current_user)
-    db.session.commit()
     data_p = {
         "code":101,
         "jobData":{
@@ -373,6 +428,8 @@ def _persist_jobcard(data, current_user):
             "username": current_user.username
         }
     }
+    record_receipt(request_key, 'add_jobcard', current_user, data_p)
+    db.session.commit()
     try:
         job_cade_print(data_p)
     except Exception:
@@ -398,11 +455,11 @@ def validate_manual_jobcard(data):
             return False
         pieces = row.get("pieces")
         count = row.get("count")
-        if not positive_integer(pieces):
+        if not positive_integer(pieces, MAX_PIECES):
             return False
-        if not positive_integer(count, maximum=500) or pieces * count > MAX_DATABASE_INTEGER:
+        if not positive_integer(count, maximum=500) or pieces * count > MAX_PIECES:
             return False
-    return sum(row["pieces"] * row["count"] for row in rows) <= MAX_DATABASE_INTEGER
+    return sum(row["pieces"] * row["count"] for row in rows) <= MAX_PIECES
 
 
 @transactional_write
@@ -410,7 +467,7 @@ def add_manual_jobcard(data, current_user, request_key):
     """Create a job card directly from manual patterns, without inventory bundles."""
     if not validate_manual_jobcard(data):
         return 405
-    if not claim_write(request_key, "add_manual_jobcard", current_user):
+    if not claim_write(request_key, "add_manual_jobcard", current_user, data):
         return 409
     product_map = item_name_mapping()
     product_names = [product_map.get(normalize_name(row["product"])) for row in data["rows"]]
@@ -449,7 +506,6 @@ def add_manual_jobcard(data, current_user, request_key):
             product_name=item["name_of_prduct"], flow_type="OUT",
             type_B=item["type"],
         ))
-    db.session.commit()
     result = {
         "code": 101,
         "jobData": {
@@ -458,6 +514,8 @@ def add_manual_jobcard(data, current_user, request_key):
             "items": items, "username": current_user.username,
         },
     }
+    record_receipt(request_key, 'add_manual_jobcard', current_user, result)
+    db.session.commit()
     try:
         outputs = job_cade_print(result)
         result['label_csvs'] = [output['filename'] for output in outputs] if isinstance(outputs, list) else []
@@ -512,7 +570,7 @@ def check_return_item(data):
             type_B = item['type']
         except (KeyError, TypeError, ValueError):
             return 405
-        if item_id is None or item_id in seen_ids or not positive_integer(returned_qty):
+        if item_id is None or item_id in seen_ids or not positive_integer(returned_qty, MAX_PIECES):
             return 405
         seen_ids.add(item_id)
         # print(item)
@@ -563,7 +621,7 @@ def in_move_entery(data,current_user,request_key):
     #     return 405
 
     try:
-        if not claim_write(request_key, "return_items", current_user):
+        if not claim_write(request_key, "return_items", current_user, data):
             return 409
         check_i = check_return_item(data)
         if check_i is not True:
@@ -597,8 +655,7 @@ def in_move_entery(data,current_user,request_key):
                 entry_method=method,
                 calculation_rows=rows,
             ))
-        db.session.commit()
-        return {
+        result = {
         "code": 101,
         "jobData": {
             "jobcard_id": data["jobcard_id"],
@@ -608,8 +665,16 @@ def in_move_entery(data,current_user,request_key):
             "username":current_user.username
         }
     }
+        record_receipt(request_key, 'return_items', current_user, result)
+        db.session.commit()
+        return result
 
-    except Exception:
+    except (DatabaseBusy, RequestConflict):
         db.session.rollback()
+        raise
+    except Exception as error:
+        db.session.rollback()
+        if is_database_busy(error):
+            raise DatabaseBusy('The database is busy. Retry the same submission.') from error
         logging.exception("Return save failed")
         return 500

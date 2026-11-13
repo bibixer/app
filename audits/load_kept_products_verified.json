@@ -1,0 +1,70 @@
+{
+  "requests_per_wave": 1001,
+  "server_threads": 32,
+  "results": [
+    {
+      "name": "kept_duplicate",
+      "requests": 1001,
+      "statuses": {
+        "302": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 32,
+      "seconds": 31.053,
+      "requests_per_second": 32.2,
+      "p50_seconds": 11.053,
+      "p95_seconds": 29.559,
+      "max_seconds": 30.389,
+      "database_invariant_ok": true,
+      "state": {
+        "kept_records": 1,
+        "advances": 1,
+        "amount_to_recover_paise": 24000,
+        "returned": 48,
+        "kept": 2,
+        "remaining": 0,
+        "payable": 50
+      },
+      "sqlite_integrity": "ok",
+      "exception_counts": {},
+      "database_error_counts": {},
+      "exception_examples": [],
+      "form_warning_counts": {},
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "kept_competing",
+      "requests": 1001,
+      "statuses": {
+        "302": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 32,
+      "seconds": 22.381,
+      "requests_per_second": 44.7,
+      "p50_seconds": 10.163,
+      "p95_seconds": 19.907,
+      "max_seconds": 21.751,
+      "database_invariant_ok": true,
+      "state": {
+        "kept_records": 1,
+        "advances": 1,
+        "amount_to_recover_paise": 24000,
+        "returned": 48,
+        "kept": 2,
+        "remaining": 0,
+        "payable": 50
+      },
+      "sqlite_integrity": "ok",
+      "exception_counts": {},
+      "database_error_counts": {},
+      "exception_examples": [],
+      "form_warning_counts": {
+        "Kept pieces cannot exceed the remaining balance for this product and type.": 1000
+      },
+      "errors": [],
+      "passed": true
+    }
+  ]
+}

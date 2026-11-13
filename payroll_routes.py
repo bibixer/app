@@ -7,6 +7,7 @@ from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
 from bundle_types import BUNDLE_TYPE_CHOICES
 from form import WriteForm
 from validation import record_id
+from kept_products import save_product_value
 from master_aliases import master_name_mapping, master_name_options, resolve_master_name
 from modes import (db, Outworker, Item_data, Jobcard, OutworkerRate, OutworkerPayroll,
                    OutworkerPayrollJob, OutworkerAdvanceRecovery)
@@ -40,10 +41,15 @@ def register_payroll_routes(app, admin_required):
                 flash("This form expired. Reload the page and try again.", "danger")
             else:
                 try:
-                    save_rate(product_id, request.form.get("bundle_type", ""), request.form.get("rate", ""),
-                              request.form.get("version"), form.submission_token.data, current_user,
-                              remove=request.form.get("action") == "remove")
-                    flash("Rate updated. Saved payroll keeps its original rates.", "success")
+                    if request.form.get('action') == 'product_value':
+                        save_product_value(product_id, request.form.get('product_value'),
+                            request.form.get('expected_value'), form.submission_token.data, current_user)
+                        flash('Product value saved. Existing kept-piece recoveries keep their original value.', 'success')
+                    else:
+                        save_rate(product_id, request.form.get("bundle_type", ""), request.form.get("rate", ""),
+                                  request.form.get("version"), form.submission_token.data, current_user,
+                                  remove=request.form.get("action") == "remove")
+                        flash("Rate updated. Saved payroll keeps its original rates.", "success")
                     return redirect(url_for("payroll_rates", product_id=product_id))
                 except ValueError as error:
                     flash(str(error), "danger")

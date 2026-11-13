@@ -1,0 +1,31 @@
+{% if kept_options or data.kept_entries %}
+<details id="kept-pieces" class="kept-section" aria-label="Pieces kept for job {{ data.jobcard_id }}">
+  <summary class="kept-section-heading"><div><p class="eyebrow">Separate from physical returns</p><h2>Record pieces kept by outworker</h2><p>Save returns first. Kept pieces qualify for payroll; their product value becomes an amount to recover.</p></div><span class="kept-section-tag"><span class="kept-show">＋ Show details</span><span class="kept-hide">− Hide details</span></span></summary>
+  <div class="kept-section-content">
+  {% if data.kept_entries %}<div class="table-container kept-saved-history"><table>
+    <thead><tr><th>Product / type</th><th>Kept</th><th>Value / piece</th><th>To recover</th><th>Recorded</th></tr></thead>
+    <tbody>{% for row in data.kept_entries %}<tr><td>{{ row.product }} · {{ row.type }}</td><td>{{ row.pieces }}</td><td>₹{{ row.unit_value_paise|money }}</td><td>₹{{ row.amount_paise|money }} · Advance #{{ row.advance_id }}</td><td>{{ row.date }} · {{ row.recorded_by }}</td></tr>{% endfor %}</tbody>
+  </table></div>{% endif %}
+  {% for option in kept_options %}{% set item=option.item %}{% set product=option.product %}{% if product %}
+  <details class="input-guide kept-item">
+    <summary><span>{{ item.product_name }} <small>{{ item.colour }}</small></span><span>{{ item.issued }} remaining · ₹{{ product.product_value_paise|money }} / piece</span></summary>
+    {% if product.product_value_paise > 0 %}
+    <form method="post" action="{{ url_for('jobcard_kept',jobcard_id=data.jobcard_id) }}" class="kept-product-form">
+      {{ kept_form.hidden_tag() }}
+      {% if kept_only %}<input type="hidden" name="kept_only" value="1">{% endif %}
+      <input type="hidden" name="product_id" value="{{ product.id }}">
+      <input type="hidden" name="bundle_type" value="{{ item.colour }}">
+      <input type="hidden" name="expected_value" value="{{ product.product_value_paise }}">
+      <input type="hidden" name="expected_remaining" value="{{ item.issued }}">
+      <input type="hidden" name="embedded" value="{{ '1' if embedded else '0' }}">
+      <label>Pieces kept<input type="number" name="pieces" min="1" max="{{ item.issued }}" step="1" required data-unit-value="{{ product.product_value_paise }}" placeholder="Enter quantity"></label>
+      <label>Notes<input name="note" maxlength="500" placeholder="Reason for keeping these pieces"></label>
+      <p role="status" class="kept-recovery-preview">Enter kept pieces to see the amount to recover.</p>
+      <input type="hidden" name="confirmed" value="yes">
+      <button type="submit" class="btn-submit">Confirm kept pieces & create recovery</button>
+    </form>
+    {% else %}<p class="kept-value-note">Set a positive product value in <a href="{{ url_for('payroll_rates',product_id=product.id) }}" target="_blank" rel="noopener">Product rates</a> first.</p>{% endif %}
+  </details>{% endif %}{% endfor %}
+  </div>
+</details>
+{% endif %}

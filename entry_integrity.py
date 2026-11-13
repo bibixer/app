@@ -89,6 +89,9 @@ def validate_affected_jobs(entity_type, obj, old):
     else:
         return
     for card_id in ids:
+        from modes import JobKeptProduct
+        if JobKeptProduct.query.filter_by(jobcard_id=card_id).first():
+            raise ValueError('This stock entry belongs to a job with kept-product recoveries and cannot be corrected independently.')
         card = db.session.get(Jobcard, card_id)
         if card is None:
             raise ValueError("A linked job card is missing.")

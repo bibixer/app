@@ -346,3 +346,9 @@
 .ui-scope.table-container,
 .ui-scope .table-container{overflow:visible}
 .ui-scope table{min-width:0}}
+.page-job-retun .kept-product-form{display:grid;gap:14px;padding:18px 0;max-width:760px}
+.page-job-retun .kept-product-form label{font-weight:650;line-height:1.6}
+.page-job-retun .kept-product-form input:not([type=checkbox]):not([type=hidden]){display:block;width:100%;min-height:44px;margin-top:6px;padding:10px 12px;border:1px solid #b8c9ce;border-radius:9px;background:#fff;color:#173344;font:inherit}
+.page-job-retun .kept-product-form input[type=checkbox]{width:19px;height:19px;vertical-align:middle;margin-right:7px}
+.page-job-retun .kept-recovery-preview{padding:14px;border-radius:10px;background:#fff1d6;color:#724912;font-size:16px;font-weight:700}
+.page-job-retun details.input-guide>summary{cursor:pointer;font-weight:700;line-height:1.6}

@@ -1,0 +1,86 @@
+{
+  "requests_per_wave": 1001,
+  "server_threads": 32,
+  "results": [
+    {
+      "name": "product_unique",
+      "requests": 1001,
+      "statuses": {
+        "302": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 32,
+      "seconds": 36.308,
+      "requests_per_second": 27.6,
+      "p50_seconds": 16.463,
+      "p95_seconds": 32.719,
+      "max_seconds": 34.922,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1002,
+        "expected": 1002,
+        "missing": []
+      },
+      "sqlite_integrity": "ok",
+      "exception_counts": {},
+      "database_error_counts": {},
+      "exception_examples": [],
+      "form_warning_counts": {},
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "manual_duplicate",
+      "requests": 1001,
+      "statuses": {
+        "200": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 32,
+      "seconds": 9.65,
+      "requests_per_second": 103.7,
+      "p50_seconds": 5.054,
+      "p95_seconds": 8.482,
+      "max_seconds": 9.172,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "sqlite_integrity": "ok",
+      "exception_counts": {},
+      "database_error_counts": {},
+      "exception_examples": [],
+      "form_warning_counts": {},
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "recover_batch",
+      "requests": 1001,
+      "statuses": {
+        "302": 1,
+        "200": 1000
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 32,
+      "seconds": 45.706,
+      "requests_per_second": 21.9,
+      "p50_seconds": 23.351,
+      "p95_seconds": 42.195,
+      "max_seconds": 44.735,
+      "database_invariant_ok": true,
+      "state": {
+        "balance": 0,
+        "receipts": 1
+      },
+      "sqlite_integrity": "ok",
+      "exception_counts": {},
+      "database_error_counts": {},
+      "exception_examples": [],
+      "form_warning_counts": {},
+      "errors": [],
+      "passed": true
+    }
+  ]
+}

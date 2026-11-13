@@ -15,7 +15,8 @@ from modes import (
 from master_aliases import validate_master_aliases
 from item_aliases import normalize_name, parse_aliases, validate_names
 from entry_integrity import validate_update, validate_affected_jobs
-from validation import MAX_DATABASE_INTEGER, record_id
+from validation import MAX_DATABASE_INTEGER, MAX_PIECES, record_id
+from database_writes import begin_write
 
 
 ENTITY_CONFIG = {
@@ -325,10 +326,20 @@ def save_entry(entity_type, entity_id, form_data, expected_version, request_key,
         return "invalid", "A valid submission token is required. Reload the form."
     request_key = hashlib.sha256(f"{username}:edit:{entity_type}:{entity_id}:{request_key}".encode()).hexdigest()
 
+    begin_write(RequestDedup)
+    digest = hashlib.sha256(json.dumps({'data': {k: v for k, v in dict(form_data).items()
+                                               if k not in {'version', 'csrf_token', 'submission_token'}}},
+                                      sort_keys=True, default=str).encode()).hexdigest()
+    previous = RequestDedup.query.filter_by(request_key=request_key).first()
+    if previous:
+        matches = previous.payload_hash == digest
+        db.session.rollback()
+        return ('duplicate', None) if matches else ('conflict', 'This request was already used for different data.')
     try:
         db.session.add(RequestDedup(
             request_key=request_key, endpoint=f"edit:{entity_type}:{entity_id}",
             username=username, created_at=datetime.now(),
+            payload_hash=digest,
         ))
         db.session.flush()
     except IntegrityError:
@@ -356,6 +367,8 @@ def save_entry(entity_type, entity_id, form_data, expected_version, request_key,
         positive = {"lot_number", "lot_count", "bale_number", "number_of_bundlie", "bale_id", "number", "s_no"}
         if any(updates.get(field, 0) < 0 for field in non_negative & updates.keys()):
             raise ValueError("Quantity, weight, size, and meter values cannot be negative")
+        if any(updates.get(field, 0) > MAX_PIECES for field in {'pieces', 'outflow', 'inflow'} & updates.keys()):
+            raise ValueError('Piece quantities cannot exceed 1,000,000,000.')
         if any(updates.get(field, 0) <= 0 for field in positive & updates.keys()):
             raise ValueError("Count and reference values must be greater than zero")
         if entity_type == "lump" and not db.session.get(Bale_date, updates["bale_id"]):

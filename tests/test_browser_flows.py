@@ -106,6 +106,8 @@ class BrowserFlowsTest(AppTestCase):
                 return
             time.sleep(.05)
         details = self.script("return {url:location.href,messages:[...document.querySelectorAll('.flash,.notice')].map(n=>n.textContent),invalid:[...document.querySelectorAll('input:invalid,select:invalid,textarea:invalid')].map(n=>({name:n.name,value:n.value,error:n.validationMessage}))}")
+        details['frames'] = self.script("return [...document.querySelectorAll('iframe')].map(f=>({src:f.src,height:f.offsetHeight,ready:f.contentDocument?.readyState,text:f.contentDocument?.body?.textContent?.slice(0,250),inputs:[...(f.contentDocument?.querySelectorAll('.return-input')||[])].map(i=>i.value)}))")
+        details['layout'] = self.script("return {open:document.querySelector('details.kept-item')?.open,frame:frameElement?.clientHeight,main:document.querySelector('main')?.getBoundingClientRect().height}")
         self.fail("Browser condition was not met: " + condition + " " + json.dumps(details))
 
     def active(self, selector):
@@ -126,6 +128,70 @@ class BrowserFlowsTest(AppTestCase):
         self.active("#manualRows tr:nth-child(2) .product")
         self.type("#manualRows tr:nth-child(2) .product", "\ue003")
         self.active("#manualRows tr:first-child .bundle-type")
+
+    def test_lost_manual_save_response_retry_restores_printable_job(self):
+        self.navigate('/manual_jobcard')
+        self.script("""
+            document.querySelector('#masterName').value='1';
+            document.querySelector('#manualRows .product').value='VIM';
+            document.querySelector('#manualRows .pieces').value='30';
+            document.querySelector('#manualRows .count').value='4';
+            const realFetch=window.fetch.bind(window);
+            window.lostResponse=false;
+            window.fetch=async (...args)=>{
+                const response=await realFetch(...args);
+                if(args[0]==='/submit-manual-jobcard' && !window.lostResponse){
+                    window.lostResponse=true;
+                    throw new TypeError('Simulated response lost after commit');
+                }
+                return response;
+            };
+        """)
+        self.click('#submitManual')
+        self.wait_for("document.querySelector('#message').textContent.includes('Network error')")
+        self.assertFalse(self.script("return document.querySelector('#submitManual').disabled"))
+        self.click('#submitManual')
+        self.wait_for("document.querySelector('#result').textContent.includes('Job Card #')")
+        self.assertIn('120 pieces', self.script("return document.querySelector('#result').textContent"))
+        self.assertTrue(self.script("return !!document.querySelector('#result button[onclick=\"window.print()\"]')"))
+        db.session.expire_all()
+        from modes import Jobcard
+        self.assertEqual(Jobcard.query.count(), 1)
+        self.job_cade_print.assert_called_once()
+
+    def test_kept_product_value_preview_recovery_and_payroll(self):
+        from kept_products import save_product_value
+        from payroll_service import save_rate
+        from modes import JobKeptProduct, OutworkerPayroll, OutworkerPayrollJob
+        save_product_value(self.product.id, '120', 0, 'browser-value', self.admin)
+        save_rate(self.product.id, '', '5.5', 'new', 'browser-rate', self.admin)
+        card_id = add_manual_jobcard(self.manual_payload(pieces=50, count=1), self.admin, 'browser-job')['jobData']['jobId']
+        in_move_entery(self.return_payload(card_id, 48), self.admin, 'browser-return')
+        self.navigate(f'/job_retun?jobcard_id={card_id}')
+        self.type('#kept-pieces > summary','\ue007')
+        self.click('details.input-guide summary')
+        self.type('.kept-product-form [name=pieces]', '2')
+        self.wait_for("document.querySelector('.kept-recovery-preview').textContent.includes('240.00')")
+        self.click('.kept-product-form button[type=submit]')
+        self.wait_for("document.body.textContent.includes('2 kept pieces recorded')")
+        db.session.expire_all()
+        row = JobKeptProduct.query.one()
+        self.assertEqual(row.amount_paise, 24000)
+        self.navigate(f'/payroll?worker_id={self.worker.id}')
+        self.assertIn('Kept: 2', self.script('return document.body.textContent'))
+        self.click(f'input[name=job_ids][value="{card_id}"]')
+        self.click(f'input[name=advance_ids][value="{row.advance_id}"]')
+        self.click('#payrollSelectionForm button[type=submit]')
+        self.wait_for("document.querySelector('#payroll-local-review').open")
+        breakdown = self.script("return document.querySelector('#payrollLocalBreakdown').textContent")
+        self.assertIn('paying 50 pieces', breakdown)
+        self.assertIn('Kept 2', breakdown)
+        self.click('#payrollLocalConfirm')
+        self.wait_for("/\\/payroll\\/\\d+$/.test(location.pathname)")
+        db.session.expire_all()
+        payroll = OutworkerPayroll.query.one()
+        self.assertEqual((payroll.gross_paise, payroll.deduction_paise, payroll.net_paise), (27500,24000,3500))
+        self.assertEqual(OutworkerPayrollJob.query.one().pieces, 50)
 
     def test_admin_corrects_return_from_job_page_and_raw_movement_is_blocked(self):
         card_id = add_manual_jobcard(self.manual_payload(), self.admin, "manual")["jobData"]["jobId"]
@@ -151,6 +217,95 @@ class BrowserFlowsTest(AppTestCase):
         self.assertEqual(get_jobcard_return_data(card_id)["items"][0]["issued"], 120)
         self.navigate(f'/edit/movement/{returned["id"]}')
         self.assertIn("managed by the app", self.script("return document.body.textContent"))
+
+    def test_admin_edits_given_return_and_kept_together(self):
+        from kept_products import save_product_value, record_kept_product
+        from modes import JobKeptProduct, OutworkerAdvance
+        save_product_value(self.product.id,'120',0,'edit-value',self.admin)
+        card_id=add_manual_jobcard(self.manual_payload(pieces=50,count=1),self.admin,'edit-kept-job')['jobData']['jobId']
+        in_move_entery(self.return_payload(card_id,48),self.admin,'edit-kept-return')
+        kept=record_kept_product(card_id,self.product.id,'lump',2,12000,2,'yes','','edit-keep',self.admin)
+        context=jobcard_edit_context(card_id)
+        self.navigate(f'/edit/jobcard/{card_id}')
+        for selector,value in ((f'[name="line_{context["given"][0]["id"]}_pieces"]','60'),
+                               (f'[name="line_{context["returns"][0]["id"]}_quantity"]','50'),
+                               (f'[name="kept_{kept.id}_pieces"]','4'),
+                               (f'[name="kept_{kept.id}_value"]','130')):
+            self.command(f'/element/{self.element(selector)}/clear',{})
+            self.type(selector,value)
+        self.assertIn('520.00',self.script("return document.querySelector('[data-kept-recovery]').textContent"))
+        self.type('[name="edit_reason"]','Correct all three sections together')
+        self.click('input[type="submit"]')
+        self.wait_for("[...document.querySelectorAll('.flash')].some(node=>node.textContent.includes('Saved.'))")
+        db.session.expire_all()
+        self.assertEqual(db.session.get(JobKeptProduct,kept.id).pieces,4)
+        self.assertEqual(OutworkerAdvance.query.one().amount_paise,52000)
+        self.assertEqual(get_jobcard_return_data(card_id)['items'][0]['issued'],6)
+
+    def test_job_ledger_layout_history_and_print_restoration(self):
+        from kept_products import save_product_value, record_kept_product
+        save_product_value(self.product.id,'120',0,'ledger-value',self.admin)
+        card_id=add_manual_jobcard(self.manual_payload(pieces=50,count=1),self.admin,'ledger-job')['jobData']['jobId']
+        in_move_entery(self.return_payload(card_id,48),self.admin,'ledger-return')
+        record_kept_product(card_id,self.product.id,'lump',2,12000,2,'yes','Retained by agreement','ledger-kept',self.admin)
+        self.navigate(f'/jobcard/{card_id}/ledger')
+        self.wait_for("document.querySelectorAll('.event').length===3")
+        self.assertEqual(self.script("return document.querySelectorAll('.total').length"),4)
+        legend_backgrounds=self.script("return [...document.querySelectorAll('.movement-legend>span')].map(node=>getComputedStyle(node).backgroundColor)")
+        self.assertEqual(len(set(legend_backgrounds)),3)
+        self.assertNotIn('rgba(0, 0, 0, 0)',legend_backgrounds)
+        self.assertIn('2 pcs',self.script("return document.querySelector('.event.kept').textContent"))
+        self.assertIn('240.00',self.script("return document.querySelector('.recovery-note').textContent"))
+        self.assertTrue(self.script(f"return !!document.querySelector('a[href=\"/edit/jobcard/{card_id}\"]')"))
+        self.click('.kept-history > summary')
+        self.assertTrue(self.script("return document.querySelector('.kept-history').open"))
+        self.assertIn('Retained by agreement',self.script("return document.querySelector('.kept-history').textContent"))
+        self.wait_for("document.readyState==='complete'")
+        previous=self.script("return [...document.querySelectorAll('.product-history')].map(node=>node.open)")
+        self.script("window.dispatchEvent(new Event('beforeprint'))")
+        self.assertTrue(self.script("return [...document.querySelectorAll('.product-history')].every(node=>node.open)"))
+        self.script("window.dispatchEvent(new Event('afterprint'))")
+        self.assertEqual(self.script("return [...document.querySelectorAll('.product-history')].map(node=>node.open)"),previous)
+        self.assertTrue(self.script("return document.querySelector('.kept-history').open"))
+        self.command('/window/rect',{'width':390,'height':844})
+        self.assertTrue(self.script("return document.documentElement.scrollWidth<=innerWidth+1"))
+        self.script("document.querySelector('a[href=\"#ledger-movements\"]').click()")
+        self.assertIn('#ledger-movements',self.script('return location.hash'))
+        self.login_as(self.operator)
+        cookie=self.client.get_cookie(self.app.config['SESSION_COOKIE_NAME'])
+        self.command('/cookie',{'cookie':{'name':cookie.key,'value':cookie.value,'path':'/','httpOnly':True}})
+        self.navigate(f'/jobcard/{card_id}/ledger')
+        self.wait_for("!!document.querySelector('.timeline')")
+        self.assertFalse(self.script("return !!document.querySelector('.payment-panel')"))
+        self.assertFalse(self.script(f"return !!document.querySelector('a[href=\"/edit/jobcard/{card_id}\"]')"))
+
+    def test_all_outworker_jobs_payment_filter_and_direct_edit(self):
+        from payroll_service import save_rate, payroll_preview, issue_payroll
+        save_rate(self.product.id,'','5.5','new','all-jobs-rate',self.admin)
+        unpaid=add_manual_jobcard(self.manual_payload(pieces=10,count=1),self.admin,'browse-unpaid')['jobData']['jobId']
+        partial=add_manual_jobcard(self.manual_payload(pieces=10,count=1),self.admin,'browse-partial')['jobData']['jobId']
+        in_move_entery(self.return_payload(partial,5),self.admin,'browse-return')
+        preview=payroll_preview(self.worker.id,[partial],'0')
+        issue_payroll(self.worker.id,[partial],'0',preview['version'],'Cash','','','browse-pay',self.admin)
+        self.navigate('/outworker_report')
+        self.click('a[href="/outworker/jobs"]')
+        self.wait_for("!!document.querySelector('#all-jobs-worker')")
+        self.type('#all-jobs-worker',str(self.worker.id))
+        self.click('.ow-all-jobs-picker button')
+        self.wait_for("document.querySelectorAll('.ow-job-entry').length===2")
+        self.assertIn('Partially paid',self.script('return document.body.textContent'))
+        self.assertIn('5 / 10 pieces paid',self.script('return document.body.textContent'))
+        self.script("document.querySelector('#job-payment-filter').value='partial'")
+        self.click('.ow-all-jobs-picker button')
+        self.wait_for("document.querySelectorAll('.ow-job-entry').length===1")
+        self.assertEqual(self.script("return document.querySelector('.ow-job-entry').dataset.jobId"),str(partial))
+        self.command('/window/rect',{'width':390,'height':844})
+        self.assertTrue(self.script("return document.documentElement.scrollWidth<=innerWidth+1"))
+        self.navigate(f'/outworker/jobs?worker_id={self.worker.id}')
+        self.wait_for("document.querySelectorAll('.ow-job-entry').length===2")
+        self.click(f'a.ow-edit-job[href="/edit/jobcard/{unpaid}"]')
+        self.wait_for(f"location.pathname==='/edit/jobcard/{unpaid}'")
+        self.assertFalse(self.script("return document.querySelector('.edit-fields').disabled"))
 
     def test_calculator_shortcuts_and_print_expansion(self):
         card_id = add_manual_jobcard(self.manual_payload(), self.admin, "manual")["jobData"]["jobId"]
@@ -206,10 +361,10 @@ class BrowserFlowsTest(AppTestCase):
             self.assertIn('Awaiting return: ' + ('5' if batch == 1 else '0'),
                           self.script('return document.body.textContent'))
             self.click(f'input[name="job_ids"][value="{card_id}"]')
-            self.click('form:has(input[name="action"][value="preview"]) button[type="submit"]')
-            self.wait_for("!!document.querySelector('#payroll-preview')")
-            self.assertIn('paying 5 pieces', self.script("return document.querySelector('#payroll-preview').textContent"))
-            self.click('form:has(input[name="action"][value="pay"]) button[type="submit"]')
+            self.click('#payrollSelectionForm button[type="submit"]')
+            self.wait_for("document.querySelector('#payroll-local-review').open")
+            self.assertIn('paying 5 pieces', self.script("return document.querySelector('#payrollLocalBreakdown').textContent"))
+            self.click('#payrollLocalConfirm')
             self.wait_for("/\\/payroll\\/\\d+$/.test(location.pathname)")
             payment_ids.append(self.script('return location.pathname'))
             db.session.expire_all()
@@ -269,6 +424,57 @@ class BrowserFlowsTest(AppTestCase):
         self.assertEqual(Jobmovement.query.filter_by(jobcard=str(ids[0]),flow_type='IN').one().inflow,3)
         self.assertEqual(Jobmovement.query.filter_by(jobcard=str(ids[1]),flow_type='IN').count(),0)
 
+    def test_worker_kept_save_stays_embedded_and_preserves_other_job_drafts(self):
+        from kept_products import save_product_value
+        from modes import JobKeptProduct
+        save_product_value(self.product.id, '120', 0, 'inline-price', self.admin)
+        ids=[add_manual_jobcard(self.manual_payload(pieces=10,count=1),self.admin,
+             f'inline-{index}')['jobData']['jobId'] for index in range(2)]
+        self.navigate(f'/returns/outworker?worker_id={self.worker.id}')
+        def enter_job(index):
+            self.command('/frame',{'id':None})
+            self.script(f"document.querySelectorAll('.return-job-frame')[{index}].scrollIntoView()")
+            element=self.element(f'[data-job-id="{ids[index]}"] iframe')
+            self.command('/frame',{'id':{'element-6066-11e4-a52e-4f735466cecf':element}})
+            self.wait_for("!!document.querySelector('.return-input')")
+        enter_job(1)
+        self.type('.return-input','7')
+        enter_job(0)
+        # Keyboard expansion is stable even when Firefox scrolls a nested frame
+        # behind the host page's fixed navigation during pointer targeting.
+        self.assertFalse(self.script("return document.querySelector('#kept-pieces').open"))
+        self.type('#kept-pieces > summary','\ue007')
+        self.wait_for("document.querySelector('#kept-pieces').open && frameElement.clientHeight >= document.querySelector('main').getBoundingClientRect().height")
+        self.type('details.kept-item summary','\ue007')
+        self.wait_for("document.querySelector('details.kept-item').open && frameElement.clientHeight >= document.querySelector('main').getBoundingClientRect().height")
+        self.type('.kept-product-form [name=pieces]','2')
+        self.type('#kept-pieces > summary','\ue007')
+        self.assertFalse(self.script("return document.querySelector('#kept-pieces').open"))
+        self.type('#kept-pieces > summary','\ue007')
+        self.wait_for("document.querySelector('#kept-pieces').open && frameElement.clientHeight >= document.querySelector('main').getBoundingClientRect().height")
+        self.assertEqual(self.script("return document.querySelector('.kept-product-form [name=pieces]').value"),'2')
+        self.wait_for("document.querySelector('.kept-recovery-preview').textContent.includes('240.00')")
+        # A kept save must not silently discard this job's unfinished return.
+        self.type('.return-input','3')
+        self.type('.kept-product-form button[type=submit]','\ue007')
+        self.wait_for("document.querySelector('.kept-recovery-preview').textContent.includes('Save or clear')")
+        self.script("document.querySelector('.return-input').value=''")
+        self.type('.kept-product-form button[type=submit]','\ue007')
+        self.wait_for("document.body.textContent.includes('2 kept pieces recorded')")
+        self.assertIn('embedded=1',self.script('return location.search'))
+        self.assertEqual(self.script("return document.querySelectorAll('[aria-label=\"Main navigation\"]').length"),0)
+        self.command('/frame',{'id':None})
+        self.wait_for("document.querySelector('#open-return-pieces').textContent==='18'")
+        self.assertEqual(self.script("return document.querySelectorAll('[aria-label=\"Main navigation\"]').length"),1)
+        self.assertIn('/returns/outworker',self.script('return location.pathname'))
+        enter_job(1)
+        self.assertEqual(self.script("return document.querySelector('.return-input').value"),'7')
+        self.command('/frame',{'id':None})
+        self.command('/window/rect', {'width':390, 'height':844})
+        self.assertTrue(self.script("return document.documentElement.scrollWidth<=innerWidth+1"))
+        db.session.expire_all()
+        self.assertEqual(JobKeptProduct.query.one().amount_paise,24000)
+
     def test_custom_dashboard_dates_and_new_tab_details(self):
         from modes import Jobcard
         card_id=add_manual_jobcard(self.manual_payload(pieces=10,count=1),self.admin,'range-browser')['jobData']['jobId']
@@ -286,6 +492,6 @@ class BrowserFlowsTest(AppTestCase):
             time.sleep(.05)
         self.assertEqual(len(handles),len(before)+1)
         self.command('/window',{'handle':next(handle for handle in handles if handle not in before)})
-        self.wait_for("location.pathname==='/dashboard/movements'")
+        self.wait_for("location.pathname==='/dashboard/movements' && document.querySelector('.ui-heading h1')?.textContent==='Outflow / given details'")
         self.assertIn('Outflow / given details',self.script('return document.body.textContent'))
         self.assertIn(f'#{card_id}',self.script('return document.body.textContent'))

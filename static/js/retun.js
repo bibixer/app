@@ -436,7 +436,7 @@ const payload = {
 
           const data_R = await response.json();
           console.log(data_R);
-          if (data_R.duplicate) {
+          if (data_R.duplicate && !(data_R.jobData && data_R.jobData.jobData)) {
             notifyReturnWorkspace(data_R.remaining);
             alert(data_R.message);
             window.location.replace(window.RETURN_EMBEDDED ? `/job_retun?jobcard_id=${encodeURIComponent(JOB_CARD.jobcard_id)}&embedded=1` : "/retune_product?ok=101");
@@ -455,6 +455,7 @@ const payload = {
           } else {
             returnSubmitInFlight = false;
             alert(data_R.message || "Return could not be saved. Refresh this job card to see its latest balance.");
+            if (data_R.retryable) return;
             window.location.reload();
           }
         } catch (error) {

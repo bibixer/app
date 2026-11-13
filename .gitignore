@@ -1,0 +1,3 @@
+# Private installation signing keys must never be committed.
+.session-secret
+.session-secret-*

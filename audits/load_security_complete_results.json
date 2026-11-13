@@ -1,0 +1,1714 @@
+{
+  "requests_per_wave": 1001,
+  "server_threads": 32,
+  "results": [
+    {
+      "name": "manual_duplicate",
+      "requests": 1001,
+      "statuses": {
+        "200": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 32,
+      "seconds": 34.34,
+      "requests_per_second": 29.1,
+      "p50_seconds": 17.861,
+      "p95_seconds": 33.06,
+      "max_seconds": 33.692,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "sqlite_integrity": "ok",
+      "exception_counts": {},
+      "database_checks": {
+        "users": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        },
+        "main": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        }
+      },
+      "database_error_counts": {},
+      "exception_examples": [],
+      "form_warning_counts": {},
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "manual_unique",
+      "requests": 1001,
+      "statuses": {
+        "200": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 32,
+      "seconds": 16.441,
+      "requests_per_second": 60.9,
+      "p50_seconds": 9.055,
+      "p95_seconds": 14.628,
+      "max_seconds": 15.661,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1001,
+        "expected": 1001
+      },
+      "sqlite_integrity": "ok",
+      "exception_counts": {},
+      "database_checks": {
+        "users": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        },
+        "main": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        }
+      },
+      "database_error_counts": {},
+      "exception_examples": [],
+      "form_warning_counts": {},
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "return_duplicate",
+      "requests": 1001,
+      "statuses": {
+        "200": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 32,
+      "seconds": 32.437,
+      "requests_per_second": 30.9,
+      "p50_seconds": 10.886,
+      "p95_seconds": 30.696,
+      "max_seconds": 31.588,
+      "database_invariant_ok": true,
+      "state": {
+        "returned": 1,
+        "rows": 1,
+        "expected": 1
+      },
+      "sqlite_integrity": "ok",
+      "exception_counts": {},
+      "database_checks": {
+        "users": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        },
+        "main": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        }
+      },
+      "database_error_counts": {},
+      "exception_examples": [],
+      "form_warning_counts": {},
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "return_competing",
+      "requests": 1001,
+      "statuses": {
+        "200": 100,
+        "400": 901
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 32,
+      "seconds": 21.475,
+      "requests_per_second": 46.6,
+      "p50_seconds": 12.308,
+      "p95_seconds": 19.628,
+      "max_seconds": 20.653,
+      "database_invariant_ok": true,
+      "state": {
+        "returned": 100,
+        "rows": 100,
+        "expected": 100
+      },
+      "sqlite_integrity": "ok",
+      "exception_counts": {},
+      "database_checks": {
+        "users": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        },
+        "main": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        }
+      },
+      "database_error_counts": {},
+      "exception_examples": [],
+      "form_warning_counts": {},
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "product_duplicate",
+      "requests": 1001,
+      "statuses": {
+        "302": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 32,
+      "seconds": 57.383,
+      "requests_per_second": 17.4,
+      "p50_seconds": 22.375,
+      "p95_seconds": 56.178,
+      "max_seconds": 56.893,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 2,
+        "expected": 2,
+        "missing": []
+      },
+      "sqlite_integrity": "ok",
+      "exception_counts": {},
+      "database_checks": {
+        "users": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        },
+        "main": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        }
+      },
+      "database_error_counts": {},
+      "exception_examples": [],
+      "form_warning_counts": {
+        "Duplicate request ignored; this product was already submitted.": 1000
+      },
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "product_unique",
+      "requests": 1001,
+      "statuses": {
+        "302": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 32,
+      "seconds": 45.417,
+      "requests_per_second": 22.0,
+      "p50_seconds": 17.036,
+      "p95_seconds": 42.869,
+      "max_seconds": 44.953,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1002,
+        "expected": 1002,
+        "missing": []
+      },
+      "sqlite_integrity": "ok",
+      "exception_counts": {},
+      "database_checks": {
+        "users": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        },
+        "main": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        }
+      },
+      "database_error_counts": {},
+      "exception_examples": [],
+      "form_warning_counts": {},
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "outworker_duplicate",
+      "requests": 1001,
+      "statuses": {
+        "302": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 32,
+      "seconds": 43.007,
+      "requests_per_second": 23.3,
+      "p50_seconds": 22.228,
+      "p95_seconds": 41.76,
+      "max_seconds": 42.509,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 2,
+        "expected": 2
+      },
+      "sqlite_integrity": "ok",
+      "exception_counts": {},
+      "database_checks": {
+        "users": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        },
+        "main": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        }
+      },
+      "database_error_counts": {},
+      "exception_examples": [],
+      "form_warning_counts": {
+        "Duplicate request ignored; this outworker was already submitted.": 1000
+      },
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "outworker_unique",
+      "requests": 1001,
+      "statuses": {
+        "302": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 32,
+      "seconds": 21.342,
+      "requests_per_second": 46.9,
+      "p50_seconds": 9.83,
+      "p95_seconds": 19.306,
+      "max_seconds": 20.615,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1002,
+        "expected": 1002
+      },
+      "sqlite_integrity": "ok",
+      "exception_counts": {},
+      "database_checks": {
+        "users": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        },
+        "main": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        }
+      },
+      "database_error_counts": {},
+      "exception_examples": [],
+      "form_warning_counts": {},
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "user_create",
+      "requests": 1001,
+      "statuses": {
+        "302": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 32,
+      "seconds": 45.59,
+      "requests_per_second": 22.0,
+      "p50_seconds": 39.33,
+      "p95_seconds": 44.057,
+      "max_seconds": 44.766,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 3,
+        "expected": 3
+      },
+      "sqlite_integrity": "ok",
+      "exception_counts": {},
+      "database_checks": {
+        "users": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        },
+        "main": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        }
+      },
+      "database_error_counts": {},
+      "exception_examples": [],
+      "form_warning_counts": {},
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "user_update",
+      "requests": 1001,
+      "statuses": {
+        "302": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 32,
+      "seconds": 15.684,
+      "requests_per_second": 63.8,
+      "p50_seconds": 8.502,
+      "p95_seconds": 13.902,
+      "max_seconds": 14.785,
+      "database_invariant_ok": true,
+      "state": {
+        "state_ok": true,
+        "audit_rows": 1,
+        "expected_audit_rows": 1
+      },
+      "sqlite_integrity": "ok",
+      "exception_counts": {},
+      "database_checks": {
+        "users": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        },
+        "main": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        }
+      },
+      "database_error_counts": {},
+      "exception_examples": [],
+      "form_warning_counts": {},
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "user_disable",
+      "requests": 1001,
+      "statuses": {
+        "302": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 32,
+      "seconds": 15.073,
+      "requests_per_second": 66.4,
+      "p50_seconds": 7.941,
+      "p95_seconds": 13.639,
+      "max_seconds": 14.455,
+      "database_invariant_ok": true,
+      "state": {
+        "state_ok": true,
+        "audit_rows": 1,
+        "expected_audit_rows": 1
+      },
+      "sqlite_integrity": "ok",
+      "exception_counts": {},
+      "database_checks": {
+        "users": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        },
+        "main": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        }
+      },
+      "database_error_counts": {},
+      "exception_examples": [],
+      "form_warning_counts": {},
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "user_enable",
+      "requests": 1001,
+      "statuses": {
+        "302": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 32,
+      "seconds": 15.138,
+      "requests_per_second": 66.1,
+      "p50_seconds": 8.76,
+      "p95_seconds": 13.738,
+      "max_seconds": 14.639,
+      "database_invariant_ok": true,
+      "state": {
+        "state_ok": true,
+        "audit_rows": 1,
+        "expected_audit_rows": 1
+      },
+      "sqlite_integrity": "ok",
+      "exception_counts": {},
+      "database_checks": {
+        "users": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        },
+        "main": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        }
+      },
+      "database_error_counts": {},
+      "exception_examples": [],
+      "form_warning_counts": {},
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "user_delete",
+      "requests": 1001,
+      "statuses": {
+        "302": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 32,
+      "seconds": 16.22,
+      "requests_per_second": 61.7,
+      "p50_seconds": 7.909,
+      "p95_seconds": 14.423,
+      "max_seconds": 15.531,
+      "database_invariant_ok": true,
+      "state": {
+        "state_ok": true,
+        "audit_rows": 1,
+        "expected_audit_rows": 1
+      },
+      "sqlite_integrity": "ok",
+      "exception_counts": {},
+      "database_checks": {
+        "users": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        },
+        "main": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        }
+      },
+      "database_error_counts": {},
+      "exception_examples": [],
+      "form_warning_counts": {},
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "rates",
+      "requests": 1001,
+      "statuses": {
+        "200": 1000,
+        "302": 1
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 32,
+      "seconds": 24.706,
+      "requests_per_second": 40.5,
+      "p50_seconds": 12.743,
+      "p95_seconds": 22.954,
+      "max_seconds": 24.111,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "sqlite_integrity": "ok",
+      "exception_counts": {},
+      "database_checks": {
+        "users": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        },
+        "main": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        }
+      },
+      "database_error_counts": {},
+      "exception_examples": [],
+      "form_warning_counts": {},
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "advance_duplicate",
+      "requests": 1001,
+      "statuses": {
+        "200": 1000,
+        "302": 1
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 32,
+      "seconds": 47.73,
+      "requests_per_second": 21.0,
+      "p50_seconds": 18.659,
+      "p95_seconds": 45.518,
+      "max_seconds": 46.734,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "sqlite_integrity": "ok",
+      "exception_counts": {},
+      "database_checks": {
+        "users": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        },
+        "main": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        }
+      },
+      "database_error_counts": {},
+      "exception_examples": [],
+      "form_warning_counts": {},
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "advance_unique",
+      "requests": 1001,
+      "statuses": {
+        "302": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 32,
+      "seconds": 68.64,
+      "requests_per_second": 14.6,
+      "p50_seconds": 35.564,
+      "p95_seconds": 67.207,
+      "max_seconds": 68.168,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1001,
+        "expected": 1001
+      },
+      "sqlite_integrity": "ok",
+      "exception_counts": {},
+      "database_checks": {
+        "users": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        },
+        "main": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        }
+      },
+      "database_error_counts": {},
+      "exception_examples": [],
+      "form_warning_counts": {},
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "recover_single",
+      "requests": 1001,
+      "statuses": {
+        "302": 1,
+        "200": 1000
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 32,
+      "seconds": 65.205,
+      "requests_per_second": 15.4,
+      "p50_seconds": 35.267,
+      "p95_seconds": 63.161,
+      "max_seconds": 64.448,
+      "database_invariant_ok": true,
+      "state": {
+        "balance": 0,
+        "receipts": 1
+      },
+      "sqlite_integrity": "ok",
+      "exception_counts": {},
+      "database_checks": {
+        "users": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        },
+        "main": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        }
+      },
+      "database_error_counts": {},
+      "exception_examples": [],
+      "form_warning_counts": {},
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "recover_batch",
+      "requests": 1001,
+      "statuses": {
+        "302": 1,
+        "200": 1000
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 32,
+      "seconds": 72.496,
+      "requests_per_second": 13.8,
+      "p50_seconds": 41.063,
+      "p95_seconds": 70.257,
+      "max_seconds": 71.558,
+      "database_invariant_ok": true,
+      "state": {
+        "balance": 0,
+        "receipts": 1
+      },
+      "sqlite_integrity": "ok",
+      "exception_counts": {},
+      "database_checks": {
+        "users": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        },
+        "main": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        }
+      },
+      "database_error_counts": {},
+      "exception_examples": [],
+      "form_warning_counts": {},
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "payroll",
+      "requests": 1001,
+      "statuses": {
+        "200": 1000,
+        "302": 1
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 32,
+      "seconds": 38.985,
+      "requests_per_second": 25.7,
+      "p50_seconds": 21.029,
+      "p95_seconds": 36.912,
+      "max_seconds": 38.515,
+      "database_invariant_ok": true,
+      "state": {
+        "payrolls": 1,
+        "paid_pieces": 10,
+        "gross_paise": 5500,
+        "advance_remaining_paise": 10000
+      },
+      "sqlite_integrity": "ok",
+      "exception_counts": {},
+      "database_checks": {
+        "users": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        },
+        "main": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        }
+      },
+      "database_error_counts": {},
+      "exception_examples": [],
+      "form_warning_counts": {},
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "edit_product",
+      "requests": 1001,
+      "statuses": {
+        "302": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 32,
+      "seconds": 28.445,
+      "requests_per_second": 35.2,
+      "p50_seconds": 13.741,
+      "p95_seconds": 26.732,
+      "max_seconds": 27.522,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "sqlite_integrity": "ok",
+      "exception_counts": {},
+      "database_checks": {
+        "users": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        },
+        "main": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        }
+      },
+      "database_error_counts": {},
+      "exception_examples": [],
+      "form_warning_counts": {
+        "Someone changed this entry after you opened it. Review the latest values and save again.": 1000
+      },
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "edit_outworker",
+      "requests": 1001,
+      "statuses": {
+        "302": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 32,
+      "seconds": 24.507,
+      "requests_per_second": 40.8,
+      "p50_seconds": 12.674,
+      "p95_seconds": 22.794,
+      "max_seconds": 23.942,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "sqlite_integrity": "ok",
+      "exception_counts": {},
+      "database_checks": {
+        "users": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        },
+        "main": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        }
+      },
+      "database_error_counts": {},
+      "exception_examples": [],
+      "form_warning_counts": {
+        "Someone changed this entry after you opened it. Review the latest values and save again.": 1000
+      },
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "edit_jobcard",
+      "requests": 1001,
+      "statuses": {
+        "302": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 32,
+      "seconds": 25.289,
+      "requests_per_second": 39.6,
+      "p50_seconds": 12.493,
+      "p95_seconds": 23.727,
+      "max_seconds": 24.805,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "sqlite_integrity": "ok",
+      "exception_counts": {},
+      "database_checks": {
+        "users": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        },
+        "main": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        }
+      },
+      "database_error_counts": {},
+      "exception_examples": [],
+      "form_warning_counts": {
+        "Someone changed this entry after you opened it. Review the latest values and save again.": 1000
+      },
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "legacy_scan",
+      "requests": 1001,
+      "statuses": {
+        "409": 1000,
+        "200": 1
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 32,
+      "seconds": 21.028,
+      "requests_per_second": 47.6,
+      "p50_seconds": 15.638,
+      "p95_seconds": 19.647,
+      "max_seconds": 20.303,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "sqlite_integrity": "ok",
+      "exception_counts": {},
+      "database_checks": {
+        "users": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        },
+        "main": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        }
+      },
+      "database_error_counts": {},
+      "exception_examples": [],
+      "form_warning_counts": {},
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "legacy_inventory",
+      "requests": 1001,
+      "statuses": {
+        "302": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 32,
+      "seconds": 11.909,
+      "requests_per_second": 84.1,
+      "p50_seconds": 6.513,
+      "p95_seconds": 10.717,
+      "max_seconds": 11.266,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "sqlite_integrity": "ok",
+      "exception_counts": {},
+      "database_checks": {
+        "users": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        },
+        "main": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        }
+      },
+      "database_error_counts": {},
+      "exception_examples": [],
+      "form_warning_counts": {
+        "This lump was already saved. Duplicate request ignored.": 1000
+      },
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "legacy_cutter",
+      "requests": 1001,
+      "statuses": {
+        "302": 993,
+        "503": 8
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 32,
+      "seconds": 70.278,
+      "requests_per_second": 14.2,
+      "p50_seconds": 6.489,
+      "p95_seconds": 68.85,
+      "max_seconds": 69.519,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 2,
+        "expected": 2
+      },
+      "sqlite_integrity": "ok",
+      "exception_counts": {},
+      "database_checks": {
+        "users": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        },
+        "main": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        }
+      },
+      "database_error_counts": {
+        "database is locked": 8
+      },
+      "exception_examples": [],
+      "form_warning_counts": {
+        "Duplicate request ignored; this cutter was already submitted.": 992
+      },
+      "errors": [],
+      "passed": false
+    },
+    {
+      "name": "legacy_supplier",
+      "requests": 1001,
+      "statuses": {
+        "302": 999,
+        "503": 2
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 32,
+      "seconds": 102.763,
+      "requests_per_second": 9.7,
+      "p50_seconds": 47.636,
+      "p95_seconds": 101.292,
+      "max_seconds": 101.971,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 2,
+        "expected": 2
+      },
+      "sqlite_integrity": "ok",
+      "exception_counts": {},
+      "database_checks": {
+        "users": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        },
+        "main": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        }
+      },
+      "database_error_counts": {
+        "database is locked": 2
+      },
+      "exception_examples": [],
+      "form_warning_counts": {
+        "Duplicate request ignored; this party was already submitted.": 998
+      },
+      "errors": [],
+      "passed": false
+    },
+    {
+      "name": "route_sweep",
+      "requests": 1001,
+      "statuses": {
+        "404": 36,
+        "200": 473,
+        "302": 140,
+        "410": 317,
+        "400": 35
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 32,
+      "seconds": 7.773,
+      "requests_per_second": 128.8,
+      "p50_seconds": 7.36,
+      "p95_seconds": 7.563,
+      "max_seconds": 7.577,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "sqlite_integrity": "ok",
+      "exception_counts": {},
+      "database_checks": {
+        "users": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        },
+        "main": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        }
+      },
+      "database_error_counts": {},
+      "exception_examples": [],
+      "form_warning_counts": {
+        "Enter a job card number.": 35,
+        "This form expired. Reload and review the kept pieces.": 17
+      },
+      "errors": [],
+      "passed": true,
+      "routes": [
+        [
+          "GET",
+          "/bootstrap/static/1"
+        ],
+        [
+          "GET",
+          "/payroll/rates"
+        ],
+        [
+          "POST",
+          "/payroll/rates"
+        ],
+        [
+          "GET",
+          "/payroll"
+        ],
+        [
+          "POST",
+          "/payroll"
+        ],
+        [
+          "GET",
+          "/payroll/job/1"
+        ],
+        [
+          "GET",
+          "/payroll/1"
+        ],
+        [
+          "GET",
+          "/users"
+        ],
+        [
+          "POST",
+          "/users"
+        ],
+        [
+          "GET",
+          "/bale_entery"
+        ],
+        [
+          "POST",
+          "/bale_entery"
+        ],
+        [
+          "GET",
+          "/lumpentry"
+        ],
+        [
+          "POST",
+          "/lumpentry"
+        ],
+        [
+          "GET",
+          "/bundle_entery"
+        ],
+        [
+          "POST",
+          "/bundle_entery"
+        ],
+        [
+          "GET",
+          "/jobcard"
+        ],
+        [
+          "POST",
+          "/jobcard"
+        ],
+        [
+          "GET",
+          "/manual_jobcard"
+        ],
+        [
+          "POST",
+          "/submit-manual-jobcard"
+        ],
+        [
+          "GET",
+          "/add_items"
+        ],
+        [
+          "POST",
+          "/add_items"
+        ],
+        [
+          "GET",
+          "/add_suppy"
+        ],
+        [
+          "POST",
+          "/add_suppy"
+        ],
+        [
+          "GET",
+          "/add_outworver"
+        ],
+        [
+          "POST",
+          "/add_outworver"
+        ],
+        [
+          "GET",
+          "/add_cutter"
+        ],
+        [
+          "POST",
+          "/add_cutter"
+        ],
+        [
+          "POST",
+          "/submit-jobcard"
+        ],
+        [
+          "GET",
+          "/retune_product"
+        ],
+        [
+          "POST",
+          "/retune_product"
+        ],
+        [
+          "GET",
+          "/returns/outworker"
+        ],
+        [
+          "GET",
+          "/job_retun"
+        ],
+        [
+          "POST",
+          "/job_retun"
+        ],
+        [
+          "POST",
+          "/jobcard/1/kept"
+        ],
+        [
+          "GET",
+          "/jobcard/ledger"
+        ],
+        [
+          "GET",
+          "/jobcard/1/ledger"
+        ],
+        [
+          "POST",
+          "/summit-retune"
+        ],
+        [
+          "GET",
+          "/admin_dashord"
+        ],
+        [
+          "POST",
+          "/admin_dashord"
+        ],
+        [
+          "GET",
+          "/dashboard/movements"
+        ],
+        [
+          "GET",
+          "/cutter_report"
+        ],
+        [
+          "POST",
+          "/cutter_report"
+        ],
+        [
+          "GET",
+          "/outworker_report"
+        ],
+        [
+          "POST",
+          "/outworker_report"
+        ],
+        [
+          "GET",
+          "/product_report"
+        ],
+        [
+          "POST",
+          "/product_report"
+        ],
+        [
+          "GET",
+          "/"
+        ],
+        [
+          "GET",
+          "/login"
+        ],
+        [
+          "POST",
+          "/login"
+        ],
+        [
+          "GET",
+          "/logout"
+        ],
+        [
+          "GET",
+          "/find_edit"
+        ],
+        [
+          "POST",
+          "/find_edit"
+        ],
+        [
+          "GET",
+          "/edit"
+        ],
+        [
+          "GET",
+          "/edit/search"
+        ],
+        [
+          "GET",
+          "/edit/product/1"
+        ],
+        [
+          "POST",
+          "/edit/product/1"
+        ],
+        [
+          "GET",
+          "/edit-logs"
+        ]
+      ]
+    },
+    {
+      "name": "alias_collision",
+      "requests": 1001,
+      "statuses": {
+        "302": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 32,
+      "seconds": 36.352,
+      "requests_per_second": 27.5,
+      "p50_seconds": 22.057,
+      "p95_seconds": 34.857,
+      "max_seconds": 35.86,
+      "database_invariant_ok": true,
+      "state": {
+        "products": 2,
+        "expected": 2,
+        "ambiguous_aliases": 0
+      },
+      "sqlite_integrity": "ok",
+      "exception_counts": {},
+      "database_checks": {
+        "users": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        },
+        "main": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        }
+      },
+      "database_error_counts": {},
+      "exception_examples": [],
+      "form_warning_counts": {
+        "Item name or alias is already used by another item": 1000
+      },
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "rate_remove",
+      "requests": 1001,
+      "statuses": {
+        "302": 1,
+        "200": 1000
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 32,
+      "seconds": 23.123,
+      "requests_per_second": 43.3,
+      "p50_seconds": 13.809,
+      "p95_seconds": 21.222,
+      "max_seconds": 22.389,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 0,
+        "expected": 0
+      },
+      "sqlite_integrity": "ok",
+      "exception_counts": {},
+      "database_checks": {
+        "users": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        },
+        "main": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        }
+      },
+      "database_error_counts": {},
+      "exception_examples": [],
+      "form_warning_counts": {},
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "assign_return",
+      "requests": 1001,
+      "statuses": {
+        "200": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 32,
+      "seconds": 34.631,
+      "requests_per_second": 28.9,
+      "p50_seconds": 17.853,
+      "p95_seconds": 32.219,
+      "max_seconds": 33.884,
+      "database_invariant_ok": true,
+      "state": {
+        "jobcard": "1",
+        "audit_rows": 1
+      },
+      "sqlite_integrity": "ok",
+      "exception_counts": {},
+      "database_checks": {
+        "users": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        },
+        "main": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        }
+      },
+      "database_error_counts": {},
+      "exception_examples": [],
+      "form_warning_counts": {},
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "legacy_edit_bale",
+      "requests": 1001,
+      "statuses": {
+        "302": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 32,
+      "seconds": 17.132,
+      "requests_per_second": 58.4,
+      "p50_seconds": 9.997,
+      "p95_seconds": 15.398,
+      "max_seconds": 16.214,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "sqlite_integrity": "ok",
+      "exception_counts": {},
+      "database_checks": {
+        "users": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        },
+        "main": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        }
+      },
+      "database_error_counts": {},
+      "exception_examples": [],
+      "form_warning_counts": {
+        "Someone changed this entry after you opened it. Review the latest values and save again.": 1000
+      },
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "legacy_edit_lump",
+      "requests": 1001,
+      "statuses": {
+        "302": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 32,
+      "seconds": 14.12,
+      "requests_per_second": 70.9,
+      "p50_seconds": 7.634,
+      "p95_seconds": 12.614,
+      "max_seconds": 13.612,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "sqlite_integrity": "ok",
+      "exception_counts": {},
+      "database_checks": {
+        "users": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        },
+        "main": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        }
+      },
+      "database_error_counts": {},
+      "exception_examples": [],
+      "form_warning_counts": {
+        "Someone changed this entry after you opened it. Review the latest values and save again.": 1000
+      },
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "legacy_edit_bundle",
+      "requests": 1001,
+      "statuses": {
+        "302": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 32,
+      "seconds": 14.736,
+      "requests_per_second": 67.9,
+      "p50_seconds": 8.351,
+      "p95_seconds": 13.33,
+      "max_seconds": 14.063,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "sqlite_integrity": "ok",
+      "exception_counts": {},
+      "database_checks": {
+        "users": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        },
+        "main": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        }
+      },
+      "database_error_counts": {},
+      "exception_examples": [],
+      "form_warning_counts": {
+        "Someone changed this entry after you opened it. Review the latest values and save again.": 1000
+      },
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "legacy_edit_cutter",
+      "requests": 1001,
+      "statuses": {
+        "302": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 32,
+      "seconds": 14.232,
+      "requests_per_second": 70.3,
+      "p50_seconds": 7.635,
+      "p95_seconds": 12.779,
+      "max_seconds": 13.765,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "sqlite_integrity": "ok",
+      "exception_counts": {},
+      "database_checks": {
+        "users": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        },
+        "main": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        }
+      },
+      "database_error_counts": {},
+      "exception_examples": [],
+      "form_warning_counts": {
+        "Someone changed this entry after you opened it. Review the latest values and save again.": 1000
+      },
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "legacy_edit_party",
+      "requests": 1001,
+      "statuses": {
+        "302": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 32,
+      "seconds": 22.788,
+      "requests_per_second": 43.9,
+      "p50_seconds": 7.451,
+      "p95_seconds": 21.654,
+      "max_seconds": 22.372,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "sqlite_integrity": "ok",
+      "exception_counts": {},
+      "database_checks": {
+        "users": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        },
+        "main": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        }
+      },
+      "database_error_counts": {},
+      "exception_examples": [],
+      "form_warning_counts": {
+        "Someone changed this entry after you opened it. Review the latest values and save again.": 1000
+      },
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "kept_duplicate",
+      "requests": 1001,
+      "statuses": {
+        "302": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 32,
+      "seconds": 24.006,
+      "requests_per_second": 41.7,
+      "p50_seconds": 9.21,
+      "p95_seconds": 22.482,
+      "max_seconds": 23.2,
+      "database_invariant_ok": true,
+      "state": {
+        "kept_records": 1,
+        "advances": 1,
+        "amount_to_recover_paise": 24000,
+        "returned": 48,
+        "kept": 2,
+        "remaining": 0,
+        "payable": 50
+      },
+      "sqlite_integrity": "ok",
+      "exception_counts": {},
+      "database_checks": {
+        "users": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        },
+        "main": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        }
+      },
+      "database_error_counts": {},
+      "exception_examples": [],
+      "form_warning_counts": {},
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "kept_competing",
+      "requests": 1001,
+      "statuses": {
+        "302": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 32,
+      "seconds": 57.905,
+      "requests_per_second": 17.3,
+      "p50_seconds": 30.162,
+      "p95_seconds": 55.884,
+      "max_seconds": 57.142,
+      "database_invariant_ok": true,
+      "state": {
+        "kept_records": 1,
+        "advances": 1,
+        "amount_to_recover_paise": 24000,
+        "returned": 48,
+        "kept": 2,
+        "remaining": 0,
+        "payable": 50
+      },
+      "sqlite_integrity": "ok",
+      "exception_counts": {},
+      "database_checks": {
+        "users": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        },
+        "main": {
+          "integrity": "ok",
+          "foreign_keys_enabled": true,
+          "foreign_key_violations": 0
+        }
+      },
+      "database_error_counts": {},
+      "exception_examples": [],
+      "form_warning_counts": {
+        "Kept pieces cannot exceed the remaining balance for this product and type.": 1000
+      },
+      "errors": [],
+      "passed": true
+    }
+  ]
+}

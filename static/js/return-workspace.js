@@ -8,7 +8,7 @@
     if (Number.isFinite(height) && height > 0 && height < 1000000) section.querySelector('iframe').style.height = `${height}px`;
     if (!Number.isSafeInteger(remaining) || remaining < 0) return;
     section.dataset.remaining = remaining;
-    section.querySelector('[data-job-pending]').textContent = remaining ? `${remaining} pieces pending` : 'Fully returned';
+    section.querySelector('[data-job-pending]').textContent = remaining ? `${remaining} pieces pending` : 'Complete · no pieces pending';
     const jobs = [...document.querySelectorAll('[data-job-id]')];
     document.querySelector('#open-return-count').textContent = jobs.filter(job => Number(job.dataset.remaining) > 0).length;
     document.querySelector('#open-return-pieces').textContent = jobs.reduce((sum,job) => sum + Number(job.dataset.remaining),0);

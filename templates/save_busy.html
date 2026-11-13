@@ -1,0 +1,10 @@
+{% extends 'app_base.html' %}
+{% block title %}{{ heading|default('Save needs a retry') }} · BH Manufacturing{% endblock %}
+{% block content %}
+<section class="ui-panel">
+  <h1>{{ heading|default('Save needs a retry') }}</h1>
+  <p role="alert">{{ message }}</p>
+  <p>{{ guidance|default('Use the button below to return to your entry, then save again without refreshing the form.') }}</p>
+  <button type="button" onclick="history.back()">Return to entry</button>
+</section>
+{% endblock %}

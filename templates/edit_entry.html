@@ -7,7 +7,7 @@
   {% for message in get_flashed_messages() %}<div class="flash">{{ message }}</div>{% endfor %}
   <section class="ui-panel"><h2>Record details</h2><form method="post" autocomplete="off">
     {{ form.hidden_tag() }}
-    <fieldset class="edit-fields" {% if entry.entity_type == 'jobcard' and entry.paid %}disabled{% endif %}>
+    <fieldset class="edit-fields" {% if entry.entity_type == 'jobcard' and (entry.paid or entry.kept_locked) %}disabled{% endif %}>
     <div class="grid">
       {% for field in entry.fields %}
       {% if config.SIMPLE_WORKFLOW and entry.entity_type == 'product' and field.name in ['meters','size'] %}
@@ -38,4 +38,4 @@
   </form></section>
   <div class="links"><a href="{{ url_for('edit_logs', entity_type=entry.entity_type, entity_id=entry.entity_id) }}">View this entry's history</a> · <a href="{{ url_for('edit_index') }}">Edit center</a></div>
 {% endblock %}
-{% block scripts %}{% if entry.entity_type == 'jobcard' %}<script defer src="{{ url_for('static', filename='js/jobcard-edit.js', v='20261107') }}"></script>{% endif %}{% endblock %}
+{% block scripts %}{% if entry.entity_type == 'jobcard' %}<script defer src="{{ url_for('static', filename='js/jobcard-edit.js', v='20261113-kept-edit') }}"></script>{% endif %}{% endblock %}

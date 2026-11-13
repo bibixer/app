@@ -70,7 +70,7 @@ class PartialPayrollTest(AppTestCase):
         other = self.card(key='other')
         unreturned = self.card(returned=0, key='not-returned')
         html = self.client.get(f'/payroll?worker_id={self.worker.id}').get_data(as_text=True)
-        self.assertIn('Jobs with returned pieces to pay', html)
+        self.assertIn('Jobs with returned or kept pieces to pay', html)
         self.assertIn('Awaiting return: 5', html)
         self.assertNotIn('each job can be paid once', html)
         self.assertNotIn(f'aria-label="Pay job {unreturned}"', html)

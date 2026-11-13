@@ -300,7 +300,7 @@ async function submitData() {
     console.log(data_R);
     if (!res.ok) throw new Error("Submit failed");
 
-    if (data_R.duplicate) {
+    if (data_R.duplicate && !data_R.jobData) {
       alert(data_R.message);
       location.reload();
       return;

@@ -105,6 +105,37 @@ class RangeAndReturnWorkspaceTest(AppTestCase):
         self.assertEqual(response.status_code,200)
         self.assertIn(self.worker.name,response.get_data(as_text=True))
 
+    def test_kept_save_stays_inside_job_without_nested_app_navigation(self):
+        self.product.product_value_paise = 12000
+        db.session.commit()
+        card = self.card()
+        workspace = self.client.get(f'/returns/outworker?worker_id={self.worker.id}').get_data(as_text=True)
+        self.assertNotIn('id="kept-window"', workspace)
+        self.assertIn('class="ui-panel returns-section-heading"', workspace)
+        self.assertIn(f'data-job-id="{card.id}"', workspace)
+        normal = self.client.get(f'/job_retun?jobcard_id={card.id}&embedded=1').get_data(as_text=True)
+        self.assertIn('class="kept-product-form"', normal)
+        self.assertIn('<input type="hidden" name="confirmed" value="yes">', normal)
+        self.assertNotIn('I confirm these pieces are kept', normal)
+        self.assertIn('<details id="kept-pieces" class="kept-section"', normal)
+        self.assertIn('＋ Show details', normal)
+        self.assertIn('− Hide details', normal)
+        popup = self.client.get(f'/job_retun?jobcard_id={card.id}&embedded=1&kept_only=1').get_data(as_text=True)
+        self.assertIn('class="kept-product-form"', popup)
+        self.assertNotIn('id="returnTable"', popup)
+        result = self.client.post(f'/jobcard/{card.id}/kept', data={
+            'product_id':self.product.id, 'bundle_type':'lump', 'pieces':2,
+            'expected_value':12000, 'expected_remaining':10, 'confirmed':'yes',
+            'embedded':'1', 'submission_token':'inline-recovery',
+        })
+        self.assertEqual(result.status_code,302)
+        self.assertIn('embedded=1', result.location)
+        self.assertNotIn('/returns/outworker', result.location)
+        saved = self.client.get(result.location).get_data(as_text=True)
+        self.assertIn('2 kept pieces recorded', saved)
+        self.assertIn('RETURN_EMBEDDED = true', saved)
+        self.assertNotIn('aria-label="Main navigation"', saved)
+
     def test_manual_save_publishes_existing_csv_format_once_in_configured_folder(self):
         root=Path(self.temp.name)/'configured-labels'
         self.app.config['LABEL_PRINT_ROOT']=str(root)

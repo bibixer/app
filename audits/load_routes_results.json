@@ -1,0 +1,1518 @@
+{
+  "requests_per_wave": 1001,
+  "server_threads": 8,
+  "results": [
+    {
+      "name": "route:bootstrap.static:GET",
+      "requests": 1001,
+      "statuses": {
+        "404": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 6,
+      "seconds": 3.218,
+      "requests_per_second": 311.1,
+      "p50_seconds": 2.473,
+      "p95_seconds": 2.944,
+      "max_seconds": 3.01,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "errors": [],
+      "passed": true,
+      "routes": [
+        [
+          "GET",
+          "/bootstrap/static/1"
+        ]
+      ]
+    },
+    {
+      "name": "route:payroll_rates:GET",
+      "requests": 1001,
+      "statuses": {
+        "200": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 8,
+      "seconds": 10.027,
+      "requests_per_second": 99.8,
+      "p50_seconds": 8.729,
+      "p95_seconds": 9.536,
+      "max_seconds": 9.605,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "errors": [],
+      "passed": true,
+      "routes": [
+        [
+          "GET",
+          "/payroll/rates"
+        ]
+      ]
+    },
+    {
+      "name": "route:payroll_rates:POST",
+      "requests": 1001,
+      "statuses": {
+        "200": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 8,
+      "seconds": 9.549,
+      "requests_per_second": 104.8,
+      "p50_seconds": 8.439,
+      "p95_seconds": 9.058,
+      "max_seconds": 9.092,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "errors": [],
+      "passed": true,
+      "routes": [
+        [
+          "POST",
+          "/payroll/rates"
+        ]
+      ]
+    },
+    {
+      "name": "route:outworker_payroll:GET",
+      "requests": 1001,
+      "statuses": {
+        "200": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 8,
+      "seconds": 14.043,
+      "requests_per_second": 71.3,
+      "p50_seconds": 8.08,
+      "p95_seconds": 12.717,
+      "max_seconds": 13.21,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "errors": [],
+      "passed": true,
+      "routes": [
+        [
+          "GET",
+          "/payroll"
+        ]
+      ]
+    },
+    {
+      "name": "route:outworker_payroll:POST",
+      "requests": 1001,
+      "statuses": {
+        "200": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 8,
+      "seconds": 14.445,
+      "requests_per_second": 69.3,
+      "p50_seconds": 8.425,
+      "p95_seconds": 13.138,
+      "max_seconds": 13.513,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "errors": [],
+      "passed": true,
+      "routes": [
+        [
+          "POST",
+          "/payroll"
+        ]
+      ]
+    },
+    {
+      "name": "route:payroll_for_job:GET",
+      "requests": 1001,
+      "statuses": {
+        "302": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 8,
+      "seconds": 7.302,
+      "requests_per_second": 137.1,
+      "p50_seconds": 4.707,
+      "p95_seconds": 6.394,
+      "max_seconds": 6.641,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "errors": [],
+      "passed": true,
+      "routes": [
+        [
+          "GET",
+          "/payroll/job/1"
+        ]
+      ]
+    },
+    {
+      "name": "route:payroll_receipt:GET",
+      "requests": 1001,
+      "statuses": {
+        "404": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 8,
+      "seconds": 5.476,
+      "requests_per_second": 182.8,
+      "p50_seconds": 5.076,
+      "p95_seconds": 5.338,
+      "max_seconds": 5.353,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "errors": [],
+      "passed": true,
+      "routes": [
+        [
+          "GET",
+          "/payroll/1"
+        ]
+      ]
+    },
+    {
+      "name": "route:manage_users:GET",
+      "requests": 1001,
+      "statuses": {
+        "200": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 8,
+      "seconds": 10.006,
+      "requests_per_second": 100.0,
+      "p50_seconds": 7.15,
+      "p95_seconds": 8.848,
+      "max_seconds": 9.163,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "errors": [],
+      "passed": true,
+      "routes": [
+        [
+          "GET",
+          "/users"
+        ]
+      ]
+    },
+    {
+      "name": "route:manage_users:POST",
+      "requests": 1001,
+      "statuses": {
+        "200": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 8,
+      "seconds": 9.92,
+      "requests_per_second": 100.9,
+      "p50_seconds": 9.045,
+      "p95_seconds": 9.354,
+      "max_seconds": 9.414,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "errors": [],
+      "passed": true,
+      "routes": [
+        [
+          "POST",
+          "/users"
+        ]
+      ]
+    },
+    {
+      "name": "route:bale_entery:GET",
+      "requests": 1001,
+      "statuses": {
+        "410": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 8,
+      "seconds": 6.398,
+      "requests_per_second": 156.5,
+      "p50_seconds": 5.996,
+      "p95_seconds": 6.299,
+      "max_seconds": 6.311,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "errors": [],
+      "passed": true,
+      "routes": [
+        [
+          "GET",
+          "/bale_entery"
+        ]
+      ]
+    },
+    {
+      "name": "route:bale_entery:POST",
+      "requests": 1001,
+      "statuses": {
+        "410": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 8,
+      "seconds": 6.126,
+      "requests_per_second": 163.4,
+      "p50_seconds": 5.722,
+      "p95_seconds": 6.035,
+      "max_seconds": 6.048,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "errors": [],
+      "passed": true,
+      "routes": [
+        [
+          "POST",
+          "/bale_entery"
+        ]
+      ]
+    },
+    {
+      "name": "route:lump_home:GET",
+      "requests": 1001,
+      "statuses": {
+        "410": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 8,
+      "seconds": 7.304,
+      "requests_per_second": 137.0,
+      "p50_seconds": 4.884,
+      "p95_seconds": 6.58,
+      "max_seconds": 6.648,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "errors": [],
+      "passed": true,
+      "routes": [
+        [
+          "GET",
+          "/lumpentry"
+        ]
+      ]
+    },
+    {
+      "name": "route:lump_home:POST",
+      "requests": 1001,
+      "statuses": {
+        "410": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 8,
+      "seconds": 6.915,
+      "requests_per_second": 144.8,
+      "p50_seconds": 4.326,
+      "p95_seconds": 5.753,
+      "max_seconds": 5.924,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "errors": [],
+      "passed": true,
+      "routes": [
+        [
+          "POST",
+          "/lumpentry"
+        ]
+      ]
+    },
+    {
+      "name": "route:bundle_entery:GET",
+      "requests": 1001,
+      "statuses": {
+        "410": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 8,
+      "seconds": 7.359,
+      "requests_per_second": 136.0,
+      "p50_seconds": 4.461,
+      "p95_seconds": 6.566,
+      "max_seconds": 6.75,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "errors": [],
+      "passed": true,
+      "routes": [
+        [
+          "GET",
+          "/bundle_entery"
+        ]
+      ]
+    },
+    {
+      "name": "route:bundle_entery:POST",
+      "requests": 1001,
+      "statuses": {
+        "410": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 8,
+      "seconds": 6.777,
+      "requests_per_second": 147.7,
+      "p50_seconds": 4.167,
+      "p95_seconds": 6.042,
+      "max_seconds": 6.223,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "errors": [],
+      "passed": true,
+      "routes": [
+        [
+          "POST",
+          "/bundle_entery"
+        ]
+      ]
+    },
+    {
+      "name": "route:job_card:GET",
+      "requests": 1001,
+      "statuses": {
+        "302": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 8,
+      "seconds": 5.203,
+      "requests_per_second": 192.4,
+      "p50_seconds": 3.064,
+      "p95_seconds": 4.589,
+      "max_seconds": 4.662,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "errors": [],
+      "passed": true,
+      "routes": [
+        [
+          "GET",
+          "/jobcard"
+        ]
+      ]
+    },
+    {
+      "name": "route:job_card:POST",
+      "requests": 1001,
+      "statuses": {
+        "302": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 8,
+      "seconds": 4.91,
+      "requests_per_second": 203.9,
+      "p50_seconds": 3.104,
+      "p95_seconds": 4.098,
+      "max_seconds": 4.304,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "errors": [],
+      "passed": true,
+      "routes": [
+        [
+          "POST",
+          "/jobcard"
+        ]
+      ]
+    },
+    {
+      "name": "route:manual_job_card:GET",
+      "requests": 1001,
+      "statuses": {
+        "200": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 8,
+      "seconds": 15.41,
+      "requests_per_second": 65.0,
+      "p50_seconds": 8.748,
+      "p95_seconds": 14.403,
+      "max_seconds": 14.923,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "errors": [],
+      "passed": true,
+      "routes": [
+        [
+          "GET",
+          "/manual_jobcard"
+        ]
+      ]
+    },
+    {
+      "name": "route:submit_manual_jobcard:POST",
+      "requests": 1001,
+      "statuses": {
+        "400": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 8,
+      "seconds": 5.587,
+      "requests_per_second": 179.2,
+      "p50_seconds": 2.941,
+      "p95_seconds": 4.41,
+      "max_seconds": 4.644,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "errors": [],
+      "passed": true,
+      "routes": [
+        [
+          "POST",
+          "/submit-manual-jobcard"
+        ]
+      ]
+    },
+    {
+      "name": "route:add_item:GET",
+      "requests": 1001,
+      "statuses": {
+        "200": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 8,
+      "seconds": 15.272,
+      "requests_per_second": 65.5,
+      "p50_seconds": 9.075,
+      "p95_seconds": 14.225,
+      "max_seconds": 14.639,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "errors": [],
+      "passed": true,
+      "routes": [
+        [
+          "GET",
+          "/add_items"
+        ]
+      ]
+    },
+    {
+      "name": "route:add_item:POST",
+      "requests": 1001,
+      "statuses": {
+        "200": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 8,
+      "seconds": 14.444,
+      "requests_per_second": 69.3,
+      "p50_seconds": 8.523,
+      "p95_seconds": 13.342,
+      "max_seconds": 13.71,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "errors": [],
+      "passed": true,
+      "routes": [
+        [
+          "POST",
+          "/add_items"
+        ]
+      ]
+    },
+    {
+      "name": "route:add_suppy:GET",
+      "requests": 1001,
+      "statuses": {
+        "410": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 8,
+      "seconds": 6.331,
+      "requests_per_second": 158.1,
+      "p50_seconds": 3.927,
+      "p95_seconds": 5.612,
+      "max_seconds": 5.736,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "errors": [],
+      "passed": true,
+      "routes": [
+        [
+          "GET",
+          "/add_suppy"
+        ]
+      ]
+    },
+    {
+      "name": "route:add_suppy:POST",
+      "requests": 1001,
+      "statuses": {
+        "410": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 8,
+      "seconds": 6.984,
+      "requests_per_second": 143.3,
+      "p50_seconds": 4.09,
+      "p95_seconds": 6.261,
+      "max_seconds": 6.396,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "errors": [],
+      "passed": true,
+      "routes": [
+        [
+          "POST",
+          "/add_suppy"
+        ]
+      ]
+    },
+    {
+      "name": "route:add_outworker:GET",
+      "requests": 1001,
+      "statuses": {
+        "200": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 8,
+      "seconds": 10.075,
+      "requests_per_second": 99.4,
+      "p50_seconds": 6.554,
+      "p95_seconds": 9.373,
+      "max_seconds": 9.568,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "errors": [],
+      "passed": true,
+      "routes": [
+        [
+          "GET",
+          "/add_outworver"
+        ]
+      ]
+    },
+    {
+      "name": "route:add_outworker:POST",
+      "requests": 1001,
+      "statuses": {
+        "200": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 8,
+      "seconds": 10.918,
+      "requests_per_second": 91.7,
+      "p50_seconds": 7.362,
+      "p95_seconds": 10.263,
+      "max_seconds": 10.296,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "errors": [],
+      "passed": true,
+      "routes": [
+        [
+          "POST",
+          "/add_outworver"
+        ]
+      ]
+    },
+    {
+      "name": "route:add_cuter:GET",
+      "requests": 1001,
+      "statuses": {
+        "410": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 8,
+      "seconds": 6.728,
+      "requests_per_second": 148.8,
+      "p50_seconds": 4.038,
+      "p95_seconds": 5.694,
+      "max_seconds": 6.123,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "errors": [],
+      "passed": true,
+      "routes": [
+        [
+          "GET",
+          "/add_cutter"
+        ]
+      ]
+    },
+    {
+      "name": "route:add_cuter:POST",
+      "requests": 1001,
+      "statuses": {
+        "410": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 8,
+      "seconds": 6.312,
+      "requests_per_second": 158.6,
+      "p50_seconds": 4.006,
+      "p95_seconds": 5.427,
+      "max_seconds": 5.562,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "errors": [],
+      "passed": true,
+      "routes": [
+        [
+          "POST",
+          "/add_cutter"
+        ]
+      ]
+    },
+    {
+      "name": "route:submit_jobcard:POST",
+      "requests": 1001,
+      "statuses": {
+        "410": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 1,
+      "seconds": 2.469,
+      "requests_per_second": 405.4,
+      "p50_seconds": 1.811,
+      "p95_seconds": 1.912,
+      "max_seconds": 1.929,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "errors": [],
+      "passed": true,
+      "routes": [
+        [
+          "POST",
+          "/submit-jobcard"
+        ]
+      ]
+    },
+    {
+      "name": "route:retune_product:GET",
+      "requests": 1001,
+      "statuses": {
+        "200": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 8,
+      "seconds": 9.801,
+      "requests_per_second": 102.1,
+      "p50_seconds": 5.722,
+      "p95_seconds": 8.846,
+      "max_seconds": 9.176,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "errors": [],
+      "passed": true,
+      "routes": [
+        [
+          "GET",
+          "/retune_product"
+        ]
+      ]
+    },
+    {
+      "name": "route:retune_product:POST",
+      "requests": 1001,
+      "statuses": {
+        "200": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 8,
+      "seconds": 9.266,
+      "requests_per_second": 108.0,
+      "p50_seconds": 5.388,
+      "p95_seconds": 8.373,
+      "max_seconds": 8.674,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "errors": [],
+      "passed": true,
+      "routes": [
+        [
+          "POST",
+          "/retune_product"
+        ]
+      ]
+    },
+    {
+      "name": "route:outworker_returns:GET",
+      "requests": 1001,
+      "statuses": {
+        "200": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 8,
+      "seconds": 9.223,
+      "requests_per_second": 108.5,
+      "p50_seconds": 5.146,
+      "p95_seconds": 8.226,
+      "max_seconds": 8.412,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "errors": [],
+      "passed": true,
+      "routes": [
+        [
+          "GET",
+          "/returns/outworker"
+        ]
+      ]
+    },
+    {
+      "name": "route:job_retun:GET",
+      "requests": 1001,
+      "statuses": {
+        "302": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 8,
+      "seconds": 5.287,
+      "requests_per_second": 189.3,
+      "p50_seconds": 4.07,
+      "p95_seconds": 4.502,
+      "max_seconds": 4.592,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "errors": [],
+      "passed": true,
+      "routes": [
+        [
+          "GET",
+          "/job_retun"
+        ]
+      ]
+    },
+    {
+      "name": "route:job_retun:POST",
+      "requests": 1001,
+      "statuses": {
+        "302": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 8,
+      "seconds": 4.563,
+      "requests_per_second": 219.4,
+      "p50_seconds": 4.048,
+      "p95_seconds": 4.198,
+      "max_seconds": 4.219,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "errors": [],
+      "passed": true,
+      "routes": [
+        [
+          "POST",
+          "/job_retun"
+        ]
+      ]
+    },
+    {
+      "name": "route:jobcard_ledger_lookup:GET",
+      "requests": 1001,
+      "statuses": {
+        "200": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 8,
+      "seconds": 6.257,
+      "requests_per_second": 160.0,
+      "p50_seconds": 5.828,
+      "p95_seconds": 6.157,
+      "max_seconds": 6.174,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "errors": [],
+      "passed": true,
+      "routes": [
+        [
+          "GET",
+          "/jobcard/ledger"
+        ]
+      ]
+    },
+    {
+      "name": "route:jobcard_ledger:GET",
+      "requests": 1001,
+      "statuses": {
+        "200": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 8,
+      "seconds": 15.316,
+      "requests_per_second": 65.4,
+      "p50_seconds": 9.058,
+      "p95_seconds": 13.922,
+      "max_seconds": 14.491,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "errors": [],
+      "passed": true,
+      "routes": [
+        [
+          "GET",
+          "/jobcard/1/ledger"
+        ]
+      ]
+    },
+    {
+      "name": "route:summit_retune:POST",
+      "requests": 1001,
+      "statuses": {
+        "400": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 8,
+      "seconds": 5.481,
+      "requests_per_second": 182.6,
+      "p50_seconds": 3.195,
+      "p95_seconds": 4.874,
+      "max_seconds": 4.992,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "errors": [],
+      "passed": true,
+      "routes": [
+        [
+          "POST",
+          "/summit-retune"
+        ]
+      ]
+    },
+    {
+      "name": "route:admin_dashord:GET",
+      "requests": 1001,
+      "statuses": {
+        "200": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 8,
+      "seconds": 20.336,
+      "requests_per_second": 49.2,
+      "p50_seconds": 12.809,
+      "p95_seconds": 19.323,
+      "max_seconds": 19.816,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "errors": [],
+      "passed": true,
+      "routes": [
+        [
+          "GET",
+          "/admin_dashord"
+        ]
+      ]
+    },
+    {
+      "name": "route:admin_dashord:POST",
+      "requests": 1001,
+      "statuses": {
+        "200": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 8,
+      "seconds": 19.48,
+      "requests_per_second": 51.4,
+      "p50_seconds": 10.427,
+      "p95_seconds": 18.303,
+      "max_seconds": 18.833,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "errors": [],
+      "passed": true,
+      "routes": [
+        [
+          "POST",
+          "/admin_dashord"
+        ]
+      ]
+    },
+    {
+      "name": "route:dashboard_movements:GET",
+      "requests": 1001,
+      "statuses": {
+        "200": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 8,
+      "seconds": 19.557,
+      "requests_per_second": 51.2,
+      "p50_seconds": 10.469,
+      "p95_seconds": 18.318,
+      "max_seconds": 18.955,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "errors": [],
+      "passed": true,
+      "routes": [
+        [
+          "GET",
+          "/dashboard/movements"
+        ]
+      ]
+    },
+    {
+      "name": "route:cutter_report:GET",
+      "requests": 1001,
+      "statuses": {
+        "410": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 8,
+      "seconds": 6.453,
+      "requests_per_second": 155.1,
+      "p50_seconds": 3.876,
+      "p95_seconds": 5.69,
+      "max_seconds": 5.802,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "errors": [],
+      "passed": true,
+      "routes": [
+        [
+          "GET",
+          "/cutter_report"
+        ]
+      ]
+    },
+    {
+      "name": "route:cutter_report:POST",
+      "requests": 1001,
+      "statuses": {
+        "410": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 8,
+      "seconds": 6.799,
+      "requests_per_second": 147.2,
+      "p50_seconds": 4.246,
+      "p95_seconds": 6.032,
+      "max_seconds": 6.224,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "errors": [],
+      "passed": true,
+      "routes": [
+        [
+          "POST",
+          "/cutter_report"
+        ]
+      ]
+    },
+    {
+      "name": "route:outworker_report:GET",
+      "requests": 1001,
+      "statuses": {
+        "200": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 8,
+      "seconds": 9.203,
+      "requests_per_second": 108.8,
+      "p50_seconds": 8.411,
+      "p95_seconds": 8.687,
+      "max_seconds": 8.747,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "errors": [],
+      "passed": true,
+      "routes": [
+        [
+          "GET",
+          "/outworker_report"
+        ]
+      ]
+    },
+    {
+      "name": "route:outworker_report:POST",
+      "requests": 1001,
+      "statuses": {
+        "200": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 8,
+      "seconds": 9.864,
+      "requests_per_second": 101.5,
+      "p50_seconds": 6.932,
+      "p95_seconds": 9.063,
+      "max_seconds": 9.106,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "errors": [],
+      "passed": true,
+      "routes": [
+        [
+          "POST",
+          "/outworker_report"
+        ]
+      ]
+    },
+    {
+      "name": "route:product_report:GET",
+      "requests": 1001,
+      "statuses": {
+        "410": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 8,
+      "seconds": 7.035,
+      "requests_per_second": 142.3,
+      "p50_seconds": 4.402,
+      "p95_seconds": 6.086,
+      "max_seconds": 6.153,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "errors": [],
+      "passed": true,
+      "routes": [
+        [
+          "GET",
+          "/product_report"
+        ]
+      ]
+    },
+    {
+      "name": "route:product_report:POST",
+      "requests": 1001,
+      "statuses": {
+        "410": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 8,
+      "seconds": 6.043,
+      "requests_per_second": 165.7,
+      "p50_seconds": 5.617,
+      "p95_seconds": 5.95,
+      "max_seconds": 5.966,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "errors": [],
+      "passed": true,
+      "routes": [
+        [
+          "POST",
+          "/product_report"
+        ]
+      ]
+    },
+    {
+      "name": "route:home:GET",
+      "requests": 1001,
+      "statuses": {
+        "302": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 8,
+      "seconds": 4.44,
+      "requests_per_second": 225.4,
+      "p50_seconds": 4.036,
+      "p95_seconds": 4.357,
+      "max_seconds": 4.367,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "errors": [],
+      "passed": true,
+      "routes": [
+        [
+          "GET",
+          "/"
+        ]
+      ]
+    },
+    {
+      "name": "route:login:GET",
+      "requests": 1001,
+      "statuses": {
+        "200": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 8,
+      "seconds": 8.057,
+      "requests_per_second": 124.2,
+      "p50_seconds": 7.539,
+      "p95_seconds": 7.758,
+      "max_seconds": 7.773,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "errors": [],
+      "passed": true,
+      "routes": [
+        [
+          "GET",
+          "/login"
+        ]
+      ]
+    },
+    {
+      "name": "route:login:POST",
+      "requests": 1001,
+      "statuses": {
+        "200": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 8,
+      "seconds": 9.098,
+      "requests_per_second": 110.0,
+      "p50_seconds": 6.559,
+      "p95_seconds": 7.953,
+      "max_seconds": 8.145,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "errors": [],
+      "passed": true,
+      "routes": [
+        [
+          "POST",
+          "/login"
+        ]
+      ]
+    },
+    {
+      "name": "route:logout:GET",
+      "requests": 1001,
+      "statuses": {
+        "302": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 8,
+      "seconds": 4.322,
+      "requests_per_second": 231.6,
+      "p50_seconds": 3.933,
+      "p95_seconds": 4.224,
+      "max_seconds": 4.239,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "errors": [],
+      "passed": true,
+      "routes": [
+        [
+          "GET",
+          "/logout"
+        ]
+      ]
+    },
+    {
+      "name": "route:find_edit:GET",
+      "requests": 1001,
+      "statuses": {
+        "410": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 8,
+      "seconds": 5.912,
+      "requests_per_second": 169.3,
+      "p50_seconds": 5.484,
+      "p95_seconds": 5.825,
+      "max_seconds": 5.841,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "errors": [],
+      "passed": true,
+      "routes": [
+        [
+          "GET",
+          "/find_edit"
+        ]
+      ]
+    },
+    {
+      "name": "route:find_edit:POST",
+      "requests": 1001,
+      "statuses": {
+        "410": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 8,
+      "seconds": 6.301,
+      "requests_per_second": 158.9,
+      "p50_seconds": 5.622,
+      "p95_seconds": 5.895,
+      "max_seconds": 5.91,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "errors": [],
+      "passed": true,
+      "routes": [
+        [
+          "POST",
+          "/find_edit"
+        ]
+      ]
+    },
+    {
+      "name": "route:edit_index:GET",
+      "requests": 1001,
+      "statuses": {
+        "200": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 8,
+      "seconds": 6.213,
+      "requests_per_second": 161.1,
+      "p50_seconds": 5.784,
+      "p95_seconds": 6.094,
+      "max_seconds": 6.115,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "errors": [],
+      "passed": true,
+      "routes": [
+        [
+          "GET",
+          "/edit"
+        ]
+      ]
+    },
+    {
+      "name": "route:edit_search:GET",
+      "requests": 1001,
+      "statuses": {
+        "410": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 1,
+      "seconds": 2.431,
+      "requests_per_second": 411.8,
+      "p50_seconds": 1.887,
+      "p95_seconds": 2.223,
+      "max_seconds": 2.245,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "errors": [],
+      "passed": true,
+      "routes": [
+        [
+          "GET",
+          "/edit/search"
+        ]
+      ]
+    },
+    {
+      "name": "route:edit_entry:GET",
+      "requests": 1001,
+      "statuses": {
+        "200": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 8,
+      "seconds": 25.913,
+      "requests_per_second": 38.6,
+      "p50_seconds": 19.115,
+      "p95_seconds": 25.141,
+      "max_seconds": 25.18,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "errors": [],
+      "passed": true,
+      "routes": [
+        [
+          "GET",
+          "/edit/product/1"
+        ]
+      ]
+    },
+    {
+      "name": "route:edit_entry:POST",
+      "requests": 1001,
+      "statuses": {
+        "200": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 8,
+      "seconds": 26.714,
+      "requests_per_second": 37.5,
+      "p50_seconds": 17.927,
+      "p95_seconds": 25.944,
+      "max_seconds": 26.004,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "errors": [],
+      "passed": true,
+      "routes": [
+        [
+          "POST",
+          "/edit/product/1"
+        ]
+      ]
+    },
+    {
+      "name": "route:edit_logs:GET",
+      "requests": 1001,
+      "statuses": {
+        "200": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 8,
+      "seconds": 6.846,
+      "requests_per_second": 146.2,
+      "p50_seconds": 6.423,
+      "p95_seconds": 6.753,
+      "max_seconds": 6.772,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "errors": [],
+      "passed": true,
+      "routes": [
+        [
+          "GET",
+          "/edit-logs"
+        ]
+      ]
+    }
+  ]
+}

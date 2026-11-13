@@ -77,7 +77,8 @@ class AliasAndEditTest(AppTestCase):
         version = edit_context("product", self.product.id)["version"]
         self.assertEqual(self.edit("product", self.product.id, {"size": "3"}, version=version)[0], "saved")
         self.assertEqual(self.edit("product", self.product.id, {"size": "4"}, token="stale", version=version)[0], "conflict")
-        self.assertEqual(self.edit("product", self.product.id, {"size": "4"})[0], "duplicate")
+        self.assertEqual(self.edit("product", self.product.id, {"size": "4"})[0], "conflict")
+        self.assertEqual(self.edit("product", self.product.id, {"size": "3"})[0], "duplicate")
         self.assertEqual(Item_data.query.one().size, 3)
         self.assertEqual(EditLog.query.filter_by(entity_type="product").count(), 1)
 

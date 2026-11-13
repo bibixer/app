@@ -1,0 +1,16 @@
+{
+  "requests_per_wave": 1001,
+  "server_threads": 32,
+  "results": [
+    {
+      "name": "kept_duplicate",
+      "passed": false,
+      "setup_error": "DetachedInstanceError('Instance <Outworker at 0x71717b8ed7f0> is not bound to a Session; attribute refresh operation cannot proceed')"
+    },
+    {
+      "name": "kept_competing",
+      "passed": false,
+      "setup_error": "DetachedInstanceError('Instance <Outworker at 0x7171603a8a50> is not bound to a Session; attribute refresh operation cannot proceed')"
+    }
+  ]
+}

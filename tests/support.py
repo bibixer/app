@@ -64,7 +64,7 @@ class AppTestCase(unittest.TestCase):
     def login_as(self, user):
         with self.client.session_transaction() as session:
             session.clear()
-            session["_user_id"] = str(user.id)
+            session["_user_id"] = user.get_id()
             session["_fresh"] = True
 
     @property
@@ -124,5 +124,9 @@ class AppTestCase(unittest.TestCase):
             for field in ("product", "type", "date", "quantity", "pieces", "count", "kg", "color"):
                 if field in row:
                     values[f'line_{row["id"]}_{field}'] = row[field]
+        for row in context.get('kept', []):
+            for field in ('product', 'pieces', 'value', 'date', 'note'):
+                values[f'kept_{row["id"]}_{field}'] = row[field]
+            values[f'kept_{row["id"]}_type'] = row['bundle_type']
         values.update(changes or {})
         return save_jobcard_edit(card_id, values, version or context["version"], token, username)

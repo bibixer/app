@@ -7,6 +7,9 @@ from collections import defaultdict
 from sqlalchemy import func
 from modes import db
 from validation import record_id
+from piece_totals import piece_sum
+from modes import JobKeptProduct
+from kept_products import kept_totals, kept_movement_pairs
 
 
 
@@ -244,8 +247,10 @@ def _build_jobcard_return_data(card, movements, breakdowns):
             })
     items = []
     completed_items = []
+    kept = kept_totals()
     for (name, type_name), group in groups.items():
-        balance = group["issued_total"] - group["returned_total"]
+        kept_quantity = kept[(str(card.id), name, type_name)]
+        balance = group["issued_total"] - group["returned_total"] - kept_quantity
         key = product_key(name, type_name)
         pattern_rows = ([{"pieces": pieces, "count": count} for pieces, count in given_patterns[key].items()]
                         if pattern_totals[key] == group["issued_total"] else [])
@@ -263,14 +268,16 @@ def _build_jobcard_return_data(card, movements, breakdowns):
                 "product_name": name,
                 "colour": type_name,
                 "issued": balance,
+                "kept": kept_quantity,
                 "given": given,
                 "history": group["history"],
             })
-        elif group["issued_total"] > 0 and group["history"]:
+        elif group["issued_total"] > 0 and (group["history"] or kept_quantity):
             completed_items.append({
                 "name": name.replace(" ", "_"),
                 "product_name": name,
                 "colour": type_name,
+                "kept": kept_quantity,
                 "given": given,
                 "history": group["history"],
             })
@@ -280,6 +287,13 @@ def _build_jobcard_return_data(card, movements, breakdowns):
         "date": card.date.strftime("%d %b, %Y"),
         "items": items,
         "completed_items": completed_items,
+        "kept_entries": [{'id': row.id, 'product': db.session.get(Item_data, row.product_id).name, 'type': row.bundle_type,
+                          'pieces': row.pieces, 'unit_value_paise': row.unit_value_paise,
+                          'amount_paise': row.amount_paise, 'advance_id': row.advance_id,
+                          'date': row.date.strftime('%d-%m-%Y %H:%M'), 'recorded_by': row.recorded_by,
+                          'date_iso': row.date.isoformat(),
+                          'note': row.note}
+                         for row in JobKeptProduct.query.filter_by(jobcard_id=card.id).order_by(JobKeptProduct.date).all()],
     }
 
 
@@ -292,7 +306,7 @@ def outworker_job_ledger(name, date_from, date_to, jobcard_id=None):
     if jobcard_id is not None:
         card_query = card_query.filter(Jobcard.id == jobcard_id)
     cards = card_query.order_by(Jobcard.date.desc(), Jobcard.id.desc()).all()
-    summary = {"jobs": 0, "given": 0, "returned": 0, "remaining": 0, "open_jobs": 0, "completed_jobs": 0}
+    summary = {"jobs": 0, "given": 0, "returned": 0, "kept": 0, "remaining": 0, "open_jobs": 0, "completed_jobs": 0}
     if not cards:
         return {"name": name, "date_from": date_from, "date_to": date_to, "summary": summary, "jobs": []}
 
@@ -324,14 +338,16 @@ def outworker_job_ledger(name, date_from, date_to, jobcard_id=None):
             returned = sum(entry["returned"] for entry in item["history"])
             products.append({
                 "name": item.get("product_name", item["name"]), "type": item["colour"],
-                "given": given, "returned": returned, "remaining": given - returned,
+                "given": given, "returned": returned, "kept": item.get('kept', 0),
+                "remaining": given - returned - item.get('kept', 0),
                 "given_patterns": item["given"]["calculation_rows"],
                 "returns": item["history"],
             })
         products.sort(key=lambda item: (item["name"].casefold(), item["type"].casefold()))
         given_total = sum(item["given"] for item in products)
         returned_total = sum(item["returned"] for item in products)
-        remaining_total = given_total - returned_total
+        kept_total = sum(item['kept'] for item in products)
+        remaining_total = given_total - returned_total - kept_total
 
         running_balance = 0
         product_balances = defaultdict(int)
@@ -388,8 +404,22 @@ def outworker_job_ledger(name, date_from, date_to, jobcard_id=None):
                 "entered_by": movement.enter_user,
             })
 
-        status = ("Check balance" if any(balance < 0 for balance in product_balances.values())
-                  else "Open" if any(balance > 0 for balance in product_balances.values())
+        for entry in card_data['kept_entries']:
+            ledger.append({'id': f'K{entry["id"]}', 'date': datetime.fromisoformat(entry['date_iso']),
+                'product': entry['product'], 'type': entry['type'], 'flow_type': 'KEPT', 'given': 0, 'returned': 0,
+                'kept': entry['pieces'], 'amount_paise': entry['amount_paise'], 'advance_id': entry['advance_id'],
+                'entered_by': entry['recorded_by'], 'bundle': None, 'method': 'kept', 'calculation_rows': []})
+        ledger.sort(key=lambda entry: (entry['date'], entry['flow_type'] == 'KEPT', int(str(entry['id']).lstrip('K'))))
+        running_balance = 0
+        product_balances = defaultdict(int)
+        for entry in ledger:
+            delta = entry['given'] - entry['returned'] - entry.get('kept', 0)
+            running_balance += delta
+            product_key = (entry['product'], entry['type'])
+            product_balances[product_key] += delta
+            entry.update(balance=running_balance, product_balance=product_balances[product_key])
+        status = ("Check balance" if any(item['remaining'] < 0 for item in products)
+                  else "Open" if any(item['remaining'] > 0 for item in products)
                   else "Complete" if given_total else "No movements")
         payments = paid_jobs[card.id]
         paid_pieces = sum(payment['pieces'] for payment in payments)
@@ -397,15 +427,20 @@ def outworker_job_ledger(name, date_from, date_to, jobcard_id=None):
             "id": card.id, "date": card.date, "given_by": card.given_by,
             "payroll_id": payments[-1]['payroll_id'] if payments else None,
             "payrolls": payments, "paid_pieces": paid_pieces,
-            "payable_pieces": max(0, returned_total - paid_pieces),
+            "payment_status": ('check' if paid_pieces > given_total else
+                               'paid' if given_total > 0 and paid_pieces == given_total else
+                               'partial' if paid_pieces > 0 else 'unpaid'),
+            "payable_pieces": max(0, returned_total + kept_total - paid_pieces),
             "unpaid_pieces": max(0, given_total - paid_pieces),
-            "last_activity": card_movements[-1].date if card_movements else card.date,
-            "given": given_total, "returned": returned_total, "remaining": remaining_total,
+            "last_activity": ledger[-1]['date'] if ledger else card.date,
+            "given": given_total, "returned": returned_total, "kept": kept_total, "remaining": remaining_total,
+            "kept_entries": card_data['kept_entries'],
             "status": status, "products": products, "ledger": ledger,
         })
         summary["jobs"] += 1
         summary["given"] += given_total
         summary["returned"] += returned_total
+        summary['kept'] += kept_total
         summary["remaining"] += remaining_total
         summary["open_jobs"] += status == "Open"
         summary["completed_jobs"] += status == "Complete"
@@ -423,25 +458,29 @@ def outworker_period_account(name, date_from, date_to):
         Jobmovement.jobcard.in_(list(cards)), Jobmovement.name_of_mater == name,
         Jobmovement.date <= end, Jobmovement.flow_type.in_(["OUT", "IN"]),
     ).order_by(Jobmovement.date, Jobmovement.id).all()) if cards else []
+    rows += [row for row, card in kept_movement_pairs() if row.jobcard in cards and row.date <= end]
+    rows.sort(key=lambda row: (row.date, row.flow_type == 'KEPT', int(str(row.id).lstrip('K'))))
     totals = {"opening": 0, "given": 0, "returned": 0, "closing": 0,
-              "incomplete_jobs": 0, "pieces_left": 0}
+              "incomplete_jobs": 0, "pieces_left": 0, 'kept': 0}
     products = {}
     jobs = {}
     for row in rows:
         key = (row.product_name, row.type_B)
         product = products.setdefault(key, {
             "name": row.product_name, "type": row.type_B,
-            "opening": 0, "given": 0, "returned": 0, "closing": 0,
+            "opening": 0, "given": 0, "returned": 0, "closing": 0, 'kept': 0,
             "pieces_left": 0, "incomplete_jobs": 0, "jobs": [],
         })
         given = (row.outflow or 0) if row.flow_type == "OUT" else 0
         returned = (row.inflow or 0) if row.flow_type == "IN" else 0
+        kept = getattr(row, 'kept', 0)
         if row.date < start:
-            product["opening"] += given - returned
+            product["opening"] += given - returned - kept
         else:
             product["given"] += given
             product["returned"] += returned
-        product["closing"] += given - returned
+            product['kept'] += kept
+        product["closing"] += given - returned - kept
         job = jobs.setdefault(row.jobcard, {
             "id": cards[row.jobcard].id, "date": cards[row.jobcard].date,
             "given": 0, "returned": 0, "remaining": 0, "pieces_left": 0,
@@ -449,14 +488,16 @@ def outworker_period_account(name, date_from, date_to):
         })
         job["given"] += given
         job["returned"] += returned
-        job["remaining"] += given - returned
+        job['kept'] = job.get('kept', 0) + kept
+        job["remaining"] += given - returned - kept
         detail = job["products"].setdefault(key, {
             "name": product["name"], "type": row.type_B,
             "given": 0, "returned": 0, "remaining": 0,
         })
         detail["given"] += given
         detail["returned"] += returned
-        detail["remaining"] += given - returned
+        detail['kept'] = detail.get('kept', 0) + kept
+        detail["remaining"] += given - returned - kept
 
     outstanding = []
     for job in jobs.values():
@@ -474,7 +515,7 @@ def outworker_period_account(name, date_from, date_to):
             totals["pieces_left"] += job["pieces_left"]
     totals["incomplete_jobs"] = len(outstanding)
     for product in products.values():
-        for field in ("opening", "given", "returned", "closing"):
+        for field in ("opening", "given", "returned", "closing", 'kept'):
             totals[field] += product[field]
     return {
         "totals": totals,
@@ -520,7 +561,7 @@ def home_dashboard(date):
     bundle_query = db.session.query(
         Bundle.status,
         func.count(Bundle.id),
-        func.coalesce(func.sum(Bundle.pieces), 0)
+        func.coalesce(piece_sum(Bundle.pieces), 0)
     ).filter(
         Bundle.status.in_(["READY", "GIVEN"]),
     ).group_by(Bundle.status).all()
@@ -535,8 +576,8 @@ def home_dashboard(date):
 
     # Movement totals
     movement_totals = db.session.query(
-        func.coalesce(func.sum(Jobmovement.inflow), 0),
-        func.coalesce(func.sum(Jobmovement.outflow), 0)
+        func.coalesce(piece_sum(Jobmovement.inflow), 0),
+        func.coalesce(piece_sum(Jobmovement.outflow), 0)
     ).filter(
         Jobmovement.date.between(start_datetime, end_datetime)
     ).first()
@@ -546,8 +587,8 @@ def home_dashboard(date):
     # Per-product aggregation
     product_flows = db.session.query(
         Jobmovement.product_name,
-        func.coalesce(func.sum(Jobmovement.inflow), 0),
-        func.coalesce(func.sum(Jobmovement.outflow), 0)
+        func.coalesce(piece_sum(Jobmovement.inflow), 0),
+        func.coalesce(piece_sum(Jobmovement.outflow), 0)
     ).filter(
         Jobmovement.date.between(start_datetime, end_datetime)
     ).group_by(Jobmovement.product_name).all()

@@ -1,0 +1,64 @@
+{
+  "requests_per_wave": 1001,
+  "server_threads": 32,
+  "results": [
+    {
+      "name": "product_unique",
+      "requests": 1001,
+      "statuses": {
+        "302": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 32,
+      "seconds": 35.232,
+      "requests_per_second": 28.4,
+      "p50_seconds": 12.904,
+      "p95_seconds": 32.468,
+      "max_seconds": 34.514,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1002,
+        "expected": 1002,
+        "missing": []
+      },
+      "sqlite_integrity": "ok",
+      "exception_counts": {},
+      "database_error_counts": {},
+      "exception_examples": [],
+      "form_warning_counts": {},
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "manual_duplicate",
+      "requests": 1001,
+      "statuses": {
+        "200": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 32,
+      "seconds": 9.26,
+      "requests_per_second": 108.1,
+      "p50_seconds": 5.197,
+      "p95_seconds": 8.188,
+      "max_seconds": 8.777,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "sqlite_integrity": "ok",
+      "exception_counts": {},
+      "database_error_counts": {},
+      "exception_examples": [],
+      "form_warning_counts": {},
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "recover_batch",
+      "passed": false,
+      "setup_error": "TimeoutError('QueuePool limit of size 5 overflow 10 reached, connection timed out, timeout 30.00')"
+    }
+  ]
+}

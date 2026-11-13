@@ -1,5 +1,53 @@
 # Application tests
 
+Kept-product recovery: `tests/test_kept_products.py` verifies physically returned
+versus retained pieces, product-value setup, payroll eligibility, recoverable
+advances, partial prior payments, duplicate/race protection and additive migration.
+Usage and rollout are documented in `KEPT_PRODUCTS.md`.
+
+Security and integrity hardening (13 November 2026): normal test discovery now
+includes the original security audit regressions in `test_security_hardening.py`.
+Coverage includes private persistent signing keys, session revocation, forced
+numeric user-ID reuse, active SQLite foreign keys, movement validation triggers,
+quantity limits, exact historical totals, additive upgrades, receipt replay, and
+101 concurrent identical/changed-payload retries. See
+`audits/SECURITY_FIX_VERIFICATION.md` for rollout notes and fresh load evidence.
+
+Recheck the authentication, integrity, upgrade and contention reproductions:
+
+```bash
+PYTHONPATH=tests:. .venv/bin/python -m unittest test_security_hardening test_database_contention test_schema_updates -v
+```
+
+The full isolated mutation load rerun uses 37 scenario waves and validates both
+databases' integrity, enabled foreign keys and lack of foreign-key violations:
+
+```bash
+PYTHONPATH=tests:. .venv/bin/python audits/load_1000.py --requests 1001 --threads 32 --output audits/load_security_complete_results.json
+```
+
+The mixed `route_sweep` wave distributes its requests across registered routes;
+it is not a separate 1,001-request wave per route. Use `--route-waves` when that
+separate per-route diagnostic is required.
+
+SQLite load fixes (13 November 2026): `database_writes.py` configures WAL, writer
+lock waiting and clean write boundaries for both databases. Contention tests in
+`test_database_contention.py` cover real lock timeouts, reusable retry keys,
+retryable API/form errors and dual-pool capacity. The Waitress settings are shared
+with the load harness through `app.SERVER_OPTIONS`.
+
+Committed request replays now take a read-only fast path in `data_entry.py`.
+First submissions still acquire the writer lock and repeat their claim check.
+Contention tests verify an existing receipt can replay while an unrelated writer
+holds SQLite's writer lock, and concurrent different payloads still conflict.
+
+Follow-up load evidence and remaining scope limits are recorded in
+`audits/LOAD_FIX_VERIFICATION.md`. Reproduce the isolated mutation waves with:
+
+```bash
+PYTHONPATH=tests:. .venv/bin/python audits/load_1000.py --requests 1001 --output audits/load_fixed_results.json
+```
+
 Run the unit, database, API and rendered-page tests from the app directory:
 
 ```bash

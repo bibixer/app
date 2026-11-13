@@ -35,7 +35,7 @@ class PayrollTest(unittest.TestCase):
         db.session.commit()
         self.client = self.app.test_client()
         with self.client.session_transaction() as session:
-            session["_user_id"] = str(self.user.id)
+            session["_user_id"] = self.user.get_id()
             session["_fresh"] = True
 
     def tearDown(self):

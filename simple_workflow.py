@@ -1,10 +1,12 @@
 """V2 manual-only workflow boundaries, job dashboard and administrator accounts."""
 
 import hashlib
+import hmac
+import json
 from datetime import date, datetime, time, timedelta
 import math
 
-from flask import abort, flash, jsonify, redirect, render_template, request, url_for
+from flask import abort, flash, jsonify, redirect, render_template, request, url_for, current_app
 from flask_login import current_user, login_required
 from sqlalchemy import func, update
 from sqlalchemy.exc import IntegrityError
@@ -14,8 +16,13 @@ from form import WriteForm
 from modes import db, User, UserAccessLog, Jobcard, Jobmovement, Item_data, Outworker
 from validation import record_id
 from item_aliases import normalize_name
+from database_writes import begin_write
+from piece_totals import piece_sum
+from kept_products import kept_totals, kept_movement_pairs
+from modes import JobKeptProduct
 
 CORE_ENTITIES = frozenset({'jobcard', 'product', 'outworker'})
+
 DISABLED_ENDPOINTS = frozenset({
     'bale_entery', 'lump_home', 'bundle_entery', 'add_cuter', 'add_suppy',
     'cutter_report', 'product_report', 'find_edit', 'submit_jobcard',
@@ -26,8 +33,8 @@ def job_overview():
     """Lifetime product totals, with pending balances calculated per job and type."""
     grouped = db.session.query(
         Jobmovement.jobcard, Jobmovement.product_name, Jobmovement.type_B,
-        func.coalesce(func.sum(Jobmovement.outflow), 0),
-        func.coalesce(func.sum(Jobmovement.inflow), 0),
+        func.coalesce(piece_sum(Jobmovement.outflow), 0),
+        func.coalesce(piece_sum(Jobmovement.inflow), 0),
     ).group_by(
         Jobmovement.jobcard, Jobmovement.product_name, Jobmovement.type_B,
     ).all()
@@ -38,6 +45,7 @@ def job_overview():
     }
     card_ids = {row[0] for row in db.session.query(Jobcard.id).all()}
     totals = {}
+    kept = kept_totals()
     unlinked = {'given': 0, 'returned': 0}
     for card_id, product, kind, given, returned in grouped:
         product_total = product_totals.setdefault(
@@ -50,17 +58,23 @@ def job_overview():
             unlinked['given'] += given
             unlinked['returned'] += returned
             continue
-        pending = max(0, given - returned)
+        kept_quantity = kept[(str(parsed), product, kind)]
+        if kept_quantity:
+            product_total['kept'] = product_total.get('kept', 0) + kept_quantity
+        pending = max(0, given - returned - kept_quantity)
         product_total['pending'] += pending
         total = totals.setdefault(parsed, {'given': 0, 'returned': 0, 'pending': 0})
         total['given'] += given
         total['returned'] += returned
+        if kept_quantity:
+            total['kept'] = total.get('kept', 0) + kept_quantity
         total['pending'] += pending
     recent = Jobcard.query.order_by(Jobcard.date.desc(), Jobcard.id.desc()).limit(20).all()
     return {
         'jobs': len(card_ids),
         'given': sum(row['given'] for row in product_totals.values()),
         'returned': sum(row['returned'] for row in product_totals.values()),
+        'kept': sum(row.get('kept', 0) for row in product_totals.values()),
         'open_jobs': sum(row['pending'] > 0 for row in totals.values()),
         'pending': sum(row['pending'] for row in totals.values()),
         'products': len(configured_products), 'workers': Outworker.query.count(),
@@ -111,29 +125,43 @@ def weekly_job_overview(day=None, *, date_from=None, date_to=None):
     from sqlalchemy import case
     rows = db.session.query(
         Jobmovement.product_name,
-        func.coalesce(func.sum(case((Jobmovement.date < start,
+        func.coalesce(piece_sum(case((Jobmovement.date < start,
                                      func.coalesce(Jobmovement.outflow, 0) - func.coalesce(Jobmovement.inflow, 0)), else_=0)), 0),
-        func.coalesce(func.sum(case((Jobmovement.date >= start, Jobmovement.outflow), else_=0)), 0),
-        func.coalesce(func.sum(case((Jobmovement.date >= start, Jobmovement.inflow), else_=0)), 0),
+        func.coalesce(piece_sum(case((Jobmovement.date >= start, Jobmovement.outflow), else_=0)), 0),
+        func.coalesce(piece_sum(case((Jobmovement.date >= start, Jobmovement.inflow), else_=0)), 0),
     ).filter(Jobmovement.date < end).group_by(Jobmovement.product_name).all()
     for name, opening, given, returned in rows:
         product = products.setdefault(normalize_name(name), {'name': name or 'Unnamed product'})
         product.update(opening=opening, given=given, returned=returned, closing=opening + given - returned)
+    names = {row.id: row.name for row in Item_data.query.all()}
+    for row in JobKeptProduct.query.filter(JobKeptProduct.date < end).all():
+        name = names.get(row.product_id, row.product_name)
+        product = products.setdefault(normalize_name(name), dict(name=name, opening=0, given=0, returned=0, closing=0))
+        if row.date < start:
+            product['opening'] -= row.pieces
+        else:
+            product['kept'] = product.get('kept', 0) + row.pieces
+        product['closing'] -= row.pieces
     product_rows = sorted(products.values(), key=lambda row: normalize_name(row['name']))
     cards = Jobcard.query.filter(Jobcard.date >= start, Jobcard.date < end).order_by(Jobcard.date.desc(), Jobcard.id.desc()).all()
     balances = {}
     if cards:
         movements = db.session.query(Jobmovement.jobcard, Jobmovement.product_name, Jobmovement.type_B,
-                                     func.coalesce(func.sum(Jobmovement.outflow), 0),
-                                     func.coalesce(func.sum(Jobmovement.inflow), 0)).filter(
+                                     func.coalesce(piece_sum(Jobmovement.outflow), 0),
+                                     func.coalesce(piece_sum(Jobmovement.inflow), 0)).filter(
             Jobmovement.jobcard.in_([str(card.id) for card in cards]), Jobmovement.date < end,
         ).group_by(Jobmovement.jobcard, Jobmovement.product_name, Jobmovement.type_B).all()
+        kept = kept_totals(before=end)
         for card_id, name, kind, given, returned in movements:
             balance = balances.setdefault(int(card_id), {'given': 0, 'returned': 0, 'pending': 0})
             balance['given'] += given
             balance['returned'] += returned
-            balance['pending'] += max(0, given - returned)
+            kept_quantity = kept[(str(card_id), name, kind)]
+            if kept_quantity:
+                balance['kept'] = balance.get('kept', 0) + kept_quantity
+            balance['pending'] += max(0, given - returned - kept_quantity)
     totals = {field: sum(row[field] for row in product_rows) for field in ('opening', 'given', 'returned', 'closing')}
+    totals['kept'] = sum(row.get('kept', 0) for row in product_rows)
     return {**totals, 'week_start': first, 'week_end': last, 'custom_range': custom,
             'previous_week': first - timedelta(days=7), 'next_week': first + timedelta(days=7),
             'product_totals': product_rows, 'outflow_pie': _product_pie(product_rows, 'given'),
@@ -163,11 +191,14 @@ def dashboard_movement_details(report, kind):
         query = query.filter(Jobmovement.date >= start)
         query = query.filter(Jobmovement.outflow > 0 if kind == 'given' else Jobmovement.inflow > 0)
     pairs = query.order_by(Jobmovement.date, Jobmovement.id).all()
+    if kind not in {'given', 'returned'}:
+        pairs += kept_movement_pairs(start if kind == 'opening' else end)
+        pairs.sort(key=lambda pair: (pair[0].date, pair[0].flow_type == 'KEPT', int(str(pair[0].id).lstrip('K'))))
     breakdowns = {row.movement_id: row for row in ReturnBreakdown.query.filter(
         ReturnBreakdown.movement_id.in_([movement.id for movement, card in pairs])).all()} if pairs else {}
     entries, balance = [], 0
     for movement, card in pairs:
-        balance += (movement.outflow or 0) - (movement.inflow or 0)
+        balance += (movement.outflow or 0) - (movement.inflow or 0) - getattr(movement, 'kept', 0)
         breakdown = breakdowns.get(movement.id)
         patterns = []
         if card and movement.flow_type == 'OUT':
@@ -181,6 +212,7 @@ def dashboard_movement_details(report, kind):
                                      'count': item.get('bundle_count', 1)})
         entries.append({'movement': movement, 'card': card, 'balance': balance,
                         'given': movement.outflow or 0, 'returned': movement.inflow or 0,
+                        'kept': getattr(movement, 'kept', 0),
                         'brought_forward': movement.date < start,
                         'patterns': patterns, 'breakdown': breakdown})
     return entries
@@ -188,7 +220,7 @@ def dashboard_movement_details(report, kind):
 
 def user_version(user):
     return hashlib.sha256(
-        f'{user.id}:{user.username}:{user.role}:{user.is_active}:{user.password}'.encode()
+        f'{user.id}:{user.username}:{user.role}:{user.is_active}:{user.password}:{user.auth_id}'.encode()
     ).hexdigest()
 
 
@@ -202,6 +234,7 @@ def save_user_access(values, token, actor_id):
     """Account changes and their deduplication/audit use the same users transaction."""
     try:
         # Serialize user writes, then refresh authority after acquiring the SQLite lock.
+        begin_write(User)
         db.session.execute(update(User).where(User.id == actor_id).values(role=User.role))
         db.session.expire_all()
         actor = db.session.get(User, actor_id)
@@ -210,8 +243,20 @@ def save_user_access(values, token, actor_id):
         if not isinstance(token, str) or not token.strip() or len(token) > 128:
             raise ValueError('Reload this form before saving.')
         key = hashlib.sha256(f'{actor.id}:users:{token}'.encode()).hexdigest()
-        if UserAccessLog.query.filter_by(request_key=key).first():
+        # Account payloads can contain a password. A plain fast digest would
+        # expose an offline password-guessing oracle if only the audit DB leaked.
+        signing_key = current_app.secret_key
+        if isinstance(signing_key, str):
+            signing_key = signing_key.encode()
+        digest = hmac.new(signing_key, json.dumps({k: v for k, v in dict(values).items()
+                                           if k not in {'version', 'csrf_token', 'submission_token'}},
+                                          sort_keys=True, default=str).encode(), hashlib.sha256).hexdigest()
+        previous = UserAccessLog.query.filter_by(request_key=key).first()
+        if previous:
+            matches = previous.payload_hash == digest
             db.session.rollback()
+            if not matches:
+                raise ValueError('This request ID was already used for a different account change.')
             return 'This account change was already saved.'
         action = values.get('action')
         old_role = None
@@ -231,6 +276,9 @@ def save_user_access(values, token, actor_id):
             if not isinstance(password, str) or len(password) < 8 or len(password) > 128:
                 raise ValueError('Use a password between 8 and 128 characters.')
             user = User(name, password, role)
+            # Audit IDs must not be reassigned after an account is deleted.
+            user.id = max(db.session.query(func.max(User.id)).scalar() or 0,
+                          db.session.query(func.max(UserAccessLog.user_id)).scalar() or 0) + 1
             db.session.add(user)
             db.session.flush()
         elif action == 'update':
@@ -257,6 +305,8 @@ def save_user_access(values, token, actor_id):
                 if len(password) < 8 or len(password) > 128:
                     raise ValueError('Use a password between 8 and 128 characters.')
                 user.password = generate_password_hash(password)
+            if password or old_role != role:
+                user.revoke_sessions()
         elif action in ('set_active', 'delete'):
             target_id = record_id(values.get('user_id'))
             user = db.session.get(User, target_id) if target_id else None
@@ -276,6 +326,7 @@ def save_user_access(values, token, actor_id):
                 if not is_active and user.is_active and user.role == 1:
                     _require_another_active_admin(user.id)
                 user.is_active = is_active
+                user.revoke_sessions()
                 action = 'enabled' if is_active else 'disabled'
                 message = 'User account enabled.' if is_active else 'User account disabled.'
             else:
@@ -287,6 +338,7 @@ def save_user_access(values, token, actor_id):
                 db.session.add(UserAccessLog(
                     request_key=key, changed_at=datetime.now(), actor=actor.username,
                     user_id=user.id, action=action, old_role=old_role, new_role=role,
+                    payload_hash=digest,
                 ))
                 db.session.delete(user)
         else:
@@ -295,6 +347,7 @@ def save_user_access(values, token, actor_id):
             db.session.add(UserAccessLog(
                 request_key=key, changed_at=datetime.now(), actor=actor.username,
                 user_id=user.id, action=action, old_role=old_role, new_role=role,
+                payload_hash=digest,
             ))
         db.session.commit()
         return message

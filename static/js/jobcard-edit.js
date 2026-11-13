@@ -1,5 +1,16 @@
 // Preview an admin's return correction. Saving and permission checks stay on the server.
 (() => {
+  document.querySelectorAll('.kept-edit-row').forEach(row => {
+    const pieces = row.querySelector('[data-kept-pieces]');
+    const value = row.querySelector('[data-kept-value]');
+    const update = () => {
+      const total = Number(pieces.value) * Math.round(Number(value.value) * 100);
+      row.querySelector('[data-kept-recovery]').textContent = pieces.validity.valid && value.validity.valid && Number.isSafeInteger(total)
+        ? `₹${(total / 100).toFixed(2)}` : 'Check quantity and value';
+    };
+    pieces.addEventListener('input', update);
+    value.addEventListener('input', update);
+  });
   document.querySelectorAll('.restore-return').forEach(button => {
     const input = document.getElementById(button.dataset.returnInput);
     const feedback = button.parentElement.querySelector('.restore-feedback');

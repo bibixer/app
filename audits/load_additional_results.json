@@ -1,0 +1,175 @@
+{
+  "requests_per_wave": 1001,
+  "server_threads": 8,
+  "results": [
+    {
+      "name": "rate_remove",
+      "requests": 1001,
+      "statuses": {
+        "200": 1000,
+        "302": 1
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 8,
+      "seconds": 18.877,
+      "requests_per_second": 53.0,
+      "p50_seconds": 9.937,
+      "p95_seconds": 17.249,
+      "max_seconds": 18.015,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 0,
+        "expected": 0
+      },
+      "sqlite_integrity": "ok",
+      "exception_counts": {},
+      "exception_examples": [],
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "assign_return",
+      "requests": 1001,
+      "statuses": {
+        "200": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 8,
+      "seconds": 29.316,
+      "requests_per_second": 34.1,
+      "p50_seconds": 16.42,
+      "p95_seconds": 27.409,
+      "max_seconds": 28.442,
+      "database_invariant_ok": true,
+      "state": {
+        "jobcard": "1",
+        "audit_rows": 1
+      },
+      "sqlite_integrity": "ok",
+      "exception_counts": {},
+      "exception_examples": [],
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "legacy_edit_bale",
+      "requests": 1001,
+      "statuses": {
+        "302": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 8,
+      "seconds": 12.627,
+      "requests_per_second": 79.3,
+      "p50_seconds": 7.159,
+      "p95_seconds": 11.101,
+      "max_seconds": 11.486,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "sqlite_integrity": "ok",
+      "exception_counts": {},
+      "exception_examples": [],
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "legacy_edit_lump",
+      "requests": 1001,
+      "statuses": {
+        "302": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 8,
+      "seconds": 12.699,
+      "requests_per_second": 78.8,
+      "p50_seconds": 6.728,
+      "p95_seconds": 10.725,
+      "max_seconds": 11.304,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "sqlite_integrity": "ok",
+      "exception_counts": {},
+      "exception_examples": [],
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "legacy_edit_bundle",
+      "requests": 1001,
+      "statuses": {
+        "302": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 8,
+      "seconds": 11.167,
+      "requests_per_second": 89.6,
+      "p50_seconds": 6.163,
+      "p95_seconds": 9.903,
+      "max_seconds": 10.37,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "sqlite_integrity": "ok",
+      "exception_counts": {},
+      "exception_examples": [],
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "legacy_edit_cutter",
+      "requests": 1001,
+      "statuses": {
+        "302": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 8,
+      "seconds": 10.687,
+      "requests_per_second": 93.7,
+      "p50_seconds": 5.733,
+      "p95_seconds": 9.604,
+      "max_seconds": 10.04,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "sqlite_integrity": "ok",
+      "exception_counts": {},
+      "exception_examples": [],
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "legacy_edit_party",
+      "requests": 1001,
+      "statuses": {
+        "302": 1001
+      },
+      "peak_client_inflight": 1001,
+      "peak_server_handlers": 8,
+      "seconds": 10.326,
+      "requests_per_second": 96.9,
+      "p50_seconds": 5.698,
+      "p95_seconds": 9.355,
+      "max_seconds": 9.805,
+      "database_invariant_ok": true,
+      "state": {
+        "rows": 1,
+        "expected": 1
+      },
+      "sqlite_integrity": "ok",
+      "exception_counts": {},
+      "exception_examples": [],
+      "errors": [],
+      "passed": true
+    }
+  ]
+}

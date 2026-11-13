@@ -69,7 +69,7 @@ class OutworkerJobLedgerTest(unittest.TestCase):
 
         report = outworker_job_ledger(worker, date(2026, 10, 1), date(2026, 10, 31))
         self.assertEqual(report["summary"], {
-            "jobs": 1, "given": 120, "returned": 50, "remaining": 70,
+            "jobs": 1, "given": 120, "returned": 50, "kept": 0, "remaining": 70,
             "open_jobs": 1, "completed_jobs": 0,
         })
         job = report["jobs"][0]
@@ -132,7 +132,7 @@ class OutworkerJobLedgerTest(unittest.TestCase):
         db.session.commit()
         account = outworker_period_account("RAM", date(2026, 10, 1), date(2026, 10, 31))
         self.assertEqual(account["totals"], {
-            "opening": 80, "given": 60, "returned": 90, "closing": 50,
+            "opening": 80, "given": 60, "returned": 90, "kept": 0, "closing": 50,
             "incomplete_jobs": 1, "pieces_left": 50,
         })
         self.assertEqual([job["id"] for job in account["outstanding_jobs"]], [older.id])

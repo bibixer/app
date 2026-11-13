@@ -7,6 +7,7 @@ from sqlalchemy import or_, func
 
 from data_entry import claim_write
 from modes import db, Jobcard, Jobmovement, EditLog, OutworkerPayrollJob
+from kept_products import kept_movement_pairs
 
 
 def _unassigned():
@@ -30,6 +31,10 @@ def matching_jobs(movement):
         Jobmovement.product_name == movement.product_name,
         Jobmovement.type_B == movement.type_B,
     ).all()
+    card_ids = {card.id for card in cards}
+    rows += [row for row, card in kept_movement_pairs()
+             if card.id in card_ids and row.product_name == movement.product_name
+             and row.type_B == movement.type_B]
     balances = defaultdict(int)
     issued_before_return = defaultdict(int)
     by_card = defaultdict(list)
@@ -43,11 +48,16 @@ def matching_jobs(movement):
             balances[row.jobcard] -= row.inflow or 0
             if row.date <= movement.date:
                 issued_before_return[row.jobcard] -= row.inflow or 0
+        elif row.flow_type == 'KEPT':
+            balances[row.jobcard] -= row.kept
+            if row.date <= movement.date:
+                issued_before_return[row.jobcard] -= row.kept
     chronological = set()
     for card in cards:
         running = 0
-        for row in sorted([*by_card[str(card.id)], movement], key=lambda row: (row.date, row.id)):
-            running += (row.outflow or 0) if row.flow_type == "OUT" else -(row.inflow or 0)
+        for row in sorted([*by_card[str(card.id)], movement],
+                          key=lambda row: (row.date, row.flow_type == 'KEPT', int(str(row.id).lstrip('K')))):
+            running += (row.outflow or 0) - (row.inflow or 0) - getattr(row, 'kept', 0)
             if running < 0:
                 break
         else:
@@ -69,7 +79,8 @@ def unassigned_returns(worker):
 def assign_return(movement_id, card_id, user):
     """Claim first so concurrent assignments cannot consume the same balance."""
     try:
-        if not claim_write(f"legacy-return-{movement_id}", "assign_return", user):
+        if not claim_write(f"legacy-return-{movement_id}", "assign_return", user,
+                           dict(movement_id=movement_id, card_id=card_id)):
             raise ValueError("This return was already submitted. Refresh the ledger.")
         movement = db.session.get(Jobmovement, movement_id, populate_existing=True)
         if movement is None or movement.flow_type != "IN":

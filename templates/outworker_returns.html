@@ -1,9 +1,35 @@
 {% extends 'app_base.html' %}
 {% block title %}Outworker returns · BH Manufacturing{% endblock %}
-{% block head %}<link rel="stylesheet" href="{{ url_for('static',filename='style/return-workspace.css',v='20261108') }}">{% endblock %}
+{% block head %}<link rel="stylesheet" href="{{ url_for('static',filename='style/return-workspace.css',v='20261113-collapse') }}">{% endblock %}
 {% block content %}
-<header class="ui-heading"><div><p class="ui-kicker">Returns · All incomplete jobs</p><h1>{{ worker.name ~ ' · ' ~ worker.adders if worker else 'Outworker returns' }}</h1><p class="ui-description">Enter returns on any open job below. Each confirmation saves to that job; other jobs keep their unsaved entries.</p></div><a class="button secondary" href="{{ url_for('retune_product') }}">Open by job number →</a></header>
-<section class="ui-panel"><form method="get" class="return-worker-picker"><label for="workspace-worker">Outworker name, alias, or ID<input id="workspace-worker" name="worker" list="workspace-workers" value="{{ worker.id if worker else '' }}" required autocomplete="off"></label><datalist id="workspace-workers">{% for option in master_options %}<option value="{{ option.value }}" label="{{ option.label }}"></option>{% endfor %}</datalist><button type="submit">Open incomplete jobs</button></form>{% if worker %}<p>Outworker #{{ worker.id }} · <strong id="open-return-count">{{ jobs|length }}</strong> incomplete jobs · <strong id="open-return-pieces">{{ jobs|sum(attribute='pending') }}</strong> pieces pending</p>{% endif %}</section>
-{% if worker %}{% for job in jobs %}<section class="ui-panel return-workspace-job" data-job-id="{{ job.card.id }}" data-remaining="{{ job.pending }}"><header><div><h2>Job #{{ job.card.id }}</h2><p>Issued {{ job.card.date.strftime('%d %b %Y') }} by {{ job.card.given_by }} · <strong data-job-pending>{{ job.pending }} pieces pending</strong></p></div><a href="{{ url_for('job_retun',jobcard_id=job.card.id) }}" target="_blank" rel="noopener">Open separately ↗</a></header><iframe class="return-job-frame" title="Return entry for job {{ job.card.id }}" src="{{ url_for('job_retun',jobcard_id=job.card.id,embedded=1) }}" loading="lazy"></iframe></section>{% else %}<section class="ui-panel"><h2>No incomplete jobs</h2><p>This outworker has no pieces left to return on their job cards.</p></section>{% endfor %}{% endif %}
+{% for category,message in get_flashed_messages(with_categories=true) %}<div class="ui-panel notice {{ category }}" role="alert">{{ message }}</div>{% endfor %}
+<header class="ui-heading returns-hero">
+  <div><p class="ui-kicker">Production / Returns</p><h1>Outworker return workspace</h1><p class="ui-description">{{ worker.name ~ ' · ' ~ worker.adders if worker else 'One account. Every open job. Clear balances.' }}</p></div>
+  <a class="button secondary" href="{{ url_for('retune_product') }}">Find a job card →</a>
+</header>
+<section class="ui-panel returns-account">
+  <div class="returns-account-heading"><span class="return-job-label">01 / Choose account</span><p>Search by name, alias or outworker ID.</p></div>
+  <form method="get" class="return-worker-picker">
+    <label for="workspace-worker">Outworker name, alias, or ID<input id="workspace-worker" name="worker" list="workspace-workers" value="{{ worker.id if worker else '' }}" required autocomplete="off" placeholder="Enter a name or ID"></label>
+    <datalist id="workspace-workers">{% for option in master_options %}<option value="{{ option.value }}" label="{{ option.label }}"></option>{% endfor %}</datalist>
+    <button type="submit">Open account →</button>
+  </form>
+  {% if worker %}<div class="return-account-summary">
+    <div><span>Incomplete jobs</span><strong id="open-return-count">{{ jobs|length }}</strong><small>Job cards with a balance</small></div>
+    <div><span>Pieces remaining</span><strong id="open-return-pieces">{{ jobs|sum(attribute='pending') }}</strong><small>Awaiting return or kept entry</small></div>
+    <div><span>Outworker account</span><strong>#{{ worker.id }}</strong><small>{{ worker.name }}</small></div>
+  </div>{% endif %}
+</section>
+{% if worker %}
+<div class="ui-panel returns-section-heading"><div><p class="ui-kicker">02 / Record movement</p><h2>Return across open jobs</h2><p>Save returns first, then record pieces kept below that job. Other jobs keep their drafts.</p></div><span class="returns-workspace-tag">Job-wise entry</span></div>
+{% for job in jobs %}
+<section class="ui-panel return-workspace-job" data-job-id="{{ job.card.id }}" data-remaining="{{ job.pending }}">
+  <header><div><span class="return-job-label">JOB CARD</span><h2>#{{ job.card.id }}</h2><p>Issued {{ job.card.date.strftime('%d %b %Y') }} · By {{ job.card.given_by }}</p></div>
+    <div class="return-job-actions"><strong data-job-pending>{{ job.pending }} pieces pending</strong><a href="{{ url_for('job_retun',jobcard_id=job.card.id) }}" target="_blank" rel="noopener">Full job view ↗</a></div>
+  </header>
+  <iframe class="return-job-frame" title="Return entry for job {{ job.card.id }}" src="{{ url_for('job_retun',jobcard_id=job.card.id,embedded=1) }}" loading="lazy"></iframe>
+</section>
+{% else %}<section class="ui-panel returns-empty"><span class="return-job-label">Account up to date</span><h2>No incomplete jobs</h2><p>This outworker has no pieces left to return on their job cards.</p><a class="button secondary" href="{{ url_for('outworker_payroll',worker_id=worker.id) }}">Open payroll →</a></section>{% endfor %}
+{% endif %}
 {% endblock %}
-{% block scripts %}<script defer src="{{ url_for('static',filename='js/return-workspace.js',v='20261108') }}"></script>{% endblock %}
+{% block scripts %}<script defer src="{{ url_for('static',filename='js/return-workspace.js',v='20261113-inline') }}"></script>{% endblock %}

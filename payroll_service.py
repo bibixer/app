@@ -12,6 +12,8 @@ from bundle_types import BUNDLE_TYPE_VALUES
 from data_entry import claim_write
 from item_aliases import normalize_name
 from validation import record_id
+from kept_products import kept_totals
+from modes import JobKeptProduct
 from modes import (db, Item_data, Outworker, Jobcard, Jobmovement, EditLog,
                    OutworkerRate, OutworkerAdvance, OutworkerPayroll, OutworkerPayrollJob,
                    OutworkerAdvanceRecovery, OutworkerAdvanceReceipt)
@@ -51,9 +53,9 @@ def parse_money(value):
     return int(_decimal(value, 2, Decimal(MAX_PAISE) / 100, "Amount") * 100)
 
 
-def _claim(token, endpoint, user):
+def _claim(token, endpoint, user, payload):
     username = user.username
-    if not claim_write(token, endpoint, user):
+    if not claim_write(token, endpoint, user, payload):
         raise ValueError("This submission was already saved. Refresh to see the saved record.")
     # The claim takes SQLite's write lock before balances and rates are re-read.
     db.session.expire_all()
@@ -75,7 +77,8 @@ def rate_version(row):
 
 def save_rate(product_id, bundle_type, value, expected_version, token, user, remove=False):
     try:
-        username = _claim(token, "outworker_rate", user)
+        username = _claim(token, "outworker_rate", user, dict(product_id=product_id, bundle_type=bundle_type,
+                          value=value, version=expected_version, remove=remove))
         if record_id(product_id) is None or not db.session.get(Item_data, product_id):
             raise ValueError("Select an existing product.")
         if bundle_type and bundle_type not in BUNDLE_TYPE_VALUES:
@@ -157,7 +160,8 @@ def advance_entries(worker_id):
 def receive_advance(worker_id, advance_id, amount, expected_remaining, method, reference, note, token, user):
     """Record a partial/full repayment under the same lock as payroll writes."""
     try:
-        username = _claim(token, "outworker_advance_receipt", user)
+        username = _claim(token, "outworker_advance_receipt", user, dict(worker_id=worker_id, advance_id=advance_id,
+                          amount=amount, remaining=expected_remaining, method=method, reference=reference, note=note))
         worker = db.session.get(Outworker, worker_id) if record_id(worker_id) else None
         if not worker:
             raise ValueError("Select an existing outworker.")
@@ -185,7 +189,8 @@ def receive_selected_advances(worker_id, advance_ids, expected_snapshot, expecte
                               method, reference, note, token, user):
     """Confirm the advance-only popup atomically, without issuing a payroll."""
     try:
-        username = _claim(token, "outworker_advance_batch_receipt", user)
+        username = _claim(token, "outworker_advance_batch_receipt", user, dict(worker_id=worker_id, advance_ids=advance_ids,
+                          snapshot=expected_snapshot, total=expected_total, method=method, reference=reference, note=note))
         worker = db.session.get(Outworker, worker_id) if record_id(worker_id) else None
         if not worker:
             raise ValueError("Select an existing outworker.")
@@ -216,7 +221,8 @@ def receive_selected_advances(worker_id, advance_ids, expected_snapshot, expecte
 
 def record_advance(worker_id, amount, method, reference, note, token, user):
     try:
-        username = _claim(token, "outworker_advance", user)
+        username = _claim(token, "outworker_advance", user, dict(worker_id=worker_id, amount=amount,
+                          method=method, reference=reference, note=note))
         worker = db.session.get(Outworker, worker_id) if record_id(worker_id) else None
         if not worker:
             raise ValueError("Select an existing outworker.")
@@ -253,6 +259,7 @@ def payable_job_quotes(worker):
     items = {normalize_name(item.name): item for item in Item_data.query.all()}
     rates = {(row.product_id, row.bundle_type): row for row in OutworkerRate.query.all()}
     quotes = []
+    kept = kept_totals()
     for card in cards:
         groups = defaultdict(lambda: {"given": 0, "returned": 0})
         invalid = False
@@ -299,12 +306,13 @@ def payable_job_quotes(worker):
             continue
         lines, errors = [], []
         for (name, type_name), group in sorted(groups.items()):
+            group['kept'] = kept[(str(card.id), name, type_name)]
             item = items.get(normalize_name(name))
             paid_quantity = paid_groups[(item.id if item else normalize_name(name), type_name)]
-            if paid_quantity > group["returned"]:
+            if group['returned'] + group['kept'] > group['given'] or paid_quantity > group["returned"] + group['kept']:
                 invalid = True
                 break
-            quantity = group["returned"] - paid_quantity
+            quantity = group["returned"] + group['kept'] - paid_quantity
             if quantity == 0:
                 continue
             override = rates.get((item.id, type_name)) if item else None
@@ -318,6 +326,7 @@ def payable_job_quotes(worker):
             lines.append({
                 "product_id": item.id if item else None, "product": name, "type": type_name,
                 "pieces": quantity, "given": group["given"], "returned": group["returned"],
+                "kept": group['kept'],
                 "already_paid": paid_quantity,
                 "rate": rate_text(rate.rate_units) if rate else None,
                 "rate_source": "Type override" if override else "Base rate",
@@ -331,8 +340,9 @@ def payable_job_quotes(worker):
         quotes.append({"id": card.id, "date": card.date, "lines": lines,
                        "given": sum(group["given"] for group in groups.values()),
                        "returned": sum(group["returned"] for group in groups.values()),
+                       "kept": sum(group.get('kept', 0) for group in groups.values()),
                        "already_paid": sum(paid_groups.values()),
-                       "pending_return": sum(group["given"] - group["returned"] for group in groups.values()),
+                       "pending_return": sum(group["given"] - group["returned"] - group.get('kept', 0) for group in groups.values()),
                        "pieces": sum(line["pieces"] for line in lines),
                        "gross_paise": gross, "errors": errors})
     return quotes
@@ -407,14 +417,16 @@ def browser_payroll_snapshot(worker, jobs, advances, available):
     """Signed page-load quote; dates are display-only and not needed for validation."""
     return {"worker": worker_label(worker), "available": available,
             "jobs": [{key: job[key] for key in (
-                "id", "given", "returned", "already_paid", "pending_return", "pieces",
+                "id", "given", "returned", "kept", "already_paid", "pending_return", "pieces",
                 "gross_paise", "lines", "errors")} for job in jobs],
             "advances": [{"id": row["id"], "remaining_paise": row["remaining_paise"]} for row in advances]}
 
 
 def issue_payroll(worker_id, job_ids, deduction, expected_version, method, reference, note, token, user, *, advance_ids=None, expected_snapshot=None):
     try:
-        username = _claim(token, "outworker_payroll", user)
+        username = _claim(token, "outworker_payroll", user, dict(worker_id=worker_id, job_ids=job_ids,
+                          deduction=deduction, version=expected_version, method=method, reference=reference,
+                          note=note, advance_ids=advance_ids, snapshot=expected_snapshot))
         preview = payroll_preview(worker_id, job_ids, deduction, advance_ids=advance_ids)
         valid = preview["version"] == expected_version
         if expected_snapshot is not None:
@@ -459,10 +471,12 @@ def payment_account(worker_id):
     advances = OutworkerAdvance.query.filter_by(worker_id=worker_id).all()
     payrolls = OutworkerPayroll.query.filter_by(worker_id=worker_id).all()
     receipts = OutworkerAdvanceReceipt.query.filter_by(worker_id=worker_id).all()
+    kept_advances = {row.advance_id for row in JobKeptProduct.query.filter_by(worker_id=worker_id).all()}
     events = [{"date": row.paid_at, "kind": "Advance", "id": row.id,
                "advance_paise": row.amount_paise, "deduction_paise": 0,
-               "gross_paise": 0, "net_paise": row.amount_paise,
+               "gross_paise": 0, "net_paise": 0 if row.id in kept_advances else row.amount_paise,
                "method": row.method, "reference": row.reference, "note": row.note,
+               "product_kept": row.id in kept_advances,
                "recorded_by": row.recorded_by} for row in advances]
     events.extend({"date": row.paid_at, "kind": "Payroll", "id": row.id,
                    "advance_paise": 0, "deduction_paise": row.deduction_paise,

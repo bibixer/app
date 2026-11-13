@@ -2,6 +2,7 @@ from  flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from datetime import datetime
+import secrets
 
 db =  SQLAlchemy()
 
@@ -110,6 +111,8 @@ class Item_data(db.Model):
     meters = db.Column(db.Float, nullable=False)
     size = db.Column(db.Float(50), nullable=False)
     enter_user = db.Column(db.String(50), nullable=False)
+    product_value_paise = db.Column(db.BigInteger, nullable=False, default=0, server_default='0')
+    __table_args__ = (db.CheckConstraint('product_value_paise >= 0 AND product_value_paise <= 99999999999'),)
 
 class ItemAlias(db.Model):
     __tablename__ = "ItemAlias"
@@ -177,6 +180,12 @@ class User(UserMixin, db.Model):
     password = db.Column(db.String(128), nullable=False)
     role = db.Column(db.Integer, nullable=False, default=2)  # 'userT' userP userB or 'admin'
     is_active = db.Column(db.Boolean, nullable=False, default=True, server_default='1')
+    auth_id = db.Column(db.String(64), nullable=False, unique=True,
+                        default=lambda: secrets.token_hex(32))
+    def get_id(self):
+        return self.auth_id
+    def revoke_sessions(self):
+        self.auth_id = secrets.token_hex(32)
     def __init__(self,username,password,role):
         self.username =  username
         self.password =  generate_password_hash(password)
@@ -195,6 +204,7 @@ class UserAccessLog(db.Model):
     action = db.Column(db.String(30), nullable=False)
     old_role = db.Column(db.Integer)
     new_role = db.Column(db.Integer, nullable=False)
+    payload_hash = db.Column(db.String(64))
 
 
 class Bale_date(db.Model):
@@ -230,6 +240,8 @@ class RequestDedup(db.Model):
     endpoint = db.Column(db.String(100), nullable=False)
     username = db.Column(db.String(100), nullable=False)
     created_at = db.Column(db.DateTime, nullable=False)
+    payload_hash = db.Column(db.String(64))
+    receipt = db.Column(db.JSON)
 
 
 class EditLog(db.Model):
@@ -272,6 +284,29 @@ class OutworkerAdvance(db.Model):
     note = db.Column(db.String(500), nullable=False, default="")
     recorded_by = db.Column(db.String(100), nullable=False)
     __table_args__ = (db.CheckConstraint("amount_paise > 0"),)
+
+
+class JobKeptProduct(db.Model):
+    """Stock retained by an outworker, not a physical return or cash advance."""
+    __tablename__ = 'job_kept_product'
+    id = db.Column(db.Integer, primary_key=True)
+    jobcard_id = db.Column(db.Integer, db.ForeignKey('JobcardData.id'), nullable=False, index=True)
+    product_id = db.Column(db.Integer, db.ForeignKey('ItemData.id'), nullable=False, index=True)
+    worker_id = db.Column(db.Integer, db.ForeignKey('OutworkData.id'), nullable=False, index=True)
+    advance_id = db.Column(db.Integer, db.ForeignKey('outworker_advance.id'), nullable=False, unique=True)
+    product_name = db.Column(db.String(50), nullable=False)
+    bundle_type = db.Column(db.String(50), nullable=False)
+    pieces = db.Column(db.Integer, nullable=False)
+    unit_value_paise = db.Column(db.BigInteger, nullable=False)
+    amount_paise = db.Column(db.BigInteger, nullable=False)
+    date = db.Column(db.DateTime, nullable=False)
+    recorded_by = db.Column(db.String(100), nullable=False)
+    note = db.Column(db.String(500), nullable=False, default='')
+    __table_args__ = (
+        db.CheckConstraint('pieces > 0 AND pieces <= 1000000000'),
+        db.CheckConstraint('unit_value_paise > 0 AND amount_paise > 0 AND amount_paise <= 99999999999'),
+        db.CheckConstraint('amount_paise = pieces * unit_value_paise'),
+    )
 
 
 class OutworkerPayroll(db.Model):

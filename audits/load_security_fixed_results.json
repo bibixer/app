@@ -1,0 +1,181 @@
+{
+  "requests_per_wave": 1001,
+  "server_threads": 8,
+  "results": [
+    {
+      "name": "manual_duplicate",
+      "passed": false,
+      "setup_error": "PermissionError(1, 'Operation not permitted')"
+    },
+    {
+      "name": "manual_unique",
+      "passed": false,
+      "setup_error": "PermissionError(1, 'Operation not permitted')"
+    },
+    {
+      "name": "return_duplicate",
+      "passed": false,
+      "setup_error": "PermissionError(1, 'Operation not permitted')"
+    },
+    {
+      "name": "return_competing",
+      "passed": false,
+      "setup_error": "PermissionError(1, 'Operation not permitted')"
+    },
+    {
+      "name": "product_duplicate",
+      "passed": false,
+      "setup_error": "PermissionError(1, 'Operation not permitted')"
+    },
+    {
+      "name": "product_unique",
+      "passed": false,
+      "setup_error": "PermissionError(1, 'Operation not permitted')"
+    },
+    {
+      "name": "outworker_duplicate",
+      "passed": false,
+      "setup_error": "PermissionError(1, 'Operation not permitted')"
+    },
+    {
+      "name": "outworker_unique",
+      "passed": false,
+      "setup_error": "PermissionError(1, 'Operation not permitted')"
+    },
+    {
+      "name": "user_create",
+      "passed": false,
+      "setup_error": "PermissionError(1, 'Operation not permitted')"
+    },
+    {
+      "name": "user_update",
+      "passed": false,
+      "setup_error": "PermissionError(1, 'Operation not permitted')"
+    },
+    {
+      "name": "user_disable",
+      "passed": false,
+      "setup_error": "PermissionError(1, 'Operation not permitted')"
+    },
+    {
+      "name": "user_enable",
+      "passed": false,
+      "setup_error": "PermissionError(1, 'Operation not permitted')"
+    },
+    {
+      "name": "user_delete",
+      "passed": false,
+      "setup_error": "PermissionError(1, 'Operation not permitted')"
+    },
+    {
+      "name": "rates",
+      "passed": false,
+      "setup_error": "PermissionError(1, 'Operation not permitted')"
+    },
+    {
+      "name": "advance_duplicate",
+      "passed": false,
+      "setup_error": "PermissionError(1, 'Operation not permitted')"
+    },
+    {
+      "name": "advance_unique",
+      "passed": false,
+      "setup_error": "PermissionError(1, 'Operation not permitted')"
+    },
+    {
+      "name": "recover_single",
+      "passed": false,
+      "setup_error": "PermissionError(1, 'Operation not permitted')"
+    },
+    {
+      "name": "recover_batch",
+      "passed": false,
+      "setup_error": "PermissionError(1, 'Operation not permitted')"
+    },
+    {
+      "name": "payroll",
+      "passed": false,
+      "setup_error": "PermissionError(1, 'Operation not permitted')"
+    },
+    {
+      "name": "edit_product",
+      "passed": false,
+      "setup_error": "PermissionError(1, 'Operation not permitted')"
+    },
+    {
+      "name": "edit_outworker",
+      "passed": false,
+      "setup_error": "PermissionError(1, 'Operation not permitted')"
+    },
+    {
+      "name": "edit_jobcard",
+      "passed": false,
+      "setup_error": "PermissionError(1, 'Operation not permitted')"
+    },
+    {
+      "name": "legacy_scan",
+      "passed": false,
+      "setup_error": "PermissionError(1, 'Operation not permitted')"
+    },
+    {
+      "name": "legacy_inventory",
+      "passed": false,
+      "setup_error": "PermissionError(1, 'Operation not permitted')"
+    },
+    {
+      "name": "legacy_cutter",
+      "passed": false,
+      "setup_error": "PermissionError(1, 'Operation not permitted')"
+    },
+    {
+      "name": "legacy_supplier",
+      "passed": false,
+      "setup_error": "PermissionError(1, 'Operation not permitted')"
+    },
+    {
+      "name": "route_sweep",
+      "passed": false,
+      "setup_error": "PermissionError(1, 'Operation not permitted')"
+    },
+    {
+      "name": "alias_collision",
+      "passed": false,
+      "setup_error": "PermissionError(1, 'Operation not permitted')"
+    },
+    {
+      "name": "rate_remove",
+      "passed": false,
+      "setup_error": "PermissionError(1, 'Operation not permitted')"
+    },
+    {
+      "name": "assign_return",
+      "passed": false,
+      "setup_error": "PermissionError(1, 'Operation not permitted')"
+    },
+    {
+      "name": "legacy_edit_bale",
+      "passed": false,
+      "setup_error": "PermissionError(1, 'Operation not permitted')"
+    },
+    {
+      "name": "legacy_edit_lump",
+      "passed": false,
+      "setup_error": "PermissionError(1, 'Operation not permitted')"
+    },
+    {
+      "name": "legacy_edit_bundle",
+      "passed": false,
+      "setup_error": "PermissionError(1, 'Operation not permitted')"
+    },
+    {
+      "name": "legacy_edit_cutter",
+      "passed": false,
+      "setup_error": "PermissionError(1, 'Operation not permitted')"
+    },
+    {
+      "name": "legacy_edit_party",
+      "passed": false,
+      "setup_error": "PermissionError(1, 'Operation not permitted')"
+    }
+  ]
+}

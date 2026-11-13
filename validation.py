@@ -3,6 +3,7 @@
 from math import isfinite
 
 MAX_DATABASE_INTEGER = 2**63 - 1
+MAX_PIECES = 1_000_000_000
 
 
 def positive_integer(value, maximum=MAX_DATABASE_INTEGER):
