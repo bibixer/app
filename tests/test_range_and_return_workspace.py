@@ -166,6 +166,47 @@ class RangeAndReturnWorkspaceTest(AppTestCase):
         self.assertEqual(Jobcard.query.count(),1)
         self.job_cade_print.assert_called_once()
 
+    def test_manual_default_csv_folder_layout_and_old_pattern_order(self):
+        root=Path(self.temp.name)/'to_print'
+        self.app.config['LABEL_PRINT_ROOT']=None
+        payload=self.manual_payload(pieces=37,count=2)
+        payload['rows'].append({'product':'VIM','pieces':36,'count':1,'type':'lump'})
+        with patch('data_print_format.PRINT_ROOT',root), patch('data_entry.job_cade_print',wraps=job_cade_print) as printer:
+            response=self.client.post('/submit-manual-jobcard',json=payload)
+            self.assertTrue(response.json['success'])
+            files=list((root/'jobcard').glob('*.csv'))
+            self.assertEqual(len(files),1)
+            with files[0].open(newline='') as source:
+                reader=csv.DictReader(source)
+                expected=['job_number','date','name','page']
+                for number in (1,2):
+                    expected.extend([f'No_{number}',f'Product_{number}',f'Type_{number}',
+                                     f'Pattern_{number}_line1',f'Pattern_{number}_line2',f'Total_{number}'])
+                self.assertEqual(reader.fieldnames,expected)
+                row=next(reader)
+            self.assertEqual(row['Pattern_1_line1'],'36x1    37x2')
+            self.assertEqual(row['Total_1'],'110')
+            self.assertTrue(self.client.post('/submit-manual-jobcard',json=payload).json['duplicate'])
+            printer.assert_called_once()
+
+    def test_manual_page_can_open_an_existing_job_for_admin_edit(self):
+        card=self.card()
+        html=self.client.get('/manual_jobcard').get_data(as_text=True)
+        self.assertIn('id="open-old-job"',html)
+        self.assertIn('id="masterSuggestions"',html)
+        self.assertNotIn('list="masterOptions"',html)
+        self.assertIn('action="/edit/jobcard/open"',html)
+        response=self.client.get('/edit/jobcard/open',query_string={'jobcard_id':card.id})
+        self.assertEqual(response.status_code,302)
+        self.assertTrue(response.location.endswith(f'/edit/jobcard/{card.id}'))
+        for invalid in ('0','bad','999999999999999999999999','9999'):
+            response=self.client.get('/edit/jobcard/open',query_string={'jobcard_id':invalid})
+            self.assertEqual(response.status_code,302)
+            self.assertIn('/manual_jobcard',response.location)
+        self.login_as(self.operator)
+        self.assertNotIn('id="open-old-job"',self.client.get('/manual_jobcard').get_data(as_text=True))
+        self.assertEqual(self.client.get('/edit/jobcard/open',query_string={'jobcard_id':card.id}).status_code,302)
+
     def test_return_response_contains_authoritative_remaining_pieces(self):
         card=self.card(pieces=10)
         payload=self.return_payload(card.id,3)

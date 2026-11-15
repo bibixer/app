@@ -1,6 +1,6 @@
 {% extends "app_base.html" %}
 {% block title %}Job Card #{{ data.jobcard_id }} Return · BH Manufacturing{% endblock %}
-{% block page_css %}<link rel="stylesheet" href="{{ url_for('static', filename='style/pages/job_retun.css') }}">{% endblock %}
+{% block page_css %}<link rel="stylesheet" href="{{ url_for('static', filename='style/pages/job_retun.css',v='20261115-saved-return') }}">{% endblock %}
 {% block main_class %}page-shell page-job-retun{% endblock %}
 {% block body_class %}{% if embedded %}return-embedded{% endif %}{% if kept_only %} kept-popup{% endif %}{% endblock %}
 {% block head %}<link rel="stylesheet" href="{{ url_for('static',filename='style/return-workspace.css',v='20261113-collapse') }}">{% endblock %}
@@ -11,6 +11,14 @@
       <div><p class="eyebrow">Production · Returns</p><h1>Job Card Return</h1><p class="page-subtitle">Review the balance and record pieces returned against this job card.</p></div>
       <div class="page-actions"><a class="back-link" href="{{ url_for('jobcard_ledger', jobcard_id=data.jobcard_id) }}">View full job ledger ↗</a><a class="back-link" href="{{ url_for('retune_product') }}">← Another job card</a></div>
     </header>
+    {% if saved_return %}
+    <section class="saved-return-preview" id="savedReturnPreview" tabindex="-1" aria-labelledby="saved-return-title">
+      <div class="saved-return-heading"><div><p class="ui-kicker">Saved successfully</p><h2 id="saved-return-title">Saved Job Return · Job #{{ saved_return.jobcard_id }}</h2></div>{% if current_user.role == 1 %}<a class="saved-return-edit" href="{{ url_for('edit_entry', entity_type='jobcard', entity_id=data.jobcard_id) }}">Edit this job & returns →</a>{% endif %}</div>
+      <p><strong>Master:</strong> {{ saved_return.party }} · {{ saved_return.date }} · Received by {{ saved_return.username }}</p>
+      {% if csv_warning %}<p class="notice warning" role="alert">Return saved, but CSV export failed. Check the server print folder.</p>{% endif %}
+      <div class="saved-return-table"><table><thead><tr><th>Product</th><th>Type</th><th>Return pattern</th><th>Returned pieces</th></tr></thead><tbody>{% for item in saved_return['items'] %}<tr><td>{{ item.name_of_product }}</td><td>{{ item.type }}</td><td>{{ item.note or 'Direct entry' }}</td><td>{{ item.returned }}</td></tr>{% endfor %}</tbody><tfoot><tr><th colspan="3">Total returned in this save</th><th>{{ saved_return['items']|sum(attribute='returned') }} pieces</th></tr></tfoot></table></div>
+    </section>
+    {% endif %}
     <section class="card" aria-label="Job card return entry">
       <div class="card-header"><div><h2>Given and return details</h2><p>See what was given, what came back, and what remains for this job card.</p></div><span class="card-badge">#{{ data.jobcard_id }}</span></div>
       <div class="job-info-bar">
@@ -43,6 +51,6 @@
 {% include 'kept_job_fields.html' %}
   <script defer src="{{ url_for('static',filename='js/kept-entry.js',v='20261113-collapse') }}"></script>
   <script>const JOB_CARD = {{ data | tojson }}; window.RETURN_EMBEDDED = {{ embedded|default(false)|tojson }};</script>
-  {% if not kept_only %}<script src="{{ url_for('static', filename='js/retun.js',v='20261113-receipt') }}"></script>{% endif %}
+  {% if not kept_only %}<script src="{{ url_for('static', filename='js/retun.js',v='20261115-server-csv') }}"></script>{% endif %}
   {% if embedded %}<script defer src="{{ url_for('static',filename='js/embedded-returns.js',v='20261108-balance') }}"></script>{% endif %}
 {% endblock %}

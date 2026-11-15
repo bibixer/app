@@ -11,6 +11,26 @@ from support import AppTestCase
 
 
 class AliasAndEditTest(AppTestCase):
+    def test_outworker_edit_form_hides_aliases_and_preserves_them_on_save(self):
+        page = self.client.get(f'/edit/outworker/{self.worker.id}').get_data(as_text=True)
+        self.assertIn('class="legacy-login"', page)
+        self.assertNotIn('name="aliases"', page)
+        self.assertNotIn('Alternate names for this master', page)
+        context = edit_context('outworker', self.worker.id)
+        original_aliases = [(row.id,row.alias) for row in self.worker.alias_rows]
+        values = {'name':'UPDATED MASTER','adders':'NEW CITY','number':'456',
+                  'version':context['version'],'submission_token':'worker-edit-no-aliases'}
+        response = self.client.post(f'/edit/outworker/{self.worker.id}',data=values)
+        self.assertEqual(response.status_code,302)
+        self.assertEqual(self.worker.name,'UPDATED MASTER')
+        self.assertEqual(self.worker.adders,'NEW CITY')
+        self.assertEqual([(row.id,row.alias) for row in self.worker.alias_rows],original_aliases)
+        self.assertEqual(resolve_master_name('RAM CITY'),self.worker_name)
+        log = EditLog.query.filter_by(entity_type='outworker',entity_id=self.worker.id).one()
+        self.assertNotIn('aliases',log.changed_fields)
+        self.assertEqual(self.client.post(f'/edit/outworker/{self.worker.id}',data=values).status_code,302)
+        self.assertEqual(EditLog.query.filter_by(entity_type='outworker').count(),1)
+
     def test_product_aliases_normalize_without_creating_other_products(self):
         self.assertEqual(normalize_name("  vimal   1 2mtr "), self.product.name)
         self.assertEqual(parse_aliases("vim, VIM\n other alias"), ["VIM", "OTHER ALIAS"])

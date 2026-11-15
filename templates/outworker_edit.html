@@ -1,0 +1,20 @@
+{% extends 'outworker_setup.html' %}
+{% block title %}Edit Outworker #{{ entry.entity_id }} · BH Manufacturing{% endblock %}
+{% block setup_heading %}Edit Outworker #{{ entry.entity_id }}{% endblock %}
+{% block setup_description %}Update the master's details. Related job records and edit history stay in sync.{% endblock %}
+{% block setup_form %}
+<form method="post" autocomplete="off" novalidate>
+  {{ form.hidden_tag() }}
+  {% for errors in form.errors.values() %}{% for error in errors %}<p class="notice danger" role="alert">{{ error }}</p>{% endfor %}{% endfor %}
+  {% for field in entry.fields if field.name != 'aliases' %}
+  <div class="mb-3">
+    <label class="form-label" for="worker-edit-{{ field.name }}">{{ {'name':'Name','adders':'Address','number':'Mobile Number'}.get(field.name,field.name|title) }}</label>
+    <input class="form-control" id="worker-edit-{{ field.name }}" name="{{ field.name }}" type="{{ 'number' if field.kind == 'int' else 'text' }}" value="{{ field.value if field.value is not none else '' }}" {% if field.kind == 'int' %}min="1" step="1"{% endif %} required>
+  </div>
+  {% endfor %}
+  {{ form.submit(value='Save changes') }}
+</form>
+{% endblock %}
+{% block setup_links %}
+<div class="outworker-edit-links"><a class="outworker-edit-link" href="{{ url_for('edit_index', type='outworker') }}">← Outworker records</a><a class="outworker-edit-link" href="{{ url_for('edit_logs', entity_type='outworker', entity_id=entry.entity_id) }}">View edit history →</a></div>
+{% endblock %}

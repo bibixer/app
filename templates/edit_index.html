@@ -1,22 +1,27 @@
 {% extends "app_base.html" %}
 {% block title %}Edit center{% endblock %}
-{% block page_css %}<link rel="stylesheet" href="{{ url_for('static', filename='style/pages/edit_index.css') }}">{% endblock %}
+{% block head %}<link rel="stylesheet" href="{{ url_for('static', filename='style/pages/edit_index.css',v='20261115-workspace') }}">{% endblock %}
 {% block main_class %}page-edit-index{% endblock %}
 {% block content %}
-<header class="ui-heading"><div><p class="ui-kicker">Administration / Records</p><h1>Edit center</h1><p class="ui-description">Find any entry by name, alias or number. Every change keeps a permanent edit history.</p></div><a class="head-link" href="{{ url_for('edit_logs') }}">View edit history →</a></header>
+<header class="edit-hero"><div><p class="edit-eyebrow">Administration / Records</p><h1>Edit center</h1><p class="edit-description">Find the right record. Make a correction. Keep every change traceable.</p><span class="edit-trust">Every saved change keeps an edit history</span></div><a class="edit-history-link" href="{{ url_for('edit_logs') }}">View edit history →</a></header>
+<div class="edit-workspace">
+  <section class="edit-search-panel" aria-labelledby="edit-search-title">
+    <div class="edit-section-head"><div><p class="edit-step">01 / Find a record</p><h2 id="edit-search-title">What would you like to edit?</h2></div><span class="edit-search-hint">Search by name, alias or ID</span></div>
   <div class="toolbar">
     <label>Entry type
       <select id="entityType">
-        {% for key, config in entities.items() %}<option value="{{ key }}" {% if key == 'product' %}selected{% endif %}>{{ config.title }}</option>{% endfor %}
+        {% for key, config in entities.items() %}<option value="{{ key }}" {% if key == selected_type %}selected{% endif %}>{{ config.title }}</option>{% endfor %}
       </select>
     </label>
     <label>Search entries
-      <input id="entrySearch" type="search" placeholder="Name, alias, number, date, or ID" autocomplete="off">
+      <input id="entrySearch" type="search" placeholder="Start typing a name, alias or number…" autocomplete="off" aria-describedby="edit-search-help">
     </label>
   </div>
-  <section>
-    <div class="list-head"><span id="listTitle"></span><span id="resultCount" aria-live="polite"></span></div>
-    <div id="entryList" class="entry-list"></div>
+  <p id="edit-search-help" class="edit-field-help">Choose an entry type to browse its records. Results update as you type.</p>
+  </section>
+  <section class="edit-results-panel" aria-labelledby="listTitle">
+    <div class="list-head"><div><p class="edit-step">02 / Select & edit</p><h2 id="listTitle"></h2></div><span id="resultCount" role="status" aria-live="polite"></span></div>
+    <div id="entryList" class="entry-list" aria-busy="true"></div>
     <p id="noResults" class="empty" hidden>No matching entries. Try another search.</p>
     <div id="pager" class="pager" hidden>
       <button id="prevPage" type="button">Previous</button>
@@ -24,7 +29,8 @@
       <button id="nextPage" type="button">Next</button>
     </div>
   </section>
-  <div class="links">{% if not config.SIMPLE_WORKFLOW %}<a href="{{ url_for('find_edit') }}">Find bale/lump/bundle</a>{% endif %}<a href="{{ url_for('edit_logs') }}">View edit history</a></div>
+  <footer class="edit-footer"><p><strong>A clear record of every correction.</strong> Open an entry to review its details before saving changes.</p><div class="links">{% if not config.SIMPLE_WORKFLOW %}<a href="{{ url_for('find_edit') }}">Find bale/lump/bundle →</a>{% endif %}<a href="{{ url_for('edit_logs') }}">Browse edit history →</a></div></footer>
+</div>
 
 <script>
 const entityType = document.getElementById('entityType');
@@ -42,6 +48,10 @@ function renderEntries(items, type) {
     const card = document.createElement('article');
     card.className = 'entry';
     const info = document.createElement('div');
+    info.className = 'entry-info';
+    const kind = document.createElement('span');
+    kind.className = 'entry-kind';
+    kind.textContent = entityType.selectedOptions[0].textContent;
     const title = document.createElement('div');
     title.className = 'entry-title';
     title.textContent = item.title;
@@ -53,7 +63,7 @@ function renderEntries(items, type) {
     link.href = `/edit/${encodeURIComponent(type)}/${item.id}`;
     link.textContent = 'Edit';
     link.setAttribute('aria-label', `Edit ${item.title}`);
-    info.append(title, details);
+    info.append(kind, title, details);
     card.append(info, link);
     entryList.append(card);
   }
@@ -65,6 +75,8 @@ async function refreshEntries(page = 1) {
   const params = new URLSearchParams({type, q: searchInput.value.trim(), page: String(page)});
   document.getElementById('listTitle').textContent = entityType.selectedOptions[0].textContent + ' entries';
   document.getElementById('resultCount').textContent = 'Loading…';
+  entryList.replaceChildren();
+  entryList.setAttribute('aria-busy', 'true');
   document.getElementById('pager').hidden = true;
   document.getElementById('noResults').hidden = true;
   document.getElementById('noResults').textContent = 'No matching entries. Try another search.';
@@ -76,6 +88,7 @@ async function refreshEntries(page = 1) {
     currentPage = data.page;
     totalPages = data.pages;
     renderEntries(data.items, type);
+    entryList.setAttribute('aria-busy', 'false');
     document.getElementById('resultCount').textContent = `${data.total} found`;
     document.getElementById('noResults').hidden = data.total !== 0;
     document.getElementById('pager').hidden = data.total === 0;
@@ -85,6 +98,7 @@ async function refreshEntries(page = 1) {
   } catch (error) {
     if (serial !== requestSerial) return;
     entryList.replaceChildren();
+    entryList.setAttribute('aria-busy', 'false');
     document.getElementById('resultCount').textContent = 'Could not load entries';
     document.getElementById('noResults').textContent = 'Search could not be loaded. Please refresh and try again.';
     document.getElementById('noResults').hidden = false;

@@ -1,3 +1,12 @@
+.app-ui .page-job-retun .saved-return-preview{margin-bottom:22px;padding:22px;border:1px solid #c7dcd7;border-radius:16px;background:linear-gradient(120deg,#edf9f4,#f0f3ff);box-shadow:0 8px 24px #294d5214;color:#31495d}
+.app-ui .page-job-retun .saved-return-heading{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+.app-ui .page-job-retun .saved-return-heading h2{margin:5px 0;font-size:20px;color:#285c55}
+.app-ui .page-job-retun .saved-return-preview p{font-size:13px;line-height:1.8;overflow-wrap:anywhere}
+.app-ui .page-job-retun .saved-return-edit{padding:12px 16px;border-radius:10px;background:#3d647b;color:white;text-decoration:none;font-weight:700;font-size:13px}
+.app-ui .page-job-retun .saved-return-table{overflow-x:auto;background:white;border:1px solid #d8e5e2;border-radius:12px}
+.app-ui .page-job-retun .saved-return-table table{min-width:540px;margin:0;border-spacing:0}
+.app-ui .page-job-retun .saved-return-table th,.app-ui .page-job-retun .saved-return-table td{padding:14px;background:#fff;border:0;border-bottom:1px solid #e1ebe8;border-radius:0;font-size:13px}
+.app-ui .page-job-retun .saved-return-table th{background:#e7f2ee;color:#365d54}
 @keyframes gradient{0%{background-position:0 0}50%{background-position:100% 100%}100%{background-position:0 0}}
 .ui-scope.wave-layer,
 .ui-scope .wave-layer{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}

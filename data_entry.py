@@ -12,7 +12,7 @@ from modes import ItemAlias
 from master_aliases import validate_master_aliases, resolve_master_name
 from bundle_types import BUNDLE_TYPE_VALUES
 from data_Process import outworker_name,get_jobcard_return_data
-from data_print_format import outworker_qr_print,buldel_qr_print,job_cade_print
+from data_print_format import outworker_qr_print,buldel_qr_print,job_cade_print,job_return_print
 from database_writes import begin_write, DatabaseBusy, is_database_busy
 
 def add_data_to_database(data):
@@ -307,7 +307,7 @@ def add_outworker_db(data,current_user,request_key):
     db.session.flush()
     db.session.add_all(OutworkerAlias(worker_id=outworker.id, alias=alias) for alias in aliases)
     OUT=add_data_to_database(outworker)
-    if OUT == 101 and not current_app.config.get('SIMPLE_WORKFLOW'):
+    if OUT == 101:
         try:
             if outworker_qr_print(outworker) != 101:
                 logging.error("Outworker %s saved, but QR printing did not succeed", outworker.id)
@@ -630,6 +630,7 @@ def in_move_entery(data,current_user,request_key):
         canonical_items = {item["item_id"]: item["product_name"]
                            for item in get_jobcard_return_data(data["jobcard_id"])["items"]}
         result_items = []
+        movement_ids = []
         for item in data['items']:
             rows = item.get("calculation_rows", [])
             method = item.get("entry_method", "direct")
@@ -650,6 +651,7 @@ def in_move_entery(data,current_user,request_key):
 
             db.session.add(job_movement)
             db.session.flush()
+            movement_ids.append(job_movement.id)
             db.session.add(ReturnBreakdown(
                 movement_id=job_movement.id,
                 entry_method=method,
@@ -659,6 +661,7 @@ def in_move_entery(data,current_user,request_key):
         "code": 101,
         "jobData": {
             "jobcard_id": data["jobcard_id"],
+            "return_id": movement_ids[0],
             "party": data['name'],
             "date": datetime.now().strftime("%d-%m-%Y"),
             "items": result_items,
@@ -667,6 +670,11 @@ def in_move_entery(data,current_user,request_key):
     }
         record_receipt(request_key, 'return_items', current_user, result)
         db.session.commit()
+        try:
+            job_return_print(result)
+        except Exception:
+            logging.exception('Return for job %s saved, but CSV export failed', data['jobcard_id'])
+            result['print_warning'] = 'Return saved, but CSV export failed. Check the server print folder.'
         return result
 
     except (DatabaseBusy, RequestConflict):

@@ -360,7 +360,11 @@ def save_entry(entity_type, entity_id, form_data, expected_version, request_key,
         return "conflict", None
 
     try:
-        updates = {name: _parse(form_data.get(name, ""), kind) for name, kind in fields.items()}
+        updates = {}
+        for name, kind in fields.items():
+            # The outworker UI no longer edits aliases; omission must not delete them.
+            fallback = old[name] if entity_type == 'outworker' and name == 'aliases' else ''
+            updates[name] = _parse(form_data.get(name, fallback), kind)
         if entity_type in {"cutter", "product", "outworker", "party"} and "name" in updates:
             updates["name"] = normalize_name(updates["name"])
         non_negative = {"meters", "size", "pieces", "kg", "outflow", "inflow"}

@@ -1,20 +1,20 @@
 {% extends "app_base.html" %}
 {% block title %}Manual Bulk Job Card{% endblock %}
-{% block page_css %}<link rel="stylesheet" href="{{ url_for('static', filename='style/pages/manual_jobcard.css') }}">{% endblock %}
+{% block page_css %}<link rel="stylesheet" href="{{ url_for('static', filename='style/pages/manual_jobcard.css',v='20261115-saved-preview') }}">{% endblock %}
 {% block main_class %}page-manual-jobcard{% endblock %}
 {% block content %}
+  {% for category,notice in get_flashed_messages(with_categories=true) %}<div class="ui-panel notice {{ category }}" role="alert">{{ notice }}</div>{% endfor %}
   <header class="ui-heading"><div><p class="ui-kicker">Production / Job cards</p><h1>Manual job card</h1><p class="ui-description">Create a job from bundle patterns, with full product names or their aliases.</p></div>{% if not config.SIMPLE_WORKFLOW %}<a class="head-link" href="{{ url_for('job_card') }}">Switch to scanning →</a>{% endif %}</header>
 
+  <section id="result" class="result hidden"></section>
   <section class="entry-area manual-workspace">
     <div class="ui-inline-guide"><b>Quick entry</b><span>Master → Item → Pieces → Bundles → Type → Next item</span><details><summary>Keyboard guide</summary><p>Enter a master name, alias or ID. Enter moves through each field. An alias fills the full product name. Press Enter on an empty new item to reach Create Job Card; press Backspace in an empty field to return to the previous field.</p></details></div>
     <div class="form-header">
-    <label class="field">Master Name, alias, or ID
-      <input id="masterName" list="masterOptions" placeholder="Enter master name, alias, or ID" autocomplete="off" autofocus>
-      <small id="masterMatch"></small>
-      <datalist id="masterOptions">
-        {% for option in master_options %}<option value="{{ option.value }}" label="{{ option.label }}"></option>{% endfor %}
-      </datalist>
-    </label>
+    <div class="field manual-master-picker"><label for="masterName">Master Name, alias, or ID</label>
+      <input id="masterName" role="combobox" aria-autocomplete="list" aria-haspopup="listbox" aria-controls="masterSuggestions" aria-expanded="false" aria-describedby="masterMatch" placeholder="Enter master name, alias, or ID" autocomplete="off" spellcheck="false" autofocus>
+      <small id="masterMatch" role="status" aria-live="polite"></small>
+      <div id="masterSuggestions" class="master-suggestions" role="listbox" aria-label="Matching outworkers" hidden></div>
+    </div>
     <label class="field">Billing Date<input id="manualDate" type="date" readonly></label>
     </div>
 
@@ -24,7 +24,6 @@
         <tbody id="manualRows"></tbody>
       </table>
     </div>
-    <datalist id="productOptions"></datalist>
     <div class="actions">
       <button type="button" class="secondary" id="addRow">+ Add pattern</button>
       <strong id="grandTotal">Total: 0 pieces</strong>
@@ -32,13 +31,16 @@
     <div class="ui-entry-footer"><p class="shortcut-help"><kbd>Enter</kbd> next field · <kbd>Backspace</kbd> previous empty field · <a href="{{ url_for('retune_product') }}"><kbd>Ctrl+I</kbd> Job Return</a></p><button type="button" class="primary" id="submitManual">Create job card <kbd>Ctrl+M</kbd></button></div>
   </section>
   <div id="message" class="message hidden"></div>
-  <section id="result" class="result hidden"></section>
+  {% if current_user.role == 1 %}
+  <section id="open-old-job" class="ui-panel manual-job-edit no-print" aria-labelledby="open-old-job-title"><div><p class="ui-kicker">Quick access / Existing job</p><h2 id="open-old-job-title">Edit an older job card</h2><p>Enter its number to open given items, returns and kept pieces in the job editor. Settled entries remain protected.</p></div><form method="get" action="{{ url_for('open_jobcard_edit') }}"><label for="editJobNumber">Job card number<input id="editJobNumber" type="number" name="jobcard_id" min="1" step="1" required placeholder="e.g. 4"></label><button type="submit">Open for editing →</button></form></section>
+  {% endif %}
 
 
+<script src="{{ url_for('static',filename='js/manual-master-suggestions.js',v='20261115-five-rows') }}"></script>
+<script src="{{ url_for('static',filename='js/manual-product-suggestions.js',v='20261115-five-rows') }}"></script>
 <script>
 const knownMasters = new Set({{ data.outworker|map(attribute='full')|list|tojson }});
 const masterAliasMap = {{ master_alias_map|tojson }};
-const products = {{ product_names|tojson }};
 const productAliasMap = {{ product_alias_map|tojson }};
 const types = {{ bundle_type_choices|tojson }};
 const rowsBody = document.getElementById('manualRows');
@@ -46,8 +48,7 @@ const message = document.getElementById('message');
 let requestId = crypto.randomUUID();
 let submitting = false;
 let rowEnterTarget = null;
-
-document.getElementById('productOptions').innerHTML = products.map(value => `<option value="${escapeHtml(value)}"></option>`).join('');
+let productPickerId = 0;
 
 function escapeHtml(value) {
   return String(value ?? '').replace(/[&<>'"]/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
@@ -73,7 +74,7 @@ function addRow(values = {}) {
   const selectedType = types.some(([value]) => value === values.type) ? values.type : types[0][0];
   const typeOptions = types.map(([value, label]) => `<option value="${escapeHtml(value)}"${value === selectedType ? ' selected' : ''}>${escapeHtml(label)}</option>`).join('');
   row.innerHTML = `
-    <td><input class="product" list="productOptions" value="${escapeHtml(values.product || '')}" placeholder="VIMAL 1 2MTR"></td>
+    <td class="manual-product-picker"><input class="product" aria-label="Item name or alias" role="combobox" aria-autocomplete="list" aria-haspopup="listbox" aria-expanded="false" autocomplete="off" spellcheck="false" value="${escapeHtml(values.product || '')}" placeholder="VIMAL 1 2MTR"><div class="master-suggestions product-suggestions" role="listbox" aria-label="Matching products" hidden></div></td>
     <td><input class="pieces" type="number" min="1" value="${values.pieces || ''}" placeholder="36"></td>
     <td><input class="count" type="number" min="1" max="500" value="${values.count || ''}" placeholder="1"></td>
     <td class="total">0</td>
@@ -81,6 +82,11 @@ function addRow(values = {}) {
     <td class="remove-cell"><button type="button" class="danger remove">×</button></td>`;
   row.querySelectorAll('input,select').forEach(input => input.addEventListener('input', updateTotals));
   const productInput = row.querySelector('.product');
+  const productList = row.querySelector('.product-suggestions');
+  productList.id = `product-suggestions-${++productPickerId}`;
+  productInput.setAttribute('aria-controls', productList.id);
+  initManualProductSuggestions({input:productInput, list:productList, mapping:productAliasMap,
+    onCommit:() => { message.className='message hidden'; row.querySelector('.pieces').focus(); }});
   productInput.addEventListener('change', () => fillFullItemName(productInput));
   productInput.addEventListener('blur', () => fillFullItemName(productInput));
   row.querySelectorAll('input,select').forEach(input => input.addEventListener('keydown', handleRowKeydown));
@@ -237,7 +243,7 @@ function renderJobCard(job) {
   const lines = [...grouped.values()].map(group => `<tr><td>${escapeHtml(group.name)}</td><td>${escapeHtml(group.type)}</td><td><strong>${group.pieces} × ${group.count}</strong> = ${group.pieces * group.count}</td></tr>`).join('');
   const total = job.items.reduce((sum,item) => sum + Number(item.qty), 0);
   const result = document.getElementById('result');
-  result.innerHTML = `<div class="result-head"><div><h2>Job Card #${job.jobId}</h2><p><strong>Master:</strong> ${escapeHtml(job.party)}</p></div><div><strong>${escapeHtml(job.date)}</strong><br>Given by ${escapeHtml(job.username)}</div></div><table><thead><tr><th>Item</th><th>Type</th><th>Pattern</th></tr></thead><tbody>${lines}</tbody><tfoot><tr><th colspan="2">Grand total</th><th>${total} pieces</th></tr></tfoot></table><div class="actions menu-print-hide"><button class="primary" onclick="window.print()">Print Job Card</button><button class="secondary" onclick="location.reload()">Create Another</button></div>`;
+  result.innerHTML = `<div class="saved-job-bar"><details class="saved-job-preview" open><summary>Saved Job Card #${job.jobId} · ${total} pieces</summary><p><strong>Master:</strong> ${escapeHtml(job.party)} · ${escapeHtml(job.date)} · Given by ${escapeHtml(job.username)}</p><div class="table-wrap"><table><thead><tr><th>Item</th><th>Type</th><th>Pattern</th></tr></thead><tbody>${lines}</tbody><tfoot><tr><th colspan="2">Grand total</th><th>${total} pieces</th></tr></tfoot></table></div></details>{% if current_user.role == 1 %}<a class="button secondary" id="editSavedJob" href="{{ url_for('open_jobcard_edit') }}?jobcard_id=${encodeURIComponent(job.jobId)}">Edit this job →</a>{% endif %}</div>`;
   result.classList.remove('hidden');
 }
 
@@ -281,44 +287,34 @@ async function submitManual() {
     requestId = crypto.randomUUID();
     showMessage(result.print_warning || (result.duplicate ? `Saved job card #${result.jobData.jobId} restored. CSV export was not repeated.` : `Job card #${result.jobData.jobId} created successfully. Label CSV saved to the server print folder.`), Boolean(result.print_warning));
     renderJobCard(result.jobData);
+    rowsBody.replaceChildren();
+    rowEnterTarget = null;
+    addRow();
+    masterInput.value = '';
+    document.getElementById('masterMatch').textContent = '';
+    masterInput.focus();
   } catch (error) {
     showMessage('Network error. Your request key is preserved; press Create Job Card to retry safely.');
+    submitting = false;
+    document.getElementById('submitManual').disabled = false;
+  } finally {
     submitting = false;
     document.getElementById('submitManual').disabled = false;
   }
 }
 
-document.getElementById('masterName').addEventListener('keydown', event => {
-  if (event.key !== 'Enter') return;
-  const typed = event.currentTarget.value.trim();
-  if (!/^\d+$/.test(typed)) return;
-  const fullName = masterAliasMap[typed];
-  if (!fullName) return;
-  event.preventDefault();
-  event.currentTarget.value = fullName;
-});
-
-document.getElementById('masterName').addEventListener('keyup', event => {
-  if (event.key !== 'Enter') return;
-  fillFullMasterName(event.currentTarget);
-  if (!knownMasters.has(event.currentTarget.value.trim())) {
-    showMessage('Select a valid master from the list.');
-    return;
-  }
-  message.className = 'message hidden';
-  rowsBody.querySelector('.product').focus();
+initManualMasterSuggestions({
+  input:document.getElementById('masterName'),
+  list:document.getElementById('masterSuggestions'),
+  status:document.getElementById('masterMatch'),
+  workers:{{ data.outworker|tojson }}, mapping:masterAliasMap,
+  onCommit:()=>{message.className='message hidden';rowsBody.querySelector('.product').focus();},
+  onInvalid:()=>showMessage('Select a valid master from the suggestions.'),
 });
 document.getElementById('addRow').addEventListener('click', () => {
   addRow().querySelector('.product').focus();
 });
-document.getElementById('masterName').addEventListener('input', event => {
-  const typed = event.currentTarget.value.trim();
-  const fullName = /^\d+$/.test(typed) ? masterAliasMap[typed] : null;
-  document.getElementById('masterMatch').textContent = fullName ? `Master #${typed}: ${fullName}` : '';
-});
 document.getElementById('submitManual').addEventListener('click', submitManual);
-document.getElementById('masterName').addEventListener('change', event => fillFullMasterName(event.currentTarget));
-document.getElementById('masterName').addEventListener('blur', event => fillFullMasterName(event.currentTarget));
 document.addEventListener('keydown', event => {
   if (!(event.ctrlKey || event.metaKey)) return;
   if (event.key.toLowerCase() === 'm') {

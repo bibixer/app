@@ -28,7 +28,7 @@ def outworker_qr_print(data):
         "address":data.adders,
         "qr_code":f"{data.id}***{data.name}--{data.adders}/-"
     }])
-    pd_data.to_csv(_output_path("outworker", f"{data.id}.csv"), index=False)
+    _write_label_csv(f"{data.id}.csv", pd_data.to_csv(index=False), kind='outworker')
     return 101
 
 
@@ -49,9 +49,9 @@ def job_cade_print(data):
     return build_custom_csvs_pandas(data)
 
 
-def _write_label_csv(filename, csv_string):
+def _write_label_csv(filename, csv_string, kind='jobcard'):
     """Publish complete files so the label watcher never reads a partial CSV."""
-    target = _output_path('jobcard', filename)
+    target = _output_path(kind, filename)
     temporary = None
     try:
         with tempfile.NamedTemporaryFile(mode='w', encoding='utf-8', newline='',
@@ -69,7 +69,22 @@ def _write_label_csv(filename, csv_string):
 def clean_text(text):
         return re.sub(r'[^a-zA-Z0-9]+', '_', str(text)).strip("_")
 
-def build_custom_csvs_pandas(data):
+def job_return_print(data):
+    """Use the existing label column order, in a separate return print queue."""
+    job = data['jobData']
+    items = []
+    for item in job['items']:
+        rows = item.get('calculation_rows') if item.get('entry_method') == 'calculator' else None
+        for row in rows or [{'pieces': item['returned'], 'count': 1}]:
+            items.append({'item_id': item['item_id'], 'name_of_prduct': item['name_of_product'],
+                          'type': item['type'], 'qty': row['pieces'] * row['count'],
+                          'pieces_per_bundle': row['pieces'], 'bundle_count': row['count']})
+    return build_custom_csvs_pandas({'jobData': {
+        **job, 'jobId': job['jobcard_id'], 'items': items,
+    }}, kind='job+retun', filename_prefix=f"return_{job['return_id']}_", movement_label='received by')
+
+
+def build_custom_csvs_pandas(data, kind='jobcard', filename_prefix='', movement_label='given by'):
         job = data["jobData"]
 
         job_id = job["jobId"]
@@ -146,7 +161,7 @@ def build_custom_csvs_pandas(data):
             base = {
                 "job_number": job_id,
                 "date": job["date"],
-                "name": f'{job["party"]} given by {job["username"]}',
+                "name": f'{job["party"]} {movement_label} {job["username"]}',
                 "page": page_index,
             }
 
@@ -175,9 +190,9 @@ def build_custom_csvs_pandas(data):
                 })
 
             out_df = pd.DataFrame([row])
-            filename = f"{job_id}_{party}_{username}_{date}_page_{page_index}.csv"
+            filename = f"{filename_prefix}{job_id}_{party}_{username}_{date}_page_{page_index}.csv"
             csv_string = out_df.to_csv(index=False)
-            _write_label_csv(filename, csv_string)
+            _write_label_csv(filename, csv_string, kind)
 
 
 

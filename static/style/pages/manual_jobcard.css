@@ -1,3 +1,30 @@
+.app-ui .ui-scope.page-manual-jobcard .manual-master-picker{position:relative;min-width:0}
+.app-ui .ui-scope.page-manual-jobcard .saved-job-bar{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.app-ui .ui-scope.page-manual-jobcard #result{background:linear-gradient(120deg,#f0f4ff,#f6f2ff);border:1px solid #d5dcf1;border-radius:16px;padding:18px;box-shadow:0 8px 24px #40578212}
+.app-ui .ui-scope.page-manual-jobcard .saved-job-preview{flex:1;min-width:0;background:#fff;border:1px solid #dce3f3;border-radius:12px;overflow:hidden}
+.app-ui .ui-scope.page-manual-jobcard .saved-job-preview summary{cursor:pointer;color:#344a79;font-weight:700;padding:16px 18px;background:linear-gradient(110deg,#e4ecff,#eee7ff);line-height:1.7;overflow-wrap:anywhere}
+.app-ui .ui-scope.page-manual-jobcard .saved-job-preview summary:hover{background:#dde6fc}
+.app-ui .ui-scope.page-manual-jobcard .saved-job-preview summary:focus-visible{outline:3px solid #647bd0;outline-offset:-3px}
+.app-ui .ui-scope.page-manual-jobcard .saved-job-preview p{margin:16px 18px;font-size:13px;line-height:1.7;color:#697b99;overflow-wrap:anywhere}
+.app-ui .ui-scope.page-manual-jobcard .saved-job-preview .table-wrap{margin:0 16px 16px}
+.app-ui .ui-scope.page-manual-jobcard .saved-job-preview tfoot th{background:#edf2ff;color:#344a79}
+.app-ui .ui-scope.page-manual-jobcard .manual-product-picker{vertical-align:top}
+.app-ui .ui-scope.page-manual-jobcard .master-suggestions.product-suggestions{position:static;max-height:240px;min-width:220px;max-width:420px;margin-top:6px;box-shadow:0 5px 14px #25365b12}
+.app-ui .ui-scope.page-manual-jobcard .master-suggestions.product-suggestions [role=option]{flex-direction:column;align-items:flex-start;gap:3px;white-space:normal}
+.app-ui .ui-scope.page-manual-jobcard .master-suggestions{position:absolute;left:0;right:0;top:100%;z-index:30;max-height:250px;overflow-y:auto;overscroll-behavior:contain;margin-top:5px;padding:6px;border:1px solid #ccd6eb;border-radius:12px;background:#fff;box-shadow:0 14px 32px #25365b24;scrollbar-width:thin}
+.app-ui .ui-scope.page-manual-jobcard .master-suggestions[hidden]{display:none}
+.app-ui .ui-scope.page-manual-jobcard .master-suggestions [role=option]{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px;border-radius:8px;cursor:pointer;color:#415878;font-size:14px;line-height:1.6;overflow-wrap:anywhere}
+.app-ui .ui-scope.page-manual-jobcard .master-suggestions [role=option]:hover,.app-ui .ui-scope.page-manual-jobcard .master-suggestions [aria-selected=true]{background:#edf1ff;color:#435ba1}
+.app-ui .ui-scope.page-manual-jobcard .master-suggestions small{color:#6e7f99;font-size:12px}
+.app-ui .ui-scope.page-manual-jobcard .master-suggestions p{padding:10px;color:#78859b;font-size:13px;line-height:1.7;margin:0}
+.app-ui .ui-scope.page-manual-jobcard .manual-csv-note{margin:18px 0;padding:14px 18px;border:1px solid #dfe5f2;border-radius:10px;background:#f6f8ff;color:#697b99;font-size:12px;line-height:1.8;overflow-wrap:anywhere}
+.app-ui .ui-scope.page-manual-jobcard .manual-job-edit{margin-top:24px;padding:22px;border:1px solid #dce2f1;border-top:3px solid #8b94cf;border-radius:14px;background:linear-gradient(120deg,#fff,#f5f6ff)}
+.app-ui .ui-scope.page-manual-jobcard .manual-job-edit h2{margin:6px 0 10px;font-size:19px;color:#4b5c83}
+.app-ui .ui-scope.page-manual-jobcard .manual-job-edit p:last-child{font-size:13px;line-height:1.7;color:#75829a;margin:0}
+.app-ui .ui-scope.page-manual-jobcard .manual-job-edit form{display:flex;align-items:end;gap:14px;flex-wrap:wrap;margin-top:18px}
+.app-ui .ui-scope.page-manual-jobcard .manual-job-edit label{flex:1;max-width:320px;min-width:180px;font-size:13px;font-weight:650}
+.app-ui .ui-scope.page-manual-jobcard #result .actions a{min-height:44px}
+@media(max-width:600px){.app-ui .ui-scope.page-manual-jobcard .manual-job-edit form{align-items:stretch;flex-direction:column}.app-ui .ui-scope.page-manual-jobcard .manual-job-edit label{max-width:none;min-width:0}}
 @keyframes gradient{0%{background-position:0 0}50%{background-position:100% 100%}100%{background-position:0 0}}
 .ui-scope.wave,
 .ui-scope .wave{position:fixed;bottom:0;left:0;width:200%;height:12em;border-radius:1000% 1000% 0 0;background:rgb(255 255 255 / 25%);opacity:.8;pointer-events:none;z-index:0;animation:wave 10s -3s linear infinite}

@@ -35,7 +35,7 @@ class AppTestCase(unittest.TestCase):
         self.context = self.app.app_context()
         self.context.push()
         self.addCleanup(self.close_database)
-        for name in ("job_cade_print", "outworker_qr_print", "buldel_qr_print"):
+        for name in ("job_cade_print", "outworker_qr_print", "buldel_qr_print", "job_return_print"):
             printer = patch(f"data_entry.{name}", return_value=101)
             setattr(self, name, printer.start())
             self.addCleanup(printer.stop)

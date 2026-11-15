@@ -127,6 +127,12 @@ class InventoryAndPrintingTest(AppTestCase):
             self.assertEqual(outworker_qr_print(self.worker), 101)
             self.assertEqual(buldel_qr_print([{"id": 7, "product": "VIMAL", "pieces": 30}]), 101)
         self.assertTrue((target / "outworker" / f"{self.worker.id}.csv").exists())
+        with (target / 'outworker' / f'{self.worker.id}.csv').open(newline='') as handle:
+            reader = csv.DictReader(handle)
+            self.assertEqual(reader.fieldnames, ['id', 'name', 'address', 'qr_code'])
+            self.assertEqual(next(reader), {'id':str(self.worker.id),'name':self.worker.name,
+                'address':self.worker.adders,'qr_code':self.worker_name})
+        self.assertFalse(list((target / 'outworker').glob('*.tmp')))
         self.assertTrue((target / "bundle" / "7.csv").exists())
 
     def test_long_pattern_labels_have_correct_chunk_totals_and_page_numbers(self):

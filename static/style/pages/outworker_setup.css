@@ -1,0 +1,11 @@
+.app-ui .outworker-setup-shell{display:grid;grid-template-columns:minmax(0,1fr);place-items:center;max-width:none;min-width:0;min-height:calc(100svh - 110px);padding:30px 18px 48px}
+.app-ui .outworker-setup-shell .legacy-login{width:540px}
+.app-ui .outworker-setup-shell .legacy-login .form-container{padding:28px 35px}
+.app-ui .outworker-setup-shell .legacy-login h1{margin-bottom:10px}
+.app-ui .outworker-setup-shell .outworker-setup-description{margin:0 0 25px;font-size:13px;line-height:1.7;color:#6b7280}
+.app-ui .outworker-setup-shell .legacy-login .form-label{flex-basis:125px}
+.app-ui .outworker-setup-shell .outworker-edit-link{display:inline-block;margin-top:24px;color:#347b63;font-size:13px;font-weight:600;text-decoration:none}
+.app-ui .outworker-setup-shell .outworker-edit-link:hover{text-decoration:underline}
+.app-ui .outworker-setup-shell .outworker-edit-links{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.app-ui .outworker-setup-shell .outworker-edit-link:focus-visible{outline:3px solid #23c483;outline-offset:5px;border-radius:3px}
+@media(max-width:480px){.app-ui .outworker-setup-shell .legacy-login .form-container{padding:25px 22px}}

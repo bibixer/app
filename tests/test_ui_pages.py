@@ -65,7 +65,7 @@ class ApplicationUiTest(unittest.TestCase):
     def test_job_pages_keep_their_interaction_targets(self):
         self.fixture.card()
         pages = {
-            "/manual_jobcard": {"masterName", "manualRows", "submitManual", "productOptions", "grandTotal"},
+            "/manual_jobcard": {"masterName", "masterSuggestions", "manualRows", "submitManual", "result", "grandTotal"},
             "/jobcard": {"custInput", "custSug", "billTable", "totalpic", "totalKg", "summaryContent"},
             "/job_retun?jobcard_id=1": {"jobName", "jobDate", "completedHistoryList"},
             "/jobcard/1/ledger": {"main-content"},
