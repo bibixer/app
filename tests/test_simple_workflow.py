@@ -12,6 +12,20 @@ class SimpleWorkflowTest(AppTestCase):
         super().setUp()
         self.app.config['SIMPLE_WORKFLOW'] = True
 
+    def test_bh_favicon_is_available_on_app_pages_and_login(self):
+        icon='/static/images/bh-nav-logo.png?v=20261115-favicon'
+        for path in ('/manual_jobcard','/admin_dashord','/users'):
+            response=self.client.get(path)
+            self.assertEqual(response.status_code,200)
+            self.assertIn(f'rel="icon" type="image/png" href="{icon}"',response.get_data(as_text=True))
+        response=self.client.get(icon)
+        self.assertEqual(response.status_code,200)
+        self.assertEqual(response.mimetype,'image/png')
+        self.assertTrue(response.get_data().startswith(b'\x89PNG\r\n\x1a\n'))
+        response.close()
+        self.client.get('/logout')
+        self.assertIn(icon,self.client.get('/login').get_data(as_text=True))
+
     def test_factory_defaults_to_v2_and_old_urls_cannot_write(self):
         default_app = create_app()
         self.assertTrue(default_app.config['SIMPLE_WORKFLOW'])
@@ -75,12 +89,59 @@ class SimpleWorkflowTest(AppTestCase):
         self.outworker_qr_print.assert_not_called()
         self.buldel_qr_print.assert_not_called()
 
-    def test_outworker_creation_does_not_print(self):
+    def test_outworker_edit_link_preselects_outworkers_and_invalid_types_fall_back(self):
+        import re
+        page = self.client.get('/add_outworver').get_data(as_text=True)
+        self.assertIn('href="/edit?type=outworker"', page)
+        for query, expected in (('?type=outworker','outworker'), ('','product'),
+                                ('?type=unknown','product'), ('?type=movement','product'),
+                                ('?type=bale','product')):
+            with self.subTest(query=query):
+                page = self.client.get('/edit'+query).get_data(as_text=True)
+                self.assertEqual(re.findall(r'<option value="([^"]+)"\s+selected',page), [expected])
+
+    def test_outworker_form_creates_worker_without_alias_field(self):
+        page = self.client.get('/add_outworver').get_data(as_text=True)
+        self.assertIn('class="legacy-login"',page)
+        self.assertIn('style/login.css',page)
+        self.assertIn('outworker-setup-title',page)
+        self.assertNotIn('name="aliases"',page)
+        self.assertNotIn('Master aliases',page)
+        response = self.client.post('/add_outworver',data={
+            'name':'FORM WORKER','address':'CITY','number':'9876543210',
+            'submission_token':'outworker-no-alias-field'})
+        self.assertEqual(response.status_code,302)
+        self.assertIsNotNone(Outworker.query.filter_by(name='FORM WORKER').first())
+
+    def test_outworker_creation_exports_csv_once_in_simple_workflow(self):
         result = add_outworker_db({'name': 'NEW WORKER', 'address': 'CITY',
                                   'number': 456, 'aliases': 'NEW'}, self.admin, 'worker-v2')
         self.assertEqual(result, 101)
         self.assertEqual(Outworker.query.count(), 2)
-        self.outworker_qr_print.assert_not_called()
+        self.outworker_qr_print.assert_called_once()
+        result = add_outworker_db({'name': 'NEW WORKER', 'address': 'CITY',
+                                  'number': 456, 'aliases': 'NEW'}, self.admin, 'worker-v2')
+        self.assertEqual(result, 409)
+        self.outworker_qr_print.assert_called_once()
+
+    def test_outworker_form_writes_original_csv_in_configured_server_folder(self):
+        import csv
+        from pathlib import Path
+        from unittest.mock import patch
+        from data_print_format import outworker_qr_print
+        self.app.config['LABEL_PRINT_ROOT'] = self.temp.name
+        payload = {'name':'CSV WORKER', 'address':'BH GARMENTS', 'number':'9876543210',
+                   'submission_token':'form-csv'}
+        with patch('data_entry.outworker_qr_print', wraps=outworker_qr_print) as exporter:
+            self.assertEqual(self.client.post('/add_outworver',data=payload).status_code,302)
+            self.assertEqual(self.client.post('/add_outworver',data=payload).status_code,302)
+            exporter.assert_called_once()
+        worker = Outworker.query.filter_by(name='CSV WORKER').one()
+        with (Path(self.temp.name)/'outworker'/f'{worker.id}.csv').open(newline='') as stream:
+            reader = csv.DictReader(stream)
+            self.assertEqual(reader.fieldnames,['id','name','address','qr_code'])
+            self.assertEqual(next(reader),{'id':str(worker.id),'name':'CSV WORKER',
+                'address':'BH GARMENTS','qr_code':f'{worker.id}***CSV WORKER--BH GARMENTS/-'})
 
     def test_product_only_needs_name_alias_then_opens_rates(self):
         response = self.client.post('/add_items', data={

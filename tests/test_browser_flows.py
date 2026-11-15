@@ -113,8 +113,79 @@ class BrowserFlowsTest(AppTestCase):
     def active(self, selector):
         self.assertTrue(self.script(f"return document.activeElement.matches({json.dumps(selector)})"), selector)
 
+    def assert_five_visible_suggestions(self, selector):
+        self.assertTrue(self.script("""
+            const list=document.querySelector(%s), rows=[...list.querySelectorAll('[role=option]')];
+            const bottom=list.getBoundingClientRect().bottom-parseFloat(getComputedStyle(list).paddingBottom)-1;
+            return rows.length>5 && rows[4].getBoundingClientRect().bottom<=bottom+1
+                && rows[5].getBoundingClientRect().top>=bottom-1 && list.scrollHeight>list.clientHeight;
+        """ % json.dumps(selector)))
+
+    def test_outworker_edit_matches_setup_and_keeps_existing_aliases(self):
+        from modes import OutworkerAlias
+        self.navigate(f'/edit/outworker/{self.worker.id}')
+        self.assertEqual(self.script("return getComputedStyle(document.querySelector('.header-box')).backgroundColor"),'rgb(0, 0, 0)')
+        self.assertEqual(self.script("return getComputedStyle(document.querySelector('input[type=submit]')).backgroundColor"),'rgb(35, 196, 131)')
+        self.assertFalse(self.script("return !!document.querySelector('[name=aliases]')"))
+        self.command(f'/element/{self.element("[name=name]")}/clear',{})
+        self.type('[name=name]','UPDATED WORKER')
+        self.click('input[type=submit]')
+        self.wait_for("document.querySelector('.notice')?.textContent.includes('Saved.')")
+        db.session.expire_all()
+        self.assertEqual(self.worker.name,'UPDATED WORKER')
+        self.assertEqual(OutworkerAlias.query.filter_by(worker_id=self.worker.id).one().alias,'RAM CITY')
+        self.command('/window/rect',{'width':390,'height':844})
+        self.wait_for('document.documentElement.scrollWidth<=innerWidth')
+        self.click('.outworker-edit-links a:first-child')
+        self.wait_for("document.querySelector('#entityType')?.value==='outworker'")
+
+    def test_edit_center_surfaces_search_default_and_mobile_layout(self):
+        self.navigate('/add_outworver')
+        self.click('.outworker-edit-link')
+        self.wait_for("document.querySelector('#entryList').getAttribute('aria-busy')==='false'")
+        self.assertEqual(self.script("return document.querySelector('#entityType').value"), 'outworker')
+        self.assertIn('RAM', self.script("return document.querySelector('#entryList').textContent"))
+        for selector in ('.edit-hero','.edit-workspace','.entry'):
+            self.assertNotEqual(self.script(f"return getComputedStyle(document.querySelector('{selector}')).backgroundImage"),'none')
+        self.assertEqual(self.script("return getComputedStyle(document.querySelector('.edit-search-panel')).backgroundColor"),'rgb(255, 255, 255)')
+        self.type('#entrySearch','NO SUCH WORKER')
+        self.wait_for("!document.querySelector('#noResults').hidden")
+        self.assertEqual(self.script("return document.querySelectorAll('.entry').length"),0)
+        self.command(f'/element/{self.element("#entrySearch")}/clear',{})
+        self.type('#entrySearch','RAM CITY')
+        self.wait_for("document.querySelectorAll('.entry').length===1")
+        self.command('/window/rect',{'width':390,'height':844})
+        self.wait_for('document.documentElement.scrollWidth<=innerWidth')
+        self.click('.edit-link')
+        self.wait_for(f"location.pathname==='/edit/outworker/{self.worker.id}'")
+
+    def test_outworker_setup_uses_login_style_and_saves_once(self):
+        from modes import Outworker
+        self.navigate('/add_outworver')
+        self.assertIn('rgb(0, 0, 0)', self.script("return getComputedStyle(document.querySelector('.legacy-login .header-box')).backgroundColor"))
+        self.assertEqual(self.script("return getComputedStyle(document.querySelector('.legacy-login .form-container')).backgroundColor"), 'rgb(255, 255, 255)')
+        self.assertEqual(self.script("return getComputedStyle(document.querySelector('input[type=submit]')).backgroundColor"), 'rgb(35, 196, 131)')
+        self.assertTrue(self.script("return !!document.querySelector('nav') && !!document.querySelector('.ui-waves')"))
+        self.type('#name','BROWSER WORKER\ue004')
+        self.active('#address')
+        self.type('#address','CITY\ue004')
+        self.active('#number')
+        self.type('#number','9876543210')
+        self.click('input[type=submit]')
+        self.wait_for("document.querySelector('.notice')?.textContent.includes('successfully added')")
+        db.session.expire_all()
+        self.assertEqual(Outworker.query.filter_by(name='BROWSER WORKER').count(),1)
+        self.outworker_qr_print.assert_called_once()
+        self.command('/window/rect', {'width':390,'height':844})
+        self.wait_for('document.documentElement.scrollWidth<=innerWidth')
+        self.assertTrue(self.script("return document.documentElement.scrollWidth<=innerWidth"),
+            self.script("return [...document.querySelectorAll('main,main *')].filter(e=>e.getBoundingClientRect().right>innerWidth).map(e=>({tag:e.tagName,cls:e.className,width:e.getBoundingClientRect().width,right:e.getBoundingClientRect().right})).slice(0,12)"))
+
     def test_manual_alias_and_type_keyboard_flow(self):
         self.navigate("/manual_jobcard")
+        self.type('#masterName','\ue007')
+        self.active('#masterName')
+        self.assertEqual(self.script("return document.querySelector('#masterName').value"),'')
         self.type("#masterName", "1\ue007")
         self.active("#manualRows .product")
         self.type("#manualRows .product", "VIM\ue007")
@@ -128,6 +199,89 @@ class BrowserFlowsTest(AppTestCase):
         self.active("#manualRows tr:nth-child(2) .product")
         self.type("#manualRows tr:nth-child(2) .product", "\ue003")
         self.active("#manualRows tr:first-child .bundle-type")
+
+    def test_manual_product_suggestions_group_names_and_aliases(self):
+        from modes import Item_data, ItemAlias
+        db.session.add(ItemAlias(item_id=self.product.id, alias='VIMAL SHORT'))
+        for index in range(12):
+            db.session.add(Item_data(name=f'FABRIC {index}', size=2, meters=1, enter_user='admin'))
+        db.session.commit()
+        self.navigate('/manual_jobcard')
+        self.type('#masterName', '1\ue007')
+        picker = '#manualRows tr:first-child .product-suggestions'
+        product = '#manualRows tr:first-child .product'
+        self.assertFalse(self.script(f"return document.querySelector('{product}').hasAttribute('list')"))
+        self.assertEqual(self.script(f"return document.querySelectorAll('{picker} [role=option]').length"), 13)
+        self.assertTrue(self.script(f"const list=document.querySelector('{picker}');return list.scrollHeight>list.clientHeight"))
+        self.assert_five_visible_suggestions(picker)
+        self.type(product, 'VIM')
+        self.assertEqual(self.script(f"return document.querySelectorAll('{picker} [role=option]').length"), 1)
+        for text in (self.product.name, 'VIM', 'VIMAL SHORT'):
+            self.assertIn(text, self.script(f"return document.querySelector('{picker}').textContent"))
+        self.type(product, '\ue007')
+        self.active('#manualRows .pieces')
+        self.assertEqual(self.script(f"return document.querySelector('{product}').value"), self.product.name)
+        self.command(f'/element/{self.element(product)}/clear', {})
+        self.type(product, 'FABRIC\ue015\ue007')
+        self.active('#manualRows .pieces')
+        self.assertEqual(self.script(f"return document.querySelector('{product}').value"), 'FABRIC 0')
+        self.command(f'/element/{self.element(product)}/clear', {})
+        self.type(product, 'VIMAL SHORT')
+        self.click(picker + ' [role=option]')
+        self.active('#manualRows .pieces')
+        self.assertEqual(self.script(f"return document.querySelector('{product}').value"), self.product.name)
+        self.command(f'/element/{self.element(product)}/clear', {})
+        self.type(product, '20\ue007')
+        self.active(product)
+        self.assertIn('not an added product', self.script("return document.querySelector('#message').textContent"))
+        self.type(product, '\ue00c')
+        self.assertEqual(self.script(f"return document.querySelector('{product}').getAttribute('aria-expanded')"), 'false')
+
+    def test_manual_worker_suggestions_are_unique_scrollable_and_keyboard_accessible(self):
+        from modes import Outworker, OutworkerAlias
+        worker=Outworker(name='RAVI',adders='BH GARMENTS',number=2,enter_user='admin')
+        db.session.add(worker)
+        db.session.flush()
+        worker_id=worker.id
+        db.session.add_all([OutworkerAlias(worker_id=worker_id,alias='RAV'),
+                            OutworkerAlias(worker_id=worker_id,alias='RAVI MASTER')])
+        for index in range(12):
+            db.session.add(Outworker(name=f'WORKER {index}',adders='CITY',number=index+100,enter_user='admin'))
+        db.session.commit()
+        db.session.add(Outworker(id=200,name='PREFIX ONLY',adders='CITY',number=200,enter_user='admin'))
+        db.session.commit()
+        self.navigate('/manual_jobcard')
+        self.wait_for("document.querySelector('#masterName').getAttribute('aria-expanded')==='true'")
+        self.assertFalse(self.script("return document.querySelector('#masterName').hasAttribute('list')"))
+        self.assertEqual(self.script("return document.querySelectorAll('#masterSuggestions [role=option]').length"),15)
+        self.assertTrue(self.script("const list=document.querySelector('#masterSuggestions');return list.scrollHeight>list.clientHeight"))
+        self.assert_five_visible_suggestions('#masterSuggestions')
+        self.type('#masterName','20\ue007')
+        self.active('#masterName')
+        self.assertEqual(self.script("return document.querySelector('#masterName').value"),'20')
+        self.command(f'/element/{self.element("#masterName")}/clear',{})
+        self.type('#masterName',str(worker_id))
+        self.wait_for("document.querySelectorAll('#masterSuggestions [role=option]').length===1")
+        self.assertIn('RAVI',self.script("return document.querySelector('#masterSuggestions').textContent"))
+        self.type('#masterName','\ue007')
+        self.active('#manualRows .product')
+        self.assertTrue(self.script(f"return document.querySelector('#masterName').value.startsWith('{worker_id}***RAVI')"))
+        self.command(f'/element/{self.element("#masterName")}/clear',{})
+        self.type('#masterName','RAV')
+        self.wait_for("document.querySelectorAll('#masterSuggestions [role=option]').length===1")
+        self.click(f'#masterSuggestions [data-worker-id="{worker_id}"]')
+        self.active('#manualRows .product')
+        self.command(f'/element/{self.element("#masterName")}/clear',{})
+        self.type('#masterName','WORKER')
+        self.wait_for("document.querySelectorAll('#masterSuggestions [role=option]').length===12")
+        self.type('#masterName','\ue015\ue007')
+        self.active('#manualRows .product')
+        self.command(f'/element/{self.element("#masterName")}/clear',{})
+        self.type('#masterName','NO SUCH WORKER\ue007')
+        self.assertIn('valid master',self.script("return document.querySelector('#message').textContent"))
+        self.active('#masterName')
+        self.type('#masterName','\ue00c')
+        self.assertEqual(self.script("return document.querySelector('#masterName').getAttribute('aria-expanded')"),'false')
 
     def test_lost_manual_save_response_retry_restores_printable_job(self):
         self.navigate('/manual_jobcard')
@@ -153,11 +307,44 @@ class BrowserFlowsTest(AppTestCase):
         self.click('#submitManual')
         self.wait_for("document.querySelector('#result').textContent.includes('Job Card #')")
         self.assertIn('120 pieces', self.script("return document.querySelector('#result').textContent"))
-        self.assertTrue(self.script("return !!document.querySelector('#result button[onclick=\"window.print()\"]')"))
+        self.assertFalse(self.script("return !!document.querySelector('#result button')"))
+        self.assertTrue(self.script("return document.querySelector('.saved-job-preview').open"))
+        self.assertNotEqual(self.script("return getComputedStyle(document.querySelector('.saved-job-preview')).backgroundColor"), 'rgba(0, 0, 0, 0)')
+        self.assertNotEqual(self.script("return getComputedStyle(document.querySelector('.saved-job-preview summary')).backgroundImage"), 'none')
+        self.active('#masterName')
+        self.assertEqual(self.script("return document.querySelector('#masterName').value"), '')
+        self.assertEqual(self.script("return document.querySelectorAll('#manualRows tr').length"), 1)
+        self.assertEqual(self.script("return document.querySelector('#manualRows .product').value"), '')
+        self.assertFalse(self.script("return document.querySelector('#submitManual').disabled"))
         db.session.expire_all()
         from modes import Jobcard
         self.assertEqual(Jobcard.query.count(), 1)
         self.job_cade_print.assert_called_once()
+        self.assertIn('jobcard_id=',self.script("return document.querySelector('#editSavedJob').getAttribute('href')"))
+        self.click('.saved-job-preview summary')
+        self.assertFalse(self.script("return document.querySelector('.saved-job-preview').open"))
+        self.click('.saved-job-preview summary')
+        self.assertTrue(self.script("return document.querySelector('.saved-job-preview').open"))
+        self.script("document.querySelector('#masterName').value='1';document.querySelector('#manualRows .product').value='VIM';document.querySelector('#manualRows .pieces').value='5';document.querySelector('#manualRows .count').value='1'")
+        self.click('#submitManual')
+        self.wait_for("document.querySelector('#result').textContent.includes('5 pieces')")
+        db.session.expire_all()
+        self.assertEqual(Jobcard.query.count(), 2)
+        self.assertEqual(self.job_cade_print.call_count, 2)
+        self.active('#masterName')
+
+    def test_manual_save_and_old_job_edit_shortcuts(self):
+        card_id=add_manual_jobcard(self.manual_payload(pieces=10,count=1),self.admin,'old-to-edit')['jobData']['jobId']
+        self.navigate('/manual_jobcard')
+        self.type('#editJobNumber',str(card_id)+'\ue007')
+        self.wait_for(f"location.pathname==='/edit/jobcard/{card_id}'")
+        self.navigate('/manual_jobcard')
+        self.script("document.querySelector('#masterName').value='1';document.querySelector('#manualRows .product').value='VIM';document.querySelector('#manualRows .pieces').value='36';document.querySelector('#manualRows .count').value='2'")
+        self.click('#submitManual')
+        self.wait_for("!!document.querySelector('#editSavedJob')")
+        self.click('#editSavedJob')
+        self.wait_for("location.pathname.startsWith('/edit/jobcard/') && !!document.querySelector('.edit-fields')")
+        self.assertNotEqual(self.script('return location.pathname'),f'/edit/jobcard/{card_id}')
 
     def test_kept_product_value_preview_recovery_and_payroll(self):
         from kept_products import save_product_value
@@ -394,6 +581,41 @@ class BrowserFlowsTest(AppTestCase):
         self.wait_for("document.querySelector('.dash-empty')?.textContent.includes('No outflow')")
         self.assertIn('No inflow',self.script('return document.body.textContent'))
 
+    def test_return_save_stays_on_job_with_preview_and_no_blob_window(self):
+        from modes import Jobmovement
+        card_id = add_manual_jobcard(self.manual_payload(pieces=10,count=1), self.admin, 'receipt-job')['jobData']['jobId']
+        self.navigate(f'/job_retun?jobcard_id={card_id}')
+        self.script("window.open=()=>{throw new Error('Unexpected popup')};URL.createObjectURL=()=>{throw new Error('Unexpected blob')}")
+        self.script("""
+            window.returnAlerts=[];window.alert=message=>window.returnAlerts.push(message);
+            const realFetch=window.fetch.bind(window);let loseResponse=true;
+            window.fetch=async (...args)=>{
+                const response=await realFetch(...args);
+                if(args[0]==='/summit-retune' && loseResponse){loseResponse=false;throw new TypeError('Lost after commit');}
+                return response;
+            };
+        """)
+        self.type('.return-input', '3')
+        self.click('.btn-submit')
+        self.wait_for("window.returnAlerts.length===1")
+        self.click('.btn-submit')
+        self.wait_for("!!document.querySelector('#savedReturnPreview')")
+        self.active('#savedReturnPreview')
+        self.assertIn('3 pieces', self.script("return document.querySelector('#savedReturnPreview').textContent"))
+        self.assertIn(f'/job_retun?jobcard_id={card_id}', self.script('return location.href'))
+        self.assertEqual(self.script("return document.querySelector('.return-input').dataset.remaining"), '7')
+        self.assertEqual(len(self.command('/window/handles')), 1)
+        self.type('.return-input', '7')
+        self.click('.btn-submit')
+        self.wait_for("document.querySelector('#savedReturnPreview')?.textContent.includes('7 pieces')")
+        self.assertFalse(self.script("return !!document.querySelector('.return-input')"))
+        self.assertEqual(len(self.command('/window/handles')), 1)
+        db.session.expire_all()
+        self.assertEqual(Jobmovement.query.filter_by(flow_type='IN').count(), 2)
+        self.assertEqual(self.job_return_print.call_count, 2)
+        self.click('.saved-return-edit')
+        self.wait_for(f"location.pathname==='/edit/jobcard/{card_id}'")
+
     def test_worker_returns_save_one_job_without_losing_another_jobs_draft(self):
         from modes import Jobmovement
         ids=[add_manual_jobcard(self.manual_payload(pieces=10,count=1),self.admin,
@@ -411,8 +633,7 @@ class BrowserFlowsTest(AppTestCase):
         enter_job(1)
         self.type('.return-input','7')
         enter_job(0)
-        # Keep receipt windows/downloads inside this isolated browser test.
-        self.script("window.open=()=>null;const click=HTMLAnchorElement.prototype.click;HTMLAnchorElement.prototype.click=function(){if(!this.download)return click.call(this)}")
+        self.script("window.open=()=>{throw new Error('Unexpected popup')};URL.createObjectURL=()=>{throw new Error('Unexpected blob')}")
         self.click('.btn-submit')
         self.command('/frame',{'id':None})
         self.wait_for(f"document.querySelector('[data-job-id=\"{ids[0]}\"]').dataset.remaining==='7'")
@@ -474,6 +695,40 @@ class BrowserFlowsTest(AppTestCase):
         self.assertTrue(self.script("return document.documentElement.scrollWidth<=innerWidth+1"))
         db.session.expire_all()
         self.assertEqual(JobKeptProduct.query.one().amount_paise,24000)
+
+    def test_dashboard_carried_balance_worker_drilldown_sort_and_mobile(self):
+        from datetime import datetime
+        from modes import Jobcard, Jobmovement
+        card_id=add_manual_jobcard(self.manual_payload(pieces=178,count=1),self.admin,'balance-browser')['jobData']['jobId']
+        in_move_entery(self.return_payload(card_id,149),self.admin,'balance-return')
+        db.session.get(Jobcard,card_id).date=datetime(2026,11,8)
+        for row in Jobmovement.query.filter_by(jobcard=str(card_id)):
+            row.date=datetime(2026,11,8 if row.flow_type=='OUT' else 9)
+        db.session.commit()
+        query='date_from=2026-11-11&date_to=2026-11-17&kind=opening'
+        self.navigate('/dashboard/movements?'+query)
+        self.wait_for("!!document.querySelector('.movement-worker-card')")
+        self.assertFalse(self.script("return document.querySelector('.movement-worker-card').open"))
+        self.assertIn('29 left',self.script("return document.querySelector('.movement-worker-products').textContent"))
+        self.click('.movement-worker-card > summary')
+        self.wait_for("document.querySelector('.movement-worker-card').open")
+        self.assertIn('3',self.script("return document.querySelector('.movement-age').textContent"))
+        self.assertTrue(self.script(f"return !!document.querySelector('a[href=\"/edit/jobcard/{card_id}\"]')"))
+        self.click('.movement-view-switch a:last-child')
+        self.wait_for("location.search.includes('view=jobs')")
+        self.assertFalse(self.script("return !!document.querySelector('.movement-worker-card')"))
+        self.type('[name=product]','vimal')
+        self.script("document.querySelector('[name=sort]').value='quantity_desc'")
+        self.click('.movement-date-form button')
+        self.wait_for("location.search.includes('sort=quantity_desc')")
+        self.assertEqual(self.script("return document.querySelector('[name=product]').value"),'vimal')
+        self.assertIn('29',self.script("return document.querySelector('.movement-job-table').textContent"))
+        self.command('/window/rect',{'width':390,'height':844})
+        self.assertTrue(self.script("return document.documentElement.scrollWidth<=innerWidth+1"))
+        self.script("window.dispatchEvent(new Event('beforeprint'))")
+        self.assertTrue(self.script("return document.querySelector('.movement-raw').open"))
+        self.script("window.dispatchEvent(new Event('afterprint'))")
+        self.assertFalse(self.script("return document.querySelector('.movement-raw').open"))
 
     def test_custom_dashboard_dates_and_new_tab_details(self):
         from modes import Jobcard

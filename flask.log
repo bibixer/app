@@ -11143,3 +11143,1514 @@ INFO:werkzeug:127.0.0.1 - - [13/Nov/2026 21:44:52] "GET /static/js/jobcard-edit.
 INFO:werkzeug:127.0.0.1 - - [13/Nov/2026 21:44:52] "[36mGET /static/images/bh-nav-logo.png HTTP/1.1[0m" 304 -
 INFO:root:Flask service starting
 INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:42:01] "GET /login HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:42:01] "GET /static/style/app.css?v=20261108-waves HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:42:01] "GET /static/js/app-ui.js?v=20261107 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:42:01] "GET /static/style/login.css?v=20261108-center HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:42:01] "GET /static/images/BH.svg HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:42:01] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:42:02] "GET /dashboard/movements?date_from=2026-11-11&date_to=2026-11-17&kind=opening HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:42:02] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:42:02] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:42:02] "GET /static/style/pages/dashboard_movements.css?v=20261115-balances HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:42:02] "GET /static/images/bh-nav-logo.png HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:42:02] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:42:02] "GET /dashboard/movements?date_from=2026-11-11&date_to=2026-11-17&kind=opening&view=jobs&sort=age_desc&product= HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:42:02] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:42:02] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:42:02] "[36mGET /static/style/pages/dashboard_movements.css?v=20261115-balances HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:42:02] "[36mGET /static/images/bh-nav-logo.png HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:42:02] "GET /dashboard/movements?kind=opening&view=jobs&date_from=2026-11-11&date_to=2026-11-17&product=vimal&sort=quantity_desc HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:42:02] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:42:02] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:42:02] "[36mGET /static/style/pages/dashboard_movements.css?v=20261115-balances HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:42:02] "[36mGET /static/images/bh-nav-logo.png HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:42:09] "GET /login HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:42:09] "GET /static/style/app.css?v=20261108-waves HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:42:09] "GET /static/js/app-ui.js?v=20261107 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:42:09] "GET /static/style/login.css?v=20261108-center HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:42:09] "GET /static/images/BH.svg HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:42:10] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:42:10] "GET /admin_dashord HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:42:10] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:42:10] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:42:10] "GET /static/style/pages/admin_dashboard.css HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:42:10] "GET /static/style/pages/dashboard_v2.css?v=20261108-ranges HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:42:10] "GET /static/js/dashboard-charts.js?v=20261108 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:42:10] "GET /static/images/bh-nav-logo.png HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:42:10] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:42:11] "GET /admin_dashord?date_from=2026-11-15&date_to=2026-11-15 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:42:11] "[36mGET /static/style/pages/admin_dashboard.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:42:11] "[36mGET /static/style/pages/dashboard_v2.css?v=20261108-ranges HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:42:11] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:42:11] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:42:11] "[36mGET /static/js/dashboard-charts.js?v=20261108 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:42:11] "[36mGET /static/images/bh-nav-logo.png HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:42:11] "GET /dashboard/movements?date_from=2026-11-15&date_to=2026-11-15&kind=given HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:42:11] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:42:11] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:42:12] "GET /static/style/pages/dashboard_movements.css?v=20261115-balances HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:42:12] "[36mGET /static/images/bh-nav-logo.png HTTP/1.1[0m" 304 -
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:flask_wtf.csrf:The CSRF token is missing.
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:55:16] "GET /login HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:55:16] "GET /static/style/login.css?v=20261108-center HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:55:16] "GET /static/js/app-ui.js?v=20261107 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:55:16] "GET /static/style/app.css?v=20261108-waves HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:55:16] "GET /static/images/BH.svg HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:55:16] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:55:16] "GET /manual_jobcard HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:55:16] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:55:16] "GET /static/style/pages/manual_jobcard.css?v=20261115-edit-shortcut HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:55:16] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:55:16] "GET /static/images/bh-nav-logo.png HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:55:17] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:55:17] "[32mGET /edit/jobcard/open?jobcard_id=1 HTTP/1.1[0m" 302 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:55:17] "GET /edit/jobcard/1 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:55:17] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:55:17] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:55:17] "GET /static/style/pages/edit_entry.css HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:55:17] "GET /static/js/jobcard-edit.js?v=20261113-kept-edit HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:55:17] "[36mGET /static/images/bh-nav-logo.png HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:55:17] "GET /manual_jobcard HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:55:18] "[36mGET /static/style/pages/manual_jobcard.css?v=20261115-edit-shortcut HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:55:18] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:55:18] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:55:18] "[36mGET /static/images/bh-nav-logo.png HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:55:18] "POST /submit-manual-jobcard HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:55:18] "[32mGET /edit/jobcard/open?jobcard_id=2 HTTP/1.1[0m" 302 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:55:18] "GET /edit/jobcard/2 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:55:18] "[36mGET /static/style/pages/edit_entry.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:55:18] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:55:18] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:55:18] "[36mGET /static/js/jobcard-edit.js?v=20261113-kept-edit HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:55:18] "[36mGET /static/images/bh-nav-logo.png HTTP/1.1[0m" 304 -
+ERROR:root:Setup save failed
+Traceback (most recent call last):
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.IntegrityError: UNIQUE constraint failed: CutData.name
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/data_entry.py", line 236, in eror
+    return func(*args, **kwargs)
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/data_entry.py", line 257, in add_cutter
+    return add_data_to_database(cuuter)
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/data_entry.py", line 20, in add_data_to_database
+    db.session.commit()
+    ~~~~~~~~~~~~~~~~~^^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/orm/scoping.py", line 598, in commit
+    return self._proxied.commit()
+           ~~~~~~~~~~~~~~~~~~~~^^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/orm/session.py", line 2035, in commit
+    trans.commit(_to_root=True)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "<string>", line 2, in commit
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/orm/state_changes.py", line 137, in _go
+    ret_value = fn(self, *arg, **kw)
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/orm/session.py", line 1316, in commit
+    self._prepare_impl()
+    ~~~~~~~~~~~~~~~~~~^^
+  File "<string>", line 2, in _prepare_impl
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/orm/state_changes.py", line 137, in _go
+    ret_value = fn(self, *arg, **kw)
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/orm/session.py", line 1290, in _prepare_impl
+    self.session.flush()
+    ~~~~~~~~~~~~~~~~~~^^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/orm/session.py", line 4353, in flush
+    self._flush(objects)
+    ~~~~~~~~~~~^^^^^^^^^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/orm/session.py", line 4488, in _flush
+    with util.safe_reraise():
+         ~~~~~~~~~~~~~~~~~^^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/util/langhelpers.py", line 122, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/orm/session.py", line 4449, in _flush
+    flush_context.execute()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/orm/unitofwork.py", line 465, in execute
+    rec.execute(self)
+    ~~~~~~~~~~~^^^^^^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/orm/unitofwork.py", line 641, in execute
+    util.preloaded.orm_persistence.save_obj(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self.mapper,
+        ^^^^^^^^^^^^
+        uow.states_for_mapper_hierarchy(self.mapper, False, False),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        uow,
+        ^^^^
+    )
+    ^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/orm/persistence.py", line 94, in save_obj
+    _emit_insert_statements(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        base_mapper,
+        ^^^^^^^^^^^^
+    ...<3 lines>...
+        insert,
+        ^^^^^^^
+    )
+    ^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/orm/persistence.py", line 1234, in _emit_insert_statements
+    result = connection.execute(
+        statement,
+        params,
+        execution_options=execution_options,
+    )
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 1421, in execute
+    return meth(
+        self,
+        distilled_parameters,
+        execution_options or NO_OPTIONS,
+    )
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/sql/elements.py", line 526, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self, distilled_params, execution_options
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 1643, in _execute_clauseelement
+    ret = self._execute_context(
+        dialect,
+    ...<8 lines>...
+        cache_hit=cache_hit,
+    )
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 1848, in _execute_context
+    return self._exec_single_context(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        dialect, context, statement, parameters
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 1988, in _exec_single_context
+    self._handle_dbapi_exception(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        e, str_statement, effective_parameters, cursor, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 2365, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+sqlalchemy.exc.IntegrityError: (sqlite3.IntegrityError) UNIQUE constraint failed: CutData.name
+[SQL: INSERT INTO "CutData" (name, enter_user) VALUES (?, ?)]
+[parameters: ('CUTTER', 'admin')]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:55:26] "GET /login HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:55:26] "GET /static/style/app.css?v=20261108-waves HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:55:26] "GET /static/style/login.css?v=20261108-center HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:55:26] "GET /static/js/app-ui.js?v=20261107 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:55:26] "GET /static/images/BH.svg HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:55:26] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:55:27] "GET /manual_jobcard HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:55:27] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:55:27] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:55:27] "GET /static/style/pages/manual_jobcard.css?v=20261115-edit-shortcut HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:55:27] "GET /static/images/bh-nav-logo.png HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:55:27] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:55:27] "POST /submit-manual-jobcard HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:55:28] "POST /submit-manual-jobcard HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:55:35] "GET /login HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:55:35] "GET /static/style/login.css?v=20261108-center HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:55:35] "GET /static/js/app-ui.js?v=20261107 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:55:35] "GET /static/style/app.css?v=20261108-waves HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:55:35] "GET /static/images/BH.svg HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:55:35] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:55:35] "GET /manual_jobcard HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:55:36] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:55:36] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:55:36] "GET /static/style/pages/manual_jobcard.css?v=20261115-edit-shortcut HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:55:36] "GET /static/images/bh-nav-logo.png HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 01:55:36] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:05:58] "GET /login HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:05:58] "GET /static/js/app-ui.js?v=20261107 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:05:58] "GET /static/style/app.css?v=20261108-waves HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:05:58] "GET /static/style/login.css?v=20261108-center HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:05:58] "GET /static/images/BH.svg HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:05:58] "GET /static/images/bh-nav-logo.png?v=20261115-favicon HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:05:58] "GET /manual_jobcard HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:05:58] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:05:58] "GET /static/style/pages/manual_jobcard.css?v=20261115-master-suggestions HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:05:58] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:05:58] "GET /static/js/manual-master-suggestions.js?v=20261115-finished HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:05:58] "GET /static/images/bh-nav-logo.png HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:05:59] "[36mGET /static/images/bh-nav-logo.png?v=20261115-favicon HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:06:07] "GET /login HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:06:07] "GET /static/style/app.css?v=20261108-waves HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:06:07] "GET /static/js/app-ui.js?v=20261107 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:06:07] "GET /static/style/login.css?v=20261108-center HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:06:07] "GET /static/images/BH.svg HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:06:08] "GET /static/images/bh-nav-logo.png?v=20261115-favicon HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:06:08] "GET /manual_jobcard HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:06:08] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:06:08] "GET /static/style/pages/manual_jobcard.css?v=20261115-master-suggestions HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:06:08] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:06:08] "GET /static/js/manual-master-suggestions.js?v=20261115-finished HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:06:08] "GET /static/images/bh-nav-logo.png HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:06:08] "[36mGET /static/images/bh-nav-logo.png?v=20261115-favicon HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:06:16] "GET /login HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:06:16] "GET /static/style/app.css?v=20261108-waves HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:06:16] "GET /static/style/login.css?v=20261108-center HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:06:16] "GET /static/js/app-ui.js?v=20261107 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:06:16] "GET /static/images/BH.svg HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:06:16] "GET /static/images/bh-nav-logo.png?v=20261115-favicon HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:06:16] "GET /manual_jobcard HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:06:16] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:06:16] "GET /static/style/pages/manual_jobcard.css?v=20261115-master-suggestions HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:06:16] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:06:16] "GET /static/js/manual-master-suggestions.js?v=20261115-finished HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:06:16] "GET /static/images/bh-nav-logo.png HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:06:17] "[36mGET /static/images/bh-nav-logo.png?v=20261115-favicon HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:06:17] "[32mGET /edit/jobcard/open?jobcard_id=1 HTTP/1.1[0m" 302 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:06:17] "GET /edit/jobcard/1 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:06:17] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:06:17] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:06:17] "GET /static/js/jobcard-edit.js?v=20261113-kept-edit HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:06:17] "GET /static/style/pages/edit_entry.css HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:06:17] "[36mGET /static/images/bh-nav-logo.png HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:06:17] "GET /manual_jobcard HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:06:17] "[36mGET /static/style/pages/manual_jobcard.css?v=20261115-master-suggestions HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:06:17] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:06:17] "[36mGET /static/js/manual-master-suggestions.js?v=20261115-finished HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:06:17] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:06:17] "[36mGET /static/images/bh-nav-logo.png HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:06:18] "POST /submit-manual-jobcard HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:06:18] "[32mGET /edit/jobcard/open?jobcard_id=2 HTTP/1.1[0m" 302 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:06:18] "GET /edit/jobcard/2 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:06:18] "[36mGET /static/style/pages/edit_entry.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:06:18] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:06:18] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:06:18] "[36mGET /static/js/jobcard-edit.js?v=20261113-kept-edit HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:06:18] "[36mGET /static/images/bh-nav-logo.png HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:06:26] "GET /login HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:06:26] "GET /static/js/app-ui.js?v=20261107 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:06:26] "GET /static/style/app.css?v=20261108-waves HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:06:26] "GET /static/style/login.css?v=20261108-center HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:06:26] "GET /static/images/BH.svg HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:06:26] "GET /static/images/bh-nav-logo.png?v=20261115-favicon HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:06:26] "GET /manual_jobcard HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:06:26] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:06:26] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:06:26] "GET /static/style/pages/manual_jobcard.css?v=20261115-master-suggestions HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:06:26] "GET /static/js/manual-master-suggestions.js?v=20261115-finished HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:06:26] "GET /static/images/bh-nav-logo.png HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:06:27] "[36mGET /static/images/bh-nav-logo.png?v=20261115-favicon HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:06:27] "POST /submit-manual-jobcard HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:06:28] "POST /submit-manual-jobcard HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:07:08] "GET /login HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:07:08] "GET /static/js/app-ui.js?v=20261107 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:07:08] "GET /static/style/app.css?v=20261108-waves HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:07:08] "GET /static/style/login.css?v=20261108-center HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:07:08] "GET /static/images/BH.svg HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:07:08] "GET /static/images/bh-nav-logo.png?v=20261115-favicon HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:07:09] "GET /manual_jobcard HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:07:09] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:07:09] "GET /static/style/pages/manual_jobcard.css?v=20261115-master-suggestions HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:07:09] "GET /static/js/manual-master-suggestions.js?v=20261115-finished HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:07:09] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:07:09] "GET /static/images/bh-nav-logo.png HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:07:09] "[36mGET /static/images/bh-nav-logo.png?v=20261115-favicon HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:07:16] "GET /login HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:07:16] "GET /static/style/app.css?v=20261108-waves HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:07:16] "GET /static/style/login.css?v=20261108-center HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:07:16] "GET /static/js/app-ui.js?v=20261107 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:07:16] "GET /static/images/BH.svg HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:07:16] "GET /static/images/bh-nav-logo.png?v=20261115-favicon HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:07:16] "GET /manual_jobcard HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:07:16] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:07:16] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:07:16] "GET /static/style/pages/manual_jobcard.css?v=20261115-master-suggestions HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:07:16] "GET /static/js/manual-master-suggestions.js?v=20261115-finished HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:07:16] "GET /static/images/bh-nav-logo.png HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:07:17] "[36mGET /static/images/bh-nav-logo.png?v=20261115-favicon HTTP/1.1[0m" 304 -
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:18:31] "GET /login HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:18:31] "GET /static/style/login.css?v=20261108-center HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:18:31] "GET /static/style/app.css?v=20261108-waves HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:18:31] "GET /static/images/BH.svg HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:18:31] "GET /static/js/app-ui.js?v=20261107 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:18:31] "GET /static/images/bh-nav-logo.png?v=20261115-favicon HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:18:31] "GET /manual_jobcard HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:18:31] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:18:31] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:18:31] "GET /static/style/pages/manual_jobcard.css?v=20261115-item-suggestions HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:18:31] "GET /static/js/manual-product-suggestions.js?v=20261115 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:18:31] "GET /static/js/manual-master-suggestions.js?v=20261115-finished HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:18:31] "GET /static/images/bh-nav-logo.png HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:18:32] "[36mGET /static/images/bh-nav-logo.png?v=20261115-favicon HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:18:38] "GET /login HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:18:39] "GET /static/style/login.css?v=20261108-center HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:18:39] "GET /static/style/app.css?v=20261108-waves HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:18:39] "GET /static/js/app-ui.js?v=20261107 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:18:39] "GET /static/images/BH.svg HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:18:39] "GET /static/images/bh-nav-logo.png?v=20261115-favicon HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:18:39] "GET /manual_jobcard HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:18:39] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:18:39] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:18:39] "GET /static/js/manual-master-suggestions.js?v=20261115-finished HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:18:39] "GET /static/js/manual-product-suggestions.js?v=20261115 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:18:39] "GET /static/style/pages/manual_jobcard.css?v=20261115-item-suggestions HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:18:39] "GET /static/images/bh-nav-logo.png HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:18:39] "[36mGET /static/images/bh-nav-logo.png?v=20261115-favicon HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:18:46] "GET /login HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:18:47] "GET /static/style/app.css?v=20261108-waves HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:18:47] "GET /static/style/login.css?v=20261108-center HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:18:47] "GET /static/js/app-ui.js?v=20261107 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:18:47] "GET /static/images/BH.svg HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:18:47] "GET /static/images/bh-nav-logo.png?v=20261115-favicon HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:18:47] "GET /manual_jobcard HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:18:47] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:18:47] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:18:47] "GET /static/js/manual-product-suggestions.js?v=20261115 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:18:47] "GET /static/js/manual-master-suggestions.js?v=20261115-finished HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:18:47] "GET /static/style/pages/manual_jobcard.css?v=20261115-item-suggestions HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:18:47] "GET /static/images/bh-nav-logo.png HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:18:48] "[36mGET /static/images/bh-nav-logo.png?v=20261115-favicon HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:18:55] "GET /login HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:18:55] "GET /static/style/app.css?v=20261108-waves HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:18:55] "GET /static/style/login.css?v=20261108-center HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:18:55] "GET /static/js/app-ui.js?v=20261107 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:18:55] "GET /static/images/BH.svg HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:18:55] "GET /static/images/bh-nav-logo.png?v=20261115-favicon HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:18:55] "GET /manual_jobcard HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:18:55] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:18:55] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:18:55] "GET /static/js/manual-master-suggestions.js?v=20261115-finished HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:18:55] "GET /static/style/pages/manual_jobcard.css?v=20261115-item-suggestions HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:18:55] "GET /static/js/manual-product-suggestions.js?v=20261115 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:18:55] "GET /static/images/bh-nav-logo.png HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:18:55] "[36mGET /static/images/bh-nav-logo.png?v=20261115-favicon HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:18:56] "POST /submit-manual-jobcard HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:18:56] "POST /submit-manual-jobcard HTTP/1.1" 200 -
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:21:16] "GET /login HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:21:16] "GET /static/style/app.css?v=20261108-waves HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:21:16] "GET /static/js/app-ui.js?v=20261107 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:21:16] "GET /static/style/login.css?v=20261108-center HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:21:16] "GET /static/images/BH.svg HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:21:16] "GET /static/images/bh-nav-logo.png?v=20261115-favicon HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:21:17] "GET /manual_jobcard HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:21:17] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:21:17] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:21:17] "GET /static/style/pages/manual_jobcard.css?v=20261115-item-suggestions HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:21:17] "GET /static/js/manual-product-suggestions.js?v=20261115-five-rows HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:21:17] "GET /static/js/manual-master-suggestions.js?v=20261115-five-rows HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:21:17] "GET /static/images/bh-nav-logo.png HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:21:17] "[36mGET /static/images/bh-nav-logo.png?v=20261115-favicon HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:21:23] "GET /login HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:21:23] "GET /static/style/app.css?v=20261108-waves HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:21:23] "GET /static/style/login.css?v=20261108-center HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:21:23] "GET /static/js/app-ui.js?v=20261107 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:21:23] "GET /static/images/BH.svg HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:21:23] "GET /static/images/bh-nav-logo.png?v=20261115-favicon HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:21:24] "GET /manual_jobcard HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:21:24] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:21:24] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:21:24] "GET /static/style/pages/manual_jobcard.css?v=20261115-item-suggestions HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:21:24] "GET /static/js/manual-master-suggestions.js?v=20261115-five-rows HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:21:24] "GET /static/js/manual-product-suggestions.js?v=20261115-five-rows HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:21:24] "GET /static/images/bh-nav-logo.png HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:21:24] "[36mGET /static/images/bh-nav-logo.png?v=20261115-favicon HTTP/1.1[0m" 304 -
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:27:27] "GET /login HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:27:27] "GET /static/style/app.css?v=20261108-waves HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:27:27] "GET /static/style/login.css?v=20261108-center HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:27:27] "GET /static/js/app-ui.js?v=20261107 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:27:27] "GET /static/images/BH.svg HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:27:27] "GET /static/images/bh-nav-logo.png?v=20261115-favicon HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:27:27] "GET /manual_jobcard HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:27:27] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:27:27] "GET /static/style/pages/manual_jobcard.css?v=20261115-quick-next-job HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:27:27] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:27:27] "GET /static/js/manual-product-suggestions.js?v=20261115-five-rows HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:27:27] "GET /static/js/manual-master-suggestions.js?v=20261115-five-rows HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:27:27] "GET /static/images/bh-nav-logo.png HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:27:28] "[36mGET /static/images/bh-nav-logo.png?v=20261115-favicon HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:27:28] "POST /submit-manual-jobcard HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:27:28] "POST /submit-manual-jobcard HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:27:28] "POST /submit-manual-jobcard HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:27:34] "GET /login HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:27:34] "GET /static/style/login.css?v=20261108-center HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:27:34] "GET /static/style/app.css?v=20261108-waves HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:27:34] "GET /static/js/app-ui.js?v=20261107 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:27:34] "GET /static/images/BH.svg HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:27:34] "GET /static/images/bh-nav-logo.png?v=20261115-favicon HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:27:34] "GET /manual_jobcard HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:27:34] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:27:35] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:27:35] "GET /static/style/pages/manual_jobcard.css?v=20261115-quick-next-job HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:27:35] "GET /static/js/manual-master-suggestions.js?v=20261115-five-rows HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:27:35] "GET /static/js/manual-product-suggestions.js?v=20261115-five-rows HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:27:35] "GET /static/images/bh-nav-logo.png HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:27:35] "[36mGET /static/images/bh-nav-logo.png?v=20261115-favicon HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:27:35] "[32mGET /edit/jobcard/open?jobcard_id=1 HTTP/1.1[0m" 302 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:27:35] "GET /edit/jobcard/1 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:27:35] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:27:35] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:27:35] "GET /static/js/jobcard-edit.js?v=20261113-kept-edit HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:27:35] "GET /static/style/pages/edit_entry.css HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:27:35] "[36mGET /static/images/bh-nav-logo.png HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:27:36] "GET /manual_jobcard HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:27:36] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:27:36] "[36mGET /static/style/pages/manual_jobcard.css?v=20261115-quick-next-job HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:27:36] "[36mGET /static/js/manual-master-suggestions.js?v=20261115-five-rows HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:27:36] "[36mGET /static/js/manual-product-suggestions.js?v=20261115-five-rows HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:27:36] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:27:36] "[36mGET /static/images/bh-nav-logo.png HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:27:36] "POST /submit-manual-jobcard HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:27:36] "[32mGET /edit/jobcard/open?jobcard_id=2 HTTP/1.1[0m" 302 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:27:36] "GET /edit/jobcard/2 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:27:36] "[36mGET /static/style/pages/edit_entry.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:27:36] "[36mGET /static/js/jobcard-edit.js?v=20261113-kept-edit HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:27:36] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:27:36] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:27:36] "[36mGET /static/images/bh-nav-logo.png HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:27:42] "GET /login HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:27:42] "GET /static/style/app.css?v=20261108-waves HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:27:42] "GET /static/style/login.css?v=20261108-center HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:27:42] "GET /static/js/app-ui.js?v=20261107 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:27:42] "GET /static/images/BH.svg HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:27:42] "GET /static/images/bh-nav-logo.png?v=20261115-favicon HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:27:42] "GET /manual_jobcard HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:27:42] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:27:42] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:27:42] "GET /static/js/manual-master-suggestions.js?v=20261115-five-rows HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:27:42] "GET /static/style/pages/manual_jobcard.css?v=20261115-quick-next-job HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:27:42] "GET /static/js/manual-product-suggestions.js?v=20261115-five-rows HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:27:42] "GET /static/images/bh-nav-logo.png HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:27:43] "[36mGET /static/images/bh-nav-logo.png?v=20261115-favicon HTTP/1.1[0m" 304 -
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:30:05] "GET /login HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:30:05] "GET /static/style/app.css?v=20261108-waves HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:30:05] "GET /static/style/login.css?v=20261108-center HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:30:05] "GET /static/js/app-ui.js?v=20261107 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:30:05] "GET /static/images/BH.svg HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:30:06] "GET /static/images/bh-nav-logo.png?v=20261115-favicon HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:30:06] "GET /manual_jobcard HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:30:06] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:30:06] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:30:06] "GET /static/js/manual-product-suggestions.js?v=20261115-five-rows HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:30:06] "GET /static/js/manual-master-suggestions.js?v=20261115-five-rows HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:30:06] "GET /static/style/pages/manual_jobcard.css?v=20261115-saved-preview HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:30:06] "GET /static/images/bh-nav-logo.png HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:30:06] "[36mGET /static/images/bh-nav-logo.png?v=20261115-favicon HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:30:06] "POST /submit-manual-jobcard HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:30:06] "POST /submit-manual-jobcard HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:30:07] "POST /submit-manual-jobcard HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:30:11] "GET /login HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:30:11] "GET /static/style/app.css?v=20261108-waves HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:30:11] "GET /static/style/login.css?v=20261108-center HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:30:11] "GET /static/js/app-ui.js?v=20261107 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:30:11] "GET /static/images/BH.svg HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:30:11] "GET /static/images/bh-nav-logo.png?v=20261115-favicon HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:30:12] "GET /manual_jobcard HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:30:12] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:30:12] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:30:12] "GET /static/js/manual-master-suggestions.js?v=20261115-five-rows HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:30:12] "GET /static/style/pages/manual_jobcard.css?v=20261115-saved-preview HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:30:12] "GET /static/js/manual-product-suggestions.js?v=20261115-five-rows HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:30:12] "GET /static/images/bh-nav-logo.png HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:30:12] "[36mGET /static/images/bh-nav-logo.png?v=20261115-favicon HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:30:12] "[32mGET /edit/jobcard/open?jobcard_id=1 HTTP/1.1[0m" 302 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:30:12] "GET /edit/jobcard/1 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:30:12] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:30:12] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:30:12] "GET /static/style/pages/edit_entry.css HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:30:12] "[36mGET /static/images/bh-nav-logo.png HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:30:12] "GET /static/js/jobcard-edit.js?v=20261113-kept-edit HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:30:12] "GET /manual_jobcard HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:30:12] "[36mGET /static/style/pages/manual_jobcard.css?v=20261115-saved-preview HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:30:12] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:30:12] "[36mGET /static/js/manual-product-suggestions.js?v=20261115-five-rows HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:30:12] "[36mGET /static/js/manual-master-suggestions.js?v=20261115-five-rows HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:30:12] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:30:12] "[36mGET /static/images/bh-nav-logo.png HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:30:12] "POST /submit-manual-jobcard HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:30:12] "[32mGET /edit/jobcard/open?jobcard_id=2 HTTP/1.1[0m" 302 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:30:13] "GET /edit/jobcard/2 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:30:13] "[36mGET /static/style/pages/edit_entry.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:30:13] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:30:13] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:30:13] "GET /static/js/jobcard-edit.js?v=20261113-kept-edit HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 02:30:13] "[36mGET /static/images/bh-nav-logo.png HTTP/1.1[0m" 304 -
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+ERROR:root:Return for job 1 saved, but CSV export failed
+Traceback (most recent call last):
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/data_entry.py", line 674, in in_move_entery
+    outputs = job_return_print(result)
+  File "/usr/lib/python3.14/unittest/mock.py", line 1176, in __call__
+    return self._mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/unittest/mock.py", line 1180, in _mock_call
+    return self._execute_mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/unittest/mock.py", line 1241, in _execute_mock_call
+    raise effect
+OSError: unavailable print drive
+ERROR:root:Setup save failed
+Traceback (most recent call last):
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.IntegrityError: UNIQUE constraint failed: CutData.name
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/data_entry.py", line 236, in eror
+    return func(*args, **kwargs)
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/data_entry.py", line 257, in add_cutter
+    return add_data_to_database(cuuter)
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/data_entry.py", line 20, in add_data_to_database
+    db.session.commit()
+    ~~~~~~~~~~~~~~~~~^^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/orm/scoping.py", line 598, in commit
+    return self._proxied.commit()
+           ~~~~~~~~~~~~~~~~~~~~^^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/orm/session.py", line 2035, in commit
+    trans.commit(_to_root=True)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "<string>", line 2, in commit
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/orm/state_changes.py", line 137, in _go
+    ret_value = fn(self, *arg, **kw)
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/orm/session.py", line 1316, in commit
+    self._prepare_impl()
+    ~~~~~~~~~~~~~~~~~~^^
+  File "<string>", line 2, in _prepare_impl
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/orm/state_changes.py", line 137, in _go
+    ret_value = fn(self, *arg, **kw)
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/orm/session.py", line 1290, in _prepare_impl
+    self.session.flush()
+    ~~~~~~~~~~~~~~~~~~^^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/orm/session.py", line 4353, in flush
+    self._flush(objects)
+    ~~~~~~~~~~~^^^^^^^^^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/orm/session.py", line 4488, in _flush
+    with util.safe_reraise():
+         ~~~~~~~~~~~~~~~~~^^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/util/langhelpers.py", line 122, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/orm/session.py", line 4449, in _flush
+    flush_context.execute()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/orm/unitofwork.py", line 465, in execute
+    rec.execute(self)
+    ~~~~~~~~~~~^^^^^^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/orm/unitofwork.py", line 641, in execute
+    util.preloaded.orm_persistence.save_obj(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self.mapper,
+        ^^^^^^^^^^^^
+        uow.states_for_mapper_hierarchy(self.mapper, False, False),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        uow,
+        ^^^^
+    )
+    ^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/orm/persistence.py", line 94, in save_obj
+    _emit_insert_statements(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        base_mapper,
+        ^^^^^^^^^^^^
+    ...<3 lines>...
+        insert,
+        ^^^^^^^
+    )
+    ^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/orm/persistence.py", line 1234, in _emit_insert_statements
+    result = connection.execute(
+        statement,
+        params,
+        execution_options=execution_options,
+    )
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 1421, in execute
+    return meth(
+        self,
+        distilled_parameters,
+        execution_options or NO_OPTIONS,
+    )
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/sql/elements.py", line 526, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self, distilled_params, execution_options
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 1643, in _execute_clauseelement
+    ret = self._execute_context(
+        dialect,
+    ...<8 lines>...
+        cache_hit=cache_hit,
+    )
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 1848, in _execute_context
+    return self._exec_single_context(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        dialect, context, statement, parameters
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 1988, in _exec_single_context
+    self._handle_dbapi_exception(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        e, str_statement, effective_parameters, cursor, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 2365, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+sqlalchemy.exc.IntegrityError: (sqlite3.IntegrityError) UNIQUE constraint failed: CutData.name
+[SQL: INSERT INTO "CutData" (name, enter_user) VALUES (?, ?)]
+[parameters: ('CUTTER', 'admin')]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:00] "GET /login HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:00] "GET /static/style/app.css?v=20261108-waves HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:00] "GET /static/style/login.css?v=20261108-center HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:00] "GET /static/js/app-ui.js?v=20261107 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:00] "GET /static/images/BH.svg HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:00] "GET /static/images/bh-nav-logo.png?v=20261115-favicon HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:00] "GET /job_retun?jobcard_id=1 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:01] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:01] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:01] "GET /static/style/return-workspace.css?v=20261113-collapse HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:01] "GET /static/js/retun.js?v=20261115-server-csv HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:01] "GET /static/style/pages/job_retun.css?v=20261115-saved-return HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:01] "GET /static/js/kept-entry.js?v=20261113-collapse HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:01] "GET /static/images/bh-nav-logo.png HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:01] "[36mGET /static/images/bh-nav-logo.png?v=20261115-favicon HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:01] "POST /summit-retune HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:01] "GET /job_retun?jobcard_id=1&saved_return=f3d7112f-e885-4f7a-930b-df71be40485a HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:01] "[36mGET /static/style/pages/job_retun.css?v=20261115-saved-return HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:01] "[36mGET /static/js/kept-entry.js?v=20261113-collapse HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:01] "[36mGET /static/style/return-workspace.css?v=20261113-collapse HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:01] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:01] "[36mGET /static/js/retun.js?v=20261115-server-csv HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:01] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:01] "[36mGET /static/images/bh-nav-logo.png HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:01] "POST /summit-retune HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:01] "GET /job_retun?jobcard_id=1&saved_return=dbbfd2ff-9384-4e55-84d9-f1e168c49468 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:01] "[36mGET /static/style/pages/job_retun.css?v=20261115-saved-return HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:01] "[36mGET /static/style/return-workspace.css?v=20261113-collapse HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:01] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:01] "[36mGET /static/js/kept-entry.js?v=20261113-collapse HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:01] "[36mGET /static/images/bh-nav-logo.png HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:01] "[36mGET /static/js/retun.js?v=20261115-server-csv HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:01] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:01] "GET /edit/jobcard/1 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:02] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:02] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:02] "GET /static/style/pages/edit_entry.css HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:02] "GET /static/js/jobcard-edit.js?v=20261113-kept-edit HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:02] "[36mGET /static/images/bh-nav-logo.png HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:08] "GET /login HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:08] "GET /static/style/app.css?v=20261108-waves HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:08] "GET /static/js/app-ui.js?v=20261107 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:08] "GET /static/style/login.css?v=20261108-center HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:08] "GET /static/images/BH.svg HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:09] "GET /static/images/bh-nav-logo.png?v=20261115-favicon HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:09] "GET /returns/outworker?worker_id=1 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:09] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:09] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:09] "GET /static/style/return-workspace.css?v=20261113-collapse HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:09] "GET /static/js/return-workspace.js?v=20261113-inline HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:09] "GET /static/images/bh-nav-logo.png HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:09] "[36mGET /static/images/bh-nav-logo.png?v=20261115-favicon HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:09] "GET /job_retun?jobcard_id=1&embedded=1 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:09] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:09] "[36mGET /static/style/return-workspace.css?v=20261113-collapse HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:09] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:09] "GET /static/style/pages/job_retun.css?v=20261115-saved-return HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:09] "GET /static/js/kept-entry.js?v=20261113-collapse HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:09] "GET /static/js/retun.js?v=20261115-server-csv HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:09] "GET /static/js/embedded-returns.js?v=20261108-balance HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:10] "GET /job_retun?jobcard_id=2&embedded=1 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:10] "[36mGET /static/style/pages/job_retun.css?v=20261115-saved-return HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:10] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:10] "[36mGET /static/style/return-workspace.css?v=20261113-collapse HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:10] "[36mGET /static/js/kept-entry.js?v=20261113-collapse HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:10] "[36mGET /static/js/retun.js?v=20261115-server-csv HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:10] "[36mGET /static/js/embedded-returns.js?v=20261108-balance HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:10] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:10] "POST /summit-retune HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:10] "GET /job_retun?jobcard_id=1&saved_return=7b386fd4-219b-4e0b-8b3a-04634883b8e5&embedded=1 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:10] "[36mGET /static/js/kept-entry.js?v=20261113-collapse HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:10] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:10] "[36mGET /static/style/return-workspace.css?v=20261113-collapse HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:10] "[36mGET /static/style/pages/job_retun.css?v=20261115-saved-return HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:10] "[36mGET /static/js/retun.js?v=20261115-server-csv HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:10] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:10] "[36mGET /static/js/embedded-returns.js?v=20261108-balance HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:39] "GET /login HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:39] "GET /static/style/app.css?v=20261108-waves HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:39] "GET /static/style/login.css?v=20261108-center HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:39] "GET /static/js/app-ui.js?v=20261107 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:39] "GET /static/images/BH.svg HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:39] "GET /static/images/bh-nav-logo.png?v=20261115-favicon HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:40] "GET /job_retun?jobcard_id=1 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:40] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:40] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:40] "GET /static/style/return-workspace.css?v=20261113-collapse HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:40] "GET /static/style/pages/job_retun.css?v=20261115-saved-return HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:40] "GET /static/js/kept-entry.js?v=20261113-collapse HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:40] "GET /static/js/retun.js?v=20261115-server-csv HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:40] "GET /static/images/bh-nav-logo.png HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:40] "[36mGET /static/images/bh-nav-logo.png?v=20261115-favicon HTTP/1.1[0m" 304 -
+ERROR:root:Setup save failed
+Traceback (most recent call last):
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.IntegrityError: UNIQUE constraint failed: CutData.name
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/data_entry.py", line 236, in eror
+    return func(*args, **kwargs)
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/data_entry.py", line 257, in add_cutter
+    return add_data_to_database(cuuter)
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/data_entry.py", line 20, in add_data_to_database
+    db.session.commit()
+    ~~~~~~~~~~~~~~~~~^^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/orm/scoping.py", line 598, in commit
+    return self._proxied.commit()
+           ~~~~~~~~~~~~~~~~~~~~^^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/orm/session.py", line 2035, in commit
+    trans.commit(_to_root=True)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "<string>", line 2, in commit
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/orm/state_changes.py", line 137, in _go
+    ret_value = fn(self, *arg, **kw)
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/orm/session.py", line 1316, in commit
+    self._prepare_impl()
+    ~~~~~~~~~~~~~~~~~~^^
+  File "<string>", line 2, in _prepare_impl
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/orm/state_changes.py", line 137, in _go
+    ret_value = fn(self, *arg, **kw)
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/orm/session.py", line 1290, in _prepare_impl
+    self.session.flush()
+    ~~~~~~~~~~~~~~~~~~^^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/orm/session.py", line 4353, in flush
+    self._flush(objects)
+    ~~~~~~~~~~~^^^^^^^^^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/orm/session.py", line 4488, in _flush
+    with util.safe_reraise():
+         ~~~~~~~~~~~~~~~~~^^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/util/langhelpers.py", line 122, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/orm/session.py", line 4449, in _flush
+    flush_context.execute()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/orm/unitofwork.py", line 465, in execute
+    rec.execute(self)
+    ~~~~~~~~~~~^^^^^^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/orm/unitofwork.py", line 641, in execute
+    util.preloaded.orm_persistence.save_obj(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self.mapper,
+        ^^^^^^^^^^^^
+        uow.states_for_mapper_hierarchy(self.mapper, False, False),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        uow,
+        ^^^^
+    )
+    ^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/orm/persistence.py", line 94, in save_obj
+    _emit_insert_statements(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        base_mapper,
+        ^^^^^^^^^^^^
+    ...<3 lines>...
+        insert,
+        ^^^^^^^
+    )
+    ^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/orm/persistence.py", line 1234, in _emit_insert_statements
+    result = connection.execute(
+        statement,
+        params,
+        execution_options=execution_options,
+    )
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 1421, in execute
+    return meth(
+        self,
+        distilled_parameters,
+        execution_options or NO_OPTIONS,
+    )
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/sql/elements.py", line 526, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self, distilled_params, execution_options
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 1643, in _execute_clauseelement
+    ret = self._execute_context(
+        dialect,
+    ...<8 lines>...
+        cache_hit=cache_hit,
+    )
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 1848, in _execute_context
+    return self._exec_single_context(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        dialect, context, statement, parameters
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 1988, in _exec_single_context
+    self._handle_dbapi_exception(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        e, str_statement, effective_parameters, cursor, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 2365, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+sqlalchemy.exc.IntegrityError: (sqlite3.IntegrityError) UNIQUE constraint failed: CutData.name
+[SQL: INSERT INTO "CutData" (name, enter_user) VALUES (?, ?)]
+[parameters: ('CUTTER', 'admin')]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:40] "POST /summit-retune HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:40] "POST /summit-retune HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:40] "GET /job_retun?jobcard_id=1&saved_return=fdeb76d5-6ccf-425e-91af-b9bf5808190a HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:40] "[36mGET /static/style/pages/job_retun.css?v=20261115-saved-return HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:40] "[36mGET /static/style/return-workspace.css?v=20261113-collapse HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:40] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:40] "[36mGET /static/js/kept-entry.js?v=20261113-collapse HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:40] "[36mGET /static/js/retun.js?v=20261115-server-csv HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:40] "[36mGET /static/images/bh-nav-logo.png HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:40] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:41] "POST /summit-retune HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:41] "GET /job_retun?jobcard_id=1&saved_return=d0266ac3-f4d4-4d95-b96c-74eab33fcd69 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:41] "[36mGET /static/style/pages/job_retun.css?v=20261115-saved-return HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:41] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:41] "[36mGET /static/style/return-workspace.css?v=20261113-collapse HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:41] "[36mGET /static/js/retun.js?v=20261115-server-csv HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:41] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:41] "[36mGET /static/js/kept-entry.js?v=20261113-collapse HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:41] "[36mGET /static/images/bh-nav-logo.png HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:41] "GET /edit/jobcard/1 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:41] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:41] "GET /static/js/jobcard-edit.js?v=20261113-kept-edit HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:41] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:41] "GET /static/style/pages/edit_entry.css HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:35:41] "[36mGET /static/images/bh-nav-logo.png HTTP/1.1[0m" 304 -
+INFO:flask_wtf.csrf:The CSRF token is missing.
+ERROR:root:Return for job 1 saved, but CSV export failed
+Traceback (most recent call last):
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/data_entry.py", line 674, in in_move_entery
+    outputs = job_return_print(result)
+  File "/usr/lib/python3.14/unittest/mock.py", line 1176, in __call__
+    return self._mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/unittest/mock.py", line 1180, in _mock_call
+    return self._execute_mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/unittest/mock.py", line 1241, in _execute_mock_call
+    raise effect
+OSError: unavailable print drive
+INFO:flask_wtf.csrf:The CSRF token is missing.
+ERROR:root:Return for job 1 saved, but CSV export failed
+Traceback (most recent call last):
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/data_entry.py", line 674, in in_move_entery
+    job_return_print(result)
+    ~~~~~~~~~~~~~~~~^^^^^^^^
+  File "/usr/lib/python3.14/unittest/mock.py", line 1176, in __call__
+    return self._mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/unittest/mock.py", line 1180, in _mock_call
+    return self._execute_mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/unittest/mock.py", line 1241, in _execute_mock_call
+    raise effect
+OSError: unavailable print drive
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:50] "GET /login HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:50] "GET /static/js/app-ui.js?v=20261107 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:50] "GET /static/style/login.css?v=20261108-center HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:50] "GET /static/style/app.css?v=20261108-waves HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:50] "GET /static/images/BH.svg HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:51] "GET /static/images/bh-nav-logo.png?v=20261115-favicon HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:51] "GET /job_retun?jobcard_id=1 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:51] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:51] "GET /static/style/pages/job_retun.css?v=20261115-saved-return HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:51] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:51] "GET /static/style/return-workspace.css?v=20261113-collapse HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:51] "GET /static/js/kept-entry.js?v=20261113-collapse HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:51] "GET /static/js/retun.js?v=20261115-server-csv HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:51] "GET /static/images/bh-nav-logo.png HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:51] "[36mGET /static/images/bh-nav-logo.png?v=20261115-favicon HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:52] "POST /summit-retune HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:52] "POST /summit-retune HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:52] "GET /job_retun?jobcard_id=1&saved_return=ed557cbb-479d-4221-80df-ef576770f243 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:52] "[36mGET /static/style/pages/job_retun.css?v=20261115-saved-return HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:52] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:52] "[36mGET /static/style/return-workspace.css?v=20261113-collapse HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:52] "[36mGET /static/js/kept-entry.js?v=20261113-collapse HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:52] "[36mGET /static/js/retun.js?v=20261115-server-csv HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:52] "[36mGET /static/images/bh-nav-logo.png HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:52] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:52] "POST /summit-retune HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:52] "GET /job_retun?jobcard_id=1&saved_return=1c1bead4-82f2-4c14-a2d7-ad2497eabfc3 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:52] "[36mGET /static/style/pages/job_retun.css?v=20261115-saved-return HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:52] "[36mGET /static/style/return-workspace.css?v=20261113-collapse HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:52] "[36mGET /static/js/retun.js?v=20261115-server-csv HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:52] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:52] "[36mGET /static/js/kept-entry.js?v=20261113-collapse HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:52] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:52] "[36mGET /static/images/bh-nav-logo.png HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:52] "GET /edit/jobcard/1 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:52] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:52] "GET /static/style/pages/edit_entry.css HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:52] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:52] "[36mGET /static/images/bh-nav-logo.png HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:52] "GET /static/js/jobcard-edit.js?v=20261113-kept-edit HTTP/1.1" 200 -
+ERROR:root:Setup save failed
+Traceback (most recent call last):
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.IntegrityError: UNIQUE constraint failed: CutData.name
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/data_entry.py", line 236, in eror
+    return func(*args, **kwargs)
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/data_entry.py", line 257, in add_cutter
+    return add_data_to_database(cuuter)
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/data_entry.py", line 20, in add_data_to_database
+    db.session.commit()
+    ~~~~~~~~~~~~~~~~~^^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/orm/scoping.py", line 598, in commit
+    return self._proxied.commit()
+           ~~~~~~~~~~~~~~~~~~~~^^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/orm/session.py", line 2035, in commit
+    trans.commit(_to_root=True)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "<string>", line 2, in commit
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/orm/state_changes.py", line 137, in _go
+    ret_value = fn(self, *arg, **kw)
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/orm/session.py", line 1316, in commit
+    self._prepare_impl()
+    ~~~~~~~~~~~~~~~~~~^^
+  File "<string>", line 2, in _prepare_impl
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/orm/state_changes.py", line 137, in _go
+    ret_value = fn(self, *arg, **kw)
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/orm/session.py", line 1290, in _prepare_impl
+    self.session.flush()
+    ~~~~~~~~~~~~~~~~~~^^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/orm/session.py", line 4353, in flush
+    self._flush(objects)
+    ~~~~~~~~~~~^^^^^^^^^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/orm/session.py", line 4488, in _flush
+    with util.safe_reraise():
+         ~~~~~~~~~~~~~~~~~^^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/util/langhelpers.py", line 122, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/orm/session.py", line 4449, in _flush
+    flush_context.execute()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/orm/unitofwork.py", line 465, in execute
+    rec.execute(self)
+    ~~~~~~~~~~~^^^^^^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/orm/unitofwork.py", line 641, in execute
+    util.preloaded.orm_persistence.save_obj(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self.mapper,
+        ^^^^^^^^^^^^
+        uow.states_for_mapper_hierarchy(self.mapper, False, False),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        uow,
+        ^^^^
+    )
+    ^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/orm/persistence.py", line 94, in save_obj
+    _emit_insert_statements(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        base_mapper,
+        ^^^^^^^^^^^^
+    ...<3 lines>...
+        insert,
+        ^^^^^^^
+    )
+    ^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/orm/persistence.py", line 1234, in _emit_insert_statements
+    result = connection.execute(
+        statement,
+        params,
+        execution_options=execution_options,
+    )
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 1421, in execute
+    return meth(
+        self,
+        distilled_parameters,
+        execution_options or NO_OPTIONS,
+    )
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/sql/elements.py", line 526, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self, distilled_params, execution_options
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 1643, in _execute_clauseelement
+    ret = self._execute_context(
+        dialect,
+    ...<8 lines>...
+        cache_hit=cache_hit,
+    )
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 1848, in _execute_context
+    return self._exec_single_context(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        dialect, context, statement, parameters
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 1988, in _exec_single_context
+    self._handle_dbapi_exception(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        e, str_statement, effective_parameters, cursor, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 2365, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+sqlalchemy.exc.IntegrityError: (sqlite3.IntegrityError) UNIQUE constraint failed: CutData.name
+[SQL: INSERT INTO "CutData" (name, enter_user) VALUES (?, ?)]
+[parameters: ('CUTTER', 'admin')]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:58] "GET /login HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:58] "GET /static/style/app.css?v=20261108-waves HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:58] "GET /static/style/login.css?v=20261108-center HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:58] "GET /static/images/BH.svg HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:58] "GET /static/js/app-ui.js?v=20261107 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:59] "GET /static/images/bh-nav-logo.png?v=20261115-favicon HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:59] "GET /returns/outworker?worker_id=1 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:59] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:59] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:59] "GET /static/style/return-workspace.css?v=20261113-collapse HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:59] "GET /static/js/return-workspace.js?v=20261113-inline HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:59] "GET /static/images/bh-nav-logo.png HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:59] "[36mGET /static/images/bh-nav-logo.png?v=20261115-favicon HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:59] "GET /job_retun?jobcard_id=1&embedded=1 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:59] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:59] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:59] "[36mGET /static/style/return-workspace.css?v=20261113-collapse HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:59] "GET /static/style/pages/job_retun.css?v=20261115-saved-return HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:59] "GET /static/js/kept-entry.js?v=20261113-collapse HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:59] "GET /static/js/retun.js?v=20261115-server-csv HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:59] "GET /static/js/embedded-returns.js?v=20261108-balance HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:59] "GET /job_retun?jobcard_id=2&embedded=1 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:59] "[36mGET /static/style/pages/job_retun.css?v=20261115-saved-return HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:59] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:59] "[36mGET /static/style/return-workspace.css?v=20261113-collapse HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:59] "[36mGET /static/js/kept-entry.js?v=20261113-collapse HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:59] "[36mGET /static/js/embedded-returns.js?v=20261108-balance HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:59] "[36mGET /static/js/retun.js?v=20261115-server-csv HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:37:59] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:38:00] "POST /summit-retune HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:38:00] "GET /job_retun?jobcard_id=1&saved_return=1b83cb6c-1dc3-449b-8ba1-3a0d403b9723&embedded=1 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:38:00] "[36mGET /static/style/pages/job_retun.css?v=20261115-saved-return HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:38:00] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:38:00] "[36mGET /static/js/kept-entry.js?v=20261113-collapse HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:38:00] "[36mGET /static/style/return-workspace.css?v=20261113-collapse HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:38:00] "[36mGET /static/js/retun.js?v=20261115-server-csv HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:38:00] "[36mGET /static/js/embedded-returns.js?v=20261108-balance HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 09:38:00] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:flask_wtf.csrf:The CSRF token is missing.
+ERROR:root:Return for job 1 saved, but CSV export failed
+Traceback (most recent call last):
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/data_entry.py", line 674, in in_move_entery
+    job_return_print(result)
+    ~~~~~~~~~~~~~~~~^^^^^^^^
+  File "/usr/lib/python3.14/unittest/mock.py", line 1176, in __call__
+    return self._mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/unittest/mock.py", line 1180, in _mock_call
+    return self._execute_mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/unittest/mock.py", line 1241, in _execute_mock_call
+    raise effect
+OSError: unavailable print drive
+INFO:flask_wtf.csrf:The CSRF token is missing.
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:flask_wtf.csrf:The CSRF token is missing.
+ERROR:root:Setup save failed
+Traceback (most recent call last):
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.IntegrityError: UNIQUE constraint failed: CutData.name
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/data_entry.py", line 236, in eror
+    return func(*args, **kwargs)
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/data_entry.py", line 257, in add_cutter
+    return add_data_to_database(cuuter)
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/data_entry.py", line 20, in add_data_to_database
+    db.session.commit()
+    ~~~~~~~~~~~~~~~~~^^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/orm/scoping.py", line 598, in commit
+    return self._proxied.commit()
+           ~~~~~~~~~~~~~~~~~~~~^^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/orm/session.py", line 2035, in commit
+    trans.commit(_to_root=True)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "<string>", line 2, in commit
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/orm/state_changes.py", line 137, in _go
+    ret_value = fn(self, *arg, **kw)
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/orm/session.py", line 1316, in commit
+    self._prepare_impl()
+    ~~~~~~~~~~~~~~~~~~^^
+  File "<string>", line 2, in _prepare_impl
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/orm/state_changes.py", line 137, in _go
+    ret_value = fn(self, *arg, **kw)
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/orm/session.py", line 1290, in _prepare_impl
+    self.session.flush()
+    ~~~~~~~~~~~~~~~~~~^^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/orm/session.py", line 4353, in flush
+    self._flush(objects)
+    ~~~~~~~~~~~^^^^^^^^^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/orm/session.py", line 4488, in _flush
+    with util.safe_reraise():
+         ~~~~~~~~~~~~~~~~~^^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/util/langhelpers.py", line 122, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/orm/session.py", line 4449, in _flush
+    flush_context.execute()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/orm/unitofwork.py", line 465, in execute
+    rec.execute(self)
+    ~~~~~~~~~~~^^^^^^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/orm/unitofwork.py", line 641, in execute
+    util.preloaded.orm_persistence.save_obj(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self.mapper,
+        ^^^^^^^^^^^^
+        uow.states_for_mapper_hierarchy(self.mapper, False, False),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        uow,
+        ^^^^
+    )
+    ^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/orm/persistence.py", line 94, in save_obj
+    _emit_insert_statements(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        base_mapper,
+        ^^^^^^^^^^^^
+    ...<3 lines>...
+        insert,
+        ^^^^^^^
+    )
+    ^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/orm/persistence.py", line 1234, in _emit_insert_statements
+    result = connection.execute(
+        statement,
+        params,
+        execution_options=execution_options,
+    )
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 1421, in execute
+    return meth(
+        self,
+        distilled_parameters,
+        execution_options or NO_OPTIONS,
+    )
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/sql/elements.py", line 526, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self, distilled_params, execution_options
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 1643, in _execute_clauseelement
+    ret = self._execute_context(
+        dialect,
+    ...<8 lines>...
+        cache_hit=cache_hit,
+    )
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 1848, in _execute_context
+    return self._exec_single_context(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        dialect, context, statement, parameters
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 1988, in _exec_single_context
+    self._handle_dbapi_exception(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        e, str_statement, effective_parameters, cursor, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 2365, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/run/media/badx/uf/Desktop/bh manfiation/app/.venv/lib/python3.14/site-packages/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+sqlalchemy.exc.IntegrityError: (sqlite3.IntegrityError) UNIQUE constraint failed: CutData.name
+[SQL: INSERT INTO "CutData" (name, enter_user) VALUES (?, ?)]
+[parameters: ('CUTTER', 'admin')]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 20:17:54] "GET /login HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 20:17:54] "GET /static/style/app.css?v=20261108-waves HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 20:17:54] "GET /static/js/app-ui.js?v=20261107 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 20:17:54] "GET /static/style/login.css?v=20261108-center HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 20:17:54] "GET /static/images/BH.svg HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 20:17:54] "GET /static/images/bh-nav-logo.png?v=20261115-favicon HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 20:17:55] "GET /add_outworver HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 20:17:55] "[36mGET /static/style/login.css?v=20261108-center HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 20:17:55] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 20:17:55] "GET /static/style/pages/outworker_setup.css?v=20261115-legacy HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 20:17:55] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 20:17:55] "GET /static/images/bh-nav-logo.png HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 20:17:55] "[36mGET /static/images/BH.svg HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 20:17:55] "[36mGET /static/images/bh-nav-logo.png?v=20261115-favicon HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 20:17:55] "POST /add_outworver HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 20:18:15] "GET /login HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 20:18:15] "GET /static/style/login.css?v=20261108-center HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 20:18:15] "GET /static/js/app-ui.js?v=20261107 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 20:18:15] "GET /static/style/app.css?v=20261108-waves HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 20:18:15] "GET /static/images/BH.svg HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 20:18:16] "GET /static/images/bh-nav-logo.png?v=20261115-favicon HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 20:18:16] "GET /add_outworver HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 20:18:16] "[36mGET /static/style/login.css?v=20261108-center HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 20:18:16] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 20:18:16] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 20:18:16] "GET /static/style/pages/outworker_setup.css?v=20261115-legacy HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 20:18:16] "GET /static/images/bh-nav-logo.png HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 20:18:16] "[36mGET /static/images/BH.svg HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 20:18:16] "[36mGET /static/images/bh-nav-logo.png?v=20261115-favicon HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 20:18:17] "[32mPOST /add_outworver HTTP/1.1[0m" 302 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 20:18:17] "GET /add_outworver HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 20:18:17] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 20:18:17] "[36mGET /static/style/login.css?v=20261108-center HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 20:18:17] "[36mGET /static/style/pages/outworker_setup.css?v=20261115-legacy HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 20:18:17] "[36mGET /static/images/bh-nav-logo.png HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 20:18:17] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 20:18:17] "[36mGET /static/images/BH.svg HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 20:18:17] "[36mGET /static/images/bh-nav-logo.png?v=20261115-favicon HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 20:18:39] "GET /login HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 20:18:39] "GET /static/style/app.css?v=20261108-waves HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 20:18:39] "GET /static/js/app-ui.js?v=20261107 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 20:18:39] "GET /static/style/login.css?v=20261108-center HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 20:18:39] "GET /static/images/BH.svg HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 20:18:39] "GET /static/images/bh-nav-logo.png?v=20261115-favicon HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 20:18:40] "GET /add_outworver HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 20:18:40] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 20:18:40] "GET /static/style/pages/outworker_setup.css?v=20261115-legacy HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 20:18:40] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 20:18:40] "[36mGET /static/style/login.css?v=20261108-center HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 20:18:40] "GET /static/images/bh-nav-logo.png HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 20:18:40] "[36mGET /static/images/BH.svg HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 20:18:40] "[36mGET /static/images/bh-nav-logo.png?v=20261115-favicon HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 20:18:41] "[32mPOST /add_outworver HTTP/1.1[0m" 302 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 20:18:41] "GET /add_outworver HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 20:18:41] "[36mGET /static/style/login.css?v=20261108-center HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 20:18:41] "[36mGET /static/style/pages/outworker_setup.css?v=20261115-legacy HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 20:18:41] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 20:18:41] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 20:18:41] "[36mGET /static/images/bh-nav-logo.png HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 20:18:41] "[36mGET /static/images/BH.svg HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 20:18:41] "[36mGET /static/images/bh-nav-logo.png?v=20261115-favicon HTTP/1.1[0m" 304 -
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:19:26] "GET /login HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:19:26] "GET /static/style/login.css?v=20261108-center HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:19:26] "GET /static/js/app-ui.js?v=20261107 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:19:26] "GET /static/style/app.css?v=20261108-waves HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:19:26] "GET /static/images/BH.svg HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:19:26] "GET /static/images/bh-nav-logo.png?v=20261115-favicon HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:19:26] "GET /add_outworver HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:19:26] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:19:26] "[36mGET /static/style/login.css?v=20261108-center HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:19:26] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:19:26] "GET /static/style/pages/outworker_setup.css?v=20261115-legacy HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:19:26] "GET /static/images/bh-nav-logo.png HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:19:27] "[36mGET /static/images/BH.svg HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:19:27] "[36mGET /static/images/bh-nav-logo.png?v=20261115-favicon HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:19:27] "GET /edit?type=outworker HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:19:27] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:19:27] "[36mGET /static/images/bh-nav-logo.png HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:19:27] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:19:27] "GET /static/style/pages/edit_index.css?v=20261115-workspace HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:19:27] "GET /edit/search?type=outworker&q=&page=1 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:19:28] "GET /edit/search?type=outworker&q=NO+SUCH+WORKER&page=1 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:19:29] "GET /edit/search?type=outworker&q=RAM+CITY&page=1 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:19:30] "GET /edit/outworker/1 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:19:30] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:19:30] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:19:30] "GET /static/style/pages/edit_entry.css HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:19:30] "[36mGET /static/images/bh-nav-logo.png HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:21:00] "GET /login HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:21:00] "GET /static/js/app-ui.js?v=20261107 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:21:00] "GET /static/style/app.css?v=20261108-waves HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:21:00] "GET /static/style/login.css?v=20261108-center HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:21:00] "GET /static/images/BH.svg HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:21:01] "GET /static/images/bh-nav-logo.png?v=20261115-favicon HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:21:01] "GET /edit/outworker/1 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:21:01] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:21:01] "[36mGET /static/style/login.css?v=20261108-center HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:21:01] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:21:01] "GET /static/style/pages/outworker_setup.css?v=20261115-legacy HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:21:01] "GET /static/images/bh-nav-logo.png HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:21:01] "[36mGET /static/images/BH.svg HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:21:01] "[36mGET /static/images/bh-nav-logo.png?v=20261115-favicon HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:21:01] "[32mPOST /edit/outworker/1 HTTP/1.1[0m" 302 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:21:01] "GET /edit/outworker/1 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:21:01] "[36mGET /static/style/pages/outworker_setup.css?v=20261115-legacy HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:21:01] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:21:01] "[36mGET /static/style/login.css?v=20261108-center HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:21:02] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:21:02] "[36mGET /static/images/bh-nav-logo.png HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:21:02] "[36mGET /static/images/BH.svg HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:21:02] "GET /edit?type=outworker HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:21:03] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:21:03] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:21:03] "GET /static/style/pages/edit_index.css?v=20261115-workspace HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:21:03] "[36mGET /static/images/bh-nav-logo.png HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:21:03] "GET /edit/search?type=outworker&q=&page=1 HTTP/1.1" 200 -
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:21:12] "GET /login HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:21:12] "GET /static/style/app.css?v=20261108-waves HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:21:12] "GET /static/style/login.css?v=20261108-center HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:21:12] "GET /static/js/app-ui.js?v=20261107 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:21:12] "GET /static/images/BH.svg HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:21:13] "GET /static/images/bh-nav-logo.png?v=20261115-favicon HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:21:13] "GET /add_outworver HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:21:13] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:21:13] "[36mGET /static/style/login.css?v=20261108-center HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:21:13] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:21:13] "GET /static/style/pages/outworker_setup.css?v=20261115-legacy HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:21:13] "GET /static/images/bh-nav-logo.png HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:21:13] "[36mGET /static/images/BH.svg HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:21:14] "[36mGET /static/images/bh-nav-logo.png?v=20261115-favicon HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:21:14] "[32mPOST /add_outworver HTTP/1.1[0m" 302 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:21:14] "GET /add_outworver HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:21:14] "[36mGET /static/style/pages/outworker_setup.css?v=20261115-legacy HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:21:14] "[36mGET /static/style/login.css?v=20261108-center HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:21:14] "[36mGET /static/js/app-ui.js?v=20261107 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:21:14] "[36mGET /static/style/app.css?v=20261108-waves HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:21:14] "[36mGET /static/images/bh-nav-logo.png HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:21:15] "[36mGET /static/images/BH.svg HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [15/Nov/2026 22:21:15] "[36mGET /static/images/bh-nav-logo.png?v=20261115-favicon HTTP/1.1[0m" 304 -
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000
+INFO:root:Flask service starting
+INFO:waitress:Serving on http://127.0.0.1:5000

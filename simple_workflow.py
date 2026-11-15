@@ -224,6 +224,93 @@ def user_version(user):
     ).hexdigest()
 
 
+def dashboard_job_balances(report, kind, entries, product_filter='', sort_by='age_desc'):
+    """Job/product balances at the selected cutoff, never today's live balance."""
+    snapshots = dashboard_movement_details(report, 'closing') if kind in {'given', 'returned'} else entries
+    def group_key(entry):
+        movement, card = entry['movement'], entry['card']
+        return ('job', card.id) if card else ('unlinked', str(movement.jobcard or ''), movement.name_of_mater)
+    selected = {group_key(entry) for entry in entries} if kind in {'given', 'returned'} else None
+    groups = {}
+    for entry in snapshots:
+        key = group_key(entry)
+        if selected is not None and key not in selected:
+            continue
+        movement, card = entry['movement'], entry['card']
+        if product_filter.strip().casefold() not in str(movement.product_name or '').casefold():
+            continue
+        group = groups.setdefault(key, {'card': card, 'worker': card.given_to if card else movement.name_of_mater,
+                                        'given': 0, 'returned': 0, 'kept': 0, 'products': {}})
+        product_key = (movement.product_name, movement.type_B)
+        product = group['products'].setdefault(product_key, {'name': product_key[0], 'type': product_key[1],
+                                                           'given': 0, 'returned': 0, 'kept': 0})
+        for field in ('given', 'returned', 'kept'):
+            group[field] += entry[field]
+            product[field] += entry[field]
+    jobs, unlinked, product_totals = [], [], {}
+    for group in groups.values():
+        products = list(group['products'].values())
+        for product in products:
+            product['remaining'] = product['given'] - product['returned'] - product['kept']
+        if kind in {'opening', 'closing'} and not any(product['remaining'] for product in products):
+            continue
+        group['products'] = sorted(products, key=lambda row: (row['name'] or '', row['type'] or ''))
+        group['remaining'] = group['given'] - group['returned'] - group['kept']
+        group['pieces_left'] = sum(max(0, product['remaining']) for product in products)
+        group['check_balance'] = any(product['remaining'] < 0 for product in products)
+        cutoff = report['week_start'] if kind == 'opening' else report['week_end']
+        group['age_days'] = max(0, (cutoff - group['card'].date.date()).days) if group['card'] else None
+        (jobs if group['card'] else unlinked).append(group)
+        for product in products:
+            key = (product['name'], product['type'])
+            total = product_totals.setdefault(key, {'name': key[0], 'type': key[1], 'given': 0,
+                'returned': 0, 'kept': 0, 'remaining': 0, 'pieces_left': 0, 'jobs': 0, 'unlinked': 0})
+            for field in ('given', 'returned', 'kept', 'remaining'):
+                total[field] += product[field]
+            total['pieces_left'] += max(0, product['remaining'])
+            total['jobs'] += bool(group['card']) and product['remaining'] != 0
+            total['unlinked'] += not bool(group['card'])
+    def order(row):
+        name = str(row.get('worker') or '')
+        product = min((str(item['name'] or '').casefold() for item in row['products']), default='')
+        age = row['age_days'] or 0
+        tie = row['card'].id if row.get('card') else name
+        if sort_by == 'age_asc':
+            return (age, name, tie)
+        if sort_by == 'quantity_desc':
+            return (-row['pieces_left'], name, tie)
+        if sort_by == 'quantity_asc':
+            return (row['pieces_left'], name, tie)
+        if sort_by == 'product':
+            return (product, name, tie)
+        return (-age, name, tie)
+    jobs.sort(key=order)
+    workers = {}
+    for job in jobs:
+        worker = workers.setdefault(job['worker'], {'worker': job['worker'], 'jobs': [], 'products': {},
+            'given': 0, 'returned': 0, 'kept': 0, 'remaining': 0, 'pieces_left': 0, 'age_days': 0,
+            'worker_id': record_id(str(job['worker']).split('***', 1)[0])})
+        worker['jobs'].append(job)
+        worker['age_days'] = max(worker['age_days'], job['age_days'])
+        for field in ('given', 'returned', 'kept', 'remaining', 'pieces_left'):
+            worker[field] += job[field]
+        for product in job['products']:
+            key = (product['name'], product['type'])
+            total = worker['products'].setdefault(key, {'name': key[0], 'type': key[1],
+                'given': 0, 'returned': 0, 'kept': 0, 'remaining': 0, 'pieces_left': 0})
+            for field in ('given', 'returned', 'kept', 'remaining'):
+                total[field] += product[field]
+            total['pieces_left'] += max(0, product['remaining'])
+    for worker in workers.values():
+        worker['products'] = sorted(worker['products'].values(), key=lambda row: (row['name'] or '', row['type'] or ''))
+    workers = sorted(workers.values(), key=order)
+    rows = jobs + unlinked
+    return {'jobs': jobs, 'workers': workers, 'unlinked': unlinked,
+            'products': sorted(product_totals.values(), key=lambda row: (row['name'] or '', row['type'] or '')),
+            'totals': {field: sum(row[field] for row in rows)
+                       for field in ('given', 'returned', 'kept', 'remaining', 'pieces_left')}}
+
+
 def _require_another_active_admin(target_id):
     admins = User.query.filter_by(role=1, is_active=True).filter(User.id != target_id).count()
     if admins == 0:

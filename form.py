@@ -134,10 +134,6 @@ class Outworker_form(WriteForm):
         "Name",
         validators=[DataRequired()],
     )
-    aliases = TextAreaField(
-        "Master aliases (comma or new line separated)",
-        render_kw={"placeholder": "Example: RAM, RAM MASTER"},
-    )
     address = StringField("address",validators=[DataRequired()],render_kw={"placeholder": "Enter address"}
                           )
     number =  IntegerField(

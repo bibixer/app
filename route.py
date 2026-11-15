@@ -3,7 +3,7 @@ from datetime import date
 from flask import flash, render_template, redirect, url_for,session,request, jsonify, g
 from form import SimpleProductForm, WriteForm
 from kept_products import record_kept_product
-from simple_workflow import CORE_ENTITIES, register_simple_workflow, dashboard_period, dashboard_movement_details
+from simple_workflow import CORE_ENTITIES, register_simple_workflow, dashboard_period, dashboard_movement_details, dashboard_job_balances
 from form import Lump_data, bundle_invadata, Item_data, Outworker_form, Cutter_form, Return_form, Login_form, Date_form, Date_form_with_name,bale_data_form,party_name,Find_and_edit,EditEntryForm
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user, AnonymousUserMixin
 from data_entry import add_cutter,add_items,add_outworker_db,add_jobcard,add_manual_jobcard,in_move_entery,bale_data_entry,add_party
@@ -450,7 +450,7 @@ def register_routes(app,db):
                 return redirect(url_for("add_outworker"))
 
         return render_template(
-            "user.html",
+            "outworker_setup.html",
             form_name=form_name,
             current_form=current_form,id=current_user.role
         )
@@ -563,7 +563,13 @@ def register_routes(app,db):
             return redirect(url_for("retune_product"))
         products = {row.name: row for row in ProductModel.query.all()}
         kept_options = [{'item': item, 'product': products.get(item['product_name'])} for item in data['items']]
+        receipt_key = request.args.get('saved_return', '')
+        receipt = saved_receipt(receipt_key, 'return_items', current_user) if receipt_key and len(receipt_key) <= 128 else {}
+        saved_return = receipt.get('jobData')
+        if saved_return and str(saved_return.get('jobcard_id')) != str(jobcard_id):
+            saved_return = None
         return render_template("job_retun.html",data=data,id=current_user.role, kept_form=WriteForm(), kept_options=kept_options,
+                               saved_return=saved_return, csv_warning=request.args.get('csv_warning') == '1',
                                kept_only=request.args.get('kept_only') == '1',
                                embedded=request.args.get('embedded') == '1')
 
@@ -586,6 +592,19 @@ def register_routes(app,db):
                                 embedded='1' if request.form.get('embedded') == '1' else None,
                                 kept_only='1' if request.form.get('kept_only') == '1' else None,
                                 _anchor='kept-pieces'))
+    @app.route('/edit/jobcard/open')
+    @login_required
+    @oly_admin
+    def open_jobcard_edit():
+        card_id = record_id(request.args.get('jobcard_id', ''))
+        if card_id is None:
+            flash('Enter a valid job card number to edit.', 'danger')
+            return redirect(url_for('manual_job_card', _anchor='open-old-job'))
+        if db.session.get(Jobcard, card_id) is None:
+            flash(f'Job card #{card_id} was not found.', 'danger')
+            return redirect(url_for('manual_job_card', _anchor='open-old-job'))
+        return redirect(url_for('edit_entry', entity_type='jobcard', entity_id=card_id))
+
     @app.route("/jobcard/ledger")
     @login_required
     @job_operator
@@ -691,11 +710,20 @@ def register_routes(app,db):
             overview = dashboard_period(request.args)
             kind = request.args.get('kind', 'all')
             entries = dashboard_movement_details(overview, kind)
+            view = request.args.get('view', 'workers' if kind in {'opening', 'closing'} else 'jobs')
+            if view not in {'workers', 'jobs'}:
+                view = 'workers'
+            sort_by = request.args.get('sort', 'age_desc')
+            if sort_by not in {'age_desc', 'age_asc', 'quantity_desc', 'quantity_asc', 'product'}:
+                sort_by = 'age_desc'
+            product_filter = request.args.get('product', '').strip()[:100]
+            balances = dashboard_job_balances(overview, kind, entries, product_filter, sort_by)
         except (ValueError, OverflowError):
             flash('Choose a valid date range and movement type.', 'danger')
             return redirect(url_for('admin_dashord'))
         return render_template('dashboard_movements.html', id=current_user.role,
-                               overview=overview, kind=kind, entries=entries)
+                               overview=overview, kind=kind, entries=entries, balances=balances,
+                               view=view, sort_by=sort_by, product_filter=product_filter)
 
     @app.route("/cutter_report",methods=["GET", "POST"])
     @login_required
@@ -919,9 +947,13 @@ def register_routes(app,db):
     @login_required
     @oly_admin
     def edit_index():
+        entities = {key: value for key, value in ENTITY_CONFIG.items()
+                    if key in CORE_ENTITIES or (not app.config.get('SIMPLE_WORKFLOW') and key != 'movement')}
+        selected_type = request.args.get('type', 'product')
+        if selected_type not in entities:
+            selected_type = 'product'
         return render_template(
-            "edit_index.html", entities={key: value for key, value in ENTITY_CONFIG.items()
-                                         if key in CORE_ENTITIES or (not app.config.get('SIMPLE_WORKFLOW') and key != 'movement')}, id=current_user.role,
+            "edit_index.html", entities=entities, selected_type=selected_type, id=current_user.role,
         )
 
     @app.route("/edit/search")
@@ -967,7 +999,8 @@ def register_routes(app,db):
                 flash("Someone changed this entry after you opened it. Review the latest values and save again.", "danger")
                 return redirect(url_for("edit_entry", entity_type=entity_type, entity_id=entity_id))
             flash(f"Could not save: {detail}", "danger")
-        return render_template("edit_entry.html", form=form, entry=context, id=current_user.role)
+        template = 'outworker_edit.html' if entity_type == 'outworker' else 'edit_entry.html'
+        return render_template(template, form=form, entry=context, id=current_user.role)
 
     @app.route("/edit-logs")
     @login_required

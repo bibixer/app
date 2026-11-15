@@ -1,0 +1,62 @@
+.app-ui .page-dashboard-movements>.ui-panel{margin-bottom:24px}
+.app-ui .page-dashboard-movements .movement-controls{background:linear-gradient(120deg,#fff,#f3f5ff);border-top:4px solid #858bd2}
+.movement-date-form{display:flex;align-items:end;gap:16px;flex-wrap:wrap}
+.movement-date-form label{flex:1;min-width:180px;font-size:13px;font-weight:650}
+.movement-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:24px 0 20px}
+.movement-tabs a{padding:10px 14px;border:1px solid #dfe3ef;border-radius:24px;color:#657297;background:white;text-decoration:none;font-size:12px;font-weight:650}
+.movement-tabs a.active{background:#6269ac;border-color:#6269ac;color:#fff}
+.movement-period-totals{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.movement-period-totals>div{padding:20px;border:1px solid #dfe4f2;border-radius:12px;background:#fff}
+.movement-period-totals span{display:block;color:#71809e;font-size:11px;font-weight:700}
+.movement-period-totals strong{display:block;margin:10px 0 6px;color:#4e609c;font-size:30px;font-variant-numeric:tabular-nums}
+.movement-period-totals small{font-size:11px;color:#74819b}
+.movement-period-totals>div:last-child{background:#eff1ff;border-color:#d3d9f2}
+.movement-equation{padding:16px;margin:18px 0 0;border:1px solid #dfe4f2;border-radius:10px;background:#fff;color:#76829b;font-size:13px;line-height:1.9}
+.movement-equation strong{color:#51648f}
+.movement-section-head{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap;margin-bottom:22px}
+.movement-section-head h2{margin:0 0 10px;color:#435479;font-size:22px}
+.movement-section-head p:last-child{margin:0;max-width:790px;color:#72809a;font-size:13px;line-height:1.8}
+.movement-count{padding:8px 12px;border:1px solid #dde3f1;border-radius:24px;background:#f3f5fc;color:#7182a6;font-size:11px;white-space:nowrap}
+.app-ui .page-dashboard-movements .table-wrap{overflow:auto}
+.app-ui .page-dashboard-movements th{white-space:nowrap;font-size:11px}
+.app-ui .page-dashboard-movements td{font-size:13px;vertical-align:top}
+.page-dashboard-movements td small{display:block;margin-top:6px;color:#75829c;font-size:11px;line-height:1.6}
+.movement-job-links{display:flex;gap:10px;align-items:center;white-space:nowrap;font-weight:750}
+.movement-job-links .movement-edit{padding:4px 9px;border:1px solid #d9dff1;border-radius:7px;background:#f0f3ff;color:#6574a4;font-size:11px;text-decoration:none}
+.movement-worker{min-width:160px;max-width:240px;overflow-wrap:anywhere}
+.movement-product-list{display:grid;gap:9px;min-width:220px}
+.movement-product-list>div{display:flex;justify-content:space-between;gap:14px;padding:10px 12px;border:1px solid #e4e8f2;border-radius:9px;background:#f7f9fd}
+.movement-product-list span{color:#536582;font-size:12px}
+.movement-product-list strong{font-size:12px;white-space:nowrap;color:#8d743c}
+.app-ui .page-dashboard-movements .kept{color:#a17e40}
+.app-ui .page-dashboard-movements .negative{color:#ab514a}
+.app-ui .page-dashboard-movements .movement-unlinked{border-left:4px solid #d2ad68;background:#fffcf6}
+.movement-raw>summary{cursor:pointer;display:flex;gap:15px;justify-content:space-between;flex-wrap:wrap;color:#53658a;font-size:16px;font-weight:750;line-height:1.8}
+.movement-raw>summary small{font-size:12px;color:#7c88a0;font-weight:400}
+.movement-history-note{color:#7b88a0;font-size:12px;line-height:1.8;margin:20px 0}
+.movement-empty{padding:28px!important;color:#78859b}
+.movement-view-switch{display:flex;gap:8px;flex-wrap:wrap;padding:6px;border:1px solid #dee3f0;border-radius:12px;background:#f5f7fd;width:fit-content}
+.movement-view-switch a{padding:10px 17px;color:#637295;font-size:13px;font-weight:650;text-decoration:none;border-radius:8px}
+.movement-view-switch a.active{background:#606cab;color:#fff;box-shadow:0 3px 10px #46558a20}
+.movement-worker-cards{display:grid;grid-template-columns:minmax(0,1fr);gap:16px}
+.movement-worker-card{min-width:0;border:1px solid #dfe4f2;border-radius:14px;background:#fff;overflow:hidden}
+.movement-worker-card>summary{padding:22px;cursor:pointer;list-style:none;background:linear-gradient(120deg,#fcfdff,#f3f5ff)}
+.movement-worker-card>summary::-webkit-details-marker{display:none}
+.movement-worker-top{display:flex;justify-content:space-between;align-items:start;gap:18px}
+.movement-worker-top h3{margin:7px 0;color:#475780;font-size:19px;overflow-wrap:anywhere}
+.movement-worker-top small{color:#73819a;font-size:12px}
+.movement-worker-quantity{text-align:right;flex-shrink:0}
+.movement-worker-quantity strong{display:block;font-size:30px;line-height:1.3;color:#596ba3;font-variant-numeric:tabular-nums}
+.movement-worker-quantity span,.movement-worker-quantity small{display:block;margin-top:4px;font-size:11px;color:#7485a6}
+.movement-worker-products{display:flex;gap:9px;flex-wrap:wrap;margin-top:18px}
+.movement-worker-products>span{padding:9px 12px;border:1px solid #e0e5f1;border-radius:9px;background:#fff;color:#6b7a98;font-size:12px;line-height:1.8}
+.movement-worker-products strong{margin-left:9px;color:#8f773f}
+.movement-worker-products small{display:block;color:#ab514b}
+.movement-worker-jobs{padding:22px;border-top:1px solid #e1e6f1}
+.movement-worker-card[open]>summary{border-bottom-left-radius:0;border-bottom-right-radius:0}
+.movement-age strong{display:block;font-size:18px;color:#907546}
+.movement-job-table caption{caption-side:top;padding:12px 14px;text-align:left;border:1px solid #dfe4f2;border-bottom:0;border-radius:9px 9px 0 0;background:#f5f7fd;color:#657694;font-size:12px;line-height:1.7}
+@media(max-width:650px){.movement-worker-card>summary,.movement-worker-jobs{padding:16px}.movement-worker-top{flex-wrap:wrap}.movement-worker-top h3{font-size:17px}.movement-date-form select{width:100%}}
+.page-dashboard-movements :is(a,summary,button):focus-visible{outline:3px solid #a2acd9;outline-offset:3px}
+@media(max-width:650px){.movement-period-totals{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.movement-period-totals>div{padding:16px}.movement-period-totals strong{font-size:26px}.movement-date-form{flex-direction:column;align-items:stretch}.movement-date-form label{min-width:0;width:100%}}
+@media print{.app-ui .page-dashboard-movements .ui-panel{box-shadow:none;border-color:#ccc;break-inside:auto}.app-ui .page-dashboard-movements .table-wrap{overflow:visible}.app-ui .page-dashboard-movements table{min-width:0}.app-ui .page-dashboard-movements :is(th,td){font-size:9px;padding:7px}.movement-edit{display:none!important}.movement-worker,.movement-product-list{min-width:0}.movement-product-list>div{display:block}.movement-raw>summary small{display:none}}
