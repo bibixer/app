@@ -239,16 +239,17 @@ class BrowserFlowsTest(AppTestCase):
           const results=['slash','split','blinds','prism','sweep','fold','orbit','cascade'].map(scene=>{
             document.documentElement.dataset.scene=scene;
             const panel=root.querySelector('.scene-panel'),art=getComputedStyle(panel,'::before');
-            return {scene,art:art.backgroundImage,animation:art.animationName,filter:art.filter};
+            return {scene,art:art.backgroundImage,animation:art.animationName,filter:art.filter,
+              brandingLayer:getComputedStyle(root.querySelector('.scene-mark')).zIndex};
           });
           document.documentElement.dataset.scene=original;document.body.classList.remove('is-page-closing');
-          if(window.BH_CAPTURE_CLOSING)root.getAnimations({subtree:true}).forEach(a=>{a.currentTime=0;a.play()});
           return results;
         """)
         for row in result:
             self.assertNotEqual(row['art'],'none',row)
             self.assertEqual(row['animation'],'none',row)
             self.assertEqual(row['filter'],'none',row)
+            self.assertEqual(row['brandingLayer'],'2',row)
         self.assertGreaterEqual(len(set(row['art'] for row in result)),6)
         if os.environ.get('BH_CLOSING_PREVIEW'):
             import base64
