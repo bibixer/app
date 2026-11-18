@@ -136,15 +136,15 @@ class SecurityHardeningTest(original_audit.SecurityRegressions):
         self.assertEqual(Jobcard.query.count(), 1)
         self.assertEqual(self.job_cade_print.call_count, 1)
 
-    def test_scan_and_return_retries_restore_receipts_and_reject_changes(self):
+    def test_manual_and_return_retries_restore_receipts_and_reject_changes(self):
         self.app.config['SIMPLE_WORKFLOW'] = False
-        payload = self.scan_payload(self.bundle())
-        first = self.client.post('/submit-jobcard', json=payload)
+        payload = self.manual_payload()
+        first = self.client.post('/submit-manual-jobcard', json=payload)
         self.assertEqual(first.status_code, 200)
-        retry = self.client.post('/submit-jobcard', json=payload)
+        retry = self.client.post('/submit-manual-jobcard', json=payload)
         self.assertEqual(retry.json['jobData'], first.json['jobData'])
-        payload['items'][0]['qty'] = 35
-        self.assertEqual(self.client.post('/submit-jobcard', json=payload).status_code, 409)
+        payload['rows'][0]['pieces'] = 35
+        self.assertEqual(self.client.post('/submit-manual-jobcard', json=payload).status_code, 409)
         payload = self.return_payload(first.json['jobData']['jobId'], 10)
         first_return = self.client.post('/summit-retune', json=payload)
         self.assertEqual(first_return.status_code, 200)
@@ -157,12 +157,12 @@ class SecurityHardeningTest(original_audit.SecurityRegressions):
         record_advance(self.worker.id, '100', 'Cash', '', '', 'advance-key', self.admin)
         with self.assertRaises(RequestConflict):
             record_advance(self.worker.id, '200', 'Cash', '', '', 'advance-key', self.admin)
-        values = dict(action='create', username='new-user', password='test-password', role='2')
+        values = dict(action='create', username='new-user', password='test-password', role='1')
         save_user_access(values, 'account-key', self.admin.id)
-        values['role'] = '1'
+        values['role'] = '2'
         with self.assertRaises(ValueError):
             save_user_access(values, 'account-key', self.admin.id)
-        self.assertEqual(User.query.filter_by(username='new-user').one().role, 2)
+        self.assertEqual(User.query.filter_by(username='new-user').one().role, 1)
 
     def test_legacy_unverifiable_request_is_not_reported_as_success(self):
         from data_entry import _request_key
@@ -223,7 +223,7 @@ class SecurityHardeningTest(original_audit.SecurityRegressions):
         import hashlib
         import hmac
         import json
-        values = dict(action='create', username='new-account', password='new-account-password', role='2')
+        values = dict(action='create', username='new-account', password='new-account-password', role='1')
         save_user_access(values, 'account-fingerprint', self.admin.id)
         payload = json.dumps(values, sort_keys=True, default=str).encode()
         fingerprint = UserAccessLog.query.one().payload_hash

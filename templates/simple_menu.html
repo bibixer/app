@@ -1,6 +1,6 @@
 {% set workflow = [('manual_job_card','✎','Assign job'),('retune_product','↩','Job returns'),('jobcard_ledger_lookup','☷','Job ledger')] %}
 {% set reports = [('outworker_report','Outworker accounts'),('outworker_payroll','Advances & payroll')] %}
-{% set management = [('add_item','Products & aliases'),('payroll_rates','Product rates'),('add_outworker','Outworkers'),('edit_index','Edit center'),('edit_logs','Edit history'),('manage_users','Users & roles')] %}
+{% set management = [('add_item','Products & aliases'),('payroll_rates','Product rates'),('add_outworker','Outworkers'),('edit_index','Edit center'),('edit_logs','Edit history'),('manage_users','User accounts')] %}
 <nav class="app-navbar" aria-label="Main navigation">
   <a class="app-brand" href="{{ url_for('home') }}"><img src="{{ url_for('static',filename='images/bh-nav-logo.png') }}" alt="BH Garments DMT"><span class="app-brand-copy"><span class="app-brand-title">BH Manufacturing</span></span></a>
   <div class="app-nav-links">
@@ -11,7 +11,7 @@
     <div class="app-dropdown"><button class="app-dropdown-button" type="button"><span>Manage</span></button><div class="app-dropdown-menu">{% for target,label in management %}<a href="{{ url_for(target) }}">{{ label }}</a>{% endfor %}</div></div>
     {% endif %}
   </div>
-  <div class="app-user"><span class="app-user-badge" title="{{ 'Administrator' if id == 1 else 'Operator' }}">{{ 'A' if id == 1 else 'U' }}</span><a class="app-nav-link app-logout" href="{{ url_for('logout') }}">Log out</a></div>
+  <div class="app-user"><button type="button" class="app-sound-toggle" data-sound-toggle aria-label="Sound effects" aria-pressed="true">♫ Sound on</button><span class="app-user-badge" title="{{ 'Administrator' if id == 1 else 'Legacy restricted' }}">{{ 'A' if id == 1 else 'U' }}</span><a class="app-nav-link app-logout" href="{{ url_for('logout') }}">Log out</a></div>
   <button class="app-menu-toggle" id="appMenuOpen" type="button" aria-label="Open navigation" aria-expanded="false">☰</button>
 </nav>
 <div class="app-nav-offset" aria-hidden="true"></div>

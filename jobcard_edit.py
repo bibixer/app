@@ -83,6 +83,7 @@ def jobcard_edit_context(card_id):
             given.append(details)
         elif row.flow_type == "IN":
             returns.append(details)
+    product_aliases = item_name_mapping()
     return {"title": "Job card", "entity_type": "jobcard", "entity_id": card.id,
             "fields": [{"name": name, "kind": kind,
                         "value": card.date.isoformat(timespec="seconds") if name == "date" else state["card"][name]}
@@ -98,7 +99,8 @@ def jobcard_edit_context(card_id):
                        "kept": sum(row['pieces'] for row in state['kept']),
                        "pending": sum(row['quantity'] for row in given) - sum(row['quantity'] for row in returns)
                                   - sum(row['pieces'] for row in state['kept'])},
-            "products": sorted(set(item_name_mapping().values())), "types": BUNDLE_TYPE_CHOICES}
+            "products": sorted(set(product_aliases.values())), "product_aliases": product_aliases,
+            "types": BUNDLE_TYPE_CHOICES}
 
 
 def _quantity(value, allow_zero=False):

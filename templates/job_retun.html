@@ -4,7 +4,6 @@
 {% block main_class %}page-shell page-job-retun{% endblock %}
 {% block body_class %}{% if embedded %}return-embedded{% endif %}{% if kept_only %} kept-popup{% endif %}{% endblock %}
 {% block head %}<link rel="stylesheet" href="{{ url_for('static',filename='style/return-workspace.css',v='20261113-collapse') }}">{% endblock %}
-{% block notifications %}{% for category,message in get_flashed_messages(with_categories=true) %}<div class="ui-panel notice {{ category }}" role="alert">{{ message }}</div>{% endfor %}{% endblock %}
 {% block content %}
 {% if not kept_only %}
 <header class="page-top">
@@ -12,6 +11,7 @@
       <div class="page-actions"><a class="back-link" href="{{ url_for('jobcard_ledger', jobcard_id=data.jobcard_id) }}">View full job ledger ↗</a><a class="back-link" href="{{ url_for('retune_product') }}">← Another job card</a></div>
     </header>
     {% if saved_return %}
+    <p class="notice success" data-app-notice="success">Job #{{ saved_return.jobcard_id }} return saved · {{ saved_return['items']|sum(attribute='returned') }} pieces recorded.</p>
     <section class="saved-return-preview" id="savedReturnPreview" tabindex="-1" aria-labelledby="saved-return-title">
       <div class="saved-return-heading"><div><p class="ui-kicker">Saved successfully</p><h2 id="saved-return-title">Saved Job Return · Job #{{ saved_return.jobcard_id }}</h2></div>{% if current_user.role == 1 %}<a class="saved-return-edit" href="{{ url_for('edit_entry', entity_type='jobcard', entity_id=data.jobcard_id) }}">Edit this job & returns →</a>{% endif %}</div>
       <p><strong>Master:</strong> {{ saved_return.party }} · {{ saved_return.date }} · Received by {{ saved_return.username }}</p>
@@ -49,8 +49,8 @@
     </section>
 {% endif %}
 {% include 'kept_job_fields.html' %}
-  <script defer src="{{ url_for('static',filename='js/kept-entry.js',v='20261113-collapse') }}"></script>
+  <script defer src="{{ url_for('static',filename='js/kept-entry.js',v='20261118-notifications') }}"></script>
   <script>const JOB_CARD = {{ data | tojson }}; window.RETURN_EMBEDDED = {{ embedded|default(false)|tojson }};</script>
-  {% if not kept_only %}<script src="{{ url_for('static', filename='js/retun.js',v='20261115-server-csv') }}"></script>{% endif %}
+  {% if not kept_only %}<script src="{{ url_for('static', filename='js/retun.js',v='20261118-transitions') }}"></script>{% endif %}
   {% if embedded %}<script defer src="{{ url_for('static',filename='js/embedded-returns.js',v='20261108-balance') }}"></script>{% endif %}
 {% endblock %}

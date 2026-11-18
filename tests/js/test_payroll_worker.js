@@ -39,4 +39,11 @@ const back=event('Backspace'); button.listeners.keydown(back);
 assert(back.prevented && input.focused,'Backspace on button returns to name input');
 const normalBack=event('Backspace'); input.listeners.keydown(normalBack);
 assert(!normalBack.prevented,'Backspace in text input edits normally');
+for (const attribute of ['readOnly','disabled']) {
+  input[attribute]=true;input.value='RAM CITY';button.focused=false;
+  input.listeners.input();input.listeners.change();input.listeners.blur();
+  const lockedEnter=event('Enter');input.listeners.keydown(lockedEnter);
+  assert(input.value==='RAM CITY'&&!lockedEnter.prevented&&!button.focused,'Locked field must not canonicalize or intercept lookup navigation');
+  input[attribute]=false;
+}
 print('PASS: payroll lookup normalization, alias/ID, Enter, Backspace, validation and submission');

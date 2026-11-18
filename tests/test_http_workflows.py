@@ -8,7 +8,7 @@ from support import AppTestCase
 
 
 class HttpWorkflowTest(AppTestCase):
-    endpoints = ("/submit-jobcard", "/submit-manual-jobcard", "/summit-retune")
+    endpoints = ("/submit-manual-jobcard", "/summit-retune")
 
     def test_write_apis_reject_missing_invalid_or_non_json_submissions(self):
         for path in self.endpoints:
@@ -49,25 +49,25 @@ class HttpWorkflowTest(AppTestCase):
         self.assertEqual(Jobmovement.query.filter_by(flow_type="IN").count(), 1)
         self.assertEqual(self.client.get(f"/job_retun?jobcard_id={card_id}").status_code, 200)
 
-    def test_scan_api_reports_changed_bundle_as_conflict(self):
+    def test_retired_scan_api_never_changes_existing_bundles(self):
         data = self.scan_payload(self.bundle())
-        self.assertTrue(self.client.post("/submit-jobcard", json=data).json["success"])
-        data["request_id"] = "other-tab"
         response = self.client.post("/submit-jobcard", json=data)
-        self.assertEqual(response.status_code, 409)
+        self.assertEqual(response.status_code, 410)
         self.assertFalse(response.json["success"])
+        self.assertEqual(Jobcard.query.count(),0)
+        self.assertEqual(Bundle.query.one().status,'READY')
 
     def test_unexpected_database_failure_is_json_and_can_be_retried(self):
         self.app.config["PROPAGATE_EXCEPTIONS"] = False
-        data = self.scan_payload(self.bundle())
-        with patch("data_entry.add_job_movemet_out", side_effect=RuntimeError("simulated fault")):
+        data = self.manual_payload()
+        with patch("data_entry.record_receipt", side_effect=RuntimeError("simulated fault")):
             with self.assertLogs(self.app.logger, level="ERROR"):
-                response = self.client.post("/submit-jobcard", json=data)
+                response = self.client.post("/submit-manual-jobcard", json=data)
         self.assertEqual(response.status_code, 500)
         self.assertFalse(response.json["success"])
         self.assertEqual(Jobcard.query.count(), 0)
-        self.assertEqual(Bundle.query.one().status, "READY")
-        self.assertTrue(self.client.post("/submit-jobcard", json=data).json["success"])
+        self.assertEqual(Jobmovement.query.count(),0)
+        self.assertTrue(self.client.post("/submit-manual-jobcard", json=data).json["success"])
 
     def test_login_valid_invalid_empty_and_logout(self):
         with self.client.session_transaction() as session:
@@ -92,14 +92,11 @@ class HttpWorkflowTest(AppTestCase):
         with self.client.session_transaction() as session:
             session.update(bale_data=data["bale_data"], bundle_data=data["main"], bundles=data["bundles"],
                            current_bundle=3, current_lump=2, sno=2, lump_workflow_id="draft")
-        with patch("route.bale_data_entry", return_value=405):
-            response = self.client.get("/bundle_entery")
-        self.assertEqual(response.status_code, 302)
+        response = self.client.get("/bundle_entery")
+        self.assertEqual(response.status_code, 410)
         with self.client.session_transaction() as session:
             self.assertEqual(session["bundles"], data["bundles"])
-            self.assertEqual(session["current_lump"], 1)
-            self.assertIn("not saved", session["_flashes"][-1][1])
-            self.assertTrue(session["inventory_save_failed"])
+            self.assertEqual(session["current_lump"], 2)
 
     def test_extreme_record_ids_return_validation_errors_not_server_errors(self):
         huge = "9" * 80

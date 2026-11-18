@@ -75,7 +75,7 @@ def rate_version(row):
     return (f"{row.id}:{row.rate_units}:{row.updated_at.isoformat()}" if row else "new")
 
 
-def save_rate(product_id, bundle_type, value, expected_version, token, user, remove=False):
+def save_rate(product_id, bundle_type, value, expected_version, token, user, remove=False, *, commit=True):
     try:
         username = _claim(token, "outworker_rate", user, dict(product_id=product_id, bundle_type=bundle_type,
                           value=value, version=expected_version, remove=remove))
@@ -111,6 +111,49 @@ def save_rate(product_id, bundle_type, value, expected_version, token, user, rem
             old_values=old, new_values={**old, "rate": new_rate}, changed_fields=["rate"],
             username=username, changed_at=datetime.now(),
         ))
+        if commit:
+            db.session.commit()
+    except Exception:
+        db.session.rollback()
+        raise
+
+
+def save_rate_page_changes(product_id, changes, next_product_id, token, user):
+    """Save dirty rate/value fields together; no partial save before switching."""
+    from data_entry import claim_write
+    from kept_products import save_product_value
+    try:
+        if user.role != 1 or not user.is_active:
+            raise ValueError('Only an administrator can update rates.')
+        if not isinstance(token, str) or not token.strip() or len(token) > 128:
+            raise ValueError('A valid submission token is required.')
+        if not isinstance(changes, list) or not 1 <= len(changes) <= len(BUNDLE_TYPE_VALUES) + 2:
+            raise ValueError('Select valid changes to save.')
+        if not record_id(product_id) or not db.session.get(Item_data, product_id):
+            raise ValueError('Select an existing product.')
+        if not record_id(next_product_id) or not db.session.get(Item_data, next_product_id):
+            raise ValueError('Select an existing destination product.')
+        payload = dict(product_id=product_id, next_product_id=next_product_id, changes=changes)
+        if not claim_write(token, 'rate_page_changes', user, payload):
+            return
+        seen = set()
+        for change in changes:
+            if not isinstance(change, dict) or change.get('field') not in {'rate', 'product_value'}:
+                raise ValueError('Invalid rate or product value change.')
+            kind = change['field']
+            bundle_type = change.get('bundle_type', '')
+            key = (kind, bundle_type if kind == 'rate' else '')
+            if key in seen:
+                raise ValueError('A field was supplied more than once.')
+            seen.add(key)
+            child_token = hashlib.sha256(f'{token}:{kind}:{bundle_type}'.encode()).hexdigest()
+            if kind == 'product_value':
+                save_product_value(product_id, change.get('value'), change.get('version'),
+                                   child_token, user, commit=False)
+            else:
+                value = str(change.get('value', '')).strip()
+                save_rate(product_id, bundle_type, value, change.get('version'), child_token, user,
+                          remove=value == '', commit=False)
         db.session.commit()
     except Exception:
         db.session.rollback()

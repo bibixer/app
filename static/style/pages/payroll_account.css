@@ -154,6 +154,7 @@
   .app-ui .payroll-account .payroll-ready strong { font-size:22px; }
   .app-ui .payroll-account .pay-head { padding:25px 22px; }
 }
+.app-ui .payroll-account .payroll-select-all {display:inline-flex;align-items:center;gap:8px;white-space:nowrap;cursor:pointer;}
 @media print {
   .app-ui .payroll-account .payroll-shortcuts { display:none; }
   .app-ui .payroll-account > .metrics .metric:last-child { background:white; }

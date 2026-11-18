@@ -1,7 +1,62 @@
-.ui-scope.box,
-.ui-scope .box{max-width:1200px;margin:auto;background:#fff;padding:24px;border-radius:16px;overflow:auto}
-.ui-scope table{width:100%;border-collapse:collapse}
-.ui-scope th,
-.ui-scope td{padding:10px;border-bottom:1px solid #dfe6ef;text-align:left;vertical-align:top}
-.ui-scope code{white-space:pre-wrap;font-size:12px}
-.ui-scope a{color:#1769e0}
+/* Read-only audit workspace; shared navigation and wave background are preserved. */
+.app-ui .page-edit-logs{--audit-ink:#344967;--audit-muted:#6a7b97;max-width:1320px}
+.app-ui .page-edit-logs .audit-hero{display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;padding:30px;margin-bottom:24px;border:1px solid #d5ddf1;border-radius:20px;background:linear-gradient(115deg,#e3ebff,#f0e8fa 65%,#e6f4ee);box-shadow:0 12px 30px #3c527415}
+.app-ui .page-edit-logs .audit-kicker{margin:0 0 8px;color:#7280a9;font-size:10px;font-weight:800;letter-spacing:.13em;text-transform:uppercase}
+.app-ui .page-edit-logs .audit-hero h1{margin:0;color:#344b77;font-size:clamp(28px,4vw,38px);letter-spacing:-.04em}
+.app-ui .page-edit-logs .audit-hero>div>p:not(.audit-kicker){margin:12px 0 18px;max-width:580px;color:#60718e;font-size:14px;line-height:1.8}
+.app-ui .page-edit-logs .audit-trust{display:inline-block;padding:7px 12px;border:1px solid #c7dcd3;border-radius:999px;background:#effaf4;color:#477660;font-size:11px;font-weight:700}
+.app-ui .page-edit-logs .audit-back{padding:13px 18px;border:1px solid #6475ad;border-radius:11px;background:#6475ad;color:white;font-size:13px;font-weight:700;text-decoration:none}
+.app-ui .page-edit-logs .audit-back:hover{background:#506197}
+.app-ui .page-edit-logs .audit-workspace{padding:22px;border:1px solid #dce3f2;border-radius:20px;background:linear-gradient(145deg,#edf2fc,#f7f4fb);box-shadow:0 12px 30px #344c6f12}
+.app-ui .page-edit-logs .audit-filters,.app-ui .page-edit-logs .audit-history{min-width:0;padding:24px;border:1px solid #dce3ef;border-radius:14px;background:#fff}
+.app-ui .page-edit-logs .audit-history{margin-top:20px;background:#f9fbff}
+.app-ui .page-edit-logs .audit-section-head{display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap;margin-bottom:22px}
+.app-ui .page-edit-logs .audit-section-head h2{margin:0;color:var(--audit-ink);font-size:19px}
+.app-ui .page-edit-logs .audit-count{padding:8px 12px;border:1px solid #d5dff5;border-radius:999px;background:#eef2ff;color:#6375a6;font-size:12px;font-weight:700}
+.app-ui .page-edit-logs .audit-order{color:#7d8baa;font-size:12px}
+.app-ui .page-edit-logs .audit-filter-form{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr) auto auto;gap:16px;align-items:end}
+.app-ui .page-edit-logs .audit-filter-form label{min-width:0;color:#576986;font-size:12px;font-weight:700}
+.app-ui .page-edit-logs .audit-filter-form :is(input,select){box-sizing:border-box;display:block;min-width:0;width:100%;min-height:46px;margin-top:8px;padding:11px 13px;border:1px solid #cdd8e9;border-radius:10px;background:#f7faff;color:var(--audit-ink);font:inherit;font-size:14px}
+.app-ui .page-edit-logs .audit-filter-form button{min-height:46px;padding:11px 16px;border:0;border-radius:10px;background:#6074ad;color:#fff;font:inherit;font-size:12px;font-weight:700;cursor:pointer}
+.app-ui .page-edit-logs .audit-reset{display:inline-flex;align-items:center;min-height:46px;color:#697ca8;font-size:12px;font-weight:700;text-decoration:none}
+.app-ui .page-edit-logs .audit-hint{margin:15px 0 0;color:var(--audit-muted);font-size:12px;line-height:1.8}
+.app-ui .page-edit-logs .audit-list{display:grid;gap:14px}
+.app-ui .page-edit-logs .audit-record{min-width:0;border:1px solid #d9e2ef;border-left:3px solid #9fadd4;border-radius:12px;overflow:hidden;background:#fff;box-shadow:0 3px 10px #344c6f08}
+.app-ui .page-edit-logs .audit-record>summary{display:flex;justify-content:space-between;align-items:center;gap:20px;padding:20px;cursor:pointer;list-style:none;background:linear-gradient(115deg,#fff,#eff3fd)}
+.app-ui .page-edit-logs .audit-record>summary::-webkit-details-marker{display:none}
+.app-ui .page-edit-logs .audit-record>summary:hover{background:#edf2ff}
+.app-ui .page-edit-logs .audit-record-summary{min-width:0}
+.app-ui .page-edit-logs .audit-meta{display:flex;align-items:center;gap:12px;flex-wrap:wrap;color:#7887a1;font-size:11px}
+.app-ui .page-edit-logs .audit-action{padding:4px 8px;border:1px solid #d4def6;border-radius:6px;background:#e8eefc;color:#6175a9;font-size:9px;font-weight:800;letter-spacing:.05em;overflow-wrap:anywhere}
+.app-ui .page-edit-logs .audit-record h3{margin:12px 0 6px;color:var(--audit-ink);font-size:16px;overflow-wrap:anywhere}
+.app-ui .page-edit-logs .audit-record-summary>p{margin:0;color:var(--audit-muted);font-size:12px;line-height:1.7;overflow-wrap:anywhere}
+.app-ui .page-edit-logs .audit-record-summary strong{color:#52688c}
+.app-ui .page-edit-logs .audit-field-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.app-ui .page-edit-logs .audit-field-tags span{padding:4px 8px;border:1px solid #dfe5ef;border-radius:6px;background:#f5f7fc;color:#7383a0;font-size:10px;overflow-wrap:anywhere}
+.app-ui .page-edit-logs .audit-toggle{flex:none;color:#6578a7;font-size:11px;font-weight:700}
+.app-ui .page-edit-logs .audit-toggle::after{content:' +';font-size:17px}
+.app-ui .page-edit-logs .audit-record[open]>summary{border-bottom:1px solid #dce3ef}
+.app-ui .page-edit-logs .audit-record[open]>summary .audit-toggle::after{content:' −'}
+.app-ui .page-edit-logs .audit-record-body{padding:18px}
+.app-ui .page-edit-logs .audit-entry-link{display:inline-block;margin-bottom:16px;padding:9px 12px;border:1px solid #cdd8ee;border-radius:8px;background:#edf2ff;color:#5a709f;font-size:12px;font-weight:700;text-decoration:none}
+.app-ui .page-edit-logs .audit-comparison{max-width:100%;overflow-x:auto;border:1px solid #e0e6ef;border-radius:10px}
+.app-ui .page-edit-logs table{width:100%;table-layout:fixed;border-collapse:collapse;min-width:540px}
+.app-ui .page-edit-logs :is(th,td){padding:13px 15px;border-bottom:1px solid #e3e9f1;text-align:left;vertical-align:top;font-size:12px;overflow-wrap:anywhere}
+.app-ui .page-edit-logs thead th{background:#edf1f9;color:#6d7d9a;font-size:10px;text-transform:uppercase;letter-spacing:.07em}
+.app-ui .page-edit-logs th:first-child{width:24%;color:#607390;background:#f7f9fd}
+.app-ui .page-edit-logs .audit-before{background:#fff7f1}
+.app-ui .page-edit-logs .audit-after{background:#eff9f3}
+.app-ui .page-edit-logs pre{max-width:100%;max-height:260px;overflow:auto;margin:0;color:#586d87;font-size:12px;line-height:1.8;white-space:pre-wrap;overflow-wrap:anywhere}
+.app-ui .page-edit-logs .audit-raw{margin-top:16px;padding:12px 14px;border:1px solid #e0e6f0;border-radius:9px;background:#f7f9fd}
+.app-ui .page-edit-logs .audit-raw>summary{cursor:pointer;color:#6b7d9e;font-size:12px;font-weight:700}
+.app-ui .page-edit-logs .audit-snapshots{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:15px}
+.app-ui .page-edit-logs .audit-snapshots section{min-width:0;padding:14px;border:1px solid #e0e7f1;border-radius:8px;background:#fff}
+.app-ui .page-edit-logs .audit-snapshots h4{margin:0 0 12px;color:#687c9d;font-size:12px}
+.app-ui .page-edit-logs .audit-empty{padding:34px 22px;border:1px dashed #c2cfe5;border-radius:12px;background:#f0f4fd;text-align:center}
+.app-ui .page-edit-logs .audit-empty h3{margin:0 0 10px;color:#52698d;font-size:16px}
+.app-ui .page-edit-logs .audit-empty p{margin:0;color:var(--audit-muted);font-size:13px;line-height:1.8}
+.app-ui .page-edit-logs .audit-empty a{display:inline-block;margin-top:16px;color:#6177ae;font-size:12px;font-weight:700}
+.app-ui .page-edit-logs :is(a,button,input,select,summary):focus-visible{outline:3px solid #8d9fdc;outline-offset:3px}
+.app-ui .page-edit-logs .audit-sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+@media(max-width:750px){.app-ui .page-edit-logs .audit-filter-form{grid-template-columns:repeat(2,minmax(0,1fr))}.app-ui .page-edit-logs .audit-hero{padding:24px}.app-ui .page-edit-logs .audit-workspace{padding:12px}.app-ui .page-edit-logs :is(.audit-filters,.audit-history){padding:18px}.app-ui .page-edit-logs .audit-snapshots{grid-template-columns:1fr}}
+@media(max-width:480px){.app-ui .page-edit-logs .audit-filter-form{grid-template-columns:1fr}.app-ui .page-edit-logs .audit-record>summary{padding:16px;gap:10px;align-items:flex-start}.app-ui .page-edit-logs .audit-toggle{font-size:0}.app-ui .page-edit-logs .audit-record-body{padding:12px}.app-ui .page-edit-logs .audit-meta{gap:8px}.app-ui .page-edit-logs .audit-section-head{gap:12px}}

@@ -103,6 +103,7 @@ function calculatePayrollLocally(data, jobIds, advanceIds) {
       document.getElementById('payrollLocalBreakdown').innerHTML = '';
       status.textContent = error.message;
       modalStatus.textContent = error.message;
+      globalThis.AppUI?.notify(error.message, {type:'error'});
       if (!review.open) status.focus();
     }
   }

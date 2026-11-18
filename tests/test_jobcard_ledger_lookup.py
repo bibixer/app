@@ -53,8 +53,8 @@ class JobcardLedgerLookupTest(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         html = response.get_data(as_text=True)
         self.assertIn("Open a job card ledger", html)
-        self.assertIn("Job Ledger", html)
-        self.assertIn("Job card ledger", html)
+        self.assertIn('href="/jobcard/ledger"', html)
+        self.assertIn("Job ledger", html)
 
         response = self.client.get("/jobcard/ledger?jobcard_id=1")
         self.assertEqual(response.status_code, 302)

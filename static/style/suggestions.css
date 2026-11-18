@@ -1,0 +1,9 @@
+/* Lookup overlay stays below the input, outside clipped panels and tables. */
+body.app-ui .bh-suggestions{position:fixed;z-index:10020;box-sizing:border-box;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;padding:6px;border:1px solid #ccd6eb;border-radius:12px;background:#fff;box-shadow:0 14px 32px #25365b24;color:#415878;font-family:inherit}
+body.app-ui .bh-suggestions[hidden]{display:none!important}
+body.app-ui .bh-suggestions [role=option]{box-sizing:border-box;display:flex;flex-direction:column;align-items:flex-start;gap:3px;padding:12px;border-radius:8px;cursor:pointer;font-size:14px;line-height:1.6;overflow-wrap:anywhere;white-space:normal}
+body.app-ui .bh-suggestions [role=option]:hover,body.app-ui .bh-suggestions [aria-selected=true]{background:#edf1ff;color:#435ba1}
+body.app-ui .bh-suggestions strong{font-weight:700}
+body.app-ui .bh-suggestions small{color:#6e7f99;font-size:12px}
+body.app-ui .bh-suggestions .bh-suggestions-empty{padding:12px;margin:0;color:#78859b;font-size:13px;line-height:1.7}
+@media print{body.app-ui .bh-suggestions{display:none!important}}

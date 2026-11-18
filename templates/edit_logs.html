@@ -1,18 +1,38 @@
 {% extends "app_base.html" %}
-{% block title %}Edit logs{% endblock %}
-{% block page_css %}<link rel="stylesheet" href="{{ url_for('static', filename='style/pages/edit_logs.css') }}">{% endblock %}
+{% block title %}Edit history · BH Manufacturing{% endblock %}
+{% block head %}<link rel="stylesheet" href="{{ url_for('static', filename='style/pages/edit_logs.css',v='20261118-history') }}">{% endblock %}
 {% block main_class %}page-edit-logs{% endblock %}
 {% block content %}
-<header class="ui-heading"><div><p class="ui-kicker">Administration / History</p><h1>Edit audit log</h1><p class="ui-description">A permanent record of who changed an entry, when it changed and the exact values before and after.</p></div><a class="head-link" href="{{ url_for('edit_index') }}">← Edit center</a></header>
-  <div class="table-wrap"><table><thead><tr><th>Time</th><th>User</th><th>Entry</th><th>Action</th><th>Fields</th><th>Before</th><th>After</th></tr></thead>
-  <tbody>
-  {% for log in logs %}
-    <tr>
-      <td>{{ log.changed_at }}</td><td>{{ log.username }}</td>
-      <td>{% if log.entity_type in ['jobcard','product','outworker','outworker_rate'] or (not config.SIMPLE_WORKFLOW and log.entity_type in ['bale','lump','bundle','cutter','party']) %}<a href="{{ url_for('payroll_rates') if log.entity_type == 'outworker_rate' else url_for('edit_entry', entity_type=log.entity_type, entity_id=log.entity_id) }}">{{ log.entity_type }} #{{ log.entity_id }}</a>{% else %}{{ log.entity_type }} #{{ log.entity_id }}{% endif %}</td>
-      <td><span class="tag">{{ log.action }}</span></td><td>{{ log.changed_fields|join(', ') }}</td>
-      <td><code>{{ log.old_values|tojson(indent=2) }}</code></td><td><code>{{ log.new_values|tojson(indent=2) }}</code></td>
-    </tr>
-  {% else %}<tr><td colspan="7">No edits recorded yet.</td></tr>{% endfor %}
-  </tbody></table></div>
+<header class="audit-hero"><div><p class="audit-kicker">Administration / History</p><h1>Edit history</h1><p>Who changed a record, when it changed, and exactly what was updated.</p><span class="audit-trust">Read-only history · Latest changes first</span></div><a class="audit-back" href="{{ url_for('edit_index') }}">← Edit center</a></header>
+<div class="audit-workspace">
+  <section class="audit-filters" aria-labelledby="audit-filter-title">
+    <div class="audit-section-head"><div><p class="audit-kicker">01 / Find changes</p><h2 id="audit-filter-title">Browse the edit trail</h2></div><span class="audit-count">{{ logs|length }} record{{ '' if logs|length == 1 else 's' }} shown</span></div>
+    <form method="get" class="audit-filter-form">
+      <label for="auditType">Entry type<select id="auditType" name="entity_type"><option value="">All entry types</option>
+      {% set audit_types = entities.keys()|list + (logs|map(attribute='entity_type')|list) + ([selected_type] if selected_type else []) %}
+      {% for key in audit_types|unique %}<option value="{{ key }}" {% if selected_type == key %}selected{% endif %}>{{ entities.get(key, {}).get('title', key|replace('_',' ')|title) }}</option>{% endfor %}
+      </select></label>
+      <label for="auditEntryId">Entry number<input id="auditEntryId" name="entity_id" type="number" min="1" step="1" value="{{ selected_id if selected_id is not none else '' }}" placeholder="All entry numbers"></label>
+      <button type="submit">Show history</button><a class="audit-reset" href="{{ url_for('edit_logs') }}">Clear filters</a>
+    </form>
+    <p class="audit-hint">Showing up to 500 recent records for these filters. Open a record to compare its changed fields.</p>
+  </section>
+  <section class="audit-history" aria-labelledby="audit-history-title">
+    <div class="audit-section-head"><div><p class="audit-kicker">02 / Review changes</p><h2 id="audit-history-title">Change timeline</h2></div><span class="audit-order">Newest → oldest</span></div>
+    <div class="audit-list">
+    {% for log in logs %}
+      <details class="audit-record" data-log-id="{{ log.id }}" {% if loop.first %}open{% endif %}>
+        <summary><div class="audit-record-summary"><div class="audit-meta"><time datetime="{{ log.changed_at.isoformat() }}">{{ log.changed_at.strftime('%d %b %Y · %H:%M:%S') }}</time><span class="audit-action">{{ log.action|replace('_',' ') }}</span></div><h3>{{ entities.get(log.entity_type, {}).get('title', log.entity_type|replace('_',' ')|title) }} #{{ log.entity_id }}</h3><p><strong>{{ log.username }}</strong> · {{ log.changed_fields|length }} field{{ '' if log.changed_fields|length == 1 else 's' }} changed</p><div class="audit-field-tags">{% for field in log.changed_fields %}<span>{{ field|replace('_',' ') }}</span>{% endfor %}</div></div><span class="audit-toggle">View changes</span></summary>
+        <div class="audit-record-body">
+          {% if log.entity_type in ['jobcard','product','outworker','outworker_rate'] %}<a class="audit-entry-link" href="{{ url_for('payroll_rates') if log.entity_type == 'outworker_rate' else url_for('edit_entry', entity_type=log.entity_type, entity_id=log.entity_id) }}">Open entry →</a>{% endif %}
+          <div class="audit-comparison"><table><caption class="audit-sr-only">Changed fields for {{ log.entity_type }} #{{ log.entity_id }}</caption><thead><tr><th scope="col">Changed field</th><th scope="col">Before</th><th scope="col">After</th></tr></thead><tbody>
+          {% for field in log.changed_fields %}<tr><th scope="row">{{ field|replace('_',' ')|title }}</th><td class="audit-before"><pre>{{ log.old_values.get(field)|tojson(indent=2) if field in log.old_values else '—' }}</pre></td><td class="audit-after"><pre>{{ log.new_values.get(field)|tojson(indent=2) if field in log.new_values else '—' }}</pre></td></tr>{% else %}<tr><td colspan="3">No individual changed fields were recorded.</td></tr>{% endfor %}
+          </tbody></table></div>
+          <details class="audit-raw"><summary>Full saved snapshots</summary><div class="audit-snapshots"><section><h4>Before</h4><pre>{{ log.old_values|tojson(indent=2) }}</pre></section><section><h4>After</h4><pre>{{ log.new_values|tojson(indent=2) }}</pre></section></div></details>
+        </div>
+      </details>
+    {% else %}<div class="audit-empty"><h3>No edits recorded{{ ' for these filters' if selected_type or selected_id else ' yet' }}.</h3><p>{{ 'Try another entry type or number, or clear the filters to see recent changes.' if selected_type or selected_id else 'Saved corrections will appear here with the user, time and before-and-after values.' }}</p>{% if selected_type or selected_id %}<a href="{{ url_for('edit_logs') }}">Show all edit history →</a>{% endif %}</div>{% endfor %}
+    </div>
+  </section>
+</div>
 {% endblock %}

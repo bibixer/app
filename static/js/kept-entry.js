@@ -19,6 +19,7 @@ document.querySelectorAll('.kept-product-form').forEach(form => {
     if (draft) {
       event.preventDefault();
       form.querySelector('.kept-recovery-preview').textContent = 'Save or clear this job’s unfinished physical return before recording kept pieces.';
+      window.AppUI?.notify('Save or clear this job’s unfinished physical return before recording kept pieces.', {type:'warning'});
       draft.focus();
     }
   });

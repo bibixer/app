@@ -18,6 +18,7 @@ class PageMarkup(HTMLParser):
         self.counts = {}
         self.ids = set()
         self.styles = []
+        self.scripts = []
         self.feed(html)
 
     def handle_starttag(self, tag, attrs):
@@ -27,6 +28,8 @@ class PageMarkup(HTMLParser):
             self.ids.add(values["id"])
         if tag == "link" and values.get("rel") == "stylesheet":
             self.styles.append(values.get("href", ""))
+        if tag == "script" and values.get("src"):
+            self.scripts.append(values["src"])
 
 
 class ApplicationUiTest(unittest.TestCase):
@@ -39,10 +42,10 @@ class ApplicationUiTest(unittest.TestCase):
         self.fixture.tearDown()
 
     def test_all_primary_pages_use_one_document_and_shared_design(self):
-        paths = ["/admin_dashord", "/bale_entery", "/jobcard", "/manual_jobcard",
-                 "/retune_product", "/outworker_report", "/product_report", "/cutter_report",
-                 "/find_edit", "/edit", "/edit/product/1", "/edit-logs", "/add_items",
-                 "/add_cutter", "/add_outworver", "/add_suppy", "/payroll", "/payroll/rates",
+        paths = ["/admin_dashord", "/manual_jobcard",
+                 "/retune_product", "/outworker_report",
+                 "/edit", "/edit/product/1", "/edit-logs", "/add_items",
+                 "/add_outworver", "/payroll", "/payroll/rates",
                  "/jobcard/ledger"]
         for path in paths:
             with self.subTest(page=path):
@@ -54,7 +57,7 @@ class ApplicationUiTest(unittest.TestCase):
                 self.assertEqual(page.counts.get("main"), 1)
                 self.assertIn("main-content", page.ids)
                 self.assertTrue(any("style/app.css" in href for href in page.styles))
-                for href in page.styles:
+                for href in page.styles + page.scripts:
                     if href.startswith("/static/"):
                         resource = self.client.get(href)
                         try:
@@ -66,7 +69,6 @@ class ApplicationUiTest(unittest.TestCase):
         self.fixture.card()
         pages = {
             "/manual_jobcard": {"masterName", "masterSuggestions", "manualRows", "submitManual", "result", "grandTotal"},
-            "/jobcard": {"custInput", "custSug", "billTable", "totalpic", "totalKg", "summaryContent"},
             "/job_retun?jobcard_id=1": {"jobName", "jobDate", "completedHistoryList"},
             "/jobcard/1/ledger": {"main-content"},
         }
@@ -75,6 +77,8 @@ class ApplicationUiTest(unittest.TestCase):
                 response = self.client.get(path)
                 self.assertEqual(response.status_code, 200)
                 self.assertTrue(expected_ids.issubset(PageMarkup(response.get_data(as_text=True)).ids))
+        self.assertEqual(self.client.get('/jobcard').status_code,302)
+        self.assertIn('/manual_jobcard',self.client.get('/jobcard').location)
         guest = self.app.test_client()
         page = PageMarkup(guest.get("/login").get_data(as_text=True))
         self.assertIn("main-content", page.ids)

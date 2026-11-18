@@ -4,13 +4,12 @@
 {% block main_class %}page-edit-entry{% endblock %}
 {% block content %}
 <header class="ui-heading"><div><p class="ui-kicker">Administration / Edit center</p><h1>Edit {{ entry.title }} #{{ entry.entity_id }}</h1><p class="ui-description">Update the entry details. Related records and the edit history are kept in sync.</p></div><a class="head-link" href="{{ url_for('edit_index') }}">← Edit center</a></header>
-  {% for message in get_flashed_messages() %}<div class="flash">{{ message }}</div>{% endfor %}
   <section class="ui-panel"><h2>Record details</h2><form method="post" autocomplete="off">
     {{ form.hidden_tag() }}
     <fieldset class="edit-fields" {% if entry.entity_type == 'jobcard' and (entry.paid or entry.kept_locked) %}disabled{% endif %}>
     <div class="grid">
       {% for field in entry.fields %}
-      {% if config.SIMPLE_WORKFLOW and entry.entity_type == 'product' and field.name in ['meters','size'] %}
+      {% if entry.entity_type == 'product' and field.name in ['meters','size'] %}
       <input type="hidden" name="{{ field.name }}" value="{{ field.value }}">
       {% else %}
       <label>{{ field.name.replace('_', ' ')|title }}

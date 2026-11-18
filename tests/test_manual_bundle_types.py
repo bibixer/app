@@ -4,7 +4,6 @@ import unittest
 
 from bundle_types import BUNDLE_TYPE_CHOICES, BUNDLE_TYPE_VALUES
 from data_entry import validate_manual_jobcard
-from form import Lump_data
 
 
 class ManualBundleTypeTest(unittest.TestCase):
@@ -14,8 +13,8 @@ class ManualBundleTypeTest(unittest.TestCase):
             "rows": [{"product": "VIMAL 1 2MTR", "pieces": 30, "count": 4, "type": type_value}],
         }
 
-    def test_inventory_form_and_manual_validation_share_choices(self):
-        self.assertEqual(tuple(Lump_data.bundle_type.kwargs["choices"]), BUNDLE_TYPE_CHOICES)
+    def test_manual_validation_uses_the_fixed_bundle_choices(self):
+        self.assertEqual(frozenset(value for value, _ in BUNDLE_TYPE_CHOICES), BUNDLE_TYPE_VALUES)
         for type_value in BUNDLE_TYPE_VALUES:
             with self.subTest(type_value=type_value):
                 self.assertTrue(validate_manual_jobcard(self.payload(type_value)))

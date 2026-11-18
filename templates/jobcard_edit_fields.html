@@ -1,5 +1,5 @@
 <input type="hidden" name="edit_lines" value="1">
-<datalist id="job-edit-products">{% for product in entry.products %}<option value="{{ product }}"></option>{% endfor %}</datalist>
+<datalist id="job-edit-products">{% for alias,product in entry.product_aliases.items() %}<option value="{{ alias }}" label="{{ product }}" data-canonical="{{ product }}"></option>{% endfor %}</datalist>
 {% if entry.paid %}<div class="notice warning">This job already has an issued payroll. Its paid quantities are locked.</div>{% endif %}
 {% if entry.kept_locked %}<div class="notice warning">Recovery money for this job has already been collected or deducted. Settled entries are locked to protect the account.</div>{% endif %}
 <div class="notice">One job card · 1. Given items · 2. Recorded returns · 3. Pieces kept. All corrections and linked recoveries save together.</div>

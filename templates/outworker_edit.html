@@ -5,7 +5,6 @@
 {% block setup_form %}
 <form method="post" autocomplete="off" novalidate>
   {{ form.hidden_tag() }}
-  {% for errors in form.errors.values() %}{% for error in errors %}<p class="notice danger" role="alert">{{ error }}</p>{% endfor %}{% endfor %}
   {% for field in entry.fields if field.name != 'aliases' %}
   <div class="mb-3">
     <label class="form-label" for="worker-edit-{{ field.name }}">{{ {'name':'Name','adders':'Address','number':'Mobile Number'}.get(field.name,field.name|title) }}</label>

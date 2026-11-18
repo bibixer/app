@@ -71,7 +71,7 @@
               returnInput.dataset.entryMethod = 'direct';
             }
           } else if (total > maxRemaining && total > 0) {
-            alert(`Total calculated (${total}) exceeds remaining balance (${maxRemaining}) for ${returnInput.getAttribute('data-name')}`);
+            window.AppUI?.notify(`Total calculated (${total}) exceeds remaining balance (${maxRemaining}) for ${returnInput.getAttribute('data-name')}`, {type:'error'});
           }
         }
 
@@ -378,26 +378,27 @@ const items = buildPayload();
             return (pieces || count) && (!positiveWholeNumber(pieces) || !positiveWholeNumber(count));
           });
           if (incompleteRow) {
-            alert(`Item #${item.item_id}: Complete each Quick Calc line with whole numbers before saving.`);
+            window.AppUI?.notify(`Item #${item.item_id}: Complete each Quick Calc line with whole numbers before saving.`, {type:'error'});
             (incompleteRow.piecesInput.value ? incompleteRow.countInput : incompleteRow.piecesInput).focus();
             return;
           }
           const sum = item.calculation_rows.reduce((total, row) => total + row.pieces * row.count, 0);
           if (sum !== item.returned) {
-            alert(`Item #${item.item_id}: Quick Calc total must match the Return quantity.`);
+            window.AppUI?.notify(`Item #${item.item_id}: Quick Calc total must match the Return quantity.`, {type:'error'});
             return;
           }
         }
 
         for (const item of items) {
           if (item.returned < 0) {
-            alert(`Item #${item.item_id}: Returned amount cannot be negative.`);
+            window.AppUI?.notify(`Item #${item.item_id}: Returned amount cannot be negative.`, {type:'error'});
             return;
           }
 
           if (item.returned > item.remaining) {
-            alert(
+            window.AppUI?.notify(
               `Item #${item.item_id}: Returned pieces (${item.returned}) cannot exceed remaining pieces (${item.remaining}).`,
+              {type:'error'},
             );
             return;
           }
@@ -420,12 +421,14 @@ const payload = {
 };
 
         if (payload.items.length === 0) {
-          alert("Please enter at least one return quantity.");
+          window.AppUI?.notify("Please enter at least one return quantity.", {type:'error'});
           return;
         }
 
         if (returnSubmitInFlight) return;
         returnSubmitInFlight = true;
+        const submitButton = document.querySelector('.btn-submit');
+        submitButton?.classList.add('app-saving');
 
         try {
           const response = await fetch("/summit-retune", {
@@ -437,8 +440,10 @@ const payload = {
           const data_R = await response.json();
           if (data_R.duplicate && !(data_R.jobData && data_R.jobData.jobData)) {
             notifyReturnWorkspace(data_R.remaining);
-            alert(data_R.message);
-            window.location.replace(`/job_retun?jobcard_id=${encodeURIComponent(JOB_CARD.jobcard_id)}${window.RETURN_EMBEDDED ? '&embedded=1' : ''}`);
+            window.AppUI?.notify(data_R.message || 'This return was already saved.', {type:'info'});
+            const destination = `/job_retun?jobcard_id=${encodeURIComponent(JOB_CARD.jobcard_id)}${window.RETURN_EMBEDDED ? '&embedded=1' : ''}`;
+            if (window.AppUI?.navigate) window.AppUI.navigate(destination, {replace:true});
+            else window.location.replace(destination);
             return;
           }
           if (data_R.success) {
@@ -449,17 +454,20 @@ const payload = {
             savedPage.searchParams.set('saved_return', payload.request_id);
             if (window.RETURN_EMBEDDED) savedPage.searchParams.set('embedded', '1');
             if (data_R.jobData.print_warning) savedPage.searchParams.set('csv_warning', '1');
-            window.location.replace(savedPage.href);
+            if (window.AppUI?.navigate) window.AppUI.navigate(savedPage.href, {replace:true});
+            else window.location.replace(savedPage.href);
           } else {
             returnSubmitInFlight = false;
-            alert(data_R.message || "Return could not be saved. Refresh this job card to see its latest balance.");
-            if (data_R.retryable) return;
-            window.location.reload();
+            window.AppUI?.notify(data_R.message || "Return could not be saved. Refresh this job card to see its latest balance.", {type:'error'});
+            // Preserve the draft and request key; a failed save must not silently
+            // discard the user's quantities or automatically submit them again.
           }
         } catch (error) {
           returnSubmitInFlight = false;
           console.error("Error submitting return:", error);
-          alert("Error submitting return. Please try again.");
+          window.AppUI?.notify("Could not confirm the return save. Your entries are still here; retry with the same request key.", {type:'error'});
+        } finally {
+          submitButton?.classList.remove('app-saving');
         }
 
       }

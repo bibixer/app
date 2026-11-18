@@ -9,8 +9,24 @@
   {% block page_css %}{% endblock %}
   <link rel="stylesheet" href="{{ url_for('static', filename='style/app.css', v='20261108-waves') }}">
   {% block head %}{% endblock %}
+  <link rel="stylesheet" href="{{ url_for('static',filename='style/suggestions.css',v='20261118') }}">
+  <script defer src="{{ url_for('static',filename='js/suggestions.js',v='20261118-focus') }}"></script>
+  <link rel="stylesheet" href="{{ url_for('static',filename='style/notifications.css',v='20261118-snap-focus') }}">
+  <link rel="stylesheet" href="{{ url_for('static',filename='style/ui-sounds.css',v='20261118') }}">
+  <script defer src="{{ url_for('static',filename='js/ui-sounds.js',v='20261118-jrpg-palette') }}"></script>
+  <script defer src="{{ url_for('static',filename='js/notifications.js',v='20261118-sound') }}"></script>
+  {% if not embedded %}<script src="{{ url_for('static',filename='js/motion-pairs.js',v='20261118-full32') }}"></script>{% endif %}
+  <link rel="stylesheet" href="{{ url_for('static',filename='style/page-transitions.css',v='20261118-designed32') }}">
+  <script defer src="{{ url_for('static',filename='js/page-transitions.js',v='20261118-login-confirm') }}"></script>
 </head>
-<body class="app-ui {% if not current_user.is_authenticated %}is-guest{% endif %} {% block body_class %}{% endblock %}"
+{% if request.path.startswith('/payroll') %}{% set transition_style = 'payroll' %}
+{% elif request.path in ['/retune_product','/job_retun'] or request.path.startswith('/returns/') or request.path.endswith('/kept') %}{% set transition_style = 'returns' %}
+{% elif request.path.startswith('/dashboard') or request.path in ['/admin_dashord','/outworker_report','/outworker/jobs','/jobcard/ledger'] or request.path.endswith('/ledger') %}{% set transition_style = 'reports' %}
+{% elif request.path in ['/manual_jobcard','/jobcard'] or request.path.startswith('/edit/jobcard/') %}{% set transition_style = 'jobs' %}
+{% else %}{% set transition_style = 'setup' %}{% endif %}
+<body class="app-ui {% if request.endpoint == 'login' and request.method == 'POST' %}no-page-motion{% endif %} {% if not current_user.is_authenticated %}is-guest{% endif %} {% block body_class %}{% endblock %}"
+  data-page-transition="{{ transition_style }}"
+  data-page-id="{{ request.endpoint or 'error' }}{% if request.endpoint == 'edit_entry' %}-{{ request.view_args.get('entity_type','record') }}{% endif %}"
   {% if current_user.is_authenticated %}
   data-shortcut-job="{{ url_for('manual_job_card') }}"
   data-shortcut-return="{{ url_for('retune_product') }}"
@@ -18,13 +34,32 @@
   {% if current_user.role == 1 %}data-shortcut-payroll="{{ url_for('outworker_payroll') }}"{% endif %}
   {% endif %}>
   <a class="ui-skip" href="#main-content">Skip to content</a>
+  <div class="app-page-cut" aria-hidden="true">
+    {% for index in range(6) %}<div class="scene-panel" style="--i:{{ index }}"></div>{% endfor %}
+    <div class="scene-flare"></div><div class="scene-mark"><b>BH</b><span>WORK<br>IN MOTION</span></div>
+  </div>
+  <div id="appNotifications" class="app-notifications" role="region" aria-label="Notifications"></div>
+  {% if not current_user.is_authenticated and not embedded %}<button type="button" class="app-sound-toggle app-sound-guest" data-sound-toggle aria-label="Sound effects" aria-pressed="true">♫ Sound on</button>{% endif %}
   {% if current_user.is_authenticated and not embedded %}{% set id = current_user.role %}{% include 'menu_bar.html' %}{% endif %}
   <div class="ui-waves" aria-hidden="true"><div class="ui-wave"></div><div class="ui-wave"></div><div class="ui-wave"></div></div>
   <main id="main-content" class="ui-scope ui-shell {% block main_class %}{% endblock %}" tabindex="-1">
+    {% with notices = get_flashed_messages(with_categories=true) %}{% if notices %}
+    <div class="app-flash-fallback" data-app-flashes>
+      {% for category,message in notices %}<div class="notice {{ category }}" data-app-notice="{{ category }}" role="{{ 'status' if category in ['success','info','message'] else 'alert' }}">{{ message }}</div>{% endfor %}
+    </div>
+    {% endif %}{% endwith %}
+    {% set validation_form = current_form if current_form is defined else form if form is defined else none %}
+    {% if validation_form and validation_form.errors %}
+    <div class="app-flash-fallback" data-app-flashes>
+      {% for name,errors in validation_form.errors.items() %}{% for error in errors %}
+      <p class="notice danger" data-app-notice="error" role="alert">{{ validation_form[name].label.text }}: {{ error }}</p>
+      {% endfor %}{% endfor %}
+    </div>
+    {% endif %}
     {% block notifications %}{% endblock %}
     {% block content %}{% endblock %}
   </main>
-  <script defer src="{{ url_for('static', filename='js/app-ui.js', v='20261107') }}"></script>
+  <script defer src="{{ url_for('static', filename='js/app-ui.js', v='20261118-transitions') }}"></script>
   {% block scripts %}{% endblock %}
 </body>
 </html>

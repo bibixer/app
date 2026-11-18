@@ -23,10 +23,14 @@ from modes import JobKeptProduct
 
 CORE_ENTITIES = frozenset({'jobcard', 'product', 'outworker'})
 
-DISABLED_ENDPOINTS = frozenset({
-    'bale_entery', 'lump_home', 'bundle_entery', 'add_cuter', 'add_suppy',
-    'cutter_report', 'product_report', 'find_edit', 'submit_jobcard',
-})
+RETIRED_ROUTES = {
+    'bale_entery': '/bale_entery', 'lump_home': '/lumpentry',
+    'bundle_entery': '/bundle_entery', 'add_cuter': '/add_cutter',
+    'add_suppy': '/add_suppy', 'cutter_report': '/cutter_report',
+    'product_report': '/product_report', 'find_edit': '/find_edit',
+    'submit_jobcard': '/submit-jobcard',
+}
+DISABLED_ENDPOINTS = frozenset(RETIRED_ROUTES)
 
 
 def job_overview():
@@ -353,9 +357,9 @@ def save_user_access(values, token, actor_id):
             try:
                 role = int(values.get('role', ''))
             except (ValueError, TypeError):
-                raise ValueError('Select Administrator or Operator.')
-            if role not in (1, 2):
-                raise ValueError('Select Administrator or Operator.')
+                raise ValueError('New accounts must have Administrator access.')
+            if role != 1:
+                raise ValueError('The Operator role is no longer available. New accounts must be Administrators.')
             name = str(values.get('username', '')).strip().lower()
             password = values.get('password', '')
             if not name or len(name) > 100 or any(c.isspace() for c in name):
@@ -369,18 +373,20 @@ def save_user_access(values, token, actor_id):
             db.session.add(user)
             db.session.flush()
         elif action == 'update':
-            try:
-                role = int(values.get('role', ''))
-            except (ValueError, TypeError):
-                raise ValueError('Select Administrator or Operator.')
-            if role not in (1, 2):
-                raise ValueError('Select Administrator or Operator.')
             target_id = record_id(values.get('user_id'))
             user = db.session.get(User, target_id) if target_id else None
             if user is None:
                 raise ValueError('User not found.')
             if values.get('version') != user_version(user):
                 raise ValueError('This account changed. Reload and review before saving.')
+            try:
+                role = 1 if values.get('grant_admin') == '1' else int(values.get('role', user.role))
+            except (ValueError, TypeError):
+                raise ValueError('Select valid account access.')
+            # Keep legacy restrictions unless an administrator explicitly upgrades
+            # the account. Do not offer or assign the retired role to other users.
+            if role != 1 and role != user.role:
+                raise ValueError('The Operator role is no longer available. Disable the account to remove access.')
             if user.id == actor.id and role != 1:
                 raise ValueError('You cannot remove your own administrator access.')
             old_role = user.role
@@ -447,10 +453,17 @@ def save_user_access(values, token, actor_id):
 
 
 def register_simple_workflow(app, admin_required):
+    # Compatibility URLs only: no retired V1 handler or write implementation is
+    # registered, even if an older config file sets SIMPLE_WORKFLOW=False.
+    def retired_workflow():
+        return render_template('disabled_workflow.html', message='This workflow has been retired. Use manual job cards.'), 410
+
+    for endpoint, path in RETIRED_ROUTES.items():
+        app.add_url_rule(path, endpoint, retired_workflow,
+                         methods=['POST'] if endpoint == 'submit_jobcard' else ['GET', 'POST'])
+
     @app.before_request
     def enforce_manual_workflow():
-        if not app.config.get('SIMPLE_WORKFLOW'):
-            return
         endpoint = request.endpoint
         disabled = endpoint in DISABLED_ENDPOINTS
         if endpoint in {'edit_entry', 'edit_search'}:
@@ -458,7 +471,7 @@ def register_simple_workflow(app, admin_required):
                       else request.args.get('type'))
             disabled = entity not in CORE_ENTITIES and entity != 'movement'
         if disabled:
-            message = 'This workflow is disabled in V2. Use manual job cards.'
+            message = 'This workflow has been retired. Use manual job cards.'
             if endpoint in {'submit_jobcard', 'edit_search'}:
                 return jsonify(success=False, code=410, message=message), 410
             return render_template('disabled_workflow.html', message=message), 410

@@ -1,6 +1,7 @@
 """Admin screens for piece rates, advances and returned-piece payroll."""
 
-from flask import render_template, request, redirect, url_for, flash, abort
+from flask import render_template, request, redirect, url_for, flash, abort, jsonify
+import json
 from flask_login import login_required, current_user
 from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
 
@@ -12,7 +13,7 @@ from master_aliases import master_name_mapping, master_name_options, resolve_mas
 from modes import (db, Outworker, Item_data, Jobcard, OutworkerRate, OutworkerPayroll,
                    OutworkerPayrollJob, OutworkerAdvanceRecovery)
 from payroll_service import (PAYMENT_METHODS, worker_label, money, money_input, rate_text, rate_version,
-                             save_rate, record_advance, payable_job_quotes,
+                             save_rate, save_rate_page_changes, record_advance, payable_job_quotes,
                              payroll_preview, issue_payroll, payment_account, advance_entries,
                              browser_payroll_snapshot, receive_advance, receive_selected_advances)
 
@@ -37,6 +38,20 @@ def register_payroll_routes(app, admin_required):
         product_id = request.values.get("product_id", type=int)
         product = (db.session.get(Item_data, product_id) if record_id(product_id) else None) if product_id else (products[0] if products else None)
         if request.method == "POST":
+            if request.form.get('action') == 'save_and_switch':
+                if not form.validate_on_submit():
+                    return jsonify(success=False, message='This form expired. Reload after keeping a copy of your changes.'), 400
+                try:
+                    raw_changes = request.form.get('changes', '')
+                    if len(raw_changes) > 20000:
+                        raise ValueError('Too many changes supplied.')
+                    changes = json.loads(raw_changes)
+                    next_id = request.form.get('next_product_id', type=int)
+                    save_rate_page_changes(product_id, changes, next_id, form.submission_token.data, current_user)
+                    flash('Product rates and values saved. The selected product is now open.', 'success')
+                    return jsonify(success=True, next_url=url_for('payroll_rates', product_id=next_id))
+                except (ValueError, TypeError) as error:
+                    return jsonify(success=False, message=str(error)), 400
             if not form.validate_on_submit():
                 flash("This form expired. Reload the page and try again.", "danger")
             else:

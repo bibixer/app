@@ -4,11 +4,11 @@ from flask import flash, render_template, redirect, url_for,session,request, jso
 from form import SimpleProductForm, WriteForm
 from kept_products import record_kept_product
 from simple_workflow import CORE_ENTITIES, register_simple_workflow, dashboard_period, dashboard_movement_details, dashboard_job_balances
-from form import Lump_data, bundle_invadata, Item_data, Outworker_form, Cutter_form, Return_form, Login_form, Date_form, Date_form_with_name,bale_data_form,party_name,Find_and_edit,EditEntryForm
+from form import Outworker_form, Return_form, Login_form, Date_form_with_name, EditEntryForm
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user, AnonymousUserMixin
-from data_entry import add_cutter,add_items,add_outworker_db,add_jobcard,add_manual_jobcard,in_move_entery,bale_data_entry,add_party
-from data_Process import get_serch_data, get_job_card_data_creation, get_jobcard_return_data, get_jobcard_ledger, \
-    get_current_week_range, home_dashboard,get_cutter_report_data,outworker_name,outworker_job_ledger,product_data,find_edit_data
+from data_entry import add_items, add_outworker_db, add_manual_jobcard, in_move_entery
+from data_Process import (get_jobcard_return_data, get_jobcard_ledger, get_current_week_range,
+                          outworker_name, outworker_job_ledger)
 from modes import User, Jobcard, Jobmovement, Item_data as ProductModel, Outworker
 from edit_service import ENTITY_CONFIG, edit_context, save_entry, audit_logs, search_entries
 from item_aliases import resolve_item_name, item_name_mapping
@@ -33,20 +33,6 @@ def _write_json():
         return None, (jsonify(success=False, code=405,
                               message="A valid request ID and JSON data are required. Reload the page."), 400)
     return data, None
-
-
-def reset_session(flow:int):
-    # remove all bale lever1
-    # remove all lump  vevel
-    if flow== 1:
-        keys_roremove =  ["bundle_data","current_bundle","bundles","sno","bale_data","current_lump","sno_lump","lump_workflow_id"]
-    if flow == 2:
-        keys_roremove = ["bundle_data", "current_bundle", "bundles", "sno", "lump_workflow_id"]
-        if  (str(type(session['bale_data']['packing_date']))) == "<class 'datetime.datetime'>":
-            session['bale_data']['packing_date'] =  session['bale_data']['packing_date'].strftime("%a, %d %b %Y")
-    for key in list(session.keys()):
-        if key in keys_roremove:
-            session.pop(key)
 
 
 def register_routes(app,db):
@@ -105,7 +91,7 @@ def register_routes(app,db):
             if current_user.role != 1:
                 if request.endpoint in JSON_ENDPOINTS:
                     return jsonify(success=False, code=403, message="Admin access only."), 403
-                flash("Admin access only")
+                flash("Administrator access is required for this page.", 'danger')
                 return redirect(url_for("home"))
             return func(*args, **kwargs)
 
@@ -116,7 +102,31 @@ def register_routes(app,db):
         db.session.rollback()
         if request.endpoint in JSON_ENDPOINTS:
             return jsonify(success=False, code=500, message="The entry could not be saved. Retry with the same request ID."), 500
-        return error
+        g._login_user = AnonymousUserMixin()
+        return render_template('error_page.html', code=500, heading='Something went wrong',
+                               message='The request could not be completed. If you were saving, return to the entry and retry with the same request key.'), 500
+
+    @app.errorhandler(400)
+    @app.errorhandler(403)
+    @app.errorhandler(404)
+    @app.errorhandler(405)
+    def page_error(error):
+        messages = {
+            400: ('Check this request', 'This request is invalid or the form has expired. Review the entry and try again.'),
+            403: ('Access not allowed', 'Your account does not have permission to open this page or perform this action.'),
+            404: ('Page or entry not found', 'This page or record could not be found. Check its number or open the workspace.'),
+            405: ('Action not available', 'This action is not available on this page. Use the buttons in the app.'),
+        }
+        heading, message = messages[error.code]
+        # Preserve status codes and protocol headers, including Allow on a 405.
+        response = error.get_response()
+        if request.endpoint in JSON_ENDPOINTS:
+            response.set_data(jsonify(success=False, code=error.code, message=message).get_data())
+            response.content_type = 'application/json'
+        else:
+            response.set_data(render_template('error_page.html', code=error.code, heading=heading, message=message))
+            response.content_type = 'text/html; charset=utf-8'
+        return response
 
     register_payroll_routes(app, oly_admin)
     register_simple_workflow(app, oly_admin)
@@ -134,200 +144,11 @@ def register_routes(app,db):
         user = (User.query.filter_by(auth_id=user_id).first()
                 if isinstance(user_id, str) and len(user_id) == 64 else None)
         return user if user and user.is_active else None
-    @app.route("/bale_entery",methods=["GET", "POST"])
-    @login_required
-    def bale_entery():
-        form_name  = " bale entery "
-        data_autofill = get_serch_data()
-        current_form = bale_data_form()
-        if current_form.validate_on_submit():
-            if current_form.cuter_name.data not in data_autofill["cuter_data"]:
-                flash("select cutter name from blow","warning")
-                return redirect(url_for("bale_entery"))
-            canonical_product = resolve_item_name(current_form.product_name.data)
-            if not canonical_product:
-                flash("select product name from blow","warning")
-                return redirect(url_for("bale_entery"))
-            if current_form.party_name.data not in data_autofill["party_data"]:
-                flash("select party name from blow","warning")
-                return redirect(url_for("bale_entery"))
-
-            ### do some date vlaidation
-
-        ## data prosessing
-            data = current_form.data
-            data["product_name"] = canonical_product
-            data.pop("submission_token", None)
-            data.pop("csrf_token", None)
-            data['packing_date'] = data['packing_date'].strftime("%a, %d %b %Y")
-            reset_session(1)
-            session["bale_data"] = data
-            session["current_lump"] = 1
-            session["sno_lump"] = 0
-            return  redirect(url_for("lump_home"))
-
-        return render_template(
-            "user.html",
-            form_name=form_name,
-            current_form=current_form,
-            data=data_autofill,
-            id=current_user.role
-        )
-    @app.route("/lumpentry", methods=["GET", "POST"])
-    @login_required
-    def lump_home():
-        if (
-                "bale_data" not in session
-                or "current_lump" not in session
-                or "sno_lump" not in session
-        ):
-            return redirect(url_for("bale_entery"))
-        total = int(session["bale_data"]["number_lup"])
-        current = int(session["current_lump"])
-        if current > total:
-            reset_session(1)
-            flash("You have successfully entered the bale.", "success")
-            return redirect(url_for('bale_entery'))
-
-        form_name = f"lump entry ({current}/{total}) "
-        current_form = Lump_data()
-        if request.method == "GET" and session.get("inventory_save_failed"):
-            for name, value in session.get("bundle_data", {}).items():
-                if name in current_form._fields and name not in {"csrf_token", "submission_token", "submit"}:
-                    current_form[name].data = value
-            current_form.submission_token.data = session.get("lump_workflow_id")
-        # data to auto fill
-        data_autofill = get_serch_data()
-        if not current_form.validate_on_submit():
-            current_form.party_name.data = session["bale_data"]["party_name"]
-
-            current_form.cuter_name.data = session["bale_data"]["cuter_name"]
-            current_form.product_name.data =  session["bale_data"]["product_name"]
-        if current_form.validate_on_submit():
-            data = current_form.data.copy()
-            lump_workflow_id = data.pop("submission_token", None)
-            if current_form.cuter_name.data not in data_autofill["cuter_data"]:
-                flash("select cutter name from blow","warning")
-                return redirect(url_for("lump_home"))
-            canonical_product = resolve_item_name(current_form.product_name.data)
-            if not canonical_product:
-                flash("select product name from blow","warning")
-                return redirect(url_for("lump_home"))
-            if current_form.party_name.data not in data_autofill["party_data"]:
-                flash("select party name from blow","warning")
-                return redirect(url_for("lump_home"))
-            data.pop("csrf_token", None)
-            data["product_name"] = canonical_product
-
-            ### do some date vlaidation
-
-            # =
-            if data['numbers_of_bundles'] > 20 :
-                    flash("you can not enter more then 20")
-                    return redirect(url_for("lump_home"))
-
-                # 🔄 reset any old flow
-            reset_session(2)
-            session.pop("inventory_save_failed", None)
-
-                # 🚀 initialize bundle workflow
-            session["bundle_data"] = data
-            session["current_bundle"] = 1
-            session["bundles"] = {}
-            session["sno"]=0
-            session["lump_workflow_id"] = lump_workflow_id
-            session["current_lump"] = current + 1
-            return redirect(url_for("bundle_entery"))
-
-
-
-        return render_template(
-            "user.html",
-            form_name=form_name,
-            current_form=current_form,
-            data=data_autofill,
-            id=current_user.role
-        )
-    @app.route("/bundle_entery", methods=["GET", "POST"])
-    @login_required
-    def bundle_entery():
-
-        # 🔐 Guard: block direct access / broken session
-        if (
-                "bundle_data" not in session
-                or "current_bundle" not in session
-                or "bundles" not in session
-                or "sno" not in session
-                or not session.get("lump_workflow_id")
-        ):
-            return redirect(url_for("lump_home"))
-
-        total = int(session["bundle_data"]["numbers_of_bundles"])
-        current = int(session["current_bundle"])
-
-        # ✅ All bundles completed
-        if current > total:
-            all_data = {
-
-
-                "main": session["bundle_data"],
-                "bundles": session["bundles"],
-                "bale_data" :session["bale_data"]
-            }
-
-            # print(all_data)
-            result = bale_data_entry(all_data, current_user, session.get("lump_workflow_id"))
-            if result not in (101, 409):
-                session["current_lump"] = max(1, int(session.get("current_lump", 2)) - 1)
-                session["inventory_save_failed"] = True
-                flash("Inventory was not saved. Your draft is retained; review the lump and bundle details and retry.", "danger")
-                return redirect(url_for("lump_home"))
-            reset_session(2)
-            if result == 409:
-                flash("This lump was already saved. Duplicate request ignored.", "warning")
-                return redirect(url_for("lump_home"))
-            else:
-                flash("You have successfully entered the bundle.", "success")
-                return redirect(url_for("lump_home"))
-
-
-        form_name = f"Bundle Entry ({current}/{total})"
-        current_form = bundle_invadata()
-        if not current_form.validate_on_submit():
-            if session['sno'] != 0:
-                current_form.no_of_so.data = session['sno'] +1
-            if  session["bundle_data"]['bundle_type'] == "goodCUT 20 picset" or  session["bundle_data"]['bundle_type'] == "fent 20 picset":
-                current_form.no_of_pics.data = 20
-
-
-        if current_form.validate_on_submit():
-            data = current_form.data.copy()
-            data.pop("submission_token", None)
-            data.pop("csrf_token", None)
-            ### do some date vlaidation
-
-            # =
-
-            # ⚠️ use string keys for session safety
-            session["bundles"][str(current)] = data
-            session["current_bundle"] = current + 1
-            session["sno"]  = current_form.no_of_so.data
-            return redirect(url_for("bundle_entery"))
-
-        return render_template(
-            "user.html",
-            form_name=form_name,
-            current_form=current_form,
-            id=current_user.role
-        )
     @app.route("/jobcard", methods=["GET", "POST"])
     @login_required
     @job_operator
     def job_card():
-        if app.config.get('SIMPLE_WORKFLOW'):
-            return redirect(url_for('manual_job_card'))
-        job_card_data_c = get_job_card_data_creation()
-        return render_template("jobcard.html",id=current_user.role,data = job_card_data_c)
+        return redirect(url_for('manual_job_card'))
 
     @app.route("/manual_jobcard")
     @login_required
@@ -373,20 +194,17 @@ def register_routes(app,db):
     @oly_admin
     def add_item():
         form_name = "Item setup"
-        current_form = SimpleProductForm() if app.config.get('SIMPLE_WORKFLOW') else Item_data()
+        current_form = SimpleProductForm()
 
         if current_form.validate_on_submit():
             data = current_form.data.copy()
             token = data.pop("submission_token")
-            if app.config.get('SIMPLE_WORKFLOW'):
-                data.update(size=0, meter=0)
+            data.update(size=0, meter=0)
             items = add_items(data,current_user,token)
             if items == 101 :
                 flash(f"You have successfully added  {data['name']} .", "success")
-                if app.config.get('SIMPLE_WORKFLOW'):
-                    product = ProductModel.query.filter_by(name=resolve_item_name(data['name'])).one()
-                    return redirect(url_for('payroll_rates', product_id=product.id))
-                return redirect(url_for("add_item"))
+                product = ProductModel.query.filter_by(name=resolve_item_name(data['name'])).one()
+                return redirect(url_for('payroll_rates', product_id=product.id))
             elif items == 409:
                 flash("Duplicate request ignored; this product was already submitted.", "warning")
                 return redirect(url_for("add_item"))
@@ -400,32 +218,6 @@ def register_routes(app,db):
             form_name=form_name,
             current_form=current_form,id=current_user.role,
             item_rows=ProductModel.query.order_by(ProductModel.name).all(),
-        )
-    @app.route("/add_suppy", methods=["GET", "POST"])
-    @login_required
-    @oly_admin
-    def add_suppy():
-        form_name = "add new suppy"
-        current_form = party_name()
-
-        if current_form.validate_on_submit():
-            data = current_form.data.copy()
-            token = data.pop("submission_token")
-            party = add_party(data, current_user,token)
-            if party == 101:
-                flash(f"You have successfully added  {data['name']} .", "success")
-                return redirect(url_for("add_suppy"))
-            elif party == 409:
-                flash("Duplicate request ignored; this party was already submitted.", "warning")
-                return redirect(url_for("add_suppy"))
-            elif party["or"] == False:
-                flash(f"call  badx {party['exception']}")
-                return redirect(url_for("add_suppy"))
-
-        return render_template(
-            "user.html",
-            form_name=form_name,
-            current_form=current_form, id=current_user.role
         )
     @app.route("/add_outworver", methods=["GET", "POST"])
     @login_required
@@ -454,54 +246,6 @@ def register_routes(app,db):
             form_name=form_name,
             current_form=current_form,id=current_user.role
         )
-    @app.route("/add_cutter", methods=["GET", "POST"])
-    @login_required
-    @oly_admin
-    def add_cuter():
-        form_name = "new cutter"
-        current_form = Cutter_form()
-
-        if current_form.validate_on_submit():
-            data = current_form.data.copy()
-            token = data.pop("submission_token")
-            add_cu = add_cutter(data,current_user,token)
-            if add_cu == 101 :
-                flash(f"You have successfully added  {data['name']} cutter.", "success")
-                return redirect(url_for("add_cuter"))
-            elif add_cu == 409:
-                flash("Duplicate request ignored; this cutter was already submitted.", "warning")
-                return redirect(url_for("add_cuter"))
-            elif  add_cu["or"] == False :
-                flash(f"call  badx{add_cu["exception"]}")
-
-                return redirect(url_for("add_cuter"))
-        return render_template(
-            "user.html",
-            form_name=form_name,
-            current_form=current_form,id=current_user.role
-        )
-    @app.route("/submit-jobcard",methods=["POST"])
-    @login_required
-    @oly_admin
-    def submit_jobcard():
-        data, error = _write_json()
-        if error:
-            return error
-        ok = add_jobcard(data,current_user,data.get("request_id") if isinstance(data, dict) else None)
-        # print(ok)
-        if type(ok) == dict:
-            if ok["code"] == 101:
-                return jsonify(success=True, message="Data saved", jobData=ok["jobData"])
-        elif ok ==401:
-            return jsonify(success=False, code=401, message="Master name not found. Select an outworker from the list."), 400
-        elif ok == 403:
-            return jsonify(success=False, code=403, message="A bundle was changed or already issued. Refresh the job card."), 409
-        elif ok == 405:
-            return jsonify(success=False, code=405, message="Job card data is invalid."), 400
-        elif ok == 409:
-            receipt = saved_receipt(data['request_id'], 'add_jobcard', current_user)
-            return jsonify(success=True, duplicate=True, message="Job card already saved; original receipt restored.", **receipt)
-        return jsonify(success=False, code=500, message="Job card could not be saved."), 500
     @app.route("/retune_product", methods=["GET", "POST"])
     @login_required
     @job_operator
@@ -513,17 +257,17 @@ def register_routes(app,db):
             return redirect(url_for("retune_product"))
 
         elif ok == 403:
-            flash("item do not macha base" )
+            flash("The item does not match this job card.", 'danger')
             return redirect(url_for("retune_product"))
 
         elif ok == 405:
-            flash("send data not right")
+            flash("Return data is invalid. Check the quantities and try again.", 'danger')
             return redirect(url_for("retune_product"))
         elif ok==401:
-            flash("name of master not in data base")
+            flash("The outworker could not be found. Select a name from the suggestions.", 'danger')
             return redirect(url_for("retune_product"))
         elif ok == 404:
-            flash("data issue")
+            flash("The return record could not be found. Check the job card number.", 'danger')
             return redirect(url_for("retune_product"))
         if current_form.validate_on_submit():
             if current_form.jobcard_id.data and current_form.jobcard_id.data > 0:
@@ -626,7 +370,8 @@ def register_routes(app,db):
     def jobcard_ledger(jobcard_id):
         detail = get_jobcard_ledger(jobcard_id)
         if detail is None:
-            return "Job card not found.", 404
+            return render_template('error_page.html', code=404, heading='Job card not found',
+                                   message='Job card not found. Check its number and try again.'), 404
         return render_template("jobcard_ledger.html", detail=detail, id=current_user.role)
     @app.route("/summit-retune", methods=["POST"])
     @login_required
@@ -637,10 +382,8 @@ def register_routes(app,db):
             return error
 
         res = in_move_entery(data,current_user,data.get("request_id") if isinstance(data, dict) else None)
-        # print(res)
         if type(res) == dict:
             if res["code"] == 101:
-             # print(res)
                 latest = get_jobcard_return_data(data['jobcard_id'])
                 remaining = sum(item['issued'] for item in latest['items'])
                 return jsonify(success=True, message="Data saved",jobData=res,remaining=remaining)
@@ -667,41 +410,13 @@ def register_routes(app,db):
     @login_required
     @oly_admin
     def admin_dashord():
-        if app.config.get('SIMPLE_WORKFLOW'):
-            try:
-                overview = dashboard_period(request.args)
-            except (ValueError, OverflowError):
-                flash('Choose valid From and To dates, with From on or before To.', 'danger')
-                return redirect(url_for('admin_dashord'))
-            return render_template('simple_dashboard.html', id=current_user.role, overview=overview)
-        range_data = get_current_week_range()
-        date_from = Date_form()
-        # Pre-fill form with current week range on GET
-        if not date_from.is_submitted():
-            date_from.date_from.data = range_data["from_date"].date()
-            date_from.date_to.data = range_data["to_date"].date()
-        elif not date_from.validate():
-            flash("Enter a valid start and end date.", "danger")
-            return redirect(url_for("admin_dashord"))
-        dash_bord_data = home_dashboard(date_from)
-        if dash_bord_data == "invalid_range":
-            flash("⚠️ 'From Date' cannot be after 'To Date'.", "danger")
-            return redirect(url_for("admin_dashord"))
-        inflow_points = sorted(
-            (point for point in dash_bord_data["inflow_pie"][0]["points"] if point["quantity"] > 0),
-            key=lambda point: point["quantity"], reverse=True,
-        )
-        outflow_points = sorted(
-            (point for point in dash_bord_data["outflow_pie"][0]["points"] if point["quantity"] > 0),
-            key=lambda point: point["quantity"], reverse=True,
-        )
-        return render_template(
-            "admin_dashboard.html", id=current_user.role,
-            date_from=date_from, dash_bord_data=dash_bord_data,
-            inflow_points=inflow_points, outflow_points=outflow_points,
-            max_inflow=max((point["quantity"] for point in inflow_points), default=1),
-            max_outflow=max((point["quantity"] for point in outflow_points), default=1),
-        )
+        try:
+            overview = dashboard_period(request.args)
+        except (ValueError, OverflowError):
+            flash('Choose valid From and To dates, with From on or before To.', 'danger')
+            return redirect(url_for('admin_dashord'))
+        return render_template('simple_dashboard.html', id=current_user.role, overview=overview)
+
     @app.route('/dashboard/movements')
     @login_required
     @oly_admin
@@ -724,45 +439,6 @@ def register_routes(app,db):
         return render_template('dashboard_movements.html', id=current_user.role,
                                overview=overview, kind=kind, entries=entries, balances=balances,
                                view=view, sort_by=sort_by, product_filter=product_filter)
-
-    @app.route("/cutter_report",methods=["GET", "POST"])
-    @login_required
-    @oly_admin
-    def cutter_report():
-        name_data_form =  Date_form_with_name()
-        range_data = get_current_week_range()
-        cuter_name = get_serch_data()["cuter_data"]
-        cuter_name.append("all_cutter")
-        if not name_data_form.is_submitted():
-            name_data_form.date_from.data = range_data["from_date"].date()
-            name_data_form.date_to.data = range_data["to_date"].date()
-            name_data_form.name.render_kw['placeholder']= 'Enter cutter Name'
-        if name_data_form.validate_on_submit():
-            if name_data_form.name.data in cuter_name:
-                if name_data_form.date_from.data > name_data_form.date_to.data:
-                    flash("date range is wong  data from is gater then date to", "danger")
-                    return  redirect(url_for("cutter_report"))
-
-
-                result = get_cutter_report_data(name_data_form,current_user)
-                if result == 404:
-                    flash("Cutter Report user isue", "danger")
-
-                    return redirect(url_for("cutter_report"))
-
-                return render_template("admin.html", date_from=name_data_form, type="CUTTER_Report",
-                                       name=cuter_name, backend_data=result)
-
-
-            else:
-
-                flash("Cutter name not in list", "danger")
-
-                return redirect(url_for("cutter_report"))
-
-
-
-        return render_template("admin.html", date_from=name_data_form, type="CUTTER_Report",name=cuter_name)
 
     @app.route('/outworker/jobs')
     @login_required
@@ -832,27 +508,11 @@ def register_routes(app,db):
         elif name_data_form.is_submitted():
             flash("Enter an outworker and valid From and To dates.", "danger")
         return render_template(
-            "outworker_job_report.html", id=current_user.role,
+            "outworker_job_report.html", id=current_user.role, master_options=master_name_options(),
             current_form=name_data_form, names=outworker_name_data, report=report,
             pending_returns=pending_returns,
             selected_worker_id=record_id(report['name'].split('***', 1)[0]) if report else None,
         )
-
-    @app.route("/product_report", methods=["GET", "POST"])
-    @login_required
-    @oly_admin
-    def product_report():
-        name_data_form = Date_form()
-        range_data = get_current_week_range()
-        if not name_data_form.is_submitted():
-            name_data_form.date_from.data = range_data["from_date"].date()
-            name_data_form.date_to.data = range_data["to_date"].date()
-
-        report =  product_data(name_data_form.data.copy(),current_user)
-
-
-        return render_template("admin.html", date_from=name_data_form, type="PRODUCT_Report",backend_data= report)
-
 
     @app.route("/")
     @login_required
@@ -860,29 +520,46 @@ def register_routes(app,db):
         if current_user.role == 1:
             return redirect("/admin_dashord")
         elif current_user.role == 2:
-            if app.config.get('SIMPLE_WORKFLOW'):
-                return redirect(url_for('manual_job_card'))
-            return redirect(url_for("bale_entery"))
+            return redirect(url_for('manual_job_card'))
         else:
             return redirect(url_for("logout"))
 
     @app.route("/login", methods=['GET', 'POST'])
     def login():
         name_from = Login_form()
+        wants_json = request.accept_mimetypes.best == 'application/json'
+
+        def login_result(message, status):
+            response = jsonify(success=False, message=message)
+            response.headers['Cache-Control'] = 'no-store'
+            return response, status
+
         if name_from.validate_on_submit():
             username = name_from.user_name.data.strip().lower()
             user = User.query.filter_by(username=username).first()
             if user and user.check_password(name_from.password.data):
                 if user.is_active:
                     login_user(user)
+                    if wants_json:
+                        response = jsonify(success=True, redirect=url_for('home'))
+                        response.headers['Cache-Control'] = 'no-store'
+                        return response
                     return redirect("/")
+                if wants_json:
+                    return login_result("This account is disabled. Contact an administrator.", 403)
                 flash("This account is disabled. Contact an administrator.", "danger")
             else:
+                if wants_json:
+                    return login_result("Username or password is incorrect.", 401)
                 flash("Username or password is incorrect.", "danger")
         elif request.method == "POST":
             if getattr(name_from, "csrf_token", None) is not None and name_from.csrf_token.errors:
+                if wants_json:
+                    return login_result("This login form expired. Reload the page and try again.", 400)
                 flash("This login form expired. Reload the page and try again.", "warning")
             else:
+                if wants_json:
+                    return login_result("Enter both a username and password.", 422)
                 flash("Enter both a username and password.", "warning")
 
         return render_template('login.html', form_name="Login",
@@ -893,62 +570,12 @@ def register_routes(app,db):
     def logout():
         logout_user()
         return redirect(url_for('login'))
-    # laber print done
-
-    ## find function
-    @app.route("/find_edit",methods=["GET", "POST"])
-    @login_required
-    @oly_admin
-    def find_edit():
-
-        current_form = Find_and_edit()
-        data_autofill = {}
-        data_autofill["cuter_data"]  = get_serch_data()["cuter_data"]
-        # data_autofill['cuter_data'].append("all_bundle")
-        if current_form.is_submitted():
-            data_sumit =  current_form.data.copy()
-            data_sumit.pop('submit')
-            data_sumit.pop('csrf_token')
-
-            date_keys =  ['entry_datetime', "cut_by" ,'s_no','id']
-            input_data = {}
-            for k in date_keys:
-                # print(data_sumit)
-                if data_sumit[k] != None:
-                    if data_sumit[k] != "":
-                        input_data[k] =  {"data":data_sumit[k]}
-
-            # print(input_data)
-            if input_data == {}:
-                flash("need some input" , "danger")
-                return redirect(url_for("find_edit"))
-            result = find_edit_data(current_user, input_data)
-            if result == 404 :
-                flash("you ae not allowed ", "danger")
-                return redirect(url_for("find_edit"))
-            elif result == 403 :
-                flash("log in first ", "danger")
-                return redirect(url_for("find_edit"))
-            elif result == 405 :
-                flash("no data found  ", "danger")
-                return redirect(url_for("find_edit"))
-            else:
-                return render_template("admin.html", date_from=current_form, type="PRODUCT_find_edit",
-                                       data=data_autofill,backend_data= result)
-
-
-
-
-
-
-        return render_template("admin.html", date_from=current_form, type="PRODUCT_find_edit",data=data_autofill)
-
     @app.route("/edit")
     @login_required
     @oly_admin
     def edit_index():
         entities = {key: value for key, value in ENTITY_CONFIG.items()
-                    if key in CORE_ENTITIES or (not app.config.get('SIMPLE_WORKFLOW') and key != 'movement')}
+                    if key in CORE_ENTITIES}
         selected_type = request.args.get('type', 'product')
         if selected_type not in entities:
             selected_type = 'product'

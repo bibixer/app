@@ -1,0 +1,10 @@
+{% extends 'app_base.html' %}
+{% block title %}{{ heading }} · BH Manufacturing{% endblock %}
+{% block content %}
+<section class="ui-panel">
+  <p class="ui-kicker">BH Manufacturing · {{ code }}</p><h1>{{ heading }}</h1>
+  <p role="alert">{{ message }}</p>
+  <p>No entry is submitted automatically from this page. Return to your work and review before trying again.</p>
+  <a class="button" href="{{ url_for('home') if current_user.is_authenticated else url_for('login') }}">Open workspace →</a>
+</section>
+{% endblock %}

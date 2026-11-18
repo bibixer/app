@@ -24,7 +24,8 @@
       const destination = shortcuts[event.key.toLowerCase()];
       if (!destination) return;
       event.preventDefault();
-      window.location.assign(destination);
+      if (window.AppUI?.navigate) window.AppUI.navigate(destination);
+      else window.location.assign(destination);
     });
   }
 

@@ -28,33 +28,38 @@ async function run() {
   assert(first.dataset.remaining === '10','Another job iframe must not update this job');
 
   const redirects=[],alerts=[],messages=[];
-  Object.assign(firstWindow,{RETURN_EMBEDDED:true,location:{origin,replace:value=>redirects.push(value),reload:()=>redirects.push('reload')},open:()=>null});
+  Object.assign(firstWindow,{RETURN_EMBEDDED:true,location:{origin,replace:value=>redirects.push(value),reload:()=>redirects.push('reload')},open:()=>{throw new Error('No new window');},AppUI:{notify:message=>alerts.push(message)}});
   firstWindow.parent={postMessage:(data,target)=>{messages.push(data);listener({origin:target,source:firstWindow,data});}};
   const source=read('static/js/retun.js');
   const prefix=source.slice(0,source.indexOf('      document.addEventListener("DOMContentLoaded"'));
   const job={name:'1***RAM--CITY/-',jobcard_id:1,items:[{item_id:1,name:'VIMAL',colour:'lump'}]};
   const response={success:true,remaining:7,jobData:{code:101,jobData:{date:'08-11-2026',jobcard_id:1,party:job.name,username:'admin',items:[{name_of_product:'VIMAL',type:'lump',returned:3,note:''}]}}};
-  let failPrint=false;
+  const documentStub=()=>({querySelectorAll:()=>[{}],getElementById:()=>firstDraft,
+    querySelector:()=>({classList:{add(){},remove(){}}}),
+    createElement:()=>{throw new Error('No browser print download');}});
+  class PageURL {
+    constructor(path,base){this.base=base+path;this.params=[];this.searchParams={set:(name,value)=>this.params.push([name,value])};}
+    get href(){return this.base+'?'+this.params.map(([name,value])=>`${name}=${encodeURIComponent(value)}`).join('&');}
+  }
   const submit=new Function('document','window','JOB_CARD','crypto','fetch','alert','console','Blob','URL',prefix+'\nreturn submitReturn;')(
-    {querySelectorAll:()=>[{}],getElementById:()=>firstDraft,createElement:()=>{if(failPrint)throw new Error('printer unavailable');return {click(){}};}},
+    documentStub(),
     firstWindow,job,{randomUUID:()=>String(Math.random())},async()=>({json:async()=>response}),
-    message=>alerts.push(message),{log(){},error(){}},class {},{createObjectURL:()=>'blob:test'});
+    ()=>{throw new Error('No native alert');},{log(){},error(){}},class {},PageURL);
   await submit();
   assert(messages.length===1 && messages[0].remaining===7,'Saved returns must immediately notify their workspace');
   assert(Number(first.dataset.remaining)===7 && counters['#open-return-pieces'].textContent===17,'Parent totals must reflect the confirmed remaining quantity');
   assert(secondDraft.value==='7' && second.dataset.remaining==='10','Other jobs must retain their draft and original balance');
-  assert(redirects[0]==='/job_retun?jobcard_id=1&embedded=1','Only the saved job iframe should refresh');
+  assert(redirects[0].startsWith(origin+'/job_retun?jobcard_id=1&saved_return=') && redirects[0].endsWith('&embedded=1'),'Only the saved job iframe should refresh with its server receipt');
   assert(!alerts.length,'Successful save must not show an error');
 
-  // A receipt failure is separate from the already committed return.
-  failPrint=true;
+  // Server CSV export warnings are separate from the committed return.
   const printSubmit=new Function('document','window','JOB_CARD','crypto','fetch','alert','console','Blob','URL',prefix+'\nreturn submitReturn;')(
-    {querySelectorAll:()=>[{}],getElementById:()=>firstDraft,createElement:()=>{throw new Error('printer unavailable');}},
-    firstWindow,job,{randomUUID:()=>'key'},async()=>({json:async()=>response}),message=>alerts.push(message),
-    {log(){},error(){}},class {},{createObjectURL:()=>'blob:test'});
+    documentStub(),
+    firstWindow,job,{randomUUID:()=>'key'},async()=>({json:async()=>({...response,jobData:{...response.jobData,print_warning:'CSV export failed'}})}),()=>{throw new Error('No native alert');},
+    {log(){},error(){}},class {},PageURL);
   await printSubmit();
-  assert(alerts.some(message=>message.startsWith('Return saved.')),'Receipt failure must accurately report that the return was saved');
-  assert(!alerts.some(message=>message.includes('Error submitting')),'Receipt failure must not be reported as a failed save');
+  assert(redirects[1].includes('csv_warning=1'),'CSV warning must accompany the saved receipt preview');
+  assert(!alerts.length,'Server CSV warning must not be reported as a failed save');
   assert(redirects.length===2,'A printing failure must still refresh the saved job');
 
   // A retryable busy response must retain both the draft and request identity.
@@ -62,13 +67,14 @@ async function run() {
   const redirectsBeforeRetry=redirects.length;
   firstDraft.value='3';
   const busySubmit=new Function('document','window','JOB_CARD','crypto','fetch','alert','console','Blob','URL',prefix+'\nreturn submitReturn;')(
-    {querySelectorAll:()=>[{}],getElementById:()=>firstDraft,createElement:()=>({click(){}})},
+    documentStub(),
     firstWindow,job,{randomUUID:()=>'preserved-return-key'},async(_url,options)=>{
       retryRequests.push(JSON.parse(options.body));
       return {json:async()=>retryRequests.length===1 ? {success:false,retryable:true,message:'Database busy; retry.'} : response};
-    },message=>alerts.push(message),{log(){},error(){}},class {},{createObjectURL:()=>'blob:test'});
+    },()=>{throw new Error('No native alert');},{log(){},error(){}},class {},PageURL);
   await busySubmit();
   assert(redirects.length===redirectsBeforeRetry && firstDraft.value==='3','Busy responses must retain the page and entered quantity');
+  assert(alerts.includes('Database busy; retry.'),'Busy response must use app popup feedback');
   await busySubmit();
   assert(retryRequests.length===2,'The user must be able to retry after a busy response');
   assert(retryRequests[0].request_id===retryRequests[1].request_id,'Retries must preserve the submission key');

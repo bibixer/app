@@ -1,0 +1,13 @@
+.app-ui .rates-switch-dialog{box-sizing:border-box;width:min(560px,calc(100vw - 32px));max-height:calc(100svh - 40px);overflow:auto;padding:28px;border:1px solid #d5dfef;border-radius:18px;background:linear-gradient(130deg,#fff,#f0f3ff);box-shadow:0 24px 80px #25385840;color:#405575}
+.app-ui .rates-switch-dialog::backdrop{background:#20304f88;backdrop-filter:blur(4px)}
+.app-ui .rates-switch-dialog h2{margin:10px 0 16px;font-size:22px;color:#344b77}
+.app-ui .rates-switch-dialog p{font-size:13px;line-height:1.8;overflow-wrap:anywhere}
+.app-ui .rates-switch-dialog .rates-switch-kicker{margin:0;color:#8792b1;font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}
+.app-ui .rates-switch-dialog ul{padding:16px 16px 16px 32px;background:#edf2fc;border:1px solid #dce3f3;border-radius:10px;font-size:13px;line-height:1.9}
+.app-ui .rates-switch-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:24px}
+.app-ui .rates-switch-actions button{padding:12px 15px;border:1px solid #6075ad;border-radius:9px;background:#6075ad;color:white;font:inherit;font-size:12px;font-weight:700;cursor:pointer}
+.app-ui .rates-switch-actions .secondary{background:#fff;color:#64789e;border-color:#cdd8ee}
+.app-ui .rates-switch-actions button:disabled{opacity:.5;cursor:wait}
+.app-ui .rates-switch-dialog .rates-switch-error{padding:12px;border:1px solid #e9c2c8;border-radius:8px;background:#fff0f2;color:#a34456}
+.app-ui .rates-switch-dialog [hidden]{display:none!important}
+.app-ui .rates-switch-actions button:focus-visible{outline:3px solid #8d9fdc;outline-offset:3px}

@@ -1,0 +1,20 @@
+.app-sound-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  padding: 7px 11px;
+  border: 1px solid #a5b4fc55;
+  border-radius: 12px;
+  background: #17233e;
+  color: #eef2ff;
+  font: 600 12px/1.2 system-ui, sans-serif;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.app-sound-toggle[data-ready] { display: inline-flex; }
+.app-sound-toggle:hover { background: #303b64; }
+.app-sound-toggle:focus-visible { outline: 2px solid #a78bfa; outline-offset: 3px; }
+.app-sound-toggle[aria-pressed="false"] { color: #cbd5e1; background: #17233e; }
+.app-sound-guest { position: fixed; top: 14px; right: 16px; z-index: 100001; }
+@media print { .app-sound-toggle { display: none !important; } }

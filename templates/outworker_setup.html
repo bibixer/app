@@ -12,7 +12,6 @@
   <section class="form-container" aria-labelledby="outworker-setup-title">
     <h1 id="outworker-setup-title">{% block setup_heading %}Outworker setup{% endblock %}</h1>
     <p class="outworker-setup-description">{% block setup_description %}Add a master to assign jobs and record returns.{% endblock %}</p>
-    {% for category,message in get_flashed_messages(with_categories=true) %}<div class="notice {{ category }}" role="alert">{{ message }}</div>{% endfor %}
     {% block setup_form %}{{ render_form(current_form, novalidate=True) }}{% endblock %}
     {% block setup_links %}<a class="outworker-edit-link" href="{{ url_for('edit_index', type='outworker') }}">Open edit center →</a>{% endblock %}
   </section>

@@ -3,8 +3,7 @@
 {% block page_css %}<link rel="stylesheet" href="{{ url_for('static', filename='style/pages/manual_jobcard.css',v='20261115-saved-preview') }}">{% endblock %}
 {% block main_class %}page-manual-jobcard{% endblock %}
 {% block content %}
-  {% for category,notice in get_flashed_messages(with_categories=true) %}<div class="ui-panel notice {{ category }}" role="alert">{{ notice }}</div>{% endfor %}
-  <header class="ui-heading"><div><p class="ui-kicker">Production / Job cards</p><h1>Manual job card</h1><p class="ui-description">Create a job from bundle patterns, with full product names or their aliases.</p></div>{% if not config.SIMPLE_WORKFLOW %}<a class="head-link" href="{{ url_for('job_card') }}">Switch to scanning →</a>{% endif %}</header>
+  <header class="ui-heading"><div><p class="ui-kicker">Production / Job cards</p><h1>Manual job card</h1><p class="ui-description">Create a job from bundle patterns, with full product names or their aliases.</p></div></header>
 
   <section id="result" class="result hidden"></section>
   <section class="entry-area manual-workspace">
@@ -36,8 +35,8 @@
   {% endif %}
 
 
-<script src="{{ url_for('static',filename='js/manual-master-suggestions.js',v='20261115-five-rows') }}"></script>
-<script src="{{ url_for('static',filename='js/manual-product-suggestions.js',v='20261115-five-rows') }}"></script>
+<script src="{{ url_for('static',filename='js/manual-master-suggestions.js',v='20261118-locked') }}"></script>
+<script src="{{ url_for('static',filename='js/manual-product-suggestions.js',v='20261118-locked') }}"></script>
 <script>
 const knownMasters = new Set({{ data.outworker|map(attribute='full')|list|tojson }});
 const masterAliasMap = {{ master_alias_map|tojson }};
@@ -60,13 +59,18 @@ function normalizeProduct(value) {
 
 function fillFullItemName(input) {
   const fullName = productAliasMap[normalizeProduct(input.value)];
-  if (fullName) input.value = fullName;
+  if (fullName && editableLookup(input)) input.value = fullName;
   return fullName;
 }
 
 function fillFullMasterName(input) {
   const fullName = masterAliasMap[normalizeProduct(input.value)];
-  if (fullName) input.value = fullName;
+  if (fullName && editableLookup(input)) input.value = fullName;
+}
+
+function editableLookup(input) {
+  return !input.matches(':disabled,[readonly],[aria-disabled="true"],[aria-readonly="true"]')
+    && !input.closest('[inert],[aria-disabled="true"]');
 }
 
 function addRow(values = {}) {
@@ -139,6 +143,7 @@ function nextItemRow(row) {
 
 function handleRowKeydown(event) {
   const input = event.currentTarget;
+  if (!editableLookup(input)) return;
   const row = input.closest('tr');
   if (event.type === 'keydown' && event.key === 'Enter') {
     rowEnterTarget = input;
@@ -226,9 +231,10 @@ function readRows() {
   }));
 }
 
-function showMessage(text, isError = true) {
+function showMessage(text, isError = true, type = isError ? 'error' : 'success') {
   message.textContent = text;
   message.className = `message ${isError ? 'error' : 'success'}`;
+  window.AppUI?.notify(text, {type});
 }
 
 function renderJobCard(job) {
@@ -267,6 +273,7 @@ async function submitManual() {
     return showMessage(`"${rows[unknownIndex].product}" is not an added product or alias. Select an item from the list or add it in Item Setup.`);
   }
   submitting = true;
+  document.getElementById('submitManual').classList.add('app-saving');
   document.getElementById('submitManual').disabled = true;
   try {
     const response = await fetch('/submit-manual-jobcard', {
@@ -285,7 +292,7 @@ async function submitManual() {
       return;
     }
     requestId = crypto.randomUUID();
-    showMessage(result.print_warning || (result.duplicate ? `Saved job card #${result.jobData.jobId} restored. CSV export was not repeated.` : `Job card #${result.jobData.jobId} created successfully. Label CSV saved to the server print folder.`), Boolean(result.print_warning));
+    showMessage(result.print_warning || (result.duplicate ? `Saved job card #${result.jobData.jobId} restored. CSV export was not repeated.` : `Job card #${result.jobData.jobId} created successfully. Label CSV saved to the server print folder.`), Boolean(result.print_warning), result.print_warning ? 'warning' : 'success');
     renderJobCard(result.jobData);
     rowsBody.replaceChildren();
     rowEnterTarget = null;
@@ -299,6 +306,7 @@ async function submitManual() {
     document.getElementById('submitManual').disabled = false;
   } finally {
     submitting = false;
+    document.getElementById('submitManual').classList.remove('app-saving');
     document.getElementById('submitManual').disabled = false;
   }
 }
@@ -322,7 +330,7 @@ document.addEventListener('keydown', event => {
     submitManual();
   } else if (event.key.toLowerCase() === 'i') {
     event.preventDefault();
-    window.location.href = {{ url_for('retune_product')|tojson }};
+    window.AppUI.navigate({{ url_for('retune_product')|tojson }});
   }
 });
 const today = new Date();

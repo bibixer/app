@@ -31,7 +31,7 @@ def kept_movement_pairs(before=None):
             for row, card, product in query.all()]
 
 
-def save_product_value(product_id, value, expected_value, token, user):
+def save_product_value(product_id, value, expected_value, token, user, *, commit=True):
     from data_entry import claim_write
     from payroll_service import parse_money
     try:
@@ -50,7 +50,8 @@ def save_product_value(product_id, value, expected_value, token, user):
         db.session.add(EditLog(entity_type='product_value', entity_id=product.id, action='UPDATE',
             old_values={'value_paise': old}, new_values={'value_paise': amount},
             changed_fields=['value_paise'], username=user.username, changed_at=datetime.now()))
-        db.session.commit()
+        if commit:
+            db.session.commit()
     except Exception:
         db.session.rollback()
         raise

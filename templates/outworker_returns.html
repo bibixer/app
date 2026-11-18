@@ -2,7 +2,6 @@
 {% block title %}Outworker returns · BH Manufacturing{% endblock %}
 {% block head %}<link rel="stylesheet" href="{{ url_for('static',filename='style/return-workspace.css',v='20261113-collapse') }}">{% endblock %}
 {% block content %}
-{% for category,message in get_flashed_messages(with_categories=true) %}<div class="ui-panel notice {{ category }}" role="alert">{{ message }}</div>{% endfor %}
 <header class="ui-heading returns-hero">
   <div><p class="ui-kicker">Production / Returns</p><h1>Outworker return workspace</h1><p class="ui-description">{{ worker.name ~ ' · ' ~ worker.adders if worker else 'One account. Every open job. Clear balances.' }}</p></div>
   <a class="button secondary" href="{{ url_for('retune_product') }}">Find a job card →</a>

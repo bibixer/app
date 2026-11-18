@@ -102,7 +102,7 @@ class BrowserFlowsTest(AppTestCase):
 
     def wait_for(self, condition):
         for _ in range(100):
-            if self.script("return " + condition):
+            if self.script("if (!document.body) return false; return " + condition):
                 return
             time.sleep(.05)
         details = self.script("return {url:location.href,messages:[...document.querySelectorAll('.flash,.notice')].map(n=>n.textContent),invalid:[...document.querySelectorAll('input:invalid,select:invalid,textarea:invalid')].map(n=>({name:n.name,value:n.value,error:n.validationMessage}))}")
@@ -113,6 +113,403 @@ class BrowserFlowsTest(AppTestCase):
     def active(self, selector):
         self.assertTrue(self.script(f"return document.activeElement.matches({json.dumps(selector)})"), selector)
 
+    def test_blue_motion_uses_consistent_choreography_across_pages(self):
+        self.navigate('/manual_jobcard')
+        self.wait_for("document.readyState==='complete'")
+        styles=self.script("""
+            const originalTimer=window.setTimeout;
+            window.setTimeout=(callback,delay,...args)=>delay===160?0:originalTimer(callback,delay,...args);
+            const result=[];
+            try {
+                for(let i=0;i<45;i++){
+                    AppUI.navigate(location.href);
+                    const style=getComputedStyle(document.querySelector('.scene-panel'));
+                    result.push({name:style.animationName,duration:style.animationDuration,pair:Number(document.documentElement.dataset.motionPair)});
+                    window.dispatchEvent(new Event('pageshow'));
+                }
+            } finally {window.setTimeout=originalTimer;}
+            return result;
+        """)
+        self.assertEqual([style['pair'] for style in styles],[index%32 for index in range(45)])
+        self.assertTrue(all(style['name'].startswith('bh-scene-') and style['duration']=='0.11s' for style in styles))
+        self.navigate('/payroll')
+        self.wait_for("document.readyState==='complete'")
+        next_style=self.script("""
+            const originalTimer=window.setTimeout;
+            window.setTimeout=(callback,delay,...args)=>delay===160?0:originalTimer(callback,delay,...args);
+            try {AppUI.navigate(location.href);return getComputedStyle(document.querySelector('.scene-panel')).animationName;}
+            finally {window.dispatchEvent(new Event('pageshow'));window.setTimeout=originalTimer;}
+        """)
+        self.assertEqual(next_style,'bh-scene-fold-close')
+
+    def test_blue_motion_selects_forward_back_and_save_without_randomness(self):
+        self.navigate('/manual_jobcard')
+        self.wait_for("document.readyState==='complete'")
+        self.navigate('/payroll')
+        self.wait_for("document.readyState==='complete'")
+        names=self.script("""
+            const originalTimer=window.setTimeout,originalRandom=window.Math.random;
+            window.setTimeout=(callback,delay,...args)=>delay===160?0:originalTimer(callback,delay,...args);
+            window.Math.random=()=>{throw new Error('Transition selection must not be random');};
+            const result=[];
+            try {
+                for(let i=0;i<6;i++){
+                    AppUI.navigate(location.href,[{},{back:true},{confirm:true}][i%3]);
+                    result.push(document.documentElement.dataset.motionDirection);
+                    window.dispatchEvent(new Event('pageshow'));
+                }
+            }finally{window.setTimeout=originalTimer;window.Math.random=originalRandom;}
+            return result;
+        """)
+        self.assertEqual(names,['forward','back','confirm']*2)
+
+    def test_section_transitions_close_then_open_and_differ_by_page(self):
+        self.navigate('/manual_jobcard')
+        self.wait_for("document.readyState==='complete' && !!window.AppUI?.navigate")
+        self.wait_for("getComputedStyle(document.querySelector('.app-page-cut')).visibility==='hidden'")
+        before = self.script("""
+            document.querySelector('.app-nav-links a[href="/payroll"]')?.click();
+            if(!document.body.classList.contains('is-page-closing'))AppUI.navigate('/payroll');
+            AppUI.navigate('/retune_product');
+            const panel=getComputedStyle(document.querySelector('.scene-panel'));
+            return {closing:document.body.classList.contains('is-page-closing'),
+                path:location.pathname,direction:panel.animationDirection,duration:panel.animationDuration,
+                effect:document.documentElement.dataset.scene,
+                expectedOpening:AppUI.motion.pairs[JSON.parse(sessionStorage.getItem(AppUI.motion.handoffKey)).pair].open,
+                playing:document.querySelector('.scene-panel').getAnimations().some(a=>a.playState==='running' && a.currentTime<100)};
+        """)
+        self.assertTrue(before['closing'])
+        self.assertEqual(before['path'],'/manual_jobcard')
+        self.assertEqual(before['direction'],'normal')
+        self.assertEqual(before['duration'],'0.11s')
+        self.assertTrue(before['playing'])
+        self.wait_for("location.pathname==='/payroll' && !!document.body && !document.body.classList.contains('is-page-closing')")
+        self.assertEqual(self.script('return document.body.dataset.pageTransition'),'payroll')
+        opening=self.script('return document.documentElement.dataset.scene')
+        self.assertNotEqual(opening,before['effect'])
+        self.assertEqual(opening,before['expectedOpening'])
+        self.assertEqual(self.script("return getComputedStyle(document.querySelector('.scene-panel')).animationName"),f'bh-scene-{opening}-open')
+        self.wait_for("getComputedStyle(document.querySelector('.app-page-cut')).visibility==='hidden'")
+        for path,kind in (('/manual_jobcard','jobs'),('/retune_product','returns'),
+                          ('/payroll','payroll'),('/outworker_report','reports'),('/add_outworver','setup')):
+            self.navigate(path)
+            self.wait_for("document.readyState==='complete'")
+            self.assertEqual(self.script('return document.body.dataset.pageTransition'),kind)
+            self.assertEqual(self.script("return getComputedStyle(document.querySelector('main')).opacity"),'1')
+
+    def test_fixed_pair_handoffs_use_authored_openings(self):
+        self.navigate('/manual_jobcard')
+        self.wait_for("document.readyState==='complete'")
+        pairs=self.script('return AppUI.motion.pairs')
+        for index in range(12):
+            pair=pairs[index]
+            direction=['forward','back','confirm'][index%3]
+            self.script("sessionStorage.setItem('bh.full-motion-handoff.v1',JSON.stringify({pair:"
+                        +str(pair['id'])+",direction:"+json.dumps(direction)+",time:Date.now(),id:'test'}))")
+            self.navigate('/payroll' if index%2 else '/manual_jobcard')
+            self.wait_for("document.readyState==='complete'")
+            opening=self.script('return document.documentElement.dataset.scene')
+            self.assertEqual(opening,pair['open'])
+            self.assertEqual(self.script('return document.documentElement.dataset.motionDirection'),direction)
+            self.assertIsNone(self.script("return sessionStorage.getItem('bh.full-motion-handoff.v1')"))
+
+    def test_blue_motion_browser_back_unwinds_and_cached_page_restores(self):
+        self.navigate('/manual_jobcard')
+        self.wait_for("document.readyState==='complete'")
+        self.script("AppUI.navigate('/payroll')")
+        self.wait_for("location.pathname==='/payroll' && !!window.AppUI?.motion")
+        self.command('/back',{})
+        self.wait_for("location.pathname==='/manual_jobcard' && document.documentElement.dataset.motionDirection==='back'")
+        self.wait_for("getComputedStyle(document.querySelector('.app-page-cut')).visibility==='hidden'")
+        self.script("window.dispatchEvent(new PageTransitionEvent('pageshow',{persisted:true}))")
+        self.assertTrue(self.script("return AppUI.motion.pairs.some(p=>p.open===document.documentElement.dataset.scene)"))
+        self.wait_for("getComputedStyle(document.querySelector('.app-page-cut')).visibility==='hidden'")
+        result=self.script("""
+          return {transform:getComputedStyle(document.querySelector('main')).transform,
+            pointer:getComputedStyle(document.querySelector('.app-page-cut')).pointerEvents};
+        """)
+        self.assertEqual(result,{'transform':'none','pointer':'none'})
+
+    def test_every_closing_style_has_static_artwork_without_extra_animation(self):
+        self.navigate('/manual_jobcard')
+        self.wait_for("document.readyState==='complete'")
+        result=self.script("""
+          const root=document.querySelector('.app-page-cut'),original=document.documentElement.dataset.scene;
+          document.body.classList.add('is-page-closing');
+          const results=['slash','split','blinds','prism','sweep','fold','orbit','cascade'].map(scene=>{
+            document.documentElement.dataset.scene=scene;
+            const panel=root.querySelector('.scene-panel'),art=getComputedStyle(panel,'::before');
+            return {scene,art:art.backgroundImage,animation:art.animationName,filter:art.filter};
+          });
+          document.documentElement.dataset.scene=original;document.body.classList.remove('is-page-closing');
+          if(window.BH_CAPTURE_CLOSING)root.getAnimations({subtree:true}).forEach(a=>{a.currentTime=0;a.play()});
+          return results;
+        """)
+        for row in result:
+            self.assertNotEqual(row['art'],'none',row)
+            self.assertEqual(row['animation'],'none',row)
+            self.assertEqual(row['filter'],'none',row)
+        self.assertGreaterEqual(len(set(row['art'] for row in result)),6)
+        if os.environ.get('BH_CLOSING_PREVIEW'):
+            import base64
+            self.script("""
+              document.documentElement.dataset.scene='sweep';document.body.classList.add('is-page-closing');
+              document.querySelector('.app-page-cut').getAnimations({subtree:true}).forEach(a=>{a.pause();a.currentTime=155});
+            """)
+            Path(os.environ['BH_CLOSING_PREVIEW']).write_bytes(base64.b64decode(self.command('/screenshot')))
+
+    def test_transition_layers_use_transform_only_and_release_after_finishing(self):
+        self.navigate('/manual_jobcard')
+        self.wait_for("document.readyState==='complete'")
+        result=self.script("""
+          const root=document.querySelector('.app-page-cut'),original=document.documentElement.dataset.scene;
+          const results=[];
+          for(const scene of ['slash','split','blinds','prism','sweep','fold','orbit','cascade']){
+            for(const closing of [false,true]){
+              document.documentElement.dataset.scene=scene;
+              document.body.classList.toggle('is-page-closing',closing);
+              const animations=root.getAnimations({subtree:true}).filter(a=>a.effect.target.classList.contains('scene-panel'));
+              results.push({scene,closing,properties:[...new Set(animations.flatMap(a=>a.effect.getKeyframes().flatMap(k=>Object.keys(k))))],
+                perspective:getComputedStyle(root).perspective});
+            }
+          }
+          document.body.classList.remove('is-page-closing');document.documentElement.dataset.scene=original;
+          return results;
+        """)
+        for row in result:
+            self.assertNotIn('clipPath',row['properties'],row)
+            self.assertNotIn('width',row['properties'],row)
+            self.assertNotIn('height',row['properties'],row)
+            self.assertIn('transform',row['properties'],row)
+            self.assertEqual(row['perspective'],'none',row)
+        self.wait_for("!document.body.classList.contains('is-motion-active')")
+        self.assertEqual(self.script("return getComputedStyle(document.querySelector('.scene-panel')).willChange"),'auto')
+        self.assertEqual(self.script("return getComputedStyle(document.querySelector('.ui-waves')).animationPlayState"),'running')
+        self.script("window.dispatchEvent(new PageTransitionEvent('pageshow',{persisted:true}))")
+        self.assertEqual(self.script("return getComputedStyle(document.querySelector('.ui-waves')).animationPlayState"),'paused')
+        self.assertEqual(self.script("return getComputedStyle(document.querySelector('.scene-panel')).willChange"),'transform')
+        self.wait_for("!document.body.classList.contains('is-motion-active')")
+
+    def test_full_page_all_32_combinations_cover_close_and_open_without_gaps(self):
+        self.navigate('/manual_jobcard')
+        self.wait_for("document.readyState==='complete'")
+        result=self.script("""
+            const root=document.querySelector('.app-page-cut'),panels=[...root.querySelectorAll('.scene-panel')];
+            const original=document.documentElement.dataset.scene;
+            const missing=()=>{
+              let uncovered=0;
+              for(const x of [.01,.25,.5,.75,.99])for(const y of [.01,.25,.5,.75,.99]){
+                if(!document.elementsFromPoint(innerWidth*x,innerHeight*y).some(n=>n.classList.contains('scene-panel')))uncovered++;
+              }
+              return uncovered;
+            };
+            root.style.pointerEvents='auto';panels.forEach(n=>n.style.pointerEvents='auto');
+            const result=AppUI.motion.pairs.map(pair=>{
+              document.documentElement.dataset.scene=pair.close;
+              document.body.classList.add('is-page-closing');
+              root.getAnimations({subtree:true}).forEach(a=>{a.pause();a.currentTime=160});
+              const closeMissing=missing();
+              document.body.classList.remove('is-page-closing');
+              document.documentElement.dataset.scene=pair.open;
+              root.getAnimations({subtree:true}).forEach(a=>{a.pause();a.currentTime=0});
+              return {id:pair.id,closeMissing,openMissing:missing()};
+            });
+            root.style.pointerEvents='';panels.forEach(n=>n.style.pointerEvents='');
+            document.documentElement.dataset.scene=original;
+            root.getAnimations({subtree:true}).forEach(a=>{a.currentTime=0;a.play()});
+            return result;
+        """)
+        self.assertEqual(len(result),32)
+        for row in result:
+            self.assertEqual(row['closeMissing'],0,row)
+            self.assertEqual(row['openMissing'],0,row)
+
+    def test_graphic_game_transition_is_fast_nonblocking_and_self_clearing(self):
+        self.navigate('/manual_jobcard')
+        self.wait_for("document.readyState==='complete'")
+        properties=self.script("""
+            const cut=document.querySelector('.app-page-cut'),style=getComputedStyle(cut);
+            return {hidden:cut.getAttribute('aria-hidden'),pointer:style.pointerEvents,
+                name:style.animationName,duration:parseFloat(style.animationDuration),
+                opacity:getComputedStyle(document.querySelector('main')).opacity,
+                panels:cut.querySelectorAll('.scene-panel').length};
+        """)
+        self.assertEqual(properties['hidden'],'true')
+        self.assertEqual(properties['pointer'],'none')
+        self.assertEqual(properties['name'],'bh-scene-finish')
+        self.assertLessEqual(properties['duration'],.35)
+        self.assertEqual(properties['opacity'],'1')
+        self.assertEqual(properties['panels'],6)
+        self.assertIn('rgb(8, 28, 74)',self.script("return getComputedStyle(document.querySelector('.ui-waves')).backgroundImage"))
+        if os.environ.get('BH_TRANSITION_PREVIEW'):
+            import base64
+            self.script("const cut=document.querySelector('.app-page-cut');cut.style.animation='none';cut.style.visibility='visible';cut.getAnimations({subtree:true}).forEach(a=>{a.pause();a.currentTime=55})")
+            Path(os.environ['BH_TRANSITION_PREVIEW']).write_bytes(base64.b64decode(self.command('/screenshot')))
+            self.script("const cut=document.querySelector('.app-page-cut');cut.style.animation='';cut.style.visibility='';cut.getAnimations({subtree:true}).forEach(a=>a.play())")
+        self.wait_for("getComputedStyle(document.querySelector('.app-page-cut')).visibility==='hidden'")
+        self.type('#masterName',str(self.worker.id)+'\ue007')
+        self.active('#manualRows .product')
+        self.command('/window/rect',{'width':390,'height':844})
+        self.navigate('/payroll')
+        self.wait_for("getComputedStyle(document.querySelector('.app-page-cut')).visibility==='hidden'")
+        self.assertTrue(self.script("return document.documentElement.scrollWidth<=innerWidth"))
+
+    def test_instant_pages_and_glow_follow_focused_field(self):
+        self.navigate('/manual_jobcard')
+        self.wait_for("document.readyState==='complete'")
+        self.assertEqual(self.script("return getComputedStyle(document.querySelector('main')).animationName"),'none')
+        self.assertEqual(self.script("return getComputedStyle(document.querySelector('main')).opacity"),'1')
+        for selector in ('#masterName','#manualRows .product','#manualRows .pieces','#manualRows .bundle-type'):
+            self.script(f"document.querySelector({json.dumps(selector)}).focus()")
+            self.active(selector)
+            style=self.script("const s=getComputedStyle(document.activeElement);return {outline:s.outlineStyle,width:s.outlineWidth,shadow:s.boxShadow,transition:s.transitionDuration}")
+            self.assertEqual(style['outline'],'solid')
+            self.assertEqual(style['width'],'2px')
+            self.assertNotEqual(style['shadow'],'none')
+            self.assertEqual(style['transition'],'0s')
+        self.assertNotEqual(self.script("return getComputedStyle(document.querySelector('#masterName')).outlineStyle"),'solid')
+        self.assertNotEqual(self.script("return getComputedStyle(document.querySelector('.ui-wave')).animationName"),'none')
+        self.script("AppUI.notify('Saved',{type:'success'})")
+        self.assertNotEqual(self.script("return getComputedStyle(document.querySelector('.app-toast')).animationName"),'none')
+
+    def test_native_browser_audio_produces_signal_after_real_interaction(self):
+        self.navigate('/manual_jobcard')
+        self.wait_for("!!document.querySelector('[data-sound-toggle][data-ready]')")
+        self.script("""
+          const NativeAudio=window.AudioContext;
+          window.AudioContext=class extends NativeAudio {
+            constructor(){super();window.nativeSoundContext=this;window.nativeSoundNotes=0;}
+            createOscillator(){window.nativeSoundNotes++;return super.createOscillator();}
+            createGain(){
+              const gain=super.createGain();
+              window.nativeSoundAnalyser=this.createAnalyser();
+              gain.connect(window.nativeSoundAnalyser);
+              return gain;
+            }
+          };
+        """)
+        self.click('#masterName')
+        self.wait_for("window.nativeSoundContext?.state==='running'")
+        result=self.command('/execute/async',{'script':"""
+          const done=arguments[0];
+          AppUI.notify('Real audio signal test',{type:'success'});
+          setTimeout(()=>{
+            const data=new Float32Array(window.nativeSoundAnalyser.fftSize);
+            window.nativeSoundAnalyser.getFloatTimeDomainData(data);
+            done({notes:window.nativeSoundNotes,peak:Math.max(...data.map(Math.abs))});
+          },185);
+        """,'args':[]})
+        self.assertEqual(result['notes'],3)
+        self.assertGreater(result['peak'],.001)
+
+    def test_sound_feedback_unlock_mute_persistence_and_mobile_control(self):
+        self.navigate('/manual_jobcard')
+        self.wait_for("!!document.querySelector('[data-sound-toggle][data-ready]')")
+        self.script("""
+          window.soundTest={contexts:0,notes:0};
+          window.AudioContext=class {
+            constructor(){window.soundTest.contexts++;this.state='suspended';this.currentTime=10;}
+            resume(){return new Promise(resolve=>setTimeout(()=>{this.state='running';resolve();},30));}
+            suspend(){this.state='suspended';return Promise.resolve();}
+            createOscillator(){return {frequency:{setValueAtTime(){},exponentialRampToValueAtTime(){}},
+              connect(){},disconnect(){},start(){window.soundTest.notes++;},stop(){this.onended();}};}
+            createGain(){return {gain:{setValueAtTime(){},linearRampToValueAtTime(){},exponentialRampToValueAtTime(){}},connect(){},disconnect(){}};}
+          };
+          window.AppUI.playSound('success');
+        """)
+        self.assertEqual(self.script('return window.soundTest'), {'contexts':0,'notes':0})
+        self.click('#masterName')
+        self.script("window.AppUI.notify('Audio integration test',{type:'success'})")
+        self.wait_for('window.soundTest.notes===3')
+        self.assertEqual(self.script('return window.soundTest'), {'contexts':1,'notes':3})
+        self.script("window.AppUI.notify('Audio integration test',{type:'success'})")
+        self.assertEqual(self.script('return window.soundTest.notes'),3)
+        self.click('[data-sound-toggle]')
+        self.assertEqual(self.script("return localStorage.getItem('bh.ui-sounds.v1')"),'off')
+        self.script("window.AppUI.notify('Muted error',{type:'error'})")
+        self.assertEqual(self.script('return window.soundTest.notes'),3)
+        self.navigate('/payroll')
+        self.wait_for("document.querySelector('[data-sound-toggle]')?.getAttribute('aria-pressed')==='false'")
+        self.command('/window/rect',{'width':390,'height':844})
+        self.assertTrue(self.script("const r=document.querySelector('[data-sound-toggle]').getBoundingClientRect();return r.width>0&&r.left>=0&&r.right<=innerWidth"))
+        self.click('[data-sound-toggle]')
+        self.assertEqual(self.script("return localStorage.getItem('bh.ui-sounds.v1')"),'on')
+
+    def test_notifications_safe_animated_deduplicated_dismissible_and_mobile(self):
+        self.navigate('/manual_jobcard')
+        self.wait_for("!!window.AppUI?.notify")
+        self.script("window.alert=()=>{throw new Error('Native alert must not be used')}")
+        self.click('#submitManual')
+        self.wait_for("!!document.querySelector('.app-toast-error')")
+        self.active('#masterName')
+        self.assertIn('valid master', self.script("return document.querySelector('.app-toast-error').textContent"))
+        self.script("AppUI.notify('<img src=x onerror=alert(1)>',{type:'error'});AppUI.notify('<img src=x onerror=alert(1)>',{type:'error'})")
+        self.assertEqual(self.script("return document.querySelectorAll('.app-toast-error').length"), 2)
+        self.assertFalse(self.script("return !!document.querySelector('.app-toast img')"))
+        self.assertIn('<img',self.script("return document.querySelector('.app-toast-error p').textContent"))
+        self.assertEqual(self.script("return document.querySelector('.app-toast-error').getAttribute('role')"),'alert')
+        self.click('.app-toast-error .app-toast-close')
+        self.wait_for("document.querySelectorAll('.app-toast-error').length===1")
+        self.script("AppUI.notify('A successful save',{type:'success'})")
+        self.assertEqual(self.script("return document.querySelector('.app-toast-success').getAttribute('role')"),'status')
+        self.assertEqual(self.script("return getComputedStyle(document.querySelector('#appNotifications')).position"),'fixed')
+        self.assertIn('app-toast-in',self.script("return getComputedStyle(document.querySelector('.app-toast-success')).animationName"))
+        self.command('/window/rect',{'width':390,'height':844})
+        self.assertTrue(self.script("return [...document.querySelectorAll('.app-toast')].every(n=>{const r=n.getBoundingClientRect();return r.left>=0&&r.right<=innerWidth})"))
+        # Success disappears on its own; errors remain until explicitly dismissed.
+        self.command('/execute/async',{'script':'setTimeout(arguments[0],7000)','args':[]})
+        self.wait_for("!document.querySelector('.app-toast-success')")
+        self.assertEqual(self.script("return document.querySelectorAll('.app-toast-error').length"),1)
+
+    def test_login_animates_only_after_confirmed_success_not_wrong_password(self):
+        self.navigate('/logout')
+        self.wait_for("!!document.querySelector('#loginForm') && !!window.AppUI?.navigate")
+        self.wait_for("getComputedStyle(document.querySelector('.app-page-cut')).visibility==='hidden'")
+        self.script("""
+          window.loginDocument=document;window.loginClosingCount=0;
+          new MutationObserver(()=>{if(document.body.classList.contains('is-page-closing'))window.loginClosingCount++;})
+            .observe(document.body,{attributes:true,attributeFilter:['class']});
+          window.loginCursor=sessionStorage.getItem('bh.full-motion-cursor.v1');
+        """)
+        self.type('[name=user_name]','admin')
+        self.type('[name=password]','wrong-password')
+        self.click('#loginForm [type=submit]')
+        self.wait_for("!!document.querySelector('.app-toast-error') && !document.querySelector('#loginForm').hasAttribute('aria-busy')")
+        self.assertTrue(self.script('return document===window.loginDocument'))
+        self.assertEqual(self.script('return window.loginClosingCount'),0)
+        self.assertTrue(self.script("return sessionStorage.getItem('bh.full-motion-cursor.v1')===window.loginCursor"))
+        self.assertEqual(self.script("return document.querySelector('[name=password]').value"),'')
+        self.script("""
+          const realFetch=window.fetch;window.loginRequests=0;
+          window.fetch=(...args)=>{window.loginRequests++;return realFetch(...args).then(response=>new Promise(resolve=>{
+            window.releaseVerifiedLogin=()=>resolve(response);
+          }));};
+        """)
+        self.type('[name=password]','test-password')
+        self.click('#loginForm [type=submit]')
+        self.wait_for("typeof window.releaseVerifiedLogin==='function'")
+        self.assertEqual(self.script('return window.loginClosingCount'),0)
+        self.script("document.querySelector('#loginForm').dispatchEvent(new Event('submit',{bubbles:true,cancelable:true}))")
+        self.assertEqual(self.script('return window.loginRequests'),1)
+        result=self.script("window.releaseVerifiedLogin();return location.pathname")
+        self.assertEqual(result,'/login')
+        self.wait_for("document.body.classList.contains('is-page-closing')")
+        self.wait_for("location.pathname==='/admin_dashord' && !!document.querySelector('.app-navbar')")
+
+    def test_notifications_native_validation_and_server_flash_on_login(self):
+        self.navigate('/retune_product')
+        self.wait_for("!!window.AppUI?.notify")
+        self.script("document.querySelector('#jobcard_id').value='';document.querySelector('#jobcard_id').reportValidity()")
+        self.wait_for("!!document.querySelector('.app-toast-error')")
+        self.active('#jobcard_id')
+        self.navigate('/logout')
+        self.type('[name=user_name]','admin')
+        self.type('[name=password]','wrong-password')
+        self.click('[type=submit]')
+        self.wait_for("!!document.querySelector('.app-toast-error')")
+        self.assertIn('incorrect',self.script("return document.querySelector('.app-toast-error').textContent"))
+        self.assertTrue(self.script("return [...document.querySelectorAll('[data-app-flashes]>*')].every(n=>n.hidden)"))
+
     def assert_five_visible_suggestions(self, selector):
         self.assertTrue(self.script("""
             const list=document.querySelector(%s), rows=[...list.querySelectorAll('[role=option]')];
@@ -120,6 +517,257 @@ class BrowserFlowsTest(AppTestCase):
             return rows.length>5 && rows[4].getBoundingClientRect().bottom<=bottom+1
                 && rows[5].getBoundingClientRect().top>=bottom-1 && list.scrollHeight>list.clientHeight;
         """ % json.dumps(selector)))
+
+    def test_edit_history_timeline_filters_comparison_and_mobile(self):
+        self.assertEqual(self.edit('product',self.product.id,{'name':'NEW PRODUCT'})[0],'saved')
+        self.navigate('/edit-logs')
+        self.wait_for("!!document.querySelector('.audit-record')")
+        self.assertTrue(self.script("return document.querySelector('.audit-record').open"))
+        self.assertNotEqual(self.script("return getComputedStyle(document.querySelector('.audit-hero')).backgroundImage"),'none')
+        self.assertNotEqual(self.script("return getComputedStyle(document.querySelector('.audit-before')).backgroundColor"),self.script("return getComputedStyle(document.querySelector('.audit-after')).backgroundColor"))
+        self.click('.audit-raw>summary')
+        self.assertTrue(self.script("return document.querySelector('.audit-raw').open"))
+        self.script("document.querySelector('#auditType').value='product'")
+        self.type('#auditEntryId',str(self.product.id))
+        self.click('.audit-filter-form button')
+        self.wait_for("new URLSearchParams(location.search).get('entity_type')==='product'")
+        self.assertIn('NEW PRODUCT',self.script("return document.querySelector('.audit-after').textContent"))
+        self.command('/window/rect',{'width':390,'height':844})
+        self.wait_for('document.documentElement.scrollWidth<=innerWidth')
+        self.click('.audit-record>summary')
+        self.assertFalse(self.script("return document.querySelector('.audit-record').open"))
+        self.click('.audit-record>summary')
+        self.click('.audit-entry-link')
+        self.wait_for(f"location.pathname==='/edit/product/{self.product.id}'")
+
+    def test_open_payroll_account_does_not_auto_open_suggestions(self):
+        from urllib.parse import urlencode
+        for query in ({'worker_id':self.worker.id},{'worker_name':self.worker_name}):
+            self.navigate('/payroll?' + urlencode(query))
+            self.wait_for("document.readyState==='complete' && !!window.BHSuggestions")
+            self.assertTrue(self.script("return document.querySelector('#bhSuggestionList').hidden"))
+            self.assertEqual(self.script("return document.querySelector('#payrollWorker').getAttribute('aria-expanded')"),'false')
+            self.click('#payrollWorker')
+            self.wait_for("!document.querySelector('#bhSuggestionList').hidden")
+            self.type('#payrollWorker','\ue00c')
+            self.assertTrue(self.script("return document.querySelector('#bhSuggestionList').hidden"))
+            self.type('#payrollWorker','\ue015')
+            self.wait_for("!document.querySelector('#bhSuggestionList').hidden")
+            self.type('#payrollWorker','\ue00c')
+            self.command(f'/element/{self.element("#payrollWorker")}/clear',{})
+            self.type('#payrollWorker','RAM')
+            self.wait_for("!document.querySelector('#bhSuggestionList').hidden")
+            self.type('#payrollWorker','\ue007')
+            self.active('#openPayrollAccount')
+            self.assertTrue(self.script("return document.querySelector('#bhSuggestionList').hidden"))
+            self.type('#openPayrollAccount','\ue003')
+            self.active('#payrollWorker')
+            self.assertTrue(self.script("return document.querySelector('#bhSuggestionList').hidden"))
+
+    def test_locked_lookup_fields_never_open_or_change_from_suggestions(self):
+        self.navigate('/payroll')
+        self.wait_for("!!window.BHSuggestions")
+        self.click('#payrollWorker')
+        self.wait_for("!document.querySelector('#bhSuggestionList').hidden")
+        self.script("""
+            window.staleOption=document.querySelector('#bhSuggestionList [role=option]');
+            const input=document.querySelector('#payrollWorker');input.value='RAM CITY';input.readOnly=true;
+        """)
+        self.wait_for("document.querySelector('#bhSuggestionList').hidden")
+        self.script("""
+            const input=document.querySelector('#payrollWorker');
+            input.dispatchEvent(new Event('focus'));input.dispatchEvent(new Event('input'));
+            input.dispatchEvent(new KeyboardEvent('keydown',{key:'ArrowDown'}));
+            staleOption.click();input.dispatchEvent(new Event('blur'));
+        """)
+        self.assertTrue(self.script("return document.querySelector('#bhSuggestionList').hidden"))
+        self.assertEqual(self.script("return document.querySelector('#payrollWorker').value"),'RAM CITY')
+        self.script("document.querySelector('#payrollWorker').readOnly=false;document.querySelector('#payrollWorker').dispatchEvent(new Event('focus'))")
+        self.wait_for("!document.querySelector('#bhSuggestionList').hidden")
+        self.script("""
+            const input=document.querySelector('#payrollWorker'),fieldset=document.createElement('fieldset');
+            input.before(fieldset);fieldset.append(input);fieldset.id='lockedLookup';fieldset.disabled=true;
+            input.dispatchEvent(new Event('input'));
+        """)
+        self.wait_for("document.querySelector('#bhSuggestionList').hidden")
+        self.script("document.querySelector('#lockedLookup').disabled=false;document.querySelector('#payrollWorker').dispatchEvent(new Event('focus'))")
+        self.wait_for("!document.querySelector('#bhSuggestionList').hidden")
+        self.script("document.querySelector('#lockedLookup').setAttribute('inert','')")
+        self.wait_for("document.querySelector('#bhSuggestionList').hidden")
+        self.navigate('/manual_jobcard')
+        for selector, list_selector in (('#masterName','#masterSuggestions'),
+                                        ('#manualRows .product','#manualRows .product-suggestions')):
+            with self.subTest(field=selector):
+                value = 'RAM CITY' if selector == '#masterName' else 'VIM'
+                self.script(f"document.querySelector({json.dumps(selector)}).focus()")
+                self.wait_for(f"!document.querySelector({json.dumps(list_selector)}).hidden")
+                self.script(f"""
+                    const input=document.querySelector({json.dumps(selector)});
+                    window.manualStale=document.querySelector({json.dumps(list_selector)}).querySelector('[role=option]');
+                    input.value={json.dumps(value)};input.readOnly=true;
+                """)
+                self.wait_for(f"document.querySelector({json.dumps(list_selector)}).hidden")
+                self.script(f"""
+                    const input=document.querySelector({json.dumps(selector)});
+                    input.dispatchEvent(new Event('focus'));input.dispatchEvent(new Event('input'));
+                    input.dispatchEvent(new KeyboardEvent('keydown',{{key:'ArrowDown'}}));
+                    input.dispatchEvent(new KeyboardEvent('keydown',{{key:'Enter'}}));manualStale.click();
+                    input.dispatchEvent(new Event('blur'));
+                """)
+                self.assertTrue(self.script(f"return document.querySelector({json.dumps(list_selector)}).hidden"))
+                self.assertEqual(self.script(f"return document.querySelector({json.dumps(selector)}).value"),value)
+                self.script(f"const input=document.querySelector({json.dumps(selector)});input.readOnly=false;input.value='';input.dispatchEvent(new Event('focus'))")
+                self.wait_for(f"!document.querySelector({json.dumps(list_selector)}).hidden")
+
+    def test_shared_suggestions_across_worker_lookup_pages(self):
+        from modes import Outworker, OutworkerAlias
+        worker=Outworker(name='RAVI',adders='BH GARMENTS',number=2,enter_user='admin')
+        db.session.add(worker);db.session.flush()
+        worker_id=worker.id
+        db.session.add(OutworkerAlias(worker_id=worker.id,alias='RAV SHORT'))
+        for index in range(12):
+            db.session.add(Outworker(name=f'EXTRA WORKER {index}',adders='CITY',number=100+index,enter_user='admin'))
+        db.session.commit()
+        pages=(('/payroll','#payrollWorker'),('/retune_product','#return-worker'),
+               ('/returns/outworker','#workspace-worker'),('/outworker/jobs','#all-jobs-worker'),
+               ('/outworker_report','#name_f'))
+        for path,selector in pages:
+            with self.subTest(page=path):
+                self.navigate(path)
+                self.click(selector)
+                self.wait_for("!document.querySelector('#bhSuggestionList').hidden")
+                self.assertEqual(self.script("return document.querySelectorAll('#bhSuggestionList [role=option]').length"),14)
+                self.assertFalse(self.script(f"return document.querySelector('{selector}').hasAttribute('list')"))
+                self.assertTrue(self.script("const list=document.querySelector('#bhSuggestionList');return list.scrollHeight>list.clientHeight && list.clientHeight<=[...list.children].slice(0,5).reduce((sum,row)=>sum+row.getBoundingClientRect().height,0)+14"))
+                self.type(selector,str(worker_id))
+                self.assertEqual(self.script("return document.querySelectorAll('#bhSuggestionList [role=option]').length"),1)
+                self.assertIn('RAVI',self.script("return document.querySelector('#bhSuggestionList').textContent"))
+                self.command(f'/element/{self.element(selector)}/clear',{})
+                self.type(selector,'RAV SHORT')
+                self.assertEqual(self.script("return document.querySelectorAll('#bhSuggestionList [role=option]').length"),1)
+                self.type(selector,'\ue015\ue007')
+                self.assertTrue(self.script(f"return document.querySelector('{selector}').value.startsWith('{worker_id}***RAVI')"))
+                self.assertEqual(self.script('return location.pathname'),path)
+                self.assertFalse(self.script("return document.querySelector('#bhSuggestionList').hidden===false"))
+        self.navigate('/retune_product')
+        self.click('#return-worker')
+        self.type('#return-worker','999999\ue007')
+        self.assertEqual(self.script("return document.querySelector('#return-worker').value"),'999999')
+        self.type('#return-worker','\ue00c')
+        self.assertTrue(self.script("return document.querySelector('#bhSuggestionList').hidden"))
+        self.command('/window/rect',{'width':390,'height':844})
+        self.command(f'/element/{self.element("#return-worker")}/clear',{})
+        self.type('#return-worker','RAV')
+        self.wait_for("!document.querySelector('#bhSuggestionList').hidden")
+        self.assertTrue(self.script("return document.querySelector('#bhSuggestionList').getBoundingClientRect().right<=innerWidth"))
+        self.click('#bhSuggestionList [role=option]')
+        self.assertTrue(self.script(f"return document.querySelector('#return-worker').value.startsWith('{worker_id}***RAVI')"))
+        self.type('#return-worker','\ue004')
+        self.active('#jobcard_id')
+        self.type('#jobcard_id','\ue004')
+        self.active('#return-worker')
+        self.navigate('/payroll')
+        self.type('#payrollWorker',str(worker_id)+'\ue007')
+        self.active('#openPayrollAccount')
+        self.type('#openPayrollAccount','\ue003')
+        self.active('#payrollWorker')
+
+    def test_shared_product_aliases_in_job_editor_and_retired_lookups(self):
+        card_id=add_manual_jobcard(self.manual_payload(),self.admin,'shared-editor')['jobData']['jobId']
+        self.navigate(f'/edit/jobcard/{card_id}')
+        selector='input[list],input[aria-controls=bhSuggestionList]'
+        self.wait_for("!!document.querySelector('input[aria-controls=bhSuggestionList]')")
+        self.command(f'/element/{self.element(selector)}/clear',{})
+        self.type(selector,'VIM')
+        self.assertEqual(self.script("return document.querySelectorAll('#bhSuggestionList [role=option]').length"),1)
+        self.assertIn('Aliases: VIM',self.script("return document.querySelector('#bhSuggestionList').textContent"))
+        self.type(selector,'\ue015\ue007')
+        self.assertEqual(self.script(f"return document.querySelector('{selector}').value"),self.product.name)
+        self.app.config['SIMPLE_WORKFLOW']=False
+        self.navigate('/bale_entery')
+        self.wait_for("document.body.textContent.includes('retired')")
+        self.assertFalse(self.script("return !!document.querySelector('#product_name')"))
+        self.assertFalse(self.script("return [...document.scripts].some(script=>script.src.includes('jquery'))"))
+
+    def test_old_job_issue_url_opens_manual_job_issue(self):
+        self.app.config['SIMPLE_WORKFLOW']=False
+        self.navigate('/jobcard')
+        self.wait_for("location.pathname==='/manual_jobcard' && !!document.querySelector('#masterName')")
+        self.type('#masterName',str(self.worker.id)+'\ue007')
+        self.active('#manualRows .product')
+        self.assertEqual(self.script("return document.querySelector('#masterName').value"),self.worker_name)
+
+    def test_rate_product_switch_auto_load_save_discard_cancel_and_retry(self):
+        from modes import Item_data, OutworkerRate, EditLog
+        from payroll_service import save_rate
+        from kept_products import save_product_value
+        other=Item_data(name='SECOND PRODUCT',size=1,meters=1,enter_user='admin')
+        db.session.add(other);db.session.commit();other_id=other.id
+        save_rate(other_id,'','7','new','other-rate',self.admin)
+        save_product_value(other_id,'90',0,'other-value',self.admin)
+        original_url=f'/payroll/rates?product_id={self.product.id}'
+        def choose(product_id):
+            self.script(f"const select=document.querySelector('#ratesProductFilter select');select.value='{product_id}';select.dispatchEvent(new Event('change',{{bubbles:true}}))")
+        self.navigate(original_url)
+        self.wait_for("document.readyState==='complete'")
+        choose(other_id)
+        self.wait_for(f"new URLSearchParams(location.search).get('product_id')==='{other_id}'")
+        self.wait_for("document.querySelector('.section-head h2')?.textContent==='SECOND PRODUCT'")
+        self.assertIn('SECOND PRODUCT',self.script("return document.querySelector('.section-head h2').textContent"))
+        self.assertEqual(self.script("return document.querySelector('[name=product_value]').value"),'90.00')
+        self.assertEqual(self.script("return document.querySelector('[name=rate]').value"),'7')
+        self.navigate(original_url)
+        self.wait_for("document.readyState==='complete'")
+        self.type('[name=rate]','5.5')
+        self.command(f'/element/{self.element("[name=product_value]")}/clear',{})
+        self.type('[name=product_value]','120')
+        choose(other_id)
+        self.wait_for("document.querySelector('#ratesSwitchDialog').open")
+        self.assertEqual(self.script("return document.querySelector('#ratesProductFilter select').value"),str(self.product.id))
+        self.click('#ratesKeepEditing')
+        self.assertEqual(self.script("return document.querySelector('[name=rate]').value"),'5.5')
+        choose(other_id)
+        self.click('#ratesDiscardAndSwitch')
+        self.wait_for(f"new URLSearchParams(location.search).get('product_id')==='{other_id}'")
+        db.session.expire_all();self.assertEqual(self.product.product_value_paise,0)
+        self.assertIsNone(OutworkerRate.query.filter_by(product_id=self.product.id).first())
+        self.navigate(original_url)
+        self.wait_for("document.readyState==='complete'")
+        self.type('[name=rate]','5.5')
+        self.command(f'/element/{self.element("[name=product_value]")}/clear',{})
+        self.type('[name=product_value]','120')
+        choose(other_id)
+        self.wait_for("document.querySelector('#ratesSwitchDialog').open")
+        self.script("const realFetch=window.fetch.bind(window);let lose=true;window.fetch=async(...args)=>{const response=await realFetch(...args);if(lose){lose=false;throw new Error('Lost response')}return response;}")
+        self.click('#ratesSaveAndSwitch')
+        self.wait_for("!document.querySelector('#ratesSwitchError').hidden")
+        self.assertTrue(self.script("return document.querySelector('#ratesSwitchDialog').open"))
+        self.wait_for("!!document.querySelector('#ratesSwitchDialog #appNotifications .app-toast-error')")
+        self.assertTrue(self.script("return document.querySelector('.app-toast-error').getBoundingClientRect().width>0"))
+        self.click('#ratesSaveAndSwitch')
+        self.wait_for(f"new URLSearchParams(location.search).get('product_id')==='{other_id}'")
+        db.session.expire_all()
+        self.assertEqual(self.product.product_value_paise,12000)
+        self.assertEqual(OutworkerRate.query.filter_by(product_id=self.product.id,bundle_type='').one().rate_units,55000)
+        self.assertEqual(EditLog.query.filter_by(entity_type='product_value',entity_id=self.product.id).count(),1)
+
+    def test_users_offer_only_admin_accounts_and_explicit_legacy_upgrade(self):
+        from modes import User
+        self.navigate('/users')
+        self.assertFalse(self.script("return !!document.querySelector('select[name=role]')"))
+        self.assertEqual(self.operator.role,2)
+        self.type('input[name=username]','new-admin')
+        self.type('form:has(input[name=username]) input[name=password]','password123')
+        self.click('form:has(input[name=username]) button[type=submit]')
+        self.wait_for("document.body.textContent.includes('new-admin')")
+        db.session.expire_all()
+        self.assertEqual(User.query.filter_by(username='new-admin').one().role,1)
+        self.assertEqual(self.operator.role,2)
+        self.click('input[name=grant_admin]')
+        self.click('form:has(input[name=grant_admin]) button[type=submit]')
+        self.wait_for("!document.querySelector('input[name=grant_admin]')")
+        db.session.expire_all()
+        self.assertEqual(self.operator.role,1)
 
     def test_outworker_edit_matches_setup_and_keeps_existing_aliases(self):
         from modes import OutworkerAlias
@@ -535,6 +1183,36 @@ class BrowserFlowsTest(AppTestCase):
             self.wait_for("!document.querySelector('#appDrawer').classList.contains('open')")
         self.command("/frame", {"id": None})
 
+    def test_payroll_select_all_jobs_skips_ineligible_and_updates_review(self):
+        from modes import Item_data
+        from payroll_service import save_rate
+        from urllib.parse import urlencode
+        save_rate(self.product.id, '', '5', 'new', 'select-all-rate', self.admin)
+        other = Item_data(name='NO RATE PRODUCT', size=0, meters=0, enter_user='admin')
+        db.session.add(other); db.session.commit()
+        for index, product in enumerate((self.product.name, self.product.name, other.name)):
+            card_id = add_manual_jobcard(self.manual_payload(product=product, pieces=10, count=1),
+                                        self.admin, f'select-all-{index}')['jobData']['jobId']
+            in_move_entery(self.return_payload(card_id, 3, key=f'all-return-{index}'),
+                           self.admin, f'all-return-{index}')
+        self.navigate('/payroll?' + urlencode({'worker_name':self.worker_name}))
+        self.wait_for("!!document.querySelector('#selectAllJobs')")
+        self.assertEqual(self.script("return document.querySelectorAll('input[name=job_ids]:disabled').length"), 1)
+        self.click('#selectAllJobs')
+        self.assertEqual(self.script("return document.querySelectorAll('input[name=job_ids]:checked').length"), 2)
+        self.assertFalse(self.script("return document.querySelector('input[name=job_ids]:disabled').checked"))
+        self.click('input[name=job_ids]:not(:disabled)')
+        self.assertTrue(self.script("return document.querySelector('#selectAllJobs').indeterminate"))
+        self.click('#selectAllJobs')
+        self.assertTrue(self.script("return document.querySelector('#selectAllJobs').checked"))
+        self.click('#payrollSelectionForm button[type=submit]')
+        self.wait_for("document.querySelector('#payroll-local-review').open")
+        self.assertIn('2 jobs · 6 pieces', self.script("return document.querySelector('#payrollLocalHeading').textContent"))
+        self.click('#payrollReviewBack')
+        self.click('#selectAllJobs')
+        self.assertEqual(self.script("return document.querySelectorAll('input[name=job_ids]:checked').length"), 0)
+        self.assertTrue(self.script("return document.querySelector('#payrollLocalConfirm').disabled"))
+
     def test_partial_job_payroll_selection_and_later_returns(self):
         from payroll_service import save_rate
         from modes import OutworkerPayrollJob
@@ -597,7 +1275,9 @@ class BrowserFlowsTest(AppTestCase):
         """)
         self.type('.return-input', '3')
         self.click('.btn-submit')
-        self.wait_for("window.returnAlerts.length===1")
+        self.wait_for("!!document.querySelector('.app-toast-error')")
+        self.assertEqual(self.script('return window.returnAlerts.length'), 0)
+        self.assertEqual(self.script("return document.querySelector('.return-input').value"), '3')
         self.click('.btn-submit')
         self.wait_for("!!document.querySelector('#savedReturnPreview')")
         self.active('#savedReturnPreview')
@@ -686,6 +1366,7 @@ class BrowserFlowsTest(AppTestCase):
         self.assertEqual(self.script("return document.querySelectorAll('[aria-label=\"Main navigation\"]').length"),0)
         self.command('/frame',{'id':None})
         self.wait_for("document.querySelector('#open-return-pieces').textContent==='18'")
+        self.wait_for("document.querySelector('.app-toast-success')?.textContent.includes('2 kept pieces recorded')")
         self.assertEqual(self.script("return document.querySelectorAll('[aria-label=\"Main navigation\"]').length"),1)
         self.assertIn('/returns/outworker',self.script('return location.pathname'))
         enter_job(1)

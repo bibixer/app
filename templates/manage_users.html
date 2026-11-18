@@ -1,5 +1,5 @@
 {% extends 'app_base.html' %}
-{% block title %}Users & roles · BH Manufacturing{% endblock %}
+{% block title %}User accounts · BH Manufacturing{% endblock %}
 {% block head %}
 <style>
   .ui-scope .v2-user-card{padding:8px 0 14px;border-bottom:1px solid #e2e8f0}
@@ -8,17 +8,18 @@
   .ui-scope .v2-user-actions form{margin:0}
   .ui-scope .account-state{margin-left:8px;color:#667085;font-size:12px;font-weight:600}
   .ui-scope .v2-user-actions .danger-button{background:#fff;color:#a33b43;border:1px solid #e6c7ca}
+  .ui-scope .v2-role-upgrade{display:flex;align-items:center;gap:8px;font-size:12px}
+  .ui-scope .v2-role-upgrade input[type=checkbox]{width:auto;min-height:0}
 </style>
 {% endblock %}
 {% block content %}
-<header class="ui-heading"><div><p class="ui-kicker">Administration</p><h1>Users & roles</h1><p class="ui-description">Operators assign manual jobs and record returns. Administrators also manage setup, rates, payments, corrections, and accounts.</p></div></header>
-{% for category,message in get_flashed_messages(with_categories=true) %}<div class="notice {{ category }}" role="alert">{{ message }}</div>{% endfor %}
+<header class="ui-heading"><div><p class="ui-kicker">Administration</p><h1>User accounts</h1><p class="ui-description">New accounts have Administrator access to all app features. Manage passwords and enable or disable accounts here.</p></div></header>
 <section class="ui-panel">
   <h2>Add user</h2>
   <form method="post" class="v2-account-form">{{ form.hidden_tag() }}<input type="hidden" name="action" value="create">
     <label>Username<input name="username" maxlength="100" required autocomplete="off"></label>
     <label>Password<input name="password" type="password" minlength="8" maxlength="128" required autocomplete="new-password"></label>
-    <label>Role<select name="role"><option value="2">Operator</option><option value="1">Administrator</option></select></label>
+    <input type="hidden" name="role" value="1"><p class="account-state">Access: Administrator · all app features</p>
     <button type="submit">Create account</button>
   </form>
 </section>
@@ -30,7 +31,8 @@
     <form method="post" class="v2-account-form">{{ form.hidden_tag() }}
       <input type="hidden" name="action" value="update"><input type="hidden" name="user_id" value="{{ user.id }}"><input type="hidden" name="version" value="{{ user_version(user) }}">
       <strong>{{ user.username }}<span class="account-state">{{ 'Enabled' if user.is_active else 'Disabled' }}</span></strong>
-      <label>Role<select name="role" aria-label="Role for {{ user.username }}"><option value="2" {% if user.role == 2 %}selected{% endif %}>Operator</option><option value="1" {% if user.role == 1 %}selected{% endif %}>Administrator</option></select></label>
+      <input type="hidden" name="role" value="{{ user.role }}">
+      {% if user.role == 1 %}<span class="account-state">Administrator · all app features</span>{% else %}<div><span class="account-state">Legacy restricted access</span><label class="v2-role-upgrade"><input type="checkbox" name="grant_admin" value="1">Grant Administrator access to all features</label></div>{% endif %}
       <label>New password<input name="password" type="password" minlength="8" maxlength="128" autocomplete="new-password"></label>
       <button type="submit">Save account</button>
     </form>
@@ -46,7 +48,7 @@
 <section class="ui-panel">
   <h2>Account change history</h2>
   <div class="table-wrap"><table><thead><tr><th>When</th><th>Changed by</th><th>User ID</th><th>Action</th><th>Previous role</th><th>New role / state</th></tr></thead><tbody>
-  {% for log in access_logs %}<tr><td>{{ log.changed_at.strftime('%d %b %Y %H:%M') }}</td><td>{{ log.actor }}</td><td>#{{ log.user_id }}</td><td>{{ log.action|title }}</td><td>{{ ('Administrator' if log.old_role == 1 else 'Operator') if log.old_role else '—' }}</td><td>{{ 'Deleted' if log.new_role == 0 else ('Administrator' if log.new_role == 1 else 'Operator') }}</td></tr>{% else %}<tr><td colspan="6">No account changes recorded.</td></tr>{% endfor %}
+  {% for log in access_logs %}<tr><td>{{ log.changed_at.strftime('%d %b %Y %H:%M') }}</td><td>{{ log.actor }}</td><td>#{{ log.user_id }}</td><td>{{ log.action|title }}</td><td>{{ ('Administrator' if log.old_role == 1 else 'Legacy restricted') if log.old_role else '—' }}</td><td>{{ 'Deleted' if log.new_role == 0 else ('Administrator' if log.new_role == 1 else 'Legacy restricted') }}</td></tr>{% else %}<tr><td colspan="6">No account changes recorded.</td></tr>{% endfor %}
   </tbody></table></div>
 </section>
 {% endblock %}

@@ -6,6 +6,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const forms = document.querySelectorAll(".form-container form");
 
   forms.forEach(form => {
+    if (form.dataset.asyncLogin === 'true') return;
     form.addEventListener("submit", function (event) {
       if (form.dataset.submitting === "true") {
         event.preventDefault();
@@ -107,7 +108,7 @@ document.addEventListener("DOMContentLoaded", function () {
               );
               if (btn) btn.click();
             } else {
-              alert("Please fill all fields before submitting.");
+              window.AppUI?.notify("Please fill all fields before submitting.", {type:'error'});
             }
           }
         }

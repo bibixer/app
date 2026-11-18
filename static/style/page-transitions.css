@@ -1,0 +1,102 @@
+/* Full-page graphic shutters: 8 geometries, 32 authored close/open pairs.
+   Only this decorative overlay moves; real forms never fade, move or replay. */
+.app-ui>.ui-waves{background-image:radial-gradient(ellipse at 85% 12%,#b94aad50,transparent 52%),linear-gradient(135deg,#081c4a 0%,#303b9a 28%,#087fae 58%,#227c96 76%,#50337f 100%)}
+.app-page-cut{--scene-accent:#82baff;position:fixed;inset:0;z-index:100010;isolation:isolate;overflow:hidden;pointer-events:none;animation:bh-scene-finish .30s steps(1,end) forwards}
+[data-page-transition=jobs]>.app-page-cut{--scene-accent:#b0a2ff}
+[data-page-transition=returns]>.app-page-cut{--scene-accent:#5aefd1}
+[data-page-transition=payroll]>.app-page-cut{--scene-accent:#ffd48a}
+.scene-panel{position:absolute;top:calc(var(--i)*100%/6);left:-18%;width:136%;height:calc(100%/6 + 2px);background:linear-gradient(125deg,#081c4a,#173c92);box-shadow:inset 0 1px #ffffff12;animation:var(--scene-open,bh-scene-slash-open) .20s cubic-bezier(.16,1,.3,1) both;animation-delay:calc(var(--i)*.008s)}
+/* Promote only while a transition runs; release large textures afterward.
+   Stop the repainting background gradient while the shutter is on screen. */
+.is-motion-active .scene-panel,.is-motion-active .scene-flare,.is-motion-active .scene-mark{will-change:transform}
+.is-motion-active>.ui-waves,.is-motion-active>.ui-waves>.ui-wave{animation-play-state:paused}
+.scene-panel::after{content:"";position:absolute;inset:auto 0 0;height:2px;background:var(--scene-accent);opacity:.7}
+/* Static artwork is rasterized with the panel, then moved as one layer.
+   No animated gradients, filters, extra moving masks, or new full-screen layers. */
+.scene-panel::before{content:"";position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(120deg,transparent 38%,#54e4ff1f 38% 39%,transparent 39% 68%,#ffffff0d 68% 78%,transparent 78%),repeating-linear-gradient(0deg,transparent 0 47px,#b4dbff0d 47px 48px)}
+[data-scene=split] .scene-panel::before{background-image:linear-gradient(135deg,transparent 22%,#54e4ff25 22% 23%,transparent 23% 52%,#b0a2ff24 52% 66%,transparent 66%),repeating-linear-gradient(90deg,transparent 0 71px,#c5eaff0d 71px 72px)}
+[data-scene=split] .scene-panel:nth-child(2)::before{transform:scaleX(-1)}
+[data-scene=blinds] .scene-panel::before,[data-scene=cascade] .scene-panel::before{background-image:linear-gradient(0deg,transparent 30%,#54e4ff1f 30% 31%,transparent 31% 70%,#ffffff12 70% 82%,transparent 82%),repeating-linear-gradient(90deg,transparent 0 39px,#a8d6ff16 39px 40px)}
+[data-scene=cascade] .scene-panel:nth-child(even)::before{transform:scaleY(-1)}
+[data-scene=prism] .scene-panel::before{background-image:linear-gradient(45deg,transparent 35%,#54e4ff28 35% 36%,transparent 36% 63%,#b0a2ff20 63% 76%,transparent 76%),repeating-linear-gradient(-45deg,transparent 0 63px,#bfe8ff0f 63px 64px)}
+[data-scene=sweep] .scene-panel::before{background-image:linear-gradient(112deg,transparent 24%,#54e4ff24 24% 37%,transparent 37% 39%,#e8faff35 39% 39.3%,transparent 39.3% 68%,#b0a2ff24 68% 81%,transparent 81%),repeating-linear-gradient(0deg,transparent 0 79px,#a8d6ff10 79px 80px)}
+[data-scene=fold] .scene-panel::before{background-image:linear-gradient(145deg,transparent 24%,#54e4ff24 24% 25%,transparent 25% 59%,#b0a2ff26 59% 74%,transparent 74%),repeating-linear-gradient(0deg,transparent 0 39px,#a8d6ff18 39px 40px)}
+[data-scene=fold] .scene-panel:nth-child(2)::before{transform:scale(-1)}
+[data-scene=orbit] .scene-panel{--orbit-center:100% 100%}
+[data-scene=orbit] .scene-panel:nth-child(2){--orbit-center:0% 100%}
+[data-scene=orbit] .scene-panel:nth-child(3){--orbit-center:100% 0%}
+[data-scene=orbit] .scene-panel:nth-child(4){--orbit-center:0% 0%}
+[data-scene=orbit] .scene-panel::before{background-image:repeating-radial-gradient(circle at var(--orbit-center),transparent 0 38px,#54e4ff28 39px 40px,transparent 41px 74px),linear-gradient(135deg,#b0a2ff12,transparent 65%)}
+.scene-panel:nth-child(even){--scene-open:bh-scene-slash-alt-open;--scene-close:bh-scene-slash-alt-close}
+.scene-flare{position:absolute;left:-20%;top:47%;width:140%;height:3px;background:linear-gradient(90deg,transparent,#54e4ff 35%,#fff 65%,transparent);transform:rotate(-8deg);animation:bh-scene-flare-open .22s both}
+.scene-mark{position:absolute;right:7%;bottom:11%;display:flex;align-items:center;gap:12px;color:#fff;transform:rotate(-5deg);font:900 34px/1 ui-sans-serif,system-ui,sans-serif;font-style:italic;letter-spacing:-2px;animation:bh-scene-mark-open .20s both}
+.scene-mark b{padding:9px 14px;background:var(--scene-accent);color:#081c4a;clip-path:polygon(8% 0,100% 0,92% 100%,0 100%)}
+.scene-mark span{font-size:9px;line-height:1.7;letter-spacing:3px;font-style:normal}
+.scene-mark::before{content:"";position:absolute;inset:-12px -18px;border-top:1px solid #bdeeff70;border-bottom:1px solid #bdeeff30;transform:skewX(-16deg);pointer-events:none}
+/* Diagonal volleys. */
+@keyframes bh-scene-slash-close{from{transform:translateX(-110%) skewX(-12deg)}to{transform:translateX(0) skewX(-12deg)}}
+@keyframes bh-scene-slash-open{from{transform:translateX(0) skewX(-12deg)}to{transform:translateX(110%) skewX(-12deg)}}
+@keyframes bh-scene-slash-alt-close{from{transform:translateX(110%) skewX(-12deg)}to{transform:translateX(0) skewX(-12deg)}}
+@keyframes bh-scene-slash-alt-open{from{transform:translateX(0) skewX(-12deg)}to{transform:translateX(-110%) skewX(-12deg)}}
+/* Split gates. */
+[data-scene=split] .scene-panel{--scene-open:bh-scene-split-open;--scene-close:bh-scene-split-close;--travel:-110%;inset:0 auto 0 0;width:50.5%;height:100%;animation-delay:0s}
+[data-scene=split] .scene-panel:nth-child(2){left:50%;--travel:110%;animation-delay:.012s}
+[data-scene=split] .scene-panel:nth-child(n+3){display:none}
+@keyframes bh-scene-split-close{from{transform:translateX(var(--travel))}to{transform:translateX(0)}}
+@keyframes bh-scene-split-open{from{transform:translateX(0)}to{transform:translateX(var(--travel))}}
+/* Vertical shutters and alternating cascade. */
+[data-scene=blinds] .scene-panel,[data-scene=cascade] .scene-panel{top:0;left:calc(var(--i)*100%/6);width:calc(100%/6 + 2px);height:100%}
+[data-scene=blinds] .scene-panel{--scene-open:bh-scene-blinds-open;--scene-close:bh-scene-blinds-close}
+[data-scene=cascade] .scene-panel{--scene-open:bh-scene-cascade-open;--scene-close:bh-scene-cascade-close;--travel:-110%}
+[data-scene=cascade] .scene-panel:nth-child(even){--travel:110%}
+[data-scene=blinds] .scene-panel::after,[data-scene=cascade] .scene-panel::after{inset:0 0 0 auto;width:2px;height:100%}
+@keyframes bh-scene-blinds-close{from{transform:translateY(-110%)}to{transform:translateY(0)}}
+@keyframes bh-scene-blinds-open{from{transform:translateY(0)}to{transform:translateY(110%)}}
+@keyframes bh-scene-cascade-close{from{transform:translateY(var(--travel))}to{transform:translateY(0)}}
+@keyframes bh-scene-cascade-open{from{transform:translateY(0)}to{transform:translateY(calc(var(--travel)*-1))}}
+/* Four converging shards. */
+[data-scene=prism] .scene-panel{--scene-open:bh-scene-prism-open;--scene-close:bh-scene-prism-close;inset:0 auto auto 0;width:100%;height:50.5%;--x:0%;--y:-110%}
+[data-scene=prism] .scene-panel:nth-child(1){clip-path:polygon(-2% -2%,102% -2%,50% 102%)}
+[data-scene=prism] .scene-panel:nth-child(2){left:49.5%;width:50.5%;height:100%;clip-path:polygon(102% -2%,102% 102%,-2% 50%);--x:110%;--y:0%}
+[data-scene=prism] .scene-panel:nth-child(3){top:49.5%;clip-path:polygon(102% 102%,-2% 102%,50% -2%);--x:0%;--y:110%}
+[data-scene=prism] .scene-panel:nth-child(4){width:50.5%;height:100%;clip-path:polygon(-2% 102%,-2% -2%,102% 50%);--x:-110%;--y:0%}
+[data-scene=prism] .scene-panel:nth-child(n+5){display:none}
+@keyframes bh-scene-prism-close{from{transform:translate(var(--x),var(--y))}to{transform:translate(0,0)}}
+@keyframes bh-scene-prism-open{from{transform:translate(0,0)}to{transform:translate(var(--x),var(--y))}}
+/* Oversized blue sweep and cyan trailing plane. */
+[data-scene=sweep] .scene-panel{--scene-open:bh-scene-sweep-open;--scene-close:bh-scene-sweep-close;inset:0 auto 0 -20%;width:140%;height:100%;animation-delay:0s}
+[data-scene=sweep] .scene-panel:nth-child(1){z-index:1}
+[data-scene=sweep] .scene-panel:nth-child(2){background:#239ce1;animation-delay:.018s}
+[data-scene=sweep] .scene-panel:nth-child(n+3){display:none}
+@keyframes bh-scene-sweep-close{from{transform:translateX(-110%) skewX(-10deg)}to{transform:translateX(0) skewX(-10deg)}}
+@keyframes bh-scene-sweep-open{from{transform:translateX(0) skewX(-10deg)}to{transform:translateX(110%) skewX(-10deg)}}
+/* Flattened hinge: same center-opening movement, without 3D rasterization. */
+[data-scene=fold] .scene-panel{--scene-open:bh-scene-fold-open;--scene-close:bh-scene-fold-close;inset:0 0 auto;width:100%;height:50.5%;transform-origin:center bottom;animation-delay:0s}
+[data-scene=fold] .scene-panel:nth-child(2){top:50%;transform-origin:center top;animation-delay:.012s}
+[data-scene=fold] .scene-panel:nth-child(n+3){display:none}
+@keyframes bh-scene-fold-close{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+@keyframes bh-scene-fold-open{from{transform:scaleY(1)}to{transform:scaleY(0)}}
+/* Four small radial tiles replace the per-frame full-screen circle mask. */
+[data-scene=orbit] .scene-panel{--scene-open:bh-scene-orbit-open;--scene-close:bh-scene-orbit-close;inset:0 auto auto 0;width:50.5%;height:50.5%;transform-origin:right bottom;animation-delay:0s;background:linear-gradient(135deg,#173c92,#081c4a)}
+[data-scene=orbit] .scene-panel:nth-child(2){left:49.5%;transform-origin:left bottom}
+[data-scene=orbit] .scene-panel:nth-child(3){top:49.5%;transform-origin:right top}
+[data-scene=orbit] .scene-panel:nth-child(4){left:49.5%;top:49.5%;transform-origin:left top}
+[data-scene=orbit] .scene-panel:nth-child(n+5){display:none}
+@keyframes bh-scene-orbit-close{from{transform:scale(0)}to{transform:scale(1)}}
+@keyframes bh-scene-orbit-open{from{transform:scale(1)}to{transform:scale(0)}}
+/* Close reaches a fully shut screen before the 160ms navigation handoff. */
+.app-ui.is-page-closing>.app-page-cut{animation:none;visibility:visible}
+.app-ui.is-page-closing>.app-page-cut>.scene-panel{animation-name:var(--scene-close,bh-scene-slash-close);animation-duration:.11s;animation-timing-function:cubic-bezier(.25,.55,.45,1);animation-fill-mode:both}
+.app-ui.is-page-closing>.app-page-cut>.scene-flare{animation:bh-scene-flare-close .15s both}
+.app-ui.is-page-closing>.app-page-cut>.scene-mark{animation:bh-scene-mark-close .13s both}
+@keyframes bh-scene-finish{from{visibility:visible}to{visibility:hidden}}
+@keyframes bh-scene-flare-open{from{transform:translateX(0) rotate(-8deg)}to{transform:translateX(120%) rotate(-8deg)}}
+@keyframes bh-scene-flare-close{from{transform:translateX(-120%) rotate(-8deg)}to{transform:translateX(0) rotate(-8deg)}}
+@keyframes bh-scene-mark-open{from{transform:translateX(0) rotate(-5deg)}to{transform:translateX(80vw) rotate(-5deg)}}
+@keyframes bh-scene-mark-close{from{transform:translateX(72px) rotate(-5deg)}to{transform:translateX(0) rotate(-5deg)}}
+.app-navbar .app-nav-link.active{position:relative;background:#123e9c;color:#fff;box-shadow:inset 3px 0 #5ce5ff}
+.app-navbar .app-nav-link.active::after{content:"";position:absolute;right:2px;top:7px;width:4px;height:9px;background:#ff5772;transform:skewX(-14deg)}
+@media(max-width:600px){.scene-mark{right:5%;bottom:9%;font-size:27px}.scene-mark span{font-size:8px;letter-spacing:2px}}
+@media(prefers-reduced-motion:reduce){.app-page-cut{display:none;animation:none}.app-page-cut>*{animation:none!important}}
+@media print{.app-page-cut{display:none!important}}
+.return-embedded>.app-page-cut{display:none}

@@ -166,16 +166,17 @@ class SimpleWorkflowTest(AppTestCase):
                 self.assertEqual(response.status_code, 405 if path == '/edit' and method == 'post' else 302, path)
         self.assertEqual(User.query.count(), 2)
 
-    def test_admin_creates_account_updates_role_and_audits_without_passwords(self):
+    def test_admin_creates_admin_account_and_audits_without_passwords(self):
         values = {'action': 'create', 'username': 'NewUser', 'password': 'password123',
-                  'role': '2', 'submission_token': 'create-user'}
+                  'role': '1', 'submission_token': 'create-user'}
         self.assertEqual(self.client.post('/users', data=values).status_code, 302)
         self.assertEqual(self.client.post('/users', data=values).status_code, 302)
         user = User.query.filter_by(username='newuser').one()
         self.assertTrue(user.check_password('password123'))
+        self.assertEqual(user.role,1)
         self.assertEqual(UserAccessLog.query.count(), 1)
         update = {'action': 'update', 'user_id': str(user.id), 'role': '1',
-                  'version': user_version(user), 'submission_token': 'promote-user', 'password': ''}
+                  'version': user_version(user), 'submission_token': 'reset-user', 'password': 'updated-password123'}
         self.assertEqual(self.client.post('/users', data=update).status_code, 302)
         self.assertEqual(user.role, 1)
         self.assertEqual(UserAccessLog.query.count(), 2)
@@ -216,7 +217,32 @@ class SimpleWorkflowTest(AppTestCase):
         self.login_as(self.operator)
         self.assertEqual(self.client.get('/users').status_code, 200)
         self.login_as(self.admin)
-        values.update(role='2', version=user_version(self.operator), submission_token='demote-operator')
+        values.update(action='set_active', active='0', version=user_version(self.operator), submission_token='disable-former-operator')
         self.assertEqual(self.client.post('/users', data=values).status_code, 302)
         self.login_as(self.operator)
         self.assertEqual(self.client.get('/users').status_code, 302)
+
+    def test_retired_role_cannot_be_created_or_assigned_and_legacy_access_is_preserved(self):
+        page=self.client.get('/users').get_data(as_text=True)
+        self.assertNotIn('<select name="role"',page)
+        self.assertNotIn('>Operator<',page)
+        self.assertIn('Grant Administrator access',page)
+        response=self.client.post('/users',data={'action':'create','username':'retired-role',
+            'password':'password123','role':'2','submission_token':'retired-create'})
+        self.assertEqual(response.status_code,200)
+        self.assertIsNone(User.query.filter_by(username='retired-role').first())
+        self.assertEqual(self.operator.role,2)
+        response=self.client.post('/users',data={'action':'update','user_id':self.operator.id,
+            'role':'2','version':user_version(self.operator),'password':'updated-password123',
+            'submission_token':'legacy-reset'})
+        self.assertEqual(response.status_code,302)
+        self.assertEqual(self.operator.role,2)
+        response=self.client.post('/users',data={'action':'update','user_id':self.operator.id,
+            'role':'2','grant_admin':'1','version':user_version(self.operator),
+            'submission_token':'explicit-upgrade'})
+        self.assertEqual(response.status_code,302)
+        self.assertEqual(self.operator.role,1)
+        response=self.client.post('/users',data={'action':'update','user_id':self.operator.id,
+            'role':'2','version':user_version(self.operator),'submission_token':'retired-demotion'})
+        self.assertEqual(response.status_code,200)
+        self.assertEqual(self.operator.role,1)
