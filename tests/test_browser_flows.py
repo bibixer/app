@@ -620,6 +620,12 @@ class BrowserFlowsTest(AppTestCase):
                 self.script(f"const input=document.querySelector({json.dumps(selector)});input.readOnly=false;input.value='';input.dispatchEvent(new Event('focus'))")
                 self.wait_for(f"!document.querySelector({json.dumps(list_selector)}).hidden")
 
+    def test_outworker_report_opens_with_focus_in_outworker_name(self):
+        self.navigate('/outworker_report')
+        self.wait_for("document.activeElement?.matches('.master-field input[name=name]')")
+        self.type('.master-field input[name=name]',str(self.worker.id))
+        self.assertEqual(self.script("return document.querySelector('.master-field input[name=name]').value"),str(self.worker.id))
+
     def test_shared_suggestions_across_worker_lookup_pages(self):
         from modes import Outworker, OutworkerAlias
         worker=Outworker(name='RAVI',adders='BH GARMENTS',number=2,enter_user='admin')
