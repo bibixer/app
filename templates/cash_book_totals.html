@@ -1,0 +1,16 @@
+{% macro rupees(paise) -%}
+  {{ '−' if paise < 0 else '' }}₹{{ (paise|abs)|money }}
+{%- endmacro %}
+
+{% macro cash_totals(cash, show_balances=true) %}
+{% set flow = [('credit', 'Cash received · CR'), ('debit', 'Cash paid · DR')] %}
+{% set totals = [('opening', 'Opening balance · B/F')] + flow + [('closing', 'Closing balance · C/F')] if show_balances else flow %}
+<dl class="cash-totals{% if not show_balances %} cash-totals--flow{% endif %}">
+  {% for key, label in totals %}
+    <div class="cash-total cash-total--{{ key }}">
+      <dt>{{ label }}</dt>
+      <dd>{{ rupees(cash[key]) }}</dd>
+    </div>
+  {% endfor %}
+</dl>
+{% endmacro %}

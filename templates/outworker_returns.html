@@ -31,4 +31,4 @@
 {% else %}<section class="ui-panel returns-empty"><span class="return-job-label">Account up to date</span><h2>No incomplete jobs</h2><p>This outworker has no pieces left to return on their job cards.</p><a class="button secondary" href="{{ url_for('outworker_payroll',worker_id=worker.id) }}">Open payroll →</a></section>{% endfor %}
 {% endif %}
 {% endblock %}
-{% block scripts %}<script defer src="{{ url_for('static',filename='js/return-workspace.js',v='20261113-inline') }}"></script>{% endblock %}
+{% block scripts %}<script defer src="{{ url_for('static',filename='js/return-workspace.js',v='20261119-guard-drafts') }}"></script>{% endblock %}

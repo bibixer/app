@@ -115,12 +115,12 @@ class SimpleWorkflowTest(AppTestCase):
 
     def test_outworker_creation_exports_csv_once_in_simple_workflow(self):
         result = add_outworker_db({'name': 'NEW WORKER', 'address': 'CITY',
-                                  'number': 456, 'aliases': 'NEW'}, self.admin, 'worker-v2')
+                                  'number': '9876543210', 'aliases': 'NEW'}, self.admin, 'worker-v2')
         self.assertEqual(result, 101)
         self.assertEqual(Outworker.query.count(), 2)
         self.outworker_qr_print.assert_called_once()
         result = add_outworker_db({'name': 'NEW WORKER', 'address': 'CITY',
-                                  'number': 456, 'aliases': 'NEW'}, self.admin, 'worker-v2')
+                                  'number': '9876543210', 'aliases': 'NEW'}, self.admin, 'worker-v2')
         self.assertEqual(result, 409)
         self.outworker_qr_print.assert_called_once()
 

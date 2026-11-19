@@ -18,7 +18,7 @@ class AliasAndEditTest(AppTestCase):
         self.assertNotIn('Alternate names for this master', page)
         context = edit_context('outworker', self.worker.id)
         original_aliases = [(row.id,row.alias) for row in self.worker.alias_rows]
-        values = {'name':'UPDATED MASTER','adders':'NEW CITY','number':'456',
+        values = {'name':'UPDATED MASTER','adders':'NEW CITY','number':'0123456789',
                   'version':context['version'],'submission_token':'worker-edit-no-aliases'}
         response = self.client.post(f'/edit/outworker/{self.worker.id}',data=values)
         self.assertEqual(response.status_code,302)

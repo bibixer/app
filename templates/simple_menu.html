@@ -1,5 +1,5 @@
 {% set workflow = [('manual_job_card','✎','Assign job'),('retune_product','↩','Job returns'),('jobcard_ledger_lookup','☷','Job ledger')] %}
-{% set reports = [('outworker_report','Outworker accounts'),('outworker_payroll','Advances & payroll')] %}
+{% set reports = [('outworker_report','Outworker accounts'),('outworker_payroll','Advances & payroll'),('advance_recovery','Advance recovery'),('cash_book','Cash book')] %}
 {% set management = [('add_item','Products & aliases'),('payroll_rates','Product rates'),('add_outworker','Outworkers'),('edit_index','Edit center'),('edit_logs','Edit history'),('manage_users','User accounts')] %}
 <nav class="app-navbar" aria-label="Main navigation">
   <a class="app-brand" href="{{ url_for('home') }}"><img src="{{ url_for('static',filename='images/bh-nav-logo.png') }}" alt="BH Garments DMT"><span class="app-brand-copy"><span class="app-brand-title">BH Manufacturing</span></span></a>

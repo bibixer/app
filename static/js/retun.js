@@ -9,7 +9,7 @@
 
       function positiveWholeNumber(value) {
         const number = Number(value);
-        return Number.isSafeInteger(number) && number > 0 ? number : 0;
+        return /^[0-9]+$/.test(value) && Number.isSafeInteger(number) && number > 0 ? number : 0;
       }
 
       function focusAtEnd(input) {
@@ -365,12 +365,19 @@ const buildPayload = () => {
       let activeReturnRequestId = crypto.randomUUID();
       let returnSubmitInFlight = false;
 
-      async function submitReturn() {
+      async function submitReturn({stay = false} = {}) {
+
+        const invalid = [...document.querySelectorAll('.return-input, .calc-pieces, .calc-count')]
+          .find(field => field.validity.badInput || (field.value && (!field.validity.valid || !/^[0-9]+$/.test(field.value))));
+        if (invalid) {
+          window.AppUI?.notify('Check the return quantities and enter whole numbers within the allowed balance.', {type:'error'});
+          (invalid.getClientRects().length ? invalid : document.getElementById(`return-input-${invalid.dataset.row}`))?.focus();
+          return;
+        }
 
 const items = buildPayload();
 
         for (const [index, item] of items.entries()) {
-          if (item.entry_method !== 'calculator') continue;
           const rows = calculatorData[index]?.rows || [];
           const incompleteRow = rows.find(row => {
             const pieces = row.piecesInput.value.trim();
@@ -379,9 +386,10 @@ const items = buildPayload();
           });
           if (incompleteRow) {
             window.AppUI?.notify(`Item #${item.item_id}: Complete each Quick Calc line with whole numbers before saving.`, {type:'error'});
-            (incompleteRow.piecesInput.value ? incompleteRow.countInput : incompleteRow.piecesInput).focus();
+            focusCalculatorForRow(index);
             return;
           }
+          if (item.entry_method !== 'calculator') continue;
           const sum = item.calculation_rows.reduce((total, row) => total + row.pieces * row.count, 0);
           if (sum !== item.returned) {
             window.AppUI?.notify(`Item #${item.item_id}: Quick Calc total must match the Return quantity.`, {type:'error'});
@@ -425,6 +433,16 @@ const payload = {
           return;
         }
 
+        for (const item of items) {
+          if (item.returned !== item.remaining) continue;
+          const keptForm = document.querySelector(`.kept-product-form[data-return-item="${item.item_id}"]`);
+          if (keptForm && [...keptForm.querySelectorAll('input:not([type=hidden])')]
+              .some(field => field.value.trim() || field.validity.badInput)) {
+            window.AppUI?.notify('This return would close a product with an unsaved kept-piece entry. Adjust the return or clear the kept draft before saving.', {type:'warning'});
+            return;
+          }
+        }
+
         if (returnSubmitInFlight) return;
         returnSubmitInFlight = true;
         const submitButton = document.querySelector('.btn-submit');
@@ -438,24 +456,28 @@ const payload = {
           });
 
           const data_R = await response.json();
+          if (data_R.success || data_R.duplicate) {
+            document.querySelectorAll('.return-input, .calc-pieces, .calc-count').forEach(field => { field.value = ''; });
+            returnSubmitInFlight = false;
+          }
           if (data_R.duplicate && !(data_R.jobData && data_R.jobData.jobData)) {
             notifyReturnWorkspace(data_R.remaining);
             window.AppUI?.notify(data_R.message || 'This return was already saved.', {type:'info'});
+            if (stay) return true;
             const destination = `/job_retun?jobcard_id=${encodeURIComponent(JOB_CARD.jobcard_id)}${window.RETURN_EMBEDDED ? '&embedded=1' : ''}`;
-            if (window.AppUI?.navigate) window.AppUI.navigate(destination, {replace:true});
-            else window.location.replace(destination);
+            openSavedReturn(destination);
             return;
           }
           if (data_R.success) {
             activeReturnRequestId = crypto.randomUUID();
             notifyReturnWorkspace(data_R.remaining);
+            if (stay) return true;
             const savedPage = new URL('/job_retun', window.location.origin);
             savedPage.searchParams.set('jobcard_id', JOB_CARD.jobcard_id);
             savedPage.searchParams.set('saved_return', payload.request_id);
             if (window.RETURN_EMBEDDED) savedPage.searchParams.set('embedded', '1');
             if (data_R.jobData.print_warning) savedPage.searchParams.set('csv_warning', '1');
-            if (window.AppUI?.navigate) window.AppUI.navigate(savedPage.href, {replace:true});
-            else window.location.replace(savedPage.href);
+            openSavedReturn(savedPage.href);
           } else {
             returnSubmitInFlight = false;
             window.AppUI?.notify(data_R.message || "Return could not be saved. Refresh this job card to see its latest balance.", {type:'error'});
@@ -472,10 +494,27 @@ const payload = {
 
       }
 
+      function openSavedReturn(destination) {
+        try {
+          window.AppUI?.drafts?.carryDrafts(destination);
+        } catch (error) {
+          window.AppUI?.notify(`Return saved. The page stayed open to preserve your kept-piece draft. ${error.message}`, {type:'warning'});
+          return;
+        }
+        if (window.AppUI?.navigate) window.AppUI.navigate(destination, {replace:true});
+        else window.location.replace(destination);
+      }
+
       document.addEventListener("DOMContentLoaded", () => {
         fillJobInfo();
         renderTable(JOB_CARD.items);
         renderCompletedHistory(JOB_CARD.completed_items || []);
+        window.AppUI?.drafts?.register({
+          label:'the physical return',
+          dirty: () => [...document.querySelectorAll('.return-input, .calc-pieces, .calc-count')]
+            .some(field => field.value !== '' || field.validity.badInput),
+          busy: () => returnSubmitInFlight,
+        });
 
         document.querySelectorAll('.return-input').forEach(input => {
           input.addEventListener('input', () => { input.dataset.entryMethod = 'direct'; });

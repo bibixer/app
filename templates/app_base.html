@@ -17,11 +17,16 @@
   <script defer src="{{ url_for('static',filename='js/notifications.js',v='20261118-sound') }}"></script>
   {% if not embedded %}<script src="{{ url_for('static',filename='js/motion-pairs.js',v='20261118-full32') }}"></script>{% endif %}
   <link rel="stylesheet" href="{{ url_for('static',filename='style/page-transitions.css',v='20261118-designed32') }}">
-  <script defer src="{{ url_for('static',filename='js/page-transitions.js',v='20261118-login-confirm') }}"></script>
+  {% set guard_drafts = request.endpoint == 'job_retun' or (not embedded and request.endpoint in ('manual_job_card', 'outworker_payroll', 'payroll_rates', 'outworker_returns', 'advance_recovery')) %}
+  {% if guard_drafts %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='style/pages/payroll_rate_switch.css', v='20261118') }}">
+  <script defer src="{{ url_for('static', filename='js/unsaved-changes.js', v='20261119-frame-drafts') }}"></script>
+  {% endif %}
+  <script defer src="{{ url_for('static',filename='js/page-transitions.js',v='20261119-discard-only') }}"></script>
 </head>
 {% if request.path.startswith('/payroll') %}{% set transition_style = 'payroll' %}
 {% elif request.path in ['/retune_product','/job_retun'] or request.path.startswith('/returns/') or request.path.endswith('/kept') %}{% set transition_style = 'returns' %}
-{% elif request.path.startswith('/dashboard') or request.path in ['/admin_dashord','/outworker_report','/outworker/jobs','/jobcard/ledger'] or request.path.endswith('/ledger') %}{% set transition_style = 'reports' %}
+{% elif request.path.startswith('/dashboard') or request.endpoint in ('cash_book','advance_recovery') or request.path in ['/admin_dashord','/outworker_report','/outworker/jobs','/jobcard/ledger'] or request.path.endswith('/ledger') %}{% set transition_style = 'reports' %}
 {% elif request.path in ['/manual_jobcard','/jobcard'] or request.path.startswith('/edit/jobcard/') %}{% set transition_style = 'jobs' %}
 {% else %}{% set transition_style = 'setup' %}{% endif %}
 <body class="app-ui {% if request.endpoint == 'login' and request.method == 'POST' %}no-page-motion{% endif %} {% if not current_user.is_authenticated %}is-guest{% endif %} {% block body_class %}{% endblock %}"
@@ -59,7 +64,10 @@
     {% block notifications %}{% endblock %}
     {% block content %}{% endblock %}
   </main>
-  <script defer src="{{ url_for('static', filename='js/app-ui.js', v='20261118-transitions') }}"></script>
+  {% if guard_drafts %}
+    {% include 'unsaved_changes.html' %}
+  {% endif %}
+  <script defer src="{{ url_for('static', filename='js/app-ui.js', v='20261119-decimal-input') }}"></script>
   {% block scripts %}{% endblock %}
 </body>
 </html>

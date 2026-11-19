@@ -28,6 +28,20 @@ def ensure_product_value(engine):
             connection.exec_driver_sql('ALTER TABLE ItemData ADD COLUMN product_value_paise BIGINT NOT NULL DEFAULT 0 CHECK(product_value_paise >= 0 AND product_value_paise <= 99999999999)')
 
 
+def ensure_outworker_contact_number(engine):
+    with schema_transaction(engine) as connection:
+        columns = {column['name'] for column in inspect(connection).get_columns('OutworkData')}
+        if 'contact_number' not in columns:
+            connection.exec_driver_sql('ALTER TABLE OutworkData ADD COLUMN contact_number VARCHAR(10)')
+
+
+def ensure_payroll_receipt_archive(engine):
+    with schema_transaction(engine) as connection:
+        columns = {column['name'] for column in inspect(connection).get_columns('outworker_payroll')}
+        if 'receipt_archive' not in columns:
+            connection.exec_driver_sql('ALTER TABLE outworker_payroll ADD COLUMN receipt_archive JSON')
+
+
 def ensure_security_schema(engine, users_engine):
     """Additive upgrades: retain historical rows, constrain future ledger writes."""
     with schema_transaction(users_engine) as connection:

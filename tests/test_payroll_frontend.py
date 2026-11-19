@@ -1,5 +1,6 @@
 import json
 import re
+from pathlib import Path
 from unittest.mock import patch
 
 from data_entry import add_manual_jobcard, in_move_entery
@@ -20,7 +21,7 @@ class FrontendPayrollTest(AppTestCase):
             html = self.client.get(f'/payroll?worker_id={self.worker.id}').get_data(as_text=True)
         self.assertIn('<dialog class="panel review payroll-review-dialog"', html)
         self.assertIn('id="payrollReviewClose"', html)
-        self.assertIn('Amount to reduce · select advances', html)
+        self.assertIn('id="payrollModalAdvancesHeading"', html)
         self.assertIn('data-payroll-advance', html)
         self.snapshot = re.search(r'name="client_snapshot" value="([^"]+)"', html).group(1)
         self.client_data = json.loads(re.search(r'id="payrollClientData" type="application/json">(.*?)</script>', html).group(1))
@@ -52,6 +53,27 @@ class FrontendPayrollTest(AppTestCase):
         self.assertEqual(advance_balance(self.worker.id), 0)
         self.pay(action='recover_selected_advances', job_ids=[])
         self.assertEqual(OutworkerAdvanceReceipt.query.count(), 1)
+
+    def test_full_repayment_receipt_and_failed_export_recovery(self):
+        self.app.config['LABEL_PRINT_ROOT'] = self.temp.name
+        another = record_advance(self.worker.id, '500', 'Cash', '', '', 'second-advance', self.admin)
+        account = self.client.get(f'/payroll?worker_id={self.worker.id}').get_data(as_text=True)
+        snapshot = re.search(r'name="client_snapshot" value="([^"]+)"', account)[1]
+        with self.assertLogs(level='ERROR'), patch('payroll_service.payroll_bill_csv', side_effect=OSError):
+            response = self.pay(advance_ids=[self.advance, another.id], deduction='0', repayment='510',
+                                client_snapshot=snapshot)
+        self.assertEqual(response.status_code, 302)
+        payroll = OutworkerPayroll.query.one()
+        path = Path(self.temp.name) / 'payroll' / f'payroll_{payroll.id}.csv'
+        self.assertFalse(path.exists())
+        self.client.get(response.location)
+        receipt = self.client.get(response.location).get_data(as_text=True)
+        self.assertIn('₹510.00', receipt)
+        self.assertIn('₹493.33', receipt)
+        self.assertEqual(self.client.post(response.location, data={'submission_token':'export'}).status_code, 302)
+        self.assertEqual(path.read_bytes().decode('utf-8'), payroll.receipt_archive['csv'])
+        self.assertEqual(OutworkerPayroll.query.count(), 1)
+        self.assertEqual(OutworkerAdvanceReceipt.query.count(), 2)
 
     def test_advance_only_rejects_jobs_bad_total_and_tampered_snapshot(self):
         for changes in ({'job_ids':str(self.card)}, {'job_ids':[], 'deduction':'9.00'},

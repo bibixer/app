@@ -22,7 +22,7 @@ for(const [jobs,advances] of [[[],[]],[['999'],[]],[['1'],['999']]]) {
 // Exercise real submit and change handlers with a minimal DOM; no network APIs.
 const elements={};
 const element=()=>({listeners:{},checked:false,hidden:true,value:'',textContent:'',innerHTML:'',addEventListener(name,fn){this.listeners[name]=fn;},focus(){this.focused=true;}});
-for(const id of ['payrollSelectionForm','payroll-local-review','payrollCalculationStatus','payrollLocalConfirm','payrollLocalHeading','payrollLocalBreakdown','payrollLocalSelectedIds','payrollLocalDeduction','payrollModalStatus','payrollModalSelectAll','payrollReviewClose','payrollReviewBack','selectAllAdvances','payrollLocalAction','payrollModalHelp','payrollModalAdvancesHeading','payrollModalAdvanceHelp','payrollLocalMethodLabel'])elements[id]=element();
+for(const id of ['payrollSelectionForm','payroll-local-review','payrollCalculationStatus','payrollLocalConfirm','payrollLocalHeading','payrollLocalBreakdown','payrollLocalTotals','payrollLocalSelectedIds','payrollLocalDeduction','payrollModalStatus','payrollModalSelectAll','payrollReviewClose','payrollReviewBack','selectAllAdvances','payrollLocalAction','payrollModalHelp','payrollModalAdvancesHeading','payrollModalAdvanceHelp','payrollLocalMethodLabel'])elements[id]=element();
 elements.payrollClientData={textContent:JSON.stringify({...data,jobs:[{...data.jobs[0],given:3,returned:3,already_paid:0,pending_return:0,lines:[{product:'<unsafe>',type:'lump',pieces:3,rate:'5.5555',rate_source:'Base',amount_paise:1667}]}]})};
 const mainBoxes=[element(),element()], modalBoxes=[element(),element()];
 mainBoxes.forEach((box,index)=>{box.value=String(index+1);box.checked=index===0;});

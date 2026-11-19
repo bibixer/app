@@ -3,12 +3,13 @@
 {% block setup_heading %}Edit Outworker #{{ entry.entity_id }}{% endblock %}
 {% block setup_description %}Update the master's details. Related job records and edit history stay in sync.{% endblock %}
 {% block setup_form %}
+{% set draft = entry.draft|default({}) %}
 <form method="post" autocomplete="off" novalidate>
   {{ form.hidden_tag() }}
   {% for field in entry.fields if field.name != 'aliases' %}
   <div class="mb-3">
     <label class="form-label" for="worker-edit-{{ field.name }}">{{ {'name':'Name','adders':'Address','number':'Mobile Number'}.get(field.name,field.name|title) }}</label>
-    <input class="form-control" id="worker-edit-{{ field.name }}" name="{{ field.name }}" type="{{ 'number' if field.kind == 'int' else 'text' }}" value="{{ field.value if field.value is not none else '' }}" {% if field.kind == 'int' %}min="1" step="1"{% endif %} required>
+    <input class="form-control" id="worker-edit-{{ field.name }}" name="{{ field.name }}" type="text" value="{{ draft.get(field.name, field.value) or '' }}" {% if field.kind == 'phone' %}inputmode="numeric" autocomplete="tel-national"{% endif %} required>
   </div>
   {% endfor %}
   {{ form.submit(value='Save changes') }}

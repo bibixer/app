@@ -41,6 +41,7 @@
   }
   function navigate(destination, options = {}) {
     const url = new URL(destination, location.href);
+    if (api.drafts?.guard(() => navigate(url.href, options))) return;
     const leave = () => options.replace ? location.replace(url.href) : location.assign(url.href);
     if (url.origin !== location.origin || reduced.matches || body.classList.contains('return-embedded')) {
       leave(); return;
@@ -62,8 +63,9 @@
     if (!link || link.hasAttribute('download') || (link.target && link.target !== '_self')) return;
     if (link.getAttribute('href').startsWith('#')) return;
     const url = new URL(link.href, location.href);
-    if (!/^https?:$/.test(url.protocol) || url.origin !== location.origin) return;
-    if (url.pathname === location.pathname && url.search === location.search && url.hash) return;
+    if (!/^https?:$/.test(url.protocol)) return;
+    if (url.origin !== location.origin && !api.drafts) return;
+    if (url.origin === location.origin && url.pathname === location.pathname && url.search === location.search && url.hash) return;
     event.preventDefault(); navigate(url.href);
   });
   document.addEventListener('submit', event => {
@@ -72,6 +74,11 @@
     if (event.target.method === 'dialog') return;
     const target = event.submitter?.formTarget || event.target.target;
     if (target && target !== '_self') return;
+    if (!event.defaultPrevented && event.target.method === 'get' &&
+        api.drafts?.guard(() => event.target.requestSubmit(event.submitter || undefined))) {
+      event.preventDefault();
+      return;
+    }
     if (pending) { event.preventDefault(); return; }
     // Native forms keep browser validation, their original submitter, and exactly
     // one request. Close visually while that request starts; never delay a POST.

@@ -17,7 +17,7 @@ from validation import MAX_PIECES, record_id
 from database_writes import begin_write
 from modes import (JobKeptProduct, OutworkerAdvance, OutworkerAdvanceReceipt,
                    OutworkerAdvanceRecovery, Item_data)
-from payroll_service import parse_money, MAX_PAISE
+from payroll_service import parse_money, unlinked_advance_deduction, MAX_PAISE
 
 
 def _snapshot(row):
@@ -38,6 +38,8 @@ def _state(card):
              "breakdowns": [_snapshot(row) for row in breakdowns.values()],
              "paid": bool(OutworkerPayrollJob.query.filter_by(jobcard_id=card.id).first()),
              "kept": [_snapshot(row) for row in kept],
+             "legacy_recovery_lock": any(unlinked_advance_deduction(worker_id)
+                                          for worker_id in {row.worker_id for row in kept}),
              "advances": [_snapshot(row) for row in OutworkerAdvance.query.filter(
                  OutworkerAdvance.id.in_(advance_ids)).order_by(OutworkerAdvance.id).all()],
              "recoveries": [_snapshot(row) for row in OutworkerAdvanceRecovery.query.filter(
@@ -93,7 +95,7 @@ def jobcard_edit_context(card_id):
                       'date': row['date'].split('.')[0],
                       'value': f"{row['unit_value_paise'] // 100}.{row['unit_value_paise'] % 100:02d}"}
                      for row in state['kept']],
-            "kept_locked": bool(state['recoveries'] or state['receipts']),
+            "kept_locked": bool(state['recoveries'] or state['receipts'] or state['legacy_recovery_lock']),
             "totals": {"given": sum(row['quantity'] for row in given),
                        "returned": sum(row['quantity'] for row in returns),
                        "kept": sum(row['pieces'] for row in state['kept']),
@@ -173,10 +175,15 @@ def save_jobcard_edit(card_id, data, expected_version, token, username):
             raise ValueError("This job belongs to an issued payroll. Its paid data is locked.")
         if before['recoveries'] or before['receipts']:
             raise ValueError('This job has product-value recovery money already collected or deducted. Its settled recovery data is locked.')
+        if before['legacy_recovery_lock']:
+            raise ValueError('This worker has older payroll deductions without advance links. Kept entries are locked to protect the account.')
         worker = resolve_master_name(data.get("given_to"))
         giver = str(data.get("given_by") or "").strip()
         if not worker or not giver or len(giver) > 50:
             raise ValueError("Choose an existing outworker and enter who gave the job.")
+        worker_id = record_id(worker.split('***', 1)[0])
+        if before['kept'] and unlinked_advance_deduction(worker_id):
+            raise ValueError('This worker has older payroll deductions without advance links. The kept charges cannot be transferred.')
         card.date, card.given_to, card.given_by = _date(data.get("date"), card.date), worker, giver
         edit_lines = data.get("edit_lines") == "1"
         reason = data.get("edit_reason", "")
@@ -263,7 +270,7 @@ def save_jobcard_edit(card_id, data, expected_version, token, username):
                 row.note = str(data.get(prefix + 'note') or '').strip()
                 if len(row.note) > 500:
                     raise ValueError('Kept notes must be at most 500 characters.')
-            row.worker_id = record_id(worker.split('***', 1)[0])
+            row.worker_id = worker_id
             advance.worker_id, advance.worker_name = row.worker_id, worker
             advance.amount_paise, advance.paid_at = row.amount_paise, row.date
             if old != _snapshot(row):

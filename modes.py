@@ -95,7 +95,12 @@ class Outworker(db.Model):
     name = db.Column(db.String(50), nullable=False)
     adders = db.Column(db.String(50), nullable=False)
     number = db.Column(db.Integer, nullable=False)
+    contact_number = db.Column(db.String(10), nullable=True)
     enter_user = db.Column(db.String(50), nullable=False)
+
+    @property
+    def mobile(self):
+        return self.contact_number if self.contact_number is not None else str(self.number)
 
 class OutworkerAlias(db.Model):
     __tablename__ = "OutworkerAlias"
@@ -322,6 +327,7 @@ class OutworkerPayroll(db.Model):
     reference = db.Column(db.String(100), nullable=False, default="")
     note = db.Column(db.String(500), nullable=False, default="")
     recorded_by = db.Column(db.String(100), nullable=False)
+    receipt_archive = db.Column(db.JSON, nullable=True)
     __table_args__ = (
         db.CheckConstraint("gross_paise >= 0 AND deduction_paise >= 0 AND net_paise >= 0"),
         db.CheckConstraint("gross_paise = deduction_paise + net_paise"),

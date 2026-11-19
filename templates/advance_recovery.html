@@ -1,0 +1,129 @@
+{% extends 'payroll_base.html' %}
+{% from 'cash_book_totals.html' import rupees %}
+{% block title %}Advance recovery · BH Manufacturing{% endblock %}
+{% block head %}<link rel="stylesheet" href="{{ url_for('static', filename='style/pages/advance_recovery.css', v='20261119-advance-views') }}">{% endblock %}
+{% block main_class %}pay-shell recovery-page{% endblock %}
+
+{% block content %}
+<header class="recovery-hero">
+  <div class="recovery-hero-copy">
+    <h1>Advance recovery</h1>
+    <p>View advances for {{ worker.name if worker else 'all outworkers' }}.</p>
+    <div class="actions recovery-hero-links">
+      <a href="{{ url_for('admin_dashord') }}">← Dashboard</a>
+      <a href="{{ url_for('cash_book') }}">Cash book ↗</a>
+    </div>
+  </div>
+  <dl class="recovery-entry-count">
+    <dt>Advance entries</dt>
+    <dd class="recovery-entry-count-amount">{{ advances|length }}</dd>
+    <dd class="recovery-entry-count-caption">All dates · {{ worker.name if worker else 'All outworkers' }}</dd>
+  </dl>
+</header>
+
+<section class="panel recovery-filters" aria-label="Filter advance recovery">
+  <form method="get" action="{{ url_for('advance_recovery') }}" class="recovery-filter-grid" id="recoveryWorkerForm">
+    <input type="hidden" name="view" value="{{ view }}">
+    <div class="field recovery-worker-picker">
+      <label for="recoveryWorker">Outworker name, alias, or ID</label>
+      <input id="recoveryWorker" name="worker_name" role="combobox" aria-autocomplete="list"
+        aria-haspopup="listbox" aria-expanded="false" aria-controls="recoveryWorkerOptions"
+        aria-describedby="recoveryWorkerStatus" value="{{ worker_name }}" autocomplete="off" spellcheck="false"
+        placeholder="Search outworkers">
+      <small id="recoveryWorkerStatus" class="recovery-picker-status" role="status"></small>
+      <div id="recoveryWorkerOptions" class="recovery-picker-options" role="listbox" aria-label="Matching outworkers" hidden></div>
+    </div>
+    <div class="actions">
+      <button type="submit" id="recoveryApplyWorker">Apply filter</button>
+      {% if worker %}<a class="button secondary" href="{{ url_for('advance_recovery', view=view) }}">All outworkers</a>{% endif %}
+    </div>
+  </form>
+</section>
+
+{% if worker %}
+<section class="panel recovery-entry" id="receive-advance">
+  <div class="section-head">
+    <div><h2>Record money received</h2><p>Enter a full or partial repayment already received from {{ worker.name }}.</p></div>
+    <a class="button secondary" href="{{ url_for('outworker_payroll', worker_id=worker.id) }}">Open payroll</a>
+  </div>
+  {% if selected %}
+  <form method="post" action="{{ url_for('advance_recovery', worker_id=worker.id, view=view) }}" id="advanceReceiptForm" data-recovery-draft>
+    {{ form.hidden_tag() }}
+    <div class="fields">
+      <label class="field">Advance to recover
+        <select name="advance_choice" id="advanceReceiptChoice" required>
+          {% for entry in outstanding %}
+          <option value="{{ entry.id }}:{{ entry.remaining_paise }}" {% if entry.id == selected.id %}selected{% endif %}>Advance #{{ entry.id }} · {{ rupees(entry.remaining_paise) }} left · {{ entry.date.strftime('%d %b %Y') }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label class="field">Amount received (₹)
+        <input type="number" inputmode="decimal" data-decimal-places="2" name="amount" id="advanceReceiptAmount" min="0.01" max="{{ selected.remaining_paise|money_input }}" step="0.01" value="{{ request.form.get('amount', '') }}" required>
+        <span id="advanceReceiptHint" class="small muted" aria-live="polite">Up to {{ rupees(selected.remaining_paise) }} for this advance.</span>
+      </label>
+      <label class="field">Received by<select name="method" required>{% for method in methods %}<option {% if request.form.get('method') == method %}selected{% endif %}>{{ method }}</option>{% endfor %}</select></label>
+      <label class="field">Reference (optional)<input name="reference" maxlength="100" value="{{ request.form.get('reference', '') }}"></label>
+      <label class="field full">Notes (optional)<textarea name="note" maxlength="500" rows="2">{{ request.form.get('note', '') }}</textarea></label>
+    </div>
+    <div class="recovery-form-footer"><button type="submit">Record money received</button></div>
+  </form>
+  {% else %}<p class="empty recovery-empty">This outworker has no outstanding advance.</p>{% endif %}
+</section>
+{% endif %}
+
+<section class="panel recovery-ledger" id="advance-list" aria-labelledby="advances-title">
+  <div class="section-head">
+    <h2 id="advances-title">All advances</h2>
+    <nav class="recovery-view-switch" aria-label="Advance views">
+      <a href="{{ url_for('advance_recovery', worker_id=worker.id if worker else none, view='accounts', _anchor='advance-list') }}" {% if view == 'accounts' %}aria-current="page"{% endif %}>Account wise</a>
+      <a href="{{ url_for('advance_recovery', worker_id=worker.id if worker else none, view='entries', _anchor='advance-list') }}" {% if view == 'entries' %}aria-current="page"{% endif %}>Entry wise</a>
+    </nav>
+  </div>
+  {% if advances %}
+  {% if view == 'accounts' %}
+  <div class="table-wrap" tabindex="0" role="region" aria-label="Advances by outworker">
+    <table>
+      <thead><tr><th scope="col">Outworker</th><th scope="col" class="right">Advance entries</th><th scope="col" class="right">Total original amount</th><th scope="col">Account</th></tr></thead>
+      <tbody>
+      {% for worker_id, rows in advances|groupby('worker_id') %}
+        {% set account = rows|first %}
+        <tr>
+          <th scope="row">{{ account.name }}<small>#{{ worker_id }} · {{ account.adders }}</small></th>
+          <td class="right">{{ rows|length }}</td>
+          <td class="right number">{{ rupees(rows|sum(attribute='amount_paise')) }}</td>
+          <td><a class="recovery-row-link" aria-label="View advance entries for {{ account.name }}" href="{{ url_for('advance_recovery', worker_id=worker_id, view='entries', _anchor='advance-list') }}">View entries →</a></td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="table-wrap" tabindex="0" role="region" aria-label="Advance entries">
+    <table>
+      <thead><tr><th scope="col">Date</th><th scope="col">Outworker</th><th scope="col">Advance</th><th scope="col" class="right">Original amount</th>{% if not worker %}<th scope="col">Account</th>{% endif %}</tr></thead>
+      <tbody>
+      {% for row in advances %}
+        <tr>
+          <td class="recovery-date">{{ row.paid_at.strftime('%d %b %Y') }}<small>{{ row.paid_at.strftime('%H:%M') }}</small></td>
+          <th scope="row">{{ row.name }}<small>#{{ row.worker_id }} · {{ row.adders }}</small></th>
+          <td>Advance #{{ row.id }}<small>{{ 'Kept-piece charge' if row.kept else row.method }}{% if row.reference %} · {{ row.reference }}{% endif %}</small></td>
+          <td class="right number">{{ rupees(row.amount_paise) }}</td>
+          {% if not worker %}
+          <td><a class="recovery-row-link" aria-label="Open account for {{ row.name }}" href="{{ url_for('advance_recovery', worker_id=row.worker_id, view=view, _anchor='receive-advance') }}">Open account →</a></td>
+          {% endif %}
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+  {% else %}<p class="empty recovery-empty">No advances recorded{% if worker %} for this outworker{% endif %}.</p>{% endif %}
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script type="application/json" id="recoveryWorkerData">{{ {'workers':worker_options, 'mapping':worker_aliases}|tojson }}</script>
+<script defer src="{{ url_for('static', filename='js/manual-master-suggestions.js', v='20261118-locked') }}"></script>
+<script defer src="{{ url_for('static', filename='js/advance-recovery-worker.js', v='20261119') }}"></script>
+<script defer src="{{ url_for('static', filename='js/advance-receipt.js', v='20261119-recovery') }}"></script>
+{% endblock %}

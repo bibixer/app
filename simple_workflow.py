@@ -107,8 +107,8 @@ def _product_pie(products, field):
     return {'total': total, 'slices': slices}
 
 
-def weekly_job_overview(day=None, *, date_from=None, date_to=None):
-    """Period account (Wednesday–Tuesday by default), with balances at the To date."""
+def report_period(day=None, *, date_from=None, date_to=None):
+    """Resolve the weekly default or an inclusive custom range."""
     custom = date_from is not None or date_to is not None
     if custom and (not isinstance(date_from, date) or not isinstance(date_to, date) or date_from > date_to):
         raise ValueError('Enter valid From and To dates, with From on or before To.')
@@ -122,6 +122,14 @@ def weekly_job_overview(day=None, *, date_from=None, date_to=None):
     # Leave room for navigation to the adjacent weeks and the exclusive end.
     if first < date(1900, 1, 10) or last > date(9999, 12, 15):
         raise ValueError('Choose a week between 1900 and 9999.')
+    return {'week_start': first, 'week_end': last, 'custom_range': custom,
+            'previous_week': first - timedelta(days=7), 'next_week': first + timedelta(days=7)}
+
+
+def weekly_job_overview(day=None, *, date_from=None, date_to=None):
+    """Period account (Wednesday–Tuesday by default), with balances at the To date."""
+    period = report_period(day, date_from=date_from, date_to=date_to)
+    first, last = period['week_start'], period['week_end']
     start = datetime.combine(first, time.min)
     end = datetime.combine(last + timedelta(days=1), time.min)
     products = {normalize_name(item.name): {'name': item.name, 'opening': 0, 'given': 0, 'returned': 0, 'closing': 0}
@@ -135,8 +143,12 @@ def weekly_job_overview(day=None, *, date_from=None, date_to=None):
         func.coalesce(piece_sum(case((Jobmovement.date >= start, Jobmovement.inflow), else_=0)), 0),
     ).filter(Jobmovement.date < end).group_by(Jobmovement.product_name).all()
     for name, opening, given, returned in rows:
-        product = products.setdefault(normalize_name(name), {'name': name or 'Unnamed product'})
-        product.update(opening=opening, given=given, returned=returned, closing=opening + given - returned)
+        product = products.setdefault(normalize_name(name), dict(name=name or 'Unnamed product',
+                                      opening=0, given=0, returned=0, closing=0))
+        product['opening'] += opening
+        product['given'] += given
+        product['returned'] += returned
+        product['closing'] += opening + given - returned
     names = {row.id: row.name for row in Item_data.query.all()}
     for row in JobKeptProduct.query.filter(JobKeptProduct.date < end).all():
         name = names.get(row.product_id, row.product_name)
@@ -166,19 +178,21 @@ def weekly_job_overview(day=None, *, date_from=None, date_to=None):
             balance['pending'] += max(0, given - returned - kept_quantity)
     totals = {field: sum(row[field] for row in product_rows) for field in ('opening', 'given', 'returned', 'closing')}
     totals['kept'] = sum(row.get('kept', 0) for row in product_rows)
-    return {**totals, 'week_start': first, 'week_end': last, 'custom_range': custom,
-            'previous_week': first - timedelta(days=7), 'next_week': first + timedelta(days=7),
+    return {**totals, **period,
             'product_totals': product_rows, 'outflow_pie': _product_pie(product_rows, 'given'),
             'inflow_pie': _product_pie(product_rows, 'returned'), 'jobs': len(cards),
             'recent': [(card, balances.get(card.id, {'given': 0, 'returned': 0, 'pending': 0})) for card in cards]}
 
 
-def dashboard_period(values):
+def report_period_selection(values):
     if 'date_from' in values or 'date_to' in values:
-        return weekly_job_overview(date_from=date.fromisoformat(values.get('date_from', '')),
-                                   date_to=date.fromisoformat(values.get('date_to', '')))
-    day = date.fromisoformat(values['week']) if values.get('week') else None
-    return weekly_job_overview(day)
+        return {'date_from': date.fromisoformat(values.get('date_from', '')),
+                'date_to': date.fromisoformat(values.get('date_to', ''))}
+    return {'day': date.fromisoformat(values['week']) if values.get('week') else None}
+
+
+def dashboard_period(values):
+    return weekly_job_overview(**report_period_selection(values))
 
 
 def dashboard_movement_details(report, kind):

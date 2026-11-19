@@ -41,6 +41,11 @@ function calculatePayrollLocally(data, jobIds, advanceIds) {
   const modalStatus = document.getElementById('payrollModalStatus');
   const modalBoxes = [...review.querySelectorAll('[data-payroll-advance]')];
   const modalAll = document.getElementById('payrollModalSelectAll');
+  const paymentForm = document.getElementById('payrollLocalPayment');
+  const excessChoice = document.getElementById('payrollExcessAdvance');
+  const carryAdvance = document.getElementById('payrollCarryAdvance');
+  const collectAdvance = document.getElementById('payrollCollectAdvance');
+  const repaymentField = document.getElementById('payrollLocalRepayment');
   let opener;
   const escape = value => String(value).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
   const money = value => `₹${(value / 100).toLocaleString('en-IN', {minimumFractionDigits:2,maximumFractionDigits:2})}`;
@@ -70,23 +75,77 @@ function calculatePayrollLocally(data, jobIds, advanceIds) {
       const jobIds = selected('job_ids'), advanceIds = selected('advance_ids');
       const result = calculatePayrollLocally(data, jobIds, advanceIds);
       const receiving = result.mode === 'recovery';
-      const jobs = result.jobs.map(job => `<h3>Job #${job.id} · paying ${job.pieces} pieces</h3><p class="small muted">Given ${job.given} · Returned ${job.returned} · Kept ${job.kept || 0} · Previously paid ${job.already_paid} · Awaiting return ${job.pending_return}</p><div class="table-wrap receipt-job"><table><thead><tr><th>Product</th><th>Type</th><th>Pieces</th><th>₹ / piece</th><th>Rate used</th><th>Amount</th></tr></thead><tbody>${job.lines.map(line => `<tr><td>${escape(line.product)}</td><td>${escape(line.type)}</td><td>${line.pieces}</td><td>₹${escape(line.rate)}</td><td>${escape(line.rate_source)}</td><td class="number">${money(line.amount_paise)}</td></tr>`).join('')}<tr class="total-row"><td colspan="5">Job total</td><td>${money(job.gross_paise)}</td></tr></tbody></table></div>`).join('');
-      const metrics = receiving ? [['Money to receive back',result.deduction],['Amount still to recover',result.remaining]] : [['Gross payroll',result.gross],['Advance deduction',result.deduction],['Final payment',result.net],['Advance left after payment',result.remaining]];
-      const recoveries = result.recoveries.length ? `<div class="advance-review"><h3>${receiving ? 'Advances being received back' : 'Advances being deducted'}</h3>${result.recoveries.map(row => `<p>Advance #${row.id}<strong>− ${money(row.amount)}</strong></p>`).join('')}</div>` : '';
-      document.getElementById('payrollLocalHeading').textContent = receiving ? `Receive money back · ${result.advances.length} advances` : `Payroll calculation · ${result.jobs.length} jobs · ${result.pieces} pieces`;
+      const selectedBalance = result.advances.reduce((sum, advance) => sum + advance.remaining_paise, 0);
+      const excess = receiving ? 0 : selectedBalance - result.deduction;
+      let repayment = 0;
+      if (excessChoice) {
+        if (open || !excess) carryAdvance.checked = true;
+        excessChoice.hidden = excess <= 0;
+        excessChoice.querySelector('[data-payroll-carry-amount]').textContent = money(excess);
+        excessChoice.querySelector('[data-payroll-collect-amount]').textContent = money(selectedBalance);
+        repayment = excess > 0 && collectAdvance.checked ? selectedBalance : 0;
+        repaymentField.disabled = !repayment;
+        repaymentField.value = repayment ? (repayment / 100).toFixed(2) : '';
+      }
+      if (open) {
+        document.getElementById('payrollLocalBreakdown').innerHTML = result.jobs.map(job => `
+          <section class="payroll-bill-job">
+            <h3>Job #${job.id} <span>· paying ${job.pieces} pieces</span></h3>
+            <div class="table-wrap">
+              <table aria-label="Charges for job ${job.id}">
+                <thead><tr><th scope="col">Product</th><th scope="col">Qty</th><th scope="col">Rate / pc</th><th scope="col">Amount</th></tr></thead>
+                <tbody>${job.lines.map(line => `
+                  <tr>
+                    <td><strong>${escape(line.product)}</strong><small class="payroll-bill-type">${escape(String(line.type).replaceAll('_', ' '))}</small></td>
+                    <td>${line.pieces}</td>
+                    <td>₹${escape(line.rate)}<small>${escape(line.rate_source)}</small></td>
+                    <td><strong>${money(line.amount_paise)}</strong></td>
+                  </tr>`).join('')}</tbody>
+                <tfoot><tr><th scope="row" colspan="3">Job subtotal</th><td>${money(job.gross_paise)}</td></tr></tfoot>
+              </table>
+            </div>
+            <details class="payroll-bill-piece-details">
+              <summary>Job piece history</summary>
+              <p>Given ${job.given} · Returned ${job.returned} · Kept ${job.kept || 0} · Previously paid ${job.already_paid} · Awaiting return ${job.pending_return}</p>
+            </details>
+          </section>`).join('');
+      }
+      const jobCount = result.jobs.length;
+      document.getElementById('payrollLocalHeading').textContent = receiving ? 'Advance repayment'
+        : `Payroll bill · ${jobCount} ${jobCount === 1 ? 'job' : 'jobs'} · ${result.pieces} pieces`;
       document.getElementById('payrollLocalAction').value = receiving ? 'recover_selected_advances' : 'pay';
-      document.getElementById('payrollModalHelp').textContent = receiving ? 'No job is selected. Confirm only after receiving this money from the outworker. No payroll will be issued.' : 'Nothing has been saved. Check the deduction and payment below.';
-      document.getElementById('payrollModalAdvancesHeading').textContent = receiving ? 'Money to receive · select advances' : 'Amount to reduce · select advances';
-      document.getElementById('payrollModalAdvanceHelp').textContent = receiving ? 'Tick advances being returned by the outworker. Totals update immediately. For partial repayment, use Receive money back on the account page.' : 'Tick the advances to deduct from this payment. Totals update immediately. Unticked or unused amounts stay to recover later.';
-      document.getElementById('payrollLocalMethodLabel').textContent = receiving ? 'Received by' : 'Payment method';
-      document.getElementById('payrollLocalBreakdown').innerHTML = jobs + `<div class="metrics">${metrics.map(([label,value]) => `<div class="metric"><span>${label}</span><strong>${money(value)}</strong></div>`).join('')}</div>` + recoveries;
+      const deduction = repayment ? 0 : result.deduction;
+      const net = repayment ? result.gross : result.net;
+      const remaining = repayment ? data.available - repayment : result.remaining;
+      document.getElementById('payrollModalHelp').textContent = repayment ? 'Confirm after collecting the advance and paying the payroll.'
+        : receiving ? 'Confirm after receiving the money.' : 'Preview · unsaved';
+      if (modalBoxes.length) {
+        document.getElementById('payrollModalAdvancesHeading').textContent = receiving ? 'Advances being repaid' : 'Deduct advances';
+        document.getElementById('payrollModalAdvanceHelp').textContent = receiving ? 'Tick the advances being repaid in full.' : 'Tick the advances to deduct from payroll.';
+      }
+      document.getElementById('payrollLocalMethodLabel').textContent = repayment ? 'Method for both transactions' : receiving ? 'Received by' : 'Payment method';
+      const adjustments = repayment ? result.advances.map(row => ({id:row.id, amount:row.remaining_paise})) : result.recoveries;
+      const advanceLines = adjustments.map(row => `
+        <div class="payroll-bill-adjustment"><dt>Advance #${row.id}</dt><dd>${receiving || repayment ? '' : '−'}${money(row.amount)}</dd></div>`).join('');
+      document.getElementById('payrollLocalTotals').innerHTML = `<dl class="payroll-bill-totals">
+        ${receiving ? '' : `<div><dt>Gross payroll</dt><dd>${money(result.gross)}</dd></div>`}
+        ${!receiving && !repayment ? `<div><dt>Advance deduction</dt><dd>${deduction ? '−' : ''}${money(deduction)}</dd></div>` : ''}
+        ${repayment ? '' : advanceLines}
+        <div class="payroll-bill-final"><dt>${receiving ? 'Amount to receive' : 'Final payment'}</dt><dd>${money(receiving ? deduction : net)}</dd></div>
+        ${repayment ? `<div class="payroll-bill-final"><dt>Collect from outworker</dt><dd>${money(repayment)}</dd></div>` : ''}
+        ${repayment ? advanceLines : ''}
+        ${repayment ? `<div class="payroll-bill-final"><dt>Cash to take</dt><dd>${money(repayment - net)}</dd></div>` : ''}
+        <div class="payroll-bill-balance"><dt>Advance balance carried forward</dt><dd>${money(remaining)}</dd></div>
+      </dl>`;
       document.getElementById('payrollLocalSelectedIds').innerHTML = jobIds.map(id => `<input type="hidden" name="job_ids" value="${escape(id)}">`).join('') + advanceIds.map(id => `<input type="hidden" name="advance_ids" value="${escape(id)}">`).join('');
-      document.getElementById('payrollLocalDeduction').value = (result.deduction / 100).toFixed(2);
-      confirm.textContent = receiving ? `Record money received · ${money(result.deduction)}` : `Record payment & issue payroll · ${money(result.net)}`;
+      document.getElementById('payrollLocalDeduction').value = (deduction / 100).toFixed(2);
+      confirm.textContent = receiving ? `Record money received · ${money(result.deduction)}`
+        : repayment ? `Save payroll & record ${money(repayment)} received`
+        : `Record payment · ${money(result.net)}`;
       confirm.disabled = false;
       if (oldReview) oldReview.hidden = true;
       status.textContent = 'Calculated on this page. Review in the popup; nothing is saved until you confirm.';
-      modalStatus.textContent = receiving ? `Receive ${money(result.deduction)} from the outworker. No payroll payment.` : `Advance deduction ${money(result.deduction)} · Final payment ${money(result.net)}.`;
+      modalStatus.textContent = '';
       if (open) {
         const chosen = new Set(advanceIds);
         modalBoxes.forEach(box => { box.checked = chosen.has(box.value); });
@@ -97,17 +156,21 @@ function calculatePayrollLocally(data, jobIds, advanceIds) {
       }
     } catch (error) {
       confirm.disabled = true;
+      if (excessChoice) excessChoice.hidden = repaymentField.disabled = true;
       document.getElementById('payrollLocalSelectedIds').innerHTML = '';
       document.getElementById('payrollLocalAction').value = '';
       document.getElementById('payrollLocalDeduction').value = '0.00';
-      document.getElementById('payrollLocalBreakdown').innerHTML = '';
+      document.getElementById('payrollLocalTotals').innerHTML = '';
       status.textContent = error.message;
       modalStatus.textContent = error.message;
       globalThis.AppUI?.notify(error.message, {type:'error'});
       if (!review.open) status.focus();
+      return false;
     }
+    return true;
   }
   function syncModalAdvances() {
+    if (carryAdvance) carryAdvance.checked = true;
     const chosen = new Set(modalBoxes.filter(box => box.checked).map(box => box.value));
     const mainBoxes = [...form.querySelectorAll('input[name="advance_ids"][type="checkbox"]')];
     mainBoxes.forEach(box => { box.checked = chosen.has(box.value); });
@@ -115,6 +178,7 @@ function calculatePayrollLocally(data, jobIds, advanceIds) {
     updateAll(modalAll, modalBoxes);
     renderReview();
   }
+  excessChoice?.addEventListener('change', () => renderReview());
   modalBoxes.forEach(box => box.addEventListener('change', syncModalAdvances));
   if (modalAll) modalAll.addEventListener('change', () => {
     modalBoxes.forEach(box => { box.checked = modalAll.checked; });
@@ -124,4 +188,34 @@ function calculatePayrollLocally(data, jobIds, advanceIds) {
     event.preventDefault();
     renderReview(true);
   });
+
+  const drafts = globalThis.AppUI?.drafts;
+  if (!drafts) return;
+  const snapshot = () => JSON.stringify([
+    selected('job_ids'), selected('advance_ids'),
+    ...['method', 'reference', 'note'].map(name => paymentForm.elements[name].value),
+  ]);
+  const baseline = snapshot();
+  drafts.register({
+    form: paymentForm,
+    label:'the payroll or advance recovery selection',
+    dirty: () => snapshot() !== baseline,
+    capture: () => JSON.parse(snapshot()),
+    restore([jobs, advances, method, reference, note]) {
+      for (const [name, ids, allId] of [
+        ['job_ids', jobs, 'selectAllJobs'], ['advance_ids', advances, 'selectAllAdvances'],
+      ]) {
+        const boxes = [...form.querySelectorAll(`input[name="${name}"]:not(:disabled)`)];
+        boxes.forEach(box => { box.checked = ids.includes(box.value); });
+        updateAll(document.getElementById(allId), boxes);
+      }
+      paymentForm.elements.method.value = method;
+      paymentForm.elements.reference.value = reference;
+      paymentForm.elements.note.value = note;
+    },
+  });
+  for (const [action, label] of [['advance', 'the advance given'], ['recover_advance', 'the money received']]) {
+    const entry = document.querySelector(`form input[name=action][value="${action}"]`)?.form;
+    if (entry) drafts.trackForm(entry, label);
+  }
 })();

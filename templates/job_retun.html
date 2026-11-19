@@ -49,8 +49,8 @@
     </section>
 {% endif %}
 {% include 'kept_job_fields.html' %}
-  <script defer src="{{ url_for('static',filename='js/kept-entry.js',v='20261118-notifications') }}"></script>
+  <script defer src="{{ url_for('static',filename='js/kept-entry.js',v='20261119-plain-quantity') }}"></script>
   <script>const JOB_CARD = {{ data | tojson }}; window.RETURN_EMBEDDED = {{ embedded|default(false)|tojson }};</script>
-  {% if not kept_only %}<script src="{{ url_for('static', filename='js/retun.js',v='20261118-transitions') }}"></script>{% endif %}
+  {% if not kept_only %}<script src="{{ url_for('static', filename='js/retun.js',v='20261119-preserve-kept') }}"></script>{% endif %}
   {% if embedded %}<script defer src="{{ url_for('static',filename='js/embedded-returns.js',v='20261108-balance') }}"></script>{% endif %}
 {% endblock %}

@@ -6,7 +6,7 @@ from unittest.mock import patch
 
 from data_Process import get_jobcard_ledger
 from data_entry import add_manual_jobcard, in_move_entery
-from modes import db, User, Jobcard, OutworkerPayroll, OutworkerPayrollJob, RequestDedup
+from modes import db, User, Jobcard, OutworkerPayroll, OutworkerPayrollJob, OutworkerRate, RequestDedup
 from payroll_service import (save_rate, rate_version, payroll_preview, issue_payroll,
                              payable_job_quotes, record_advance, advance_balance)
 from support import AppTestCase
@@ -33,6 +33,26 @@ class PartialPayrollTest(AppTestCase):
         preview = payroll_preview(self.worker.id, ids, deduction)
         return issue_payroll(self.worker.id, ids, deduction, version or preview['version'],
                              'Cash', '', '', token, self.admin)
+
+    def test_installments_round_to_same_total_as_one_payment(self):
+        rate = OutworkerRate.query.one()
+        save_rate(self.product.id, '', '5.5555', rate_version(rate), 'fractional-rate', self.admin)
+        whole = self.card(returned=3, pieces=3, key='whole')
+        split = self.card(returned=0, pieces=3, key='split')
+        whole_total = self.pay([whole], 'whole-payment').gross_paise
+        installments = []
+        for index in range(3):
+            self.add_return(split, 1, f'split-return-{index}')
+            installments.append(self.pay([split], f'split-payment-{index}').gross_paise)
+        self.assertEqual(installments, [556, 555, 556])
+        self.assertEqual(sum(installments), whole_total)
+
+    def test_job_below_one_paisa_is_not_marked_paid_at_zero(self):
+        save_rate(self.product.id, 'lump', '0.0001', 'new', 'tiny-rate', self.admin)
+        card = self.card(returned=1, pieces=1)
+        with self.assertRaisesRegex(ValueError, 'less than one payable paisa'):
+            self.pay([card], 'zero-paisa-payment')
+        self.assertEqual(OutworkerPayrollJob.query.count(), 0)
 
     def test_ten_piece_job_paid_in_two_batches_of_five(self):
         card_id = self.card()

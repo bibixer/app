@@ -1,3 +1,5 @@
+import csv
+from io import StringIO
 import pandas as pd
 import re
 from pathlib import Path
@@ -64,6 +66,78 @@ def _write_label_csv(filename, csv_string, kind='jobcard'):
     finally:
         if temporary is not None:
             temporary.unlink(missing_ok=True)
+
+
+def build_payroll_bill_csv(payroll, preview, repayments, remaining_advance):
+    """Build a stable CSV from the payment snapshot."""
+    def money(paise):
+        if paise is None:
+            return ''
+        sign = '-' if paise < 0 else ''
+        rupees, cents = divmod(abs(paise), 100)
+        return f'{sign}{rupees}.{cents:02d}'
+
+    def text(value):
+        value = str(value or '')
+        # Keep user-entered text from being evaluated as a formula in a spreadsheet.
+        return "'" + value if value.lstrip().startswith(('=', '+', '-', '@')) or value.startswith(('\t', '\r', '\n')) else value
+
+    output = StringIO(newline='')
+    writer = csv.DictWriter(output, fieldnames=[
+        'record_type', 'payroll_id', 'saved_at', 'worker_id', 'outworker', 'recorded_by',
+        'method', 'reference', 'note', 'jobs', 'jobcard_id', 'job_issued_date',
+        'product_id', 'product', 'bundle_type', 'pieces', 'given', 'returned', 'kept',
+        'previously_paid', 'awaiting_return', 'rate_per_piece', 'rate_source',
+        'advance_id', 'recovery_id', 'amount', 'gross_payroll', 'advance_deduction',
+        'final_payment', 'advance_received_back', 'cash_to_take', 'advance_carried_forward',
+    ])
+    writer.writeheader()
+    common = dict(payroll_id=payroll.id, saved_at=payroll.paid_at.isoformat(sep=' ', timespec='seconds'),
+                  worker_id=payroll.worker_id, outworker=text(payroll.worker_name),
+                  recorded_by=text(payroll.recorded_by), method=payroll.method,
+                  reference=text(payroll.reference), note=text(payroll.note))
+
+    def row(record_type, **fields):
+        writer.writerow(dict(record_type=record_type, **common, **fields))
+
+    received = sum(receipt['amount_paise'] for receipt in repayments)
+    row('payroll', jobs=len(preview['jobs']), pieces=preview['pieces'],
+        gross_payroll=money(payroll.gross_paise), advance_deduction=money(payroll.deduction_paise),
+        final_payment=money(payroll.net_paise), advance_received_back=money(received),
+        cash_to_take=money(received - payroll.net_paise) if received else '',
+        advance_carried_forward=money(remaining_advance))
+    for job in preview['jobs']:
+        job_fields = dict(jobcard_id=job['id'], job_issued_date=job['date'].isoformat() if job.get('date') else '')
+        row('job', **job_fields, pieces=job['pieces'], given=job.get('given'), returned=job.get('returned'),
+            kept=job.get('kept'), previously_paid=job.get('already_paid'), awaiting_return=job.get('pending_return'),
+            amount=money(job['gross_paise']))
+        for line in job['lines']:
+            balances = [line.get(key) for key in ('given', 'returned', 'kept')]
+            pending = balances[0] - balances[1] - balances[2] if all(isinstance(qty, int) for qty in balances) else None
+            row('product', **job_fields, product_id=line.get('product_id'), product=text(line.get('product')),
+                bundle_type=text(line.get('type')), pieces=line.get('pieces'), given=line.get('given'),
+                returned=line.get('returned'), kept=line.get('kept'), previously_paid=line.get('already_paid'),
+                awaiting_return=pending, rate_per_piece=line.get('rate'), rate_source=line.get('rate_source'),
+                amount=money(line.get('amount_paise')))
+    if payroll.deduction_paise:
+        for recovery in preview['advance_recoveries']:
+            row('advance_deduction', advance_id=recovery['advance_id'], amount=money(recovery['amount_paise']))
+    for receipt in repayments:
+        row('advance_repayment', advance_id=receipt['advance_id'],
+            recovery_id=receipt['id'], amount=money(receipt['amount_paise']))
+    return output.getvalue()
+
+
+def payroll_bill_csv(payroll_id, content):
+    _write_label_csv(f'payroll_{payroll_id}.csv', content, kind='payroll')
+
+
+def existing_payroll_bill_csv(payroll_id):
+    try:
+        with _output_path('payroll', f'payroll_{payroll_id}.csv').open(encoding='utf-8', newline='') as source:
+            return source.read()
+    except FileNotFoundError:
+        return None
 
 
 def clean_text(text):

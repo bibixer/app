@@ -81,7 +81,7 @@ class InventoryAndPrintingTest(AppTestCase):
 
     def test_worker_creation_saves_alias_and_survives_printer_failure(self):
         self.outworker_qr_print.side_effect = OSError("printer offline")
-        data = {"name": "new worker", "aliases": "new alias", "address": "CITY", "number": 456}
+        data = {"name": "new worker", "aliases": "new alias", "address": "CITY", "number": 9876543210}
         with self.assertLogs(level="ERROR"):
             self.assertEqual(add_outworker_db(data, self.admin, "new-worker"), 101)
         self.assertEqual(add_outworker_db(data, self.admin, "new-worker"), 409)

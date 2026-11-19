@@ -6,16 +6,19 @@ from flask_login import login_required, current_user
 from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
 
 from bundle_types import BUNDLE_TYPE_CHOICES
+from advance_recovery import list_advances
+from data_Process import outworker_name
 from form import WriteForm
 from validation import record_id
 from kept_products import save_product_value
 from master_aliases import master_name_mapping, master_name_options, resolve_master_name
 from modes import (db, Outworker, Item_data, Jobcard, OutworkerRate, OutworkerPayroll,
                    OutworkerPayrollJob, OutworkerAdvanceRecovery)
-from payroll_service import (PAYMENT_METHODS, worker_label, money, money_input, rate_text, rate_version,
+from payroll_service import (PAYMENT_METHODS, worker_label, money, money_input, parse_money, rate_text, rate_version,
                              save_rate, save_rate_page_changes, record_advance, payable_job_quotes,
                              payroll_preview, issue_payroll, payment_account, advance_entries,
-                             browser_payroll_snapshot, receive_advance, receive_selected_advances)
+                             browser_payroll_snapshot, receive_advance, receive_selected_advances,
+                             legacy_payroll_repayments, reexport_payroll_bill)
 
 
 def register_payroll_routes(app, admin_required):
@@ -28,6 +31,48 @@ def register_payroll_routes(app, admin_required):
                 request.form.get("client_snapshot", ""), max_age=7200)
         except (BadSignature, SignatureExpired):
             raise ValueError("This payroll review expired or is invalid. Reload the account and calculate again.") from None
+
+    @app.route("/advance_recovery", methods=["GET", "POST"])
+    @login_required
+    @admin_required
+    def advance_recovery():
+        view = "entries" if request.args.get("view") == "entries" else "accounts"
+        lookup = request.args.get("worker_name", "").strip()
+        raw_id = request.args.get("worker_id")
+        if lookup:
+            name = resolve_master_name(lookup)
+            raw_id = name.split("***", 1)[0] if name else None
+        worker_id = record_id(raw_id)
+        worker = db.session.get(Outworker, worker_id) if worker_id else None
+        if (lookup or raw_id) and worker is None:
+            flash("Select an existing outworker by name, alias, or ID.", "danger")
+            return redirect(url_for("advance_recovery", view=view))
+
+        form = WriteForm()
+        choice = request.form.get("advance_choice", "").split(":", 1)
+        if request.method == "POST":
+            if not form.validate_on_submit():
+                flash("This form expired. Reload the page and try again.", "danger")
+            elif worker is None or len(choice) != 2:
+                flash("Select an outworker and an outstanding advance.", "danger")
+            else:
+                try:
+                    receipt = receive_advance(worker.id, choice[0], request.form.get("amount"), choice[1],
+                        request.form.get("method"), request.form.get("reference"), request.form.get("note"),
+                        form.submission_token.data, current_user)
+                    flash(f"Received ₹{money(receipt.amount_paise)} back. Recovery #{receipt.id} recorded.", "success")
+                    return redirect(url_for("advance_recovery", worker_id=worker.id, view=view, _anchor="receive-advance"))
+                except ValueError as error:
+                    flash(str(error), "danger")
+
+        outstanding = [entry for entry in advance_entries(worker.id) if entry["remaining_paise"] > 0] if worker else []
+        selected = next((entry for entry in outstanding if entry["id"] == record_id(choice[0])),
+                        outstanding[0] if outstanding else None)
+        return render_template("advance_recovery.html", id=current_user.role, view=view,
+                               worker=worker, worker_name=worker_label(worker) if worker else "",
+                               worker_options=outworker_name(), worker_aliases=master_name_mapping(),
+                               advances=list_advances(worker_id),
+                               outstanding=outstanding, selected=selected, form=form, methods=PAYMENT_METHODS)
 
     @app.route("/payroll/rates", methods=["GET", "POST"])
     @login_required
@@ -48,11 +93,14 @@ def register_payroll_routes(app, admin_required):
                     changes = json.loads(raw_changes)
                     next_id = request.form.get('next_product_id', type=int)
                     save_rate_page_changes(product_id, changes, next_id, form.submission_token.data, current_user)
-                    flash('Product rates and values saved. The selected product is now open.', 'success')
+                    flash('Product rates and values saved.', 'success')
                     return jsonify(success=True, next_url=url_for('payroll_rates', product_id=next_id))
                 except (ValueError, TypeError) as error:
                     return jsonify(success=False, message=str(error)), 400
+            wants_json = request.accept_mimetypes.best == 'application/json'
             if not form.validate_on_submit():
+                if wants_json:
+                    return jsonify(success=False, message="This form expired. Reload the page and try again."), 400
                 flash("This form expired. Reload the page and try again.", "danger")
             else:
                 try:
@@ -65,8 +113,12 @@ def register_payroll_routes(app, admin_required):
                                   request.form.get("version"), form.submission_token.data, current_user,
                                   remove=request.form.get("action") == "remove")
                         flash("Rate updated. Saved payroll keeps its original rates.", "success")
+                    if wants_json:
+                        return jsonify(success=True)
                     return redirect(url_for("payroll_rates", product_id=product_id))
                 except ValueError as error:
+                    if wants_json:
+                        return jsonify(success=False, message=str(error)), 400
                     flash(str(error), "danger")
         configured = {row.bundle_type: row for row in OutworkerRate.query.filter_by(product_id=product.id).all()} if product else {}
         rate_rows = [{"type": value, "label": label, "configured": configured.get(value),
@@ -81,6 +133,11 @@ def register_payroll_routes(app, admin_required):
     @admin_required
     def outworker_payroll():
         form = WriteForm()
+        wants_json = request.accept_mimetypes.best == 'application/json'
+
+        def saved(destination):
+            return jsonify(success=True) if wants_json else redirect(destination)
+
         workers = Outworker.query.order_by(Outworker.name).all()
         worker_id = request.values.get("worker_id", type=int)
         # Match manual job entry on lookup only. Payment POSTs keep their explicit ID.
@@ -99,8 +156,12 @@ def register_payroll_routes(app, admin_required):
         selected_advances = request.form.getlist("advance_ids") if request.form.get("advance_selection") == "1" else None
         if request.method == "POST":
             if not form.validate_on_submit():
+                if wants_json:
+                    return jsonify(success=False, message="This form expired. Reload the page and try again."), 400
                 flash("This form expired. Reload the page and try again.", "danger")
             elif worker is None:
+                if wants_json:
+                    return jsonify(success=False, message="Select an existing outworker."), 400
                 flash("Select an existing outworker.", "danger")
             else:
                 try:
@@ -110,7 +171,7 @@ def register_payroll_routes(app, admin_required):
                                        request.form.get("reference"), request.form.get("note"),
                                        form.submission_token.data, current_user)
                         flash("Advance payment recorded in the outworker account.", "success")
-                        return redirect(url_for("outworker_payroll", worker_id=worker.id))
+                        return saved(url_for("outworker_payroll", worker_id=worker.id))
                     elif action == "recover_advance":
                         choice = request.form.get("advance_choice", "").split(":")
                         if len(choice) != 2:
@@ -119,7 +180,7 @@ def register_payroll_routes(app, admin_required):
                             request.form.get("method"), request.form.get("reference"), request.form.get("note"),
                             form.submission_token.data, current_user)
                         flash(f"Money received recorded as Recovery #{receipt.id}. The amount to recover has been reduced.", "success")
-                        return redirect(url_for("outworker_payroll", worker_id=worker.id, _anchor="payment-ledger"))
+                        return saved(url_for("outworker_payroll", worker_id=worker.id, _anchor="payment-ledger"))
                     elif action == "recover_selected_advances":
                         if selected_ids:
                             raise ValueError("Direct recovery cannot include jobs. Calculate the payroll instead.")
@@ -128,7 +189,7 @@ def register_payroll_routes(app, admin_required):
                             request.form.get("reference"), request.form.get("note"),
                             form.submission_token.data, current_user)
                         flash(f"Received ₹{money(total)} back from the outworker. Selected advances have been reduced; no payroll was issued.", "success")
-                        return redirect(url_for("outworker_payroll", worker_id=worker.id, _anchor="payment-ledger"))
+                        return saved(url_for("outworker_payroll", worker_id=worker.id, _anchor="payment-ledger"))
                     elif action == "preview":
                         if "deduction_mode" in request.form:
                             if deduction_mode not in ("none", "available"):
@@ -137,6 +198,7 @@ def register_payroll_routes(app, admin_required):
                         preview = payroll_preview(worker.id, selected_ids, deduction, advance_ids=selected_advances)
                     elif action == "pay":
                         snapshot = None
+                        repayment = request.form.get("repayment") or None
                         if request.form.get("client_snapshot"):
                             snapshot = read_review_snapshot()
                             if selected_advances is None:
@@ -144,12 +206,18 @@ def register_payroll_routes(app, admin_required):
                         payroll = issue_payroll(worker.id, selected_ids, deduction, request.form.get("version"),
                                                 request.form.get("method"), request.form.get("reference"),
                                                 request.form.get("note"), form.submission_token.data, current_user,
-                                                advance_ids=selected_advances, expected_snapshot=snapshot)
-                        flash("Payment recorded and payroll issued.", "success")
-                        return redirect(url_for("payroll_receipt", payroll_id=payroll.id))
+                                                advance_ids=selected_advances, expected_snapshot=snapshot,
+                                                repayment=repayment)
+                        flash(f"Payroll issued and ₹{money(parse_money(repayment))} recorded as received back."
+                              if repayment is not None else "Payment recorded and payroll issued.", "success")
+                        if getattr(payroll, "csv_export_failed", False):
+                            flash("Payroll saved, but its CSV could not be written. Check the server print folder.", "warning")
+                        return saved(url_for("payroll_receipt", payroll_id=payroll.id))
                     else:
                         raise ValueError("Choose an advance or payroll action.")
                 except ValueError as error:
+                    if wants_json:
+                        return jsonify(success=False, message=str(error)), 400
                     flash(str(error), "danger")
         jobs = payable_job_quotes(worker) if worker else []
         advances = advance_entries(worker.id) if worker else []
@@ -184,7 +252,7 @@ def register_payroll_routes(app, admin_required):
         flash("The job card must be linked to an outworker in Setup before payroll can be calculated.", "danger")
         return redirect(url_for("outworker_payroll"))
 
-    @app.route("/payroll/<int:payroll_id>")
+    @app.route("/payroll/<int:payroll_id>", methods=["GET", "POST"])
     @login_required
     def payroll_receipt(payroll_id):
         if current_user.role != 1:
@@ -195,5 +263,21 @@ def register_payroll_routes(app, admin_required):
         jobs = OutworkerPayrollJob.query.filter_by(payroll_id=payroll.id).order_by(OutworkerPayrollJob.jobcard_id).all()
         recoveries = OutworkerAdvanceRecovery.query.filter_by(payroll_id=payroll.id).order_by(
             OutworkerAdvanceRecovery.advance_id).all()
+        archive = payroll.receipt_archive
+        repayments = archive["repayments"] if archive else legacy_payroll_repayments(payroll)
+        form = WriteForm()
+        if request.method == "POST":
+            if not form.validate_on_submit():
+                flash("This form expired. Reload the receipt and try again.", "danger")
+            else:
+                try:
+                    reexport_payroll_bill(payroll, jobs, recoveries, repayments)
+                    flash(f"Payroll #{payroll.id} CSV exported to the server print folder.", "success")
+                except OSError:
+                    app.logger.exception("Could not re-export payroll %s", payroll.id)
+                    flash("The CSV could not be written. Check the server print folder and try again.", "danger")
+            return redirect(url_for("payroll_receipt", payroll_id=payroll.id))
         return render_template("payroll_receipt.html", id=current_user.role, payroll=payroll, jobs=jobs,
-                               recoveries=recoveries)
+                               recoveries=recoveries, repayments=repayments, export_form=form,
+                               received_paise=sum(row["amount_paise"] for row in repayments),
+                               remaining_advance=archive["remaining_advance_paise"] if archive else None)

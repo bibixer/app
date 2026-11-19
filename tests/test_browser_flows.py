@@ -855,6 +855,31 @@ class BrowserFlowsTest(AppTestCase):
         self.type("#manualRows tr:nth-child(2) .product", "\ue003")
         self.active("#manualRows tr:first-child .bundle-type")
 
+    def test_unexpected_quantity_row_and_exponent_amount_are_blocked(self):
+        from modes import Jobcard, OutworkerAdvance
+        self.navigate('/manual_jobcard')
+        self.wait_for("!!window.AppUI?.drafts")
+        self.type('#masterName', '  rAm   CiTy  ')
+        self.type('#manualRows .product', ' vIm ')
+        self.type('#manualRows .pieces', '36')
+        self.type('#manualRows .count', '1')
+        self.script("addRow()")
+        trailing = '#manualRows tr:last-child .pieces'
+        self.type(trailing, '-')
+        self.click('#submitManual')
+        self.wait_for("document.querySelector('#message').textContent.includes('whole numbers')")
+        self.active(trailing)
+        self.assertEqual(Jobcard.query.count(), 0)
+        self.assertEqual(self.script("return document.querySelector('#manualRows .pieces').value"), '36')
+
+        self.navigate(f'/payroll?worker_id={self.worker.id}')
+        self.wait_for("document.readyState==='complete'")
+        amount = '#advance-entry input[name=amount]'
+        self.type(amount, '1e3')
+        self.assertTrue(self.script("return document.querySelector('#advance-entry input[name=amount]').validity.customError"))
+        self.click('#advance-entry button[type=submit]')
+        self.assertEqual(OutworkerAdvance.query.count(), 0)
+
     def test_manual_product_suggestions_group_names_and_aliases(self):
         from modes import Item_data, ItemAlias
         db.session.add(ItemAlias(item_id=self.product.id, alias='VIMAL SHORT'))
@@ -938,6 +963,55 @@ class BrowserFlowsTest(AppTestCase):
         self.type('#masterName','\ue00c')
         self.assertEqual(self.script("return document.querySelector('#masterName').getAttribute('aria-expanded')"),'false')
 
+    def test_unsaved_job_card_keep_and_discard_navigation(self):
+        from modes import Jobcard
+        self.navigate('/manual_jobcard')
+        self.wait_for("!!window.AppUI?.drafts")
+        self.type('#masterName', '1')
+        self.script("AppUI.navigate('/retune_product')")
+        self.click('[data-draft-keep]')
+        self.assertEqual(self.script("return document.querySelector('#masterName').value"), '1')
+        self.script("AppUI.navigate('/retune_product')")
+        self.assertFalse(self.script("return !!document.querySelector('[data-draft-save]')"))
+        self.click('[data-draft-discard]')
+        self.wait_for("location.pathname==='/retune_product'")
+        db.session.expire_all()
+        self.assertEqual(Jobcard.query.count(), 0)
+        self.navigate('/manual_jobcard')
+        self.wait_for("!!window.AppUI?.drafts")
+        self.type('#manualRows .product', 'VIM')
+        self.script("AppUI.navigate('/retune_product')")
+        self.click('[data-draft-discard]')
+        self.wait_for("location.pathname==='/retune_product'")
+        self.assertEqual(Jobcard.query.count(), 1)
+
+    def test_unsaved_return_can_be_discarded_or_kept(self):
+        card_id = add_manual_jobcard(self.manual_payload(pieces=10, count=1), self.admin,
+                                     'leave-return-job')['jobData']['jobId']
+        self.navigate(f'/job_retun?jobcard_id={card_id}')
+        self.wait_for("!!document.querySelector('.return-input') && !!window.AppUI?.drafts")
+        self.type('.return-input', '3')
+        self.script("AppUI.navigate('/retune_product')")
+        self.assertFalse(self.script("return !!document.querySelector('[data-draft-save]')"))
+        self.click('[data-draft-discard]')
+        self.wait_for("location.pathname==='/retune_product'")
+        db.session.expire_all()
+        self.assertEqual(get_jobcard_return_data(card_id)['items'][0]['issued'], 10)
+
+    def test_unsaved_payroll_selection_can_be_discarded(self):
+        from payroll_service import save_rate
+        save_rate(self.product.id, '', '5.5', 'new', 'leave-payroll-rate', self.admin)
+        card_id = add_manual_jobcard(self.manual_payload(pieces=10, count=1), self.admin,
+                                     'leave-payroll-job')['jobData']['jobId']
+        in_move_entery(self.return_payload(card_id, 5), self.admin, 'leave-payroll-return')
+        self.navigate(f'/payroll?worker_id={self.worker.id}')
+        self.wait_for("document.readyState==='complete'")
+        self.click(f'input[name="job_ids"][value="{card_id}"]')
+        self.script("AppUI.navigate('/retune_product')")
+        self.assertFalse(self.script("return !!document.querySelector('[data-draft-save]')"))
+        self.click('[data-draft-discard]')
+        self.wait_for("location.pathname==='/retune_product'")
+
     def test_lost_manual_save_response_retry_restores_printable_job(self):
         self.navigate('/manual_jobcard')
         self.script("""
@@ -1011,7 +1085,6 @@ class BrowserFlowsTest(AppTestCase):
         in_move_entery(self.return_payload(card_id, 48), self.admin, 'browser-return')
         self.navigate(f'/job_retun?jobcard_id={card_id}')
         self.type('#kept-pieces > summary','\ue007')
-        self.click('details.input-guide summary')
         self.type('.kept-product-form [name=pieces]', '2')
         self.wait_for("document.querySelector('.kept-recovery-preview').textContent.includes('240.00')")
         self.click('.kept-product-form button[type=submit]')
@@ -1045,7 +1118,7 @@ class BrowserFlowsTest(AppTestCase):
         self.type(selector, "50")
         self.type('[name="edit_reason"]', "Corrected returned count")
         self.click('input[type="submit"]')
-        self.wait_for("[...document.querySelectorAll('.flash')].some(node=>node.textContent.includes('Saved.'))")
+        self.wait_for("[...document.querySelectorAll('[data-app-notice], .app-toast')].some(node=>node.textContent.includes('Saved.'))")
         db.session.expire_all()
         self.assertEqual(get_jobcard_return_data(card_id)["items"][0]["issued"], 70)
         version = self.script("return document.querySelector('[name=version]').value")
@@ -1078,7 +1151,7 @@ class BrowserFlowsTest(AppTestCase):
         self.assertIn('520.00',self.script("return document.querySelector('[data-kept-recovery]').textContent"))
         self.type('[name="edit_reason"]','Correct all three sections together')
         self.click('input[type="submit"]')
-        self.wait_for("[...document.querySelectorAll('.flash')].some(node=>node.textContent.includes('Saved.'))")
+        self.wait_for("[...document.querySelectorAll('[data-app-notice], .app-toast')].some(node=>node.textContent.includes('Saved.'))")
         db.session.expire_all()
         self.assertEqual(db.session.get(JobKeptProduct,kept.id).pieces,4)
         self.assertEqual(OutworkerAdvance.query.one().amount_paise,52000)
@@ -1304,7 +1377,9 @@ class BrowserFlowsTest(AppTestCase):
         self.wait_for(f"location.pathname==='/edit/jobcard/{card_id}'")
 
     def test_worker_returns_save_one_job_without_losing_another_jobs_draft(self):
+        from kept_products import save_product_value
         from modes import Jobmovement
+        save_product_value(self.product.id, '120', 0, 'workspace-product-value', self.admin)
         ids=[add_manual_jobcard(self.manual_payload(pieces=10,count=1),self.admin,
                                 f'workspace-{index}')['jobData']['jobId'] for index in range(2)]
         self.navigate(f'/returns/outworker?worker_id={self.worker.id}')
@@ -1316,6 +1391,9 @@ class BrowserFlowsTest(AppTestCase):
             self.command('/frame',{'id':{'element-6066-11e4-a52e-4f735466cecf':element}})
             self.wait_for("!!document.querySelector('.return-input')")
         enter_job(0)
+        self.type('#kept-pieces > summary', '\ue007')
+        self.type('.kept-product-form input[name=pieces]', '2')
+        self.type('.kept-product-form input[name=note]', 'Keep this draft')
         self.type('.return-input','3')
         enter_job(1)
         self.type('.return-input','7')
@@ -1325,6 +1403,9 @@ class BrowserFlowsTest(AppTestCase):
         self.command('/frame',{'id':None})
         self.wait_for(f"document.querySelector('[data-job-id=\"{ids[0]}\"]').dataset.remaining==='7'")
         self.assertEqual(self.script("return document.querySelector('#open-return-pieces').textContent"),'17')
+        enter_job(0)
+        self.wait_for("document.querySelector('.kept-product-form input[name=pieces]').value==='2'")
+        self.assertEqual(self.script("return document.querySelector('.kept-product-form input[name=note]').value"),'Keep this draft')
         enter_job(1)
         self.assertEqual(self.script("return document.querySelector('.return-input').value"),'7')
         self.command('/frame',{'id':None})
@@ -1353,7 +1434,6 @@ class BrowserFlowsTest(AppTestCase):
         self.assertFalse(self.script("return document.querySelector('#kept-pieces').open"))
         self.type('#kept-pieces > summary','\ue007')
         self.wait_for("document.querySelector('#kept-pieces').open && frameElement.clientHeight >= document.querySelector('main').getBoundingClientRect().height")
-        self.type('details.kept-item summary','\ue007')
         self.wait_for("document.querySelector('details.kept-item').open && frameElement.clientHeight >= document.querySelector('main').getBoundingClientRect().height")
         self.type('.kept-product-form [name=pieces]','2')
         self.type('#kept-pieces > summary','\ue007')

@@ -3,7 +3,10 @@ from datetime import date
 from flask import flash, render_template, redirect, url_for,session,request, jsonify, g
 from form import SimpleProductForm, WriteForm
 from kept_products import record_kept_product
-from simple_workflow import CORE_ENTITIES, register_simple_workflow, dashboard_period, dashboard_movement_details, dashboard_job_balances
+from cash_book import cash_book_period
+from advance_recovery import advance_recovery_period, outstanding_worker_totals
+from simple_workflow import (CORE_ENTITIES, register_simple_workflow, dashboard_period, dashboard_movement_details,
+                             dashboard_job_balances, report_period, report_period_selection)
 from form import Outworker_form, Return_form, Login_form, Date_form_with_name, EditEntryForm
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user, AnonymousUserMixin
 from data_entry import add_items, add_outworker_db, add_manual_jobcard, in_move_entery
@@ -211,7 +214,6 @@ def register_routes(app,db):
             elif isinstance(items, dict) and items.get("or") is False:
                 message = str(items["exception"]) if isinstance(items["exception"], ValueError) else "Could not save item. Please retry; if it still fails, contact the administrator."
                 flash(message, "danger")
-                return redirect(url_for("add_item"))
 
         return render_template(
             "user.html",
@@ -239,7 +241,6 @@ def register_routes(app,db):
             elif isinstance(outworker, dict) and outworker.get("or") is False:
                 message = str(outworker["exception"]) if isinstance(outworker["exception"], ValueError) else "Could not save master. Please retry; if it still fails, contact the administrator."
                 flash(message, "danger")
-                return redirect(url_for("add_outworker"))
 
         return render_template(
             "outworker_setup.html",
@@ -322,7 +323,10 @@ def register_routes(app,db):
     @job_operator
     def jobcard_kept(jobcard_id):
         form = WriteForm()
+        wants_json = request.accept_mimetypes.best == 'application/json'
         if not form.validate_on_submit():
+            if wants_json:
+                return jsonify(success=False, message='This form expired. Reload and review the kept pieces.'), 400
             flash('This form expired. Reload and review the kept pieces.', 'danger')
         else:
             try:
@@ -330,7 +334,11 @@ def register_routes(app,db):
                     request.form.get('pieces'), request.form.get('expected_value'), request.form.get('expected_remaining'),
                     request.form.get('confirmed'), request.form.get('note'), form.submission_token.data, current_user)
                 flash(f'{row.pieces} kept pieces recorded. ₹{row.amount_paise / 100:.2f} added to amount to recover (Advance #{row.advance_id}).', 'success')
+                if wants_json:
+                    return jsonify(success=True)
             except ValueError as error:
+                if wants_json:
+                    return jsonify(success=False, message=str(error)), 400
                 flash(str(error), 'danger')
         return redirect(url_for('job_retun', jobcard_id=jobcard_id,
                                 embedded='1' if request.form.get('embedded') == '1' else None,
@@ -399,6 +407,8 @@ def register_routes(app,db):
             return jsonify(success=False, message="Return data is invalid.",code=405), 400
         elif res == 4033:
             return jsonify(success=False, message="Return exceeds the remaining balance on this job card. Refresh and try again.", code=4033), 409
+        elif res == 4035:
+            return jsonify(success=False, message="This product has future-dated job movements. Correct those dates before recording a return.", code=4035), 409
         elif res == 409:
             latest = get_jobcard_return_data(data.get('jobcard_id'))
             remaining = sum(item['issued'] for item in latest['items']) if latest else None
@@ -415,7 +425,23 @@ def register_routes(app,db):
         except (ValueError, OverflowError):
             flash('Choose valid From and To dates, with From on or before To.', 'danger')
             return redirect(url_for('admin_dashord'))
-        return render_template('simple_dashboard.html', id=current_user.role, overview=overview)
+        cash = cash_book_period(overview['week_start'], overview['week_end'])
+        recovery = advance_recovery_period(overview['week_start'], overview['week_end'])
+        recovery['outstanding'] = sum(row.balance for row in outstanding_worker_totals())
+        return render_template('simple_dashboard.html', id=current_user.role, overview=overview, cash=cash,
+                               recovery=recovery)
+
+    @app.route('/cash_book')
+    @login_required
+    @oly_admin
+    def cash_book():
+        try:
+            period = report_period(**report_period_selection(request.args))
+        except (ValueError, OverflowError):
+            flash('Choose valid From and To dates, with From on or before To.', 'danger')
+            return redirect(url_for('cash_book'))
+        cash = cash_book_period(period['week_start'], period['week_end'], include_entries=True)
+        return render_template('cash_book.html', id=current_user.role, period=period, cash=cash)
 
     @app.route('/dashboard/movements')
     @login_required
@@ -476,19 +502,19 @@ def register_routes(app,db):
     def outworker_report():
         name_data_form = Date_form_with_name()
         range_data = get_current_week_range()
-        outworker_name_data =  outworker_name(oly_full_name=True)
         if not name_data_form.is_submitted():
             name_data_form.date_from.data = range_data["from_date"].date()
             name_data_form.date_to.data = range_data["to_date"].date()
         report = None
         pending_returns = []
         if name_data_form.validate_on_submit():
-            name = name_data_form.name.data.strip()
-            if name not in outworker_name_data:
-                flash("Select an outworker from the list.", "danger")
+            name = resolve_master_name(name_data_form.name.data)
+            if not name:
+                flash("Select an outworker by name, alias, or ID.", "danger")
             elif name_data_form.date_from.data > name_data_form.date_to.data:
                 flash("The From date must be on or before the To date.", "danger")
             else:
+                name_data_form.name.data = name
                 if request.form.get("action") == "assign_return":
                     try:
                         assign_return(
@@ -509,7 +535,7 @@ def register_routes(app,db):
             flash("Enter an outworker and valid From and To dates.", "danger")
         return render_template(
             "outworker_job_report.html", id=current_user.role, master_options=master_name_options(),
-            current_form=name_data_form, names=outworker_name_data, report=report,
+            current_form=name_data_form, report=report,
             pending_returns=pending_returns,
             selected_worker_id=record_id(report['name'].split('***', 1)[0]) if report else None,
         )
@@ -626,6 +652,8 @@ def register_routes(app,db):
                 flash("Someone changed this entry after you opened it. Review the latest values and save again.", "danger")
                 return redirect(url_for("edit_entry", entity_type=entity_type, entity_id=entity_id))
             flash(f"Could not save: {detail}", "danger")
+        if request.method == "POST":
+            context["draft"] = request.form
         template = 'outworker_edit.html' if entity_type == 'outworker' else 'edit_entry.html'
         return render_template(template, form=form, entry=context, id=current_user.role)
 

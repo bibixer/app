@@ -7,9 +7,9 @@ import json
 from functools import wraps
 from sqlalchemy.exc import IntegrityError
 from item_aliases import normalize_name, parse_aliases, validate_names, resolve_item_name, item_name_mapping
-from validation import positive_integer, finite_number, record_id, MAX_DATABASE_INTEGER, MAX_PIECES
-from modes import ItemAlias
-from master_aliases import validate_master_aliases, resolve_master_name
+from validation import positive_integer, finite_number, record_id, mobile_number, identity_text, MAX_DATABASE_INTEGER, MAX_PIECES
+from modes import ItemAlias, JobKeptProduct
+from master_aliases import validate_master_aliases, validate_worker_contact, resolve_master_name
 from bundle_types import BUNDLE_TYPE_VALUES
 from data_Process import outworker_name,get_jobcard_return_data
 from data_print_format import outworker_qr_print,buldel_qr_print,job_cade_print,job_return_print
@@ -292,15 +292,15 @@ def add_outworker_db(data,current_user,request_key):
     name = normalize_name(data["name"])
     aliases = parse_aliases(data.get("aliases"))
     validate_master_aliases(name, aliases)
-    address = str(data.get("address") or "").strip()
-    if not address or len(address) > 50 or not positive_integer(data.get("number")):
-        raise ValueError("Enter an address of at most 50 characters and a positive contact number.")
-    if any(normalize_name(row.name) == name and normalize_name(row.adders) == normalize_name(address)
-           and row.number == data["number"] for row in Outworker.query.all()):
-        raise ValueError("This outworker with the same address and contact number already exists.")
+    address = " ".join(str(data.get("address") or "").split())
+    identity_text(address, "Address")
+    if not address or len(address) > 50:
+        raise ValueError("Enter an address of at most 50 characters.")
+    number = mobile_number(data.get("number"))
+    validate_worker_contact(name, address, number)
     outworker = Outworker(name=name,
                           adders=address,
-                          number = data["number"],
+                          number=int(number), contact_number=number,
                           enter_user=current_user.username
                           )
     db.session.add(outworker)
@@ -629,6 +629,17 @@ def in_move_entery(data,current_user,request_key):
             return check_i
         canonical_items = {item["item_id"]: item["product_name"]
                            for item in get_jobcard_return_data(data["jobcard_id"])["items"]}
+        now = datetime.now()
+        card_id = data["jobcard_id"]
+        groups = {(canonical_items[record_id(item["item_id"])], item["type"]) for item in data["items"]}
+        future_movements = Jobmovement.query.filter_by(jobcard=str(card_id)).filter(Jobmovement.date > now)
+        future_kept = db.session.query(Item_data.name, JobKeptProduct.bundle_type).join(
+            Item_data, Item_data.id == JobKeptProduct.product_id
+        ).filter(JobKeptProduct.jobcard_id == card_id, JobKeptProduct.date > now)
+        if (any((row.product_name, row.type_B) in groups for row in future_movements) or
+                any((name, bundle_type) in groups for name, bundle_type in future_kept)):
+            db.session.rollback()
+            return 4035
         result_items = []
         movement_ids = []
         for item in data['items']:
@@ -638,7 +649,7 @@ def in_move_entery(data,current_user,request_key):
             product_name = canonical_items[record_id(item["item_id"])]
             result_items.append({**item, "note": note, "name_of_product": product_name})
             job_movement = Jobmovement(
-                date=datetime.now(),
+                date=now,
                 jobcard=str(data["jobcard_id"]),
                 partculer=f"Return card {data['jobcard_id']} {note}"[:50],
                 product_name = product_name,

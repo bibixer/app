@@ -6,14 +6,22 @@ from sqlalchemy import func
 
 from item_aliases import normalize_name, parse_aliases
 from modes import Outworker, OutworkerAlias
+from validation import identity_text
 
 
 def master_full_name(worker):
     return f"{worker.id}***{worker.name}--{worker.adders}/-"
 
 
+def validate_worker_contact(name, address, number, worker_id=None):
+    if any(row.id != worker_id and normalize_name(row.name) == normalize_name(name)
+           and normalize_name(row.adders) == normalize_name(address) and row.mobile == number
+           for row in Outworker.query):
+        raise ValueError("This outworker with the same address and contact number already exists.")
+
+
 def validate_master_aliases(name, aliases, worker_id=None):
-    name = normalize_name(name)
+    name = identity_text(normalize_name(name), "Outworker name")
     if not name or len(name) > 50:
         raise ValueError("Master name must be between 1 and 50 characters")
     if name in aliases:

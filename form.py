@@ -25,9 +25,11 @@ class Outworker_form(WriteForm):
     )
     address = StringField("address",validators=[DataRequired()],render_kw={"placeholder": "Enter address"}
                           )
-    number =  IntegerField(
+    number =  StringField(
         "Mobile Number",
-        validators=[DataRequired()] ,render_kw={"placeholder": "Enter mobile number"}
+        validators=[DataRequired()],
+        render_kw={"placeholder": "Enter 10-digit mobile number", "inputmode": "numeric",
+                   "autocomplete": "tel-national", "pattern": "[0-9]{10}"}
     )
     submit = SubmitField(
         "Submit",

@@ -3,12 +3,15 @@ if (keptSection && (location.hash === '#kept-pieces' || document.body.classList.
   keptSection.open = true;
 }
 document.querySelectorAll('.kept-product-form').forEach(form => {
+  document.addEventListener('DOMContentLoaded', () => {
+    if (!window.AppUI?.drafts) return;
+    const product = form.closest('details').querySelector('summary span').textContent.trim();
+    window.AppUI.drafts.trackForm(form, `kept pieces for ${product}`);
+  });
   const input = form.querySelector('[name=pieces]');
-  if (document.body.classList.contains('kept-popup')) {
-    form.closest('details').open = true;
-  }
   input.addEventListener('input', () => {
     const qty = Number(input.value), value = Number(input.dataset.unitValue);
+    input.setCustomValidity(input.value && !/^[0-9]+$/.test(input.value) ? 'Enter a whole number using digits only.' : '');
     form.querySelector('.kept-recovery-preview').textContent = Number.isInteger(qty) && qty > 0 && input.validity.valid
       ? `${qty} kept × ₹${(value / 100).toFixed(2)} = ₹${(qty * value / 100).toFixed(2)} to recover. Kept pieces become eligible for payroll.`
       : 'Enter valid kept pieces.';

@@ -10,4 +10,7 @@
   }
   choice.addEventListener('change', update);
   update();
+  if (choice.form?.hasAttribute('data-recovery-draft')) {
+    window.AppUI?.drafts?.trackForm(choice.form, 'the advance repayment');
+  }
 })();

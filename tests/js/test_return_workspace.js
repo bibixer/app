@@ -11,7 +11,7 @@ async function run() {
   let listener;
   const firstWindow = {};
   const secondWindow = {};
-  const firstDraft = {value:'3',dataset:{entryMethod:'direct',remaining:'10'}};
+  const firstDraft = {value:'3',validity:{badInput:false,valid:true},dataset:{entryMethod:'direct',remaining:'10'}};
   const secondDraft = {value:'7'};
   const badge = {textContent:''};
   const counters = {'#open-return-count':{textContent:''},'#open-return-pieces':{textContent:''}};
@@ -21,7 +21,8 @@ async function run() {
     selector === 'iframe' ? {contentWindow:secondWindow,style:{}} : {textContent:''}};
   new Function('window','document','location',read('static/js/return-workspace.js'))(
     {addEventListener:(name,callback) => {listener=callback;}},
-    {querySelectorAll:()=>[first,second],querySelector:selector=>counters[selector]}, {origin});
+    {querySelectorAll:selector=>selector==='[data-job-id]'?[first,second]:[],
+      querySelector:selector=>counters[selector]}, {origin});
   listener({origin:'http://other.test',source:firstWindow,data:{type:'job-return-state',jobId:1,remaining:0}});
   assert(first.dataset.remaining === '10','Foreign origins must be ignored');
   listener({origin,source:secondWindow,data:{type:'job-return-state',jobId:1,remaining:0}});
@@ -34,7 +35,7 @@ async function run() {
   const prefix=source.slice(0,source.indexOf('      document.addEventListener("DOMContentLoaded"'));
   const job={name:'1***RAM--CITY/-',jobcard_id:1,items:[{item_id:1,name:'VIMAL',colour:'lump'}]};
   const response={success:true,remaining:7,jobData:{code:101,jobData:{date:'08-11-2026',jobcard_id:1,party:job.name,username:'admin',items:[{name_of_product:'VIMAL',type:'lump',returned:3,note:''}]}}};
-  const documentStub=()=>({querySelectorAll:()=>[{}],getElementById:()=>firstDraft,
+  const documentStub=()=>({querySelectorAll:()=>[firstDraft],getElementById:()=>firstDraft,
     querySelector:()=>({classList:{add(){},remove(){}}}),
     createElement:()=>{throw new Error('No browser print download');}});
   class PageURL {
@@ -53,6 +54,7 @@ async function run() {
   assert(!alerts.length,'Successful save must not show an error');
 
   // Server CSV export warnings are separate from the committed return.
+  firstDraft.value='3';
   const printSubmit=new Function('document','window','JOB_CARD','crypto','fetch','alert','console','Blob','URL',prefix+'\nreturn submitReturn;')(
     documentStub(),
     firstWindow,job,{randomUUID:()=>'key'},async()=>({json:async()=>({...response,jobData:{...response.jobData,print_warning:'CSV export failed'}})}),()=>{throw new Error('No native alert');},

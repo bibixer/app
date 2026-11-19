@@ -1,6 +1,7 @@
 """Issue/return correctness, malformed submissions and transactional failures."""
 
 from copy import deepcopy
+from datetime import datetime, timedelta
 from unittest.mock import patch
 
 from data_entry import (add_jobcard, add_manual_jobcard, validate_payload_structure,
@@ -11,6 +12,18 @@ from support import AppTestCase
 
 
 class JobcardWriteTest(AppTestCase):
+    def test_future_dated_issue_cannot_receive_a_return_today(self):
+        card_id = add_manual_jobcard(self.manual_payload(), self.admin, "future-job")["jobData"]["jobId"]
+        row = Jobmovement.query.filter_by(jobcard=str(card_id)).one()
+        future = datetime.now() + timedelta(days=2)
+        self.assertEqual(self.job_edit(card_id, {
+            "date": future.isoformat(), f"line_{row.id}_date": future.isoformat(),
+        })[0], "saved")
+        response = self.client.post("/summit-retune", json=self.return_payload(card_id, 4))
+        self.assertEqual(response.status_code, 409)
+        self.assertEqual(response.json["code"], 4035)
+        self.assertEqual(Jobmovement.query.filter_by(jobcard=str(card_id), flow_type="IN").count(), 0)
+
     def test_scanning_saves_one_card_and_marks_bundles_given(self):
         bundle = self.bundle()
         data = self.scan_payload(bundle)

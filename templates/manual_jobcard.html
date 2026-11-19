@@ -114,15 +114,14 @@ function addRow(values = {}) {
   return row;
 }
 
-function validPositiveInteger(input, maximum = Infinity) {
+function validPositiveInteger(input, maximum = 1_000_000_000) {
   const value = Number(input.value);
-  return input.value.trim() !== '' && Number.isInteger(value) && value > 0 && value <= maximum;
+  return !input.validity.badInput && /^[0-9]+$/.test(input.value) && value > 0 && value <= maximum;
 }
 
 function emptyRow(row) {
-  return !row.querySelector('.product').value.trim()
-    && !row.querySelector('.pieces').value.trim()
-    && !row.querySelector('.count').value.trim();
+  return [...row.querySelectorAll('.product, .pieces, .count')]
+    .every(input => !input.value.trim() && !input.validity.badInput);
 }
 
 function previousInput(input) {
@@ -263,8 +262,17 @@ async function submitManual() {
     document.getElementById('masterName').focus();
     return showMessage('Select a valid master from the list.');
   }
+  const invalidQuantity = [...rowsBody.querySelectorAll('.pieces, .count')].find(input =>
+    input.validity.badInput || (input.value && !validPositiveInteger(input, input.classList.contains('count') ? 500 : 1_000_000_000)));
+  if (invalidQuantity) {
+    invalidQuantity.focus();
+    return showMessage('Enter pieces and bundle counts as whole numbers within the allowed limits.');
+  }
   if (!rows.length || rows.some(row => !row.product || !types.some(([value]) => value === row.type) || !Number.isInteger(row.pieces) || row.pieces <= 0 || !Number.isInteger(row.count) || row.count <= 0 || row.count > 500)) {
     return showMessage('Complete every row with item, a listed bundle type, pieces, and bundle count.');
+  }
+  if (rows.length > 100 || rows.reduce((total, row) => total + row.pieces * row.count, 0) > 1_000_000_000) {
+    return showMessage('A job card can contain up to 100 rows and 1,000,000,000 pieces.');
   }
   const unknownIndex = rows.findIndex(row => !productAliasMap[normalizeProduct(row.product)]);
   if (unknownIndex !== -1) {
@@ -300,6 +308,7 @@ async function submitManual() {
     masterInput.value = '';
     document.getElementById('masterMatch').textContent = '';
     masterInput.focus();
+    return true;
   } catch (error) {
     showMessage('Network error. Your request key is preserved; press Create Job Card to retry safely.');
     submitting = false;
@@ -336,5 +345,14 @@ document.addEventListener('keydown', event => {
 const today = new Date();
 document.getElementById('manualDate').value = new Date(today.getTime() - today.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
 addRow();
+document.addEventListener('DOMContentLoaded', () => {
+  window.AppUI?.drafts?.register({
+    label:'the job card',
+    dirty: () => Boolean(document.getElementById('masterName').value.trim()) ||
+      [...rowsBody.rows].some(row => !emptyRow(row) ||
+        [...row.querySelectorAll('input[type=number]')].some(input => input.validity.badInput)),
+    busy: () => submitting,
+  });
+});
 </script>
 {% endblock %}

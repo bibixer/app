@@ -3,29 +3,31 @@
 {% block page_css %}<link rel="stylesheet" href="{{ url_for('static', filename='style/pages/edit_entry.css') }}">{% endblock %}
 {% block main_class %}page-edit-entry{% endblock %}
 {% block content %}
+{% set draft = entry.draft|default({}) %}
 <header class="ui-heading"><div><p class="ui-kicker">Administration / Edit center</p><h1>Edit {{ entry.title }} #{{ entry.entity_id }}</h1><p class="ui-description">Update the entry details. Related records and the edit history are kept in sync.</p></div><a class="head-link" href="{{ url_for('edit_index') }}">← Edit center</a></header>
   <section class="ui-panel"><h2>Record details</h2><form method="post" autocomplete="off">
     {{ form.hidden_tag() }}
     <fieldset class="edit-fields" {% if entry.entity_type == 'jobcard' and (entry.paid or entry.kept_locked) %}disabled{% endif %}>
     <div class="grid">
       {% for field in entry.fields %}
+      {% set value = draft.get(field.name, field.value) %}
       {% if entry.entity_type == 'product' and field.name in ['meters','size'] %}
-      <input type="hidden" name="{{ field.name }}" value="{{ field.value }}">
+      <input type="hidden" name="{{ field.name }}" value="{{ value }}">
       {% else %}
       <label>{{ field.name.replace('_', ' ')|title }}
         {% if field.kind == 'status' %}
-          <select name="{{ field.name }}"><option {% if field.value == 'READY' %}selected{% endif %}>READY</option><option {% if field.value == 'GIVEN' %}selected{% endif %}>GIVEN</option></select>
+          <select name="{{ field.name }}"><option {% if value == 'READY' %}selected{% endif %}>READY</option><option {% if value == 'GIVEN' %}selected{% endif %}>GIVEN</option></select>
         {% elif field.kind == 'aliases' %}
-          <textarea name="{{ field.name }}" rows="4" placeholder="One alias per line, or separate with commas">{{ field.value or '' }}</textarea>
+          <textarea name="{{ field.name }}" rows="4" placeholder="One alias per line, or separate with commas">{{ value or '' }}</textarea>
           <small>{% if entry.entity_type == 'outworker' %}Alternate names for this master. Job cards keep the master ID and full name.{% else %}Alternate names for this item. Stock and reports keep the main name.{% endif %}</small>
         {% elif field.kind == 'flow' %}
-          <select name="{{ field.name }}"><option {% if field.value == 'IN' %}selected{% endif %}>IN</option><option {% if field.value == 'OUT' %}selected{% endif %}>OUT</option></select>
+          <select name="{{ field.name }}"><option {% if value == 'IN' %}selected{% endif %}>IN</option><option {% if value == 'OUT' %}selected{% endif %}>OUT</option></select>
         {% elif 'datetime' in field.kind %}
-          <input type="datetime-local" step="any" name="{{ field.name }}" value="{{ field.value or '' }}" {% if not field.kind.startswith('optional') %}required{% endif %}>
+          <input type="datetime-local" step="any" name="{{ field.name }}" value="{{ value or '' }}" {% if not field.kind.startswith('optional') %}required{% endif %}>
         {% elif field.kind in ('int', 'float') %}
-          <input type="number" {% if field.kind == 'float' %}step="any"{% endif %} name="{{ field.name }}" value="{{ field.value }}" required>
+          <input type="number" {% if field.kind == 'float' %}step="any"{% endif %} name="{{ field.name }}" value="{{ value }}" required>
         {% else %}
-          <input type="text" name="{{ field.name }}" value="{{ field.value or '' }}" {% if not field.kind.startswith('optional') %}required{% endif %}>
+          <input type="text" name="{{ field.name }}" value="{{ value or '' }}" {% if not field.kind.startswith('optional') %}required{% endif %}>
         {% endif %}
       </label>
       {% endif %}

@@ -11,3 +11,5 @@
 .app-ui .rates-switch-dialog .rates-switch-error{padding:12px;border:1px solid #e9c2c8;border-radius:8px;background:#fff0f2;color:#a34456}
 .app-ui .rates-switch-dialog [hidden]{display:none!important}
 .app-ui .rates-switch-actions button:focus-visible{outline:3px solid #8d9fdc;outline-offset:3px}
+.app-ui .ui-scope .rate-row input.rate-edited{background:#fff8e7;border-color:#99600c}
+.app-ui .rate-row .rate-edited-label{color:#774500;font-size:12px;font-weight:750}

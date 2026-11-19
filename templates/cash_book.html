@@ -1,0 +1,78 @@
+{% extends "payroll_base.html" %}
+{% from 'cash_book_totals.html' import cash_totals, rupees %}
+{% block title %}Cash book · BH Manufacturing{% endblock %}
+{% block head %}<link rel="stylesheet" href="{{ url_for('static', filename='style/pages/cash_book.css') }}">{% endblock %}
+{% block main_class %}pay-shell cash-book{% endblock %}
+
+{% block content %}
+<header class="pay-head cash-book-header">
+  <div>
+    <p class="eyebrow">Accounts</p>
+    <h1>Cash book</h1>
+    <p class="lead">{{ period.week_start.strftime('%d %b %Y') }} – {{ period.week_end.strftime('%d %b %Y') }}</p>
+  </div>
+  <div class="actions no-print">
+    <a class="button secondary" href="{{ url_for('admin_dashord', date_from=period.week_start.isoformat(), date_to=period.week_end.isoformat()) }}">Dashboard</a>
+    <button type="button" onclick="window.print()">Print cash book</button>
+  </div>
+</header>
+
+<section class="panel cash-book-filters no-print" aria-label="Cash book date range">
+  <form method="get" action="{{ url_for('cash_book') }}" class="filter-form">
+    <label class="field">From date<input type="date" name="date_from" value="{{ period.week_start.isoformat() }}" required></label>
+    <label class="field">To date<input type="date" name="date_to" value="{{ period.week_end.isoformat() }}" required></label>
+    <button type="submit">Apply dates</button>
+  </form>
+  <nav class="cash-week-links" aria-label="Change cash book week">
+    <a href="{{ url_for('cash_book', week=period.previous_week.isoformat()) }}">← Previous week</a>
+    <a href="{{ url_for('cash_book') }}">Current week</a>
+    <a href="{{ url_for('cash_book', week=period.next_week.isoformat()) }}">Next week →</a>
+  </nav>
+</section>
+
+{{ cash_totals(cash) }}
+<section class="panel cash-ledger" aria-labelledby="cash-ledger-title">
+  <div class="section-head"><div>
+    <h2 id="cash-ledger-title">Cash ledger</h2>
+    <p>Cash advances and payroll payments are debits. Cash repayments from outworkers are credits. The balance reflects cash recorded in this app.</p>
+  </div><strong>{{ cash.entries|length }} transactions</strong></div>
+  <label class="cash-balance-toggle no-print">
+    <input type="checkbox" aria-controls="cash-ledger-table"> Show running balance
+  </label>
+  <div class="table-wrap" id="cash-ledger-table" tabindex="0" role="region" aria-label="Cash transactions">
+    <table>
+      <thead><tr><th scope="col">No.</th><th scope="col">Date</th><th scope="col">Particulars</th><th scope="col" class="right">DR · Paid out</th><th scope="col" class="right">CR · Received</th><th scope="col" class="right cash-running-balance">Running balance</th></tr></thead>
+      <tbody>
+        <tr class="cash-balance-row cash-running-balance"><th scope="row" colspan="3">Opening balance · B/F</th><td></td><td></td><td class="right number">{{ rupees(cash.opening) }}</td></tr>
+        {% for row in cash.entries %}
+          {% set worker_label = row.worker_name.split('***', 1)[-1].removesuffix('/-').replace('--', ' · ') %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td class="cash-date">{{ row.recorded_at.strftime('%d %b %Y') }}<small>{{ row.recorded_at.strftime('%H:%M') }}</small></td>
+            <td>
+              <details>
+                <summary><strong>{{ {'advance': 'Advance given', 'payroll': 'Payroll paid', 'repayment': 'Advance received back'}[row.kind] }}</strong>
+                  <small>{{ worker_label }} · #{{ row.record_id }}</small>
+                </summary>
+                <div class="cash-entry-details">
+                  <p>Recorded by {{ row.recorded_by }}</p>
+                  {% if row.reference %}<p>Reference: {{ row.reference }}</p>{% endif %}
+                  {% if row.note %}<p>{{ row.note }}</p>{% endif %}
+                  {% if row.kind == 'payroll' %}<a href="{{ url_for('payroll_receipt', payroll_id=row.record_id) }}">Open payroll receipt →</a>
+                  {% else %}<a href="{{ url_for('outworker_payroll', worker_id=row.worker_id, _anchor='payment-ledger') }}">Open outworker ledger →</a>{% endif %}
+                </div>
+              </details>
+            </td>
+            <td class="right number cash-debit">{{ rupees(row.debit) if row.debit else '—' }}</td>
+            <td class="right number cash-credit">{{ rupees(row.credit) if row.credit else '—' }}</td>
+            <td class="right number cash-running-balance">{{ rupees(row.balance) }}</td>
+          </tr>
+        {% else %}
+          <tr><td colspan="5" class="empty">No cash transactions for these dates.</td><td class="cash-running-balance"></td></tr>
+        {% endfor %}
+      </tbody>
+      <tfoot><tr><th scope="row" colspan="3">Period totals</th><td class="right number cash-debit">{{ rupees(cash.debit) }}</td><td class="right number cash-credit">{{ rupees(cash.credit) }}</td><td class="right number cash-running-balance">{{ rupees(cash.closing) }}</td></tr></tfoot>
+    </table>
+  </div>
+</section>
+{% endblock %}

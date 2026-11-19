@@ -21,6 +21,7 @@ class ReturnBreakdownTest(unittest.TestCase):
         self.app.config.update(
             SQLALCHEMY_DATABASE_URI=f"sqlite:///{root / 'main.db'}",
             SQLALCHEMY_BINDS={"users": f"sqlite:///{root / 'users.db'}"},
+            LABEL_PRINT_ROOT=root / "labels",
         )
         db.init_app(self.app)
         self.context = self.app.app_context()

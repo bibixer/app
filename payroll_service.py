@@ -2,6 +2,8 @@
 
 import hashlib
 import json
+import logging
+import re
 from collections import defaultdict
 from datetime import datetime
 from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
@@ -10,6 +12,7 @@ from sqlalchemy.exc import IntegrityError
 
 from bundle_types import BUNDLE_TYPE_VALUES
 from data_entry import claim_write
+from data_print_format import build_payroll_bill_csv, existing_payroll_bill_csv, payroll_bill_csv
 from item_aliases import normalize_name
 from validation import record_id
 from kept_products import kept_totals
@@ -40,12 +43,15 @@ def rate_text(units):
 
 def _decimal(value, places, maximum, label):
     try:
-        amount = Decimal(str(value))
+        text = str(value).strip()
+        if not re.fullmatch(rf'(?:[0-9]+(?:\.[0-9]{{1,{places}}})?|\.[0-9]{{1,{places}}})', text):
+            raise ValueError
+        amount = Decimal(text)
         if (not amount.is_finite() or amount < 0 or amount > maximum
                 or amount != amount.quantize(Decimal(1).scaleb(-places))):
             raise ValueError
     except (InvalidOperation, ValueError, TypeError):
-        raise ValueError(f"{label} must be a non-negative number with up to {places} decimal places.") from None
+        raise ValueError(f"{label} must be a non-negative number with up to {places} decimal places. Use digits and a decimal point only.") from None
     return amount
 
 
@@ -170,6 +176,16 @@ def advance_balance(worker_id):
     return int(advances) - int(deductions) - int(receipts)
 
 
+def unlinked_advance_deduction(worker_id, linked_total=None):
+    if linked_total is None:
+        linked_total = db.session.query(db.func.coalesce(db.func.sum(OutworkerAdvanceRecovery.amount_paise), 0)).join(
+            OutworkerPayroll, OutworkerPayroll.id == OutworkerAdvanceRecovery.payroll_id
+        ).filter(OutworkerPayroll.worker_id == worker_id).scalar()
+    total = db.session.query(db.func.coalesce(db.func.sum(OutworkerPayroll.deduction_paise), 0)).filter(
+        OutworkerPayroll.worker_id == worker_id).scalar()
+    return max(0, int(total) - int(linked_total))
+
+
 def advance_entries(worker_id):
     """Outstanding amounts; historical aggregate deductions consume oldest first.
 
@@ -182,9 +198,7 @@ def advance_entries(worker_id):
         OutworkerAdvanceRecovery.advance_id, db.func.sum(OutworkerAdvanceRecovery.amount_paise)
     ).join(OutworkerPayroll, OutworkerPayroll.id == OutworkerAdvanceRecovery.payroll_id).filter(
         OutworkerPayroll.worker_id == worker_id).group_by(OutworkerAdvanceRecovery.advance_id).all())
-    total_deducted = db.session.query(db.func.coalesce(db.func.sum(OutworkerPayroll.deduction_paise), 0)).filter(
-        OutworkerPayroll.worker_id == worker_id).scalar()
-    legacy = int(total_deducted) - sum(recovered.values())
+    legacy = unlinked_advance_deduction(worker_id, sum(recovered.values()))
     for advance_id, amount in db.session.query(
             OutworkerAdvanceReceipt.advance_id, db.func.sum(OutworkerAdvanceReceipt.amount_paise)).filter(
             OutworkerAdvanceReceipt.worker_id == worker_id).group_by(OutworkerAdvanceReceipt.advance_id).all():
@@ -322,6 +336,8 @@ def payable_job_quotes(worker):
         ):
             continue
         paid_groups = defaultdict(int)
+        paid_exact_paise = defaultdict(Decimal)
+        paid_rounded_paise = defaultdict(int)
         for payment in paid[card.id]:
             if not isinstance(payment.lines, list) or not payment.lines:
                 invalid = True
@@ -339,6 +355,20 @@ def payable_job_quotes(worker):
                     invalid = True
                     break
                 paid_groups[key] += quantity
+                try:
+                    exact = Decimal(line["rate"]) * quantity * 100
+                    if not exact.is_finite() or exact < 0:
+                        raise ValueError
+                    rounded = line.get("amount_paise")
+                    if rounded is None:
+                        rounded = int(exact.quantize(Decimal("1"), rounding=ROUND_HALF_UP))
+                    if not isinstance(rounded, int) or isinstance(rounded, bool) or rounded < 0:
+                        raise ValueError
+                except (KeyError, InvalidOperation, TypeError, ValueError):
+                    invalid = True
+                    break
+                paid_exact_paise[key] += exact
+                paid_rounded_paise[key] += rounded
                 payment_pieces += quantity
             if payment_pieces != payment.pieces:
                 invalid = True
@@ -351,7 +381,8 @@ def payable_job_quotes(worker):
         for (name, type_name), group in sorted(groups.items()):
             group['kept'] = kept[(str(card.id), name, type_name)]
             item = items.get(normalize_name(name))
-            paid_quantity = paid_groups[(item.id if item else normalize_name(name), type_name)]
+            key = (item.id if item else normalize_name(name), type_name)
+            paid_quantity = paid_groups[key]
             if group['returned'] + group['kept'] > group['given'] or paid_quantity > group["returned"] + group['kept']:
                 invalid = True
                 break
@@ -364,8 +395,10 @@ def payable_job_quotes(worker):
                 errors.append(f"{name}: product is not in Item Setup.")
             elif not rate:
                 errors.append(f"Set a base or {type_name} rate for {name}.")
-            paise = int((Decimal(quantity) * rate.rate_units / 100).quantize(
-                Decimal("1"), rounding=ROUND_HALF_UP)) if rate else None
+            paise = None
+            if rate:
+                cumulative = paid_exact_paise[key] + Decimal(quantity) * rate.rate_units / 100
+                paise = max(0, int(cumulative.quantize(Decimal("1"), rounding=ROUND_HALF_UP)) - paid_rounded_paise[key])
             lines.append({
                 "product_id": item.id if item else None, "product": name, "type": type_name,
                 "pieces": quantity, "given": group["given"], "returned": group["returned"],
@@ -380,6 +413,8 @@ def payable_job_quotes(worker):
         gross = sum(line["amount_paise"] or 0 for line in lines)
         if gross > MAX_PAISE:
             errors.append("Job amount exceeds the supported payment limit.")
+        if not gross and not errors:
+            errors.append("This job totals less than one payable paisa. Add returned pieces or review the piece rate before paying.")
         quotes.append({"id": card.id, "date": card.date, "lines": lines,
                        "given": sum(group["given"] for group in groups.values()),
                        "returned": sum(group["returned"] for group in groups.values()),
@@ -465,12 +500,16 @@ def browser_payroll_snapshot(worker, jobs, advances, available):
             "advances": [{"id": row["id"], "remaining_paise": row["remaining_paise"]} for row in advances]}
 
 
-def issue_payroll(worker_id, job_ids, deduction, expected_version, method, reference, note, token, user, *, advance_ids=None, expected_snapshot=None):
+def issue_payroll(worker_id, job_ids, deduction, expected_version, method, reference, note, token, user, *, advance_ids=None, expected_snapshot=None, repayment=None):
     try:
-        username = _claim(token, "outworker_payroll", user, dict(worker_id=worker_id, job_ids=job_ids,
+        payload = dict(worker_id=worker_id, job_ids=job_ids,
                           deduction=deduction, version=expected_version, method=method, reference=reference,
-                          note=note, advance_ids=advance_ids, snapshot=expected_snapshot))
+                          note=note, advance_ids=advance_ids, snapshot=expected_snapshot)
+        if repayment is not None:
+            payload["repayment"] = repayment
+        username = _claim(token, "outworker_payroll", user, payload)
         preview = payroll_preview(worker_id, job_ids, deduction, advance_ids=advance_ids)
+        reviewed_deduction = preview["deduction_paise"] if repayment is None else 0
         valid = preview["version"] == expected_version
         if expected_snapshot is not None:
             current = browser_payroll_snapshot(preview["worker"], preview["jobs"],
@@ -481,33 +520,99 @@ def issue_payroll(worker_id, job_ids, deduction, expected_version, method, refer
                         "jobs": [job for job in expected_snapshot["jobs"] if job["id"] in ids],
                         "advances": [row for row in expected_snapshot["advances"] if row["id"] in selected]}
             current["advances"] = [row for row in current["advances"] if row["id"] in selected]
-            valid = current == original and parse_money(deduction) == preview["deduction_paise"]
+            valid = current == original and parse_money(deduction) == reviewed_deduction
         if not valid:
             raise ValueError("Rates, job quantities or advances changed. Calculate the payroll again before paying.")
+        repayments = []
+        if repayment is not None:
+            if expected_snapshot is None or advance_ids is None:
+                raise ValueError("Review the selected advances before recording a repayment.")
+            repayments = [(row["id"], row["remaining_paise"]) for row in current["advances"]]
+            total = sum(amount for _, amount in repayments)
+            if total <= preview["gross_paise"] or parse_money(repayment) != total:
+                raise ValueError("The repayment must match the full outstanding balance of the selected advances and exceed the payroll. Calculate again.")
         reference, note = _details(method, reference, note)
+        now = datetime.now()
         payroll = OutworkerPayroll(
             worker_id=worker_id, worker_name=preview["worker_name"],
-            gross_paise=preview["gross_paise"], deduction_paise=preview["deduction_paise"],
-            net_paise=preview["net_paise"], paid_at=datetime.now(), method=method,
+            gross_paise=preview["gross_paise"], deduction_paise=reviewed_deduction,
+            net_paise=preview["gross_paise"] - reviewed_deduction, paid_at=now, method=method,
             reference=reference, note=note, recorded_by=username,
         )
         db.session.add(payroll)
         db.session.flush()
-        for recovery in preview["advance_recoveries"]:
-            db.session.add(OutworkerAdvanceRecovery(payroll_id=payroll.id, **recovery))
+        if repayment is None:
+            for recovery in preview["advance_recoveries"]:
+                db.session.add(OutworkerAdvanceRecovery(payroll_id=payroll.id, **recovery))
+        receipts = []
+        for advance_id, amount in repayments:
+            receipt = OutworkerAdvanceReceipt(
+                worker_id=worker_id, advance_id=advance_id, worker_name=preview["worker_name"],
+                amount_paise=amount, received_at=now, method=method, reference=reference,
+                note=note, recorded_by=username,
+            )
+            receipts.append(receipt)
+            db.session.add(receipt)
         for job in preview["jobs"]:
             db.session.add(OutworkerPayrollJob(
                 payroll_id=payroll.id, jobcard_id=job["id"], pieces=job["pieces"],
                 amount_paise=job["gross_paise"], lines=job["lines"],
             ))
+        db.session.flush()
+        remaining = preview["available_paise"] - reviewed_deduction - sum(amount for _, amount in repayments)
+        receipt_details = [{"id": receipt.id, "advance_id": receipt.advance_id,
+                            "amount_paise": receipt.amount_paise} for receipt in receipts]
+        payroll.receipt_archive = {
+            "csv": build_payroll_bill_csv(payroll, preview, receipt_details, remaining),
+            "repayments": receipt_details,
+            "remaining_advance_paise": remaining,
+        }
         db.session.commit()
-        return payroll
     except IntegrityError:
         db.session.rollback()
         raise ValueError("This payroll conflicts with a saved payment. Refresh the account.") from None
     except Exception:
         db.session.rollback()
         raise
+    # The database is authoritative. A print-folder failure must not invite a second payment.
+    try:
+        payroll_bill_csv(payroll.id, payroll.receipt_archive["csv"])
+    except Exception:
+        logging.exception("Payroll %s saved, but CSV export failed", payroll.id)
+        payroll.csv_export_failed = True
+    return payroll
+
+
+def legacy_payroll_repayments(payroll):
+    """Earlier combined settlements stamped both records with the same exact time."""
+    if payroll.deduction_paise or OutworkerPayroll.query.filter_by(
+            worker_id=payroll.worker_id, paid_at=payroll.paid_at).count() != 1:
+        return []
+    receipts = OutworkerAdvanceReceipt.query.filter_by(
+        worker_id=payroll.worker_id, worker_name=payroll.worker_name, received_at=payroll.paid_at,
+        method=payroll.method, reference=payroll.reference, note=payroll.note, recorded_by=payroll.recorded_by,
+    ).order_by(OutworkerAdvanceReceipt.id).all()
+    if sum(row.amount_paise for row in receipts) <= payroll.net_paise:
+        return []
+    return [{"id": row.id, "advance_id": row.advance_id, "amount_paise": row.amount_paise} for row in receipts]
+
+
+def reexport_payroll_bill(payroll, jobs, recoveries, repayments):
+    if payroll.receipt_archive:
+        content = payroll.receipt_archive["csv"]
+    else:
+        content = existing_payroll_bill_csv(payroll.id)
+    if content is None:
+        # Older payrolls did not snapshot every balance. Export saved values and leave gaps blank.
+        preview = {
+            "jobs": [{"id": row.jobcard_id, "pieces": row.pieces, "gross_paise": row.amount_paise,
+                      "lines": row.lines or []} for row in jobs],
+            "pieces": sum(row.pieces for row in jobs),
+            "advance_recoveries": [{"advance_id": row.advance_id, "amount_paise":row.amount_paise}
+                                   for row in recoveries],
+        }
+        content = build_payroll_bill_csv(payroll, preview, repayments, None)
+    payroll_bill_csv(payroll.id, content)
 
 
 def payment_account(worker_id):

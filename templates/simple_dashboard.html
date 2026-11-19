@@ -1,26 +1,192 @@
 {% extends 'app_base.html' %}
+{% from 'cash_book_totals.html' import cash_totals, rupees %}
 {% block title %}Production dashboard · BH Manufacturing{% endblock %}
-{% block page_css %}<link rel="stylesheet" href="{{ url_for('static', filename='style/pages/admin_dashboard.css') }}">{% endblock %}
-{% block head %}<link rel="stylesheet" href="{{ url_for('static', filename='style/pages/dashboard_v2.css', v='20261108-ranges') }}">{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='style/pages/cash_book.css', v='20261119-accounts') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='style/pages/dashboard_v2.css', v='20261119-overview') }}">
+{% endblock %}
 {% block main_class %}dashboard page-admin-dashboard v2-dashboard{% endblock %}
-{% macro icon(name) %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{% if name == 'given' %}<path d="M4 16V5h11M4 5l15 15M12 20h7v-7"/>{% elif name == 'returned' %}<path d="M20 8v11H9M20 19L5 4M12 4H5v7"/>{% elif name == 'pending' %}<circle cx="12" cy="12" r="8"/><path d="M12 7v5l3 2"/>{% elif name == 'people' %}<circle cx="9" cy="8" r="3"/><path d="M3 21v-3a6 6 0 0112 0v3M17 5a3 3 0 010 6M21 21v-3a6 6 0 00-3-5"/>{% else %}<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V2h6v2M9 10h6M9 14h6M9 18h3"/>{% endif %}</svg>{% endmacro %}
-{% macro pie_chart(key,title,description,chart) %}
-<section class="panel dash-data-panel dash-pie-panel" data-pie-chart aria-labelledby="{{ key }}-title"><div class="section-head"><div><span class="dash-overline">Product-wise · selected dates</span><h2 id="{{ key }}-title">{{ title }}</h2><p>{{ description }}</p></div><span class="dash-count">{{ chart.slices|length }} products</span></div>
-{% if chart.total %}<div class="dash-pie-layout"><div class="dash-pie"><svg viewBox="-100 -100 200 200" role="img" aria-label="{{ title }} by product, {{ chart.total }} pieces">{% for slice in chart.slices %}{% if slice.full %}<circle cx="0" cy="0" r="90"{% else %}<path d="{{ slice.path }}"{% endif %} fill="{{ slice.color }}" stroke="#fff" stroke-width="1.5" tabindex="0" data-slice="{{ loop.index0 }}" data-name="{{ slice.name }}" data-quantity="{{ slice.quantity }}" data-percent="{{ slice.percent }}" aria-label="{{ slice.name }}: {{ slice.quantity }} pieces, {{ slice.percent }} percent"><title>{{ slice.name }} · {{ slice.quantity }} pcs · {{ slice.percent }}%</title>{% if slice.full %}</circle>{% else %}</path>{% endif %}{% endfor %}</svg><output class="dash-pie-readout" aria-live="polite" data-pie-readout data-total="{{ '{:,}'.format(chart.total) }} pieces in total">{{ '{:,}'.format(chart.total) }} pieces in total</output></div><ul class="dash-pie-legend">{% for slice in chart.slices %}<li><button type="button" data-slice="{{ loop.index0 }}" data-name="{{ slice.name }}" data-quantity="{{ slice.quantity }}" data-percent="{{ slice.percent }}"><span class="dash-pie-swatch" style="background:{{ slice.color }}"></span><span class="dash-pie-name">{{ slice.name }}</span><strong>{{ '{:,}'.format(slice.quantity) }}<small>{{ slice.percent }}%</small></strong></button></li>{% endfor %}</ul></div>{% else %}<div class="dash-empty"><span aria-hidden="true">◯</span><strong>No {{ key }} during these dates</strong><p>{{ description }} will appear here when movements are recorded.</p></div>{% endif %}
+
+{% macro icon(name) %}
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+  {% if name == 'given' %}<path d="M4 16V5h11M4 5l15 15M12 20h7v-7"/>
+  {% elif name == 'returned' %}<path d="M20 8v11H9M20 19L5 4M12 4H5v7"/>
+  {% elif name == 'closing' %}<circle cx="12" cy="12" r="8"/><path d="M12 7v5l3 2"/>
+  {% else %}<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V2h6v2M9 10h6M9 14h3"/>{% endif %}
+</svg>
+{% endmacro %}
+
+{% macro pie_chart(key, title, description, chart) %}
+<section class="panel dash-data-panel dash-pie-panel" data-pie-chart aria-labelledby="{{ key }}-title">
+  <div class="section-head">
+    <div><h3 id="{{ key }}-title">{{ title }}</h3><p>{{ description }}</p></div>
+    {% if chart.slices %}<span class="dash-count">{{ chart.slices|length }} products</span>{% endif %}
+  </div>
+  {% if chart.total %}
+  <div class="dash-pie-layout">
+    <figure class="dash-pie">
+      <svg viewBox="-100 -100 200 200" role="img" aria-label="{{ title }}, {{ chart.total }} pieces">
+        {% for slice in chart.slices %}
+          {% if slice.full %}<circle cx="0" cy="0" r="90"{% else %}<path d="{{ slice.path }}"{% endif %}
+            fill="{{ slice.color }}" stroke="#fff" stroke-width="1.5" tabindex="0" data-slice="{{ loop.index0 }}"
+            data-name="{{ slice.name }}" data-quantity="{{ slice.quantity }}" data-percent="{{ slice.percent }}"
+            aria-label="{{ slice.name }}: {{ slice.quantity }} pieces, {{ slice.percent }} percent">
+            <title>{{ slice.name }} · {{ slice.quantity }} pcs · {{ slice.percent }}%</title>
+          {% if slice.full %}</circle>{% else %}</path>{% endif %}
+        {% endfor %}
+        <circle class="dash-donut-hole" cx="0" cy="0" r="53" aria-hidden="true"/>
+      </svg>
+      <figcaption class="dash-donut-total" aria-hidden="true"><strong>{{ '{:,}'.format(chart.total) }}</strong><small>pieces</small></figcaption>
+    </figure>
+    <ul class="dash-pie-legend" aria-label="{{ title }} breakdown">
+      {% for slice in chart.slices %}
+      <li><button type="button" data-slice="{{ loop.index0 }}" data-name="{{ slice.name }}"
+          data-quantity="{{ slice.quantity }}" data-percent="{{ slice.percent }}">
+        <span class="dash-pie-swatch" style="background:{{ slice.color }}"></span>
+        <span class="dash-pie-name">{{ slice.name }}</span>
+        <strong>{{ '{:,}'.format(slice.quantity) }}<small>{{ slice.percent }}%</small></strong>
+      </button></li>
+      {% endfor %}
+    </ul>
+  </div>
+  <output class="dash-pie-readout" aria-live="polite" data-pie-readout data-total="{{ '{:,}'.format(chart.total) }} pieces in total">{{ '{:,}'.format(chart.total) }} pieces in total</output>
+  {% else %}
+    <p class="dash-empty">No {{ key }} during these dates.</p>
+  {% endif %}
 </section>
 {% endmacro %}
+
 {% block content %}
-<header class="dash-hero dash-weekly-hero"><div class="dash-hero-copy"><span class="dash-eyebrow"><span class="dash-live-dot"></span> Your production account</span><h1>{{ 'Your date range.' if overview.custom_range else 'This week.' }}<br><span>Every movement.</span></h1><p>{{ overview.week_start.strftime('%d %b %Y') }} — {{ overview.week_end.strftime('%d %b %Y') }}<br>Outflow is given work. Inflow is returned work.</p><div class="dash-hero-actions"><a class="button primary" href="{{ url_for('manual_job_card') }}">＋ Assign a job ↗</a><a class="button secondary" href="{{ url_for('retune_product') }}">Record return ↩</a></div></div>
-<div class="dash-week-selector"><span class="dash-mini-label">Choose From & To dates</span><form method="get" action="{{ url_for('admin_dashord') }}"><div><label for="dashboard-from">From date</label><input id="dashboard-from" name="date_from" type="date" value="{{ overview.week_start.isoformat() }}" required></div><div><label for="dashboard-to">To date</label><input id="dashboard-to" name="date_to" type="date" value="{{ overview.week_end.isoformat() }}" required></div><button type="submit">Open date range →</button></form><nav aria-label="Change dashboard week"><a href="{{ url_for('admin_dashord',week=overview.previous_week.isoformat()) }}">← Previous week</a><a href="{{ url_for('admin_dashord') }}">Current week</a><a href="{{ url_for('admin_dashord',week=overview.next_week.isoformat()) }}">Next week →</a></nav><p>Custom dates supported · Default week: Wednesday to Tuesday</p></div></header>
-<section class="dash-piece-section" aria-labelledby="piece-overview-title"><div class="dash-section-heading"><div><span class="dash-overline">{{ 'Selected date range' if overview.custom_range else 'Weekly movement' }}</span><h2 id="piece-overview-title">Inflow, outflow & balance</h2><a class="dash-detail-link" href="{{ url_for('dashboard_movements',date_from=overview.week_start.isoformat(),date_to=overview.week_end.isoformat(),kind='all') }}" target="_blank" rel="noopener">Open complete movement ledger ↗</a></div><span class="dash-period-badge">{{ overview.week_start.strftime('%d %b') }} – {{ overview.week_end.strftime('%d %b') }}</span></div><div class="metrics dashboard-totals dash-four" aria-label="Period totals">
-{% for key,label,value,caption in [('opening','Balance b/f',overview.opening,'Outstanding before the From date'),('given','Total outflow · given',overview.given,'Pieces given during these dates'),('returned','Total inflow · returned',overview.returned,'Pieces returned during these dates'),('closing','Balance c/f',overview.closing,'Balance carried past the To date')] %}<a class="panel metric dash-metric dash-{{ key }}" href="{{ url_for('dashboard_movements',date_from=overview.week_start.isoformat(),date_to=overview.week_end.isoformat(),kind=key) }}" target="_blank" rel="noopener" aria-label="Open {{ label }} details in a new tab"><div class="dash-metric-top"><span class="metric-label">{{ label }}</span><span class="dash-metric-icon">{{ icon(key) }}</span></div><p class="metric-value">{{ '{:,}'.format(value) }}</p><p class="metric-foot"><span class="dash-metric-dot"></span>{{ caption }}</p><div class="dash-metric-decoration" aria-hidden="true"></div></a>{% endfor %}
-</div><p class="dash-carry-note"><strong>Balance b/f: {{ '{:,}'.format(overview.opening) }} pcs</strong><span>+ Outflow {{ '{:,}'.format(overview.given) }} − Inflow {{ '{:,}'.format(overview.returned) }}{% if overview.kept %} − Kept {{ overview.kept }}{% endif %} = <b>Balance c/f {{ '{:,}'.format(overview.closing) }} pcs</b></span></p></section>
-<div class="dash-pie-grid">{{ pie_chart('outflow','Outflow by product','Pieces given to outworkers during the selected dates.',overview.outflow_pie) }}{{ pie_chart('inflow','Inflow by product','Pieces returned from outworkers during the selected dates.',overview.inflow_pie) }}</div>
-<section class="panel dash-data-panel dash-recent"><div class="section-head"><div><span class="dash-overline">Issued during these dates</span><h2>Job issue data</h2><p>Jobs issued during the selected dates. Given, returned, and pending quantities are shown at week end.</p></div><a class="dash-find-job" href="{{ url_for('jobcard_ledger_lookup') }}">Find a job <span aria-hidden="true">↗</span></a></div>
-<div class="table-wrap"><table><thead><tr><th>Job</th><th>Given on / by</th><th>Outworker</th><th>Given</th><th>Returned</th><th>Pending</th><th>Open</th></tr></thead><tbody>
-{% for card,total in overview.recent %}<tr><td><a class="dash-job-id" href="{{ url_for('jobcard_ledger',jobcard_id=card.id) }}">#{{ card.id }}</a></td><td>{{ card.date.strftime('%d %b %Y') }}<br><small>{{ card.given_by }}</small></td><td class="dash-worker">{% set worker_parts = card.given_to.split('***',1) %}{% if worker_parts|length == 2 %}<strong>{{ worker_parts[1].removesuffix('/-').replace('--',' · ') }}</strong><br><small>Outworker #{{ worker_parts[0] }}</small>{% else %}{{ card.given_to }}{% endif %}</td><td class="number">{{ '{:,}'.format(total.given) }}</td><td class="number">{{ '{:,}'.format(total.returned) }}{% if total.kept|default(0) %}<br><small>Kept: {{ total.kept }}</small>{% endif %}</td><td><span class="dash-balance {{ 'is-clear' if not total.pending }}">{{ '{:,}'.format(total.pending) }}</span></td><td><a class="dash-row-action" href="{{ url_for('job_retun',jobcard_id=card.id) }}">{{ 'Record return' if total.pending else 'View returns' }} <span aria-hidden="true">↗</span></a></td></tr>
-{% else %}<tr><td colspan="7"><div class="dash-empty"><span aria-hidden="true">☷</span><strong>A fresh start for your next job</strong><p>No job cards were issued during these dates.</p><a href="{{ url_for('manual_job_card') }}">Assign a job →</a></div></td></tr>{% endfor %}
-</tbody></table></div></section>
-<details class="panel dash-data-panel dash-week-products"><summary>Product-wise period account <span>Opening, given, returned, and closing pieces</span></summary><div class="table-wrap"><table><thead><tr><th>Product</th><th>Balance b/f</th><th>Outflow · given</th><th>Inflow · returned</th><th>Kept</th><th>Balance c/f</th></tr></thead><tbody>{% for product in overview.product_totals %}<tr><td><strong>{{ product.name }}</strong></td><td class="number">{{ '{:,}'.format(product.opening) }}</td><td class="number given">{{ '{:,}'.format(product.given) }}</td><td class="number returned">{{ '{:,}'.format(product.returned) }}</td><td>{{ product.kept|default(0) }}</td><td class="number">{{ '{:,}'.format(product.closing) }}</td></tr>{% else %}<tr><td colspan="6">No products configured.</td></tr>{% endfor %}</tbody><tfoot><tr class="total-row"><td>Grand total · all products</td><td>{{ '{:,}'.format(overview.opening) }}</td><td>{{ '{:,}'.format(overview.given) }}</td><td>{{ '{:,}'.format(overview.returned) }}</td><td>{{ overview.kept }}</td><td>{{ '{:,}'.format(overview.closing) }}</td></tr></tfoot></table></div></details>
+{% set dates = {'date_from': overview.week_start.isoformat(), 'date_to': overview.week_end.isoformat()} %}
+<header class="dash-hero dash-weekly-hero">
+  <div class="dash-hero-copy">
+    <h1>Production dashboard</h1>
+    <div class="dash-reporting-period">
+      <span>{{ 'Selected dates' if overview.custom_range else 'Reporting week' }}</span>
+      <strong>{{ overview.week_start.strftime('%d %b %Y') }} – {{ overview.week_end.strftime('%d %b %Y') }}</strong>
+    </div>
+    <div class="dash-hero-actions">
+      <a class="button primary" href="{{ url_for('manual_job_card') }}">Assign a job</a>
+      <a class="button secondary" href="{{ url_for('retune_product') }}">Record return</a>
+    </div>
+  </div>
+  <div class="dash-week-selector">
+    <h2>Reporting dates</h2>
+    <form method="get" action="{{ url_for('admin_dashord') }}">
+      <div><label for="dashboard-from">From date</label><input id="dashboard-from" name="date_from" type="date" value="{{ dates.date_from }}" required></div>
+      <div><label for="dashboard-to">To date</label><input id="dashboard-to" name="date_to" type="date" value="{{ dates.date_to }}" required></div>
+      <button type="submit">Apply dates</button>
+    </form>
+    <nav aria-label="Change dashboard week">
+      <a href="{{ url_for('admin_dashord', week=overview.previous_week.isoformat()) }}">← Previous week</a>
+      <a href="{{ url_for('admin_dashord') }}">Current week</a>
+      <a href="{{ url_for('admin_dashord', week=overview.next_week.isoformat()) }}">Next week →</a>
+    </nav>
+  </div>
+</header>
+
+<section class="dash-piece-section" aria-labelledby="piece-overview-title">
+  <div class="dash-section-heading">
+    <div><h2 id="piece-overview-title">Inflow, outflow & balance</h2><p>Production pieces for the selected dates</p></div>
+    <a class="dash-detail-link" href="{{ url_for('dashboard_movements', kind='all', **dates) }}" target="_blank" rel="noopener">Movement ledger ↗</a>
+  </div>
+  <div class="metrics dashboard-totals dash-four" aria-label="Period totals">
+    {% for key,label,value,caption in [
+      ('opening', 'Balance b/f', overview.opening, 'Outstanding before the From date'),
+      ('given', 'Total outflow · given', overview.given, 'Pieces assigned during these dates'),
+      ('returned', 'Total inflow · returned', overview.returned, 'Pieces physically returned'),
+      ('closing', 'Balance c/f', overview.closing, 'Outstanding at the end of the To date')
+    ] %}
+    <a class="panel metric dash-metric dash-{{ key }}" href="{{ url_for('dashboard_movements', kind=key, **dates) }}"
+      target="_blank" rel="noopener" aria-label="{{ label }}, {{ value }} pieces. Open details in a new tab.">
+      <div class="dash-metric-top"><span class="dash-metric-icon">{{ icon(key) }}</span><span class="dash-metric-arrow" aria-hidden="true">↗</span></div>
+      <p class="metric-value">{{ '{:,}'.format(value) }} <small>pcs</small></p>
+      <h3 class="metric-label">{{ label }}</h3>
+      <p class="metric-foot">{{ caption }}</p>
+    </a>
+    {% endfor %}
+  </div>
+  <p class="dash-carry-note">
+    <strong>Balance b/f {{ '{:,}'.format(overview.opening) }}</strong>
+    <span>+ Given {{ '{:,}'.format(overview.given) }} − Returned {{ '{:,}'.format(overview.returned) }}{% if overview.kept %} − Kept {{ '{:,}'.format(overview.kept) }}{% endif %}</span>
+    <b>= Balance c/f {{ '{:,}'.format(overview.closing) }} pcs</b>
+  </p>
+</section>
+
+<section class="dash-accounts" aria-labelledby="dashboard-accounts-title">
+  <div class="dash-section-heading"><h2 id="dashboard-accounts-title">Outworker accounts</h2></div>
+  <div class="dashboard-account-tools">
+    <section class="panel dash-data-panel dash-cash-book" aria-labelledby="dashboard-cash-title">
+      <div class="section-head"><h3 id="dashboard-cash-title">Cash book</h3>
+        <a class="dash-detail-link" href="{{ url_for('cash_book', **dates) }}">Open cash book →</a>
+      </div>
+      {{ cash_totals(cash, show_balances=false) }}
+    </section>
+    <section class="panel dash-data-panel" aria-labelledby="dashboard-recovery-title">
+      <div class="section-head"><h3 id="dashboard-recovery-title">Advance recovery</h3>
+        <a class="dash-detail-link" href="{{ url_for('advance_recovery') }}">Open advance recovery →</a>
+      </div>
+      <dl class="cash-totals cash-totals--flow">
+        <div class="cash-total cash-total--credit"><dt>Recovered · selected dates</dt><dd>{{ rupees(recovery.recovered) }}</dd></div>
+        <div class="cash-total cash-total--closing"><dt>Still to recover · current</dt><dd>{{ rupees(recovery.outstanding) }}</dd></div>
+      </dl>
+    </section>
+  </div>
+</section>
+
+<section class="dash-products" aria-labelledby="dashboard-products-title">
+  <div class="dash-section-heading"><h2 id="dashboard-products-title">Movement by product</h2></div>
+  <div class="dash-pie-grid">
+    {{ pie_chart('outflow', 'Outflow by product', 'Pieces given to outworkers.', overview.outflow_pie) }}
+    {{ pie_chart('inflow', 'Inflow by product', 'Pieces physically returned.', overview.inflow_pie) }}
+  </div>
+  <details class="panel dash-data-panel dash-week-products">
+    <summary>Product-wise period account</summary>
+    <div class="table-wrap" tabindex="0" role="region" aria-label="Product balances">
+      <table>
+        <thead><tr><th scope="col">Product</th><th scope="col">Balance b/f</th><th scope="col">Outflow · given</th><th scope="col">Inflow · returned</th><th scope="col">Kept</th><th scope="col">Balance c/f</th></tr></thead>
+        <tbody>
+        {% for product in overview.product_totals %}
+          <tr><th scope="row">{{ product.name }}</th><td>{{ '{:,}'.format(product.opening) }}</td><td>{{ '{:,}'.format(product.given) }}</td><td>{{ '{:,}'.format(product.returned) }}</td><td>{{ '{:,}'.format(product.kept|default(0)) }}</td><td>{{ '{:,}'.format(product.closing) }}</td></tr>
+        {% else %}<tr><td colspan="6">No products configured.</td></tr>{% endfor %}
+        </tbody>
+        <tfoot><tr><th scope="row">Grand total</th><td>{{ '{:,}'.format(overview.opening) }}</td><td>{{ '{:,}'.format(overview.given) }}</td><td>{{ '{:,}'.format(overview.returned) }}</td><td>{{ '{:,}'.format(overview.kept) }}</td><td>{{ '{:,}'.format(overview.closing) }}</td></tr></tfoot>
+      </table>
+    </div>
+  </details>
+</section>
+
+<section class="panel dash-data-panel dash-recent" aria-labelledby="dashboard-jobs-title">
+  <div class="section-head">
+    <div><h2 id="dashboard-jobs-title">Job issue data</h2><p>{{ overview.jobs }} {{ 'job' if overview.jobs == 1 else 'jobs' }} issued during the selected dates</p></div>
+    <a class="dash-detail-link" href="{{ url_for('jobcard_ledger_lookup') }}">Find a job →</a>
+  </div>
+  {% if overview.recent %}
+  <div class="table-wrap" tabindex="0" role="region" aria-label="Job cards issued during the selected dates">
+    <table>
+      <thead><tr><th scope="col">Job</th><th scope="col">Given on / by</th><th scope="col">Outworker</th><th scope="col">Given</th><th scope="col">Returned</th><th scope="col">Pending</th><th scope="col">Open</th></tr></thead>
+      <tbody>
+      {% for card,total in overview.recent %}
+        <tr>
+          <th scope="row"><a class="dash-job-id" href="{{ url_for('jobcard_ledger', jobcard_id=card.id) }}">#{{ card.id }}</a></th>
+          <td>{{ card.date.strftime('%d %b %Y') }}<small>{{ card.given_by }}</small></td>
+          <td class="dash-worker">
+            {% set worker_parts = card.given_to.split('***',1) %}
+            {% if worker_parts|length == 2 %}<strong>{{ worker_parts[1].removesuffix('/-').replace('--',' · ') }}</strong><small>Outworker #{{ worker_parts[0] }}</small>{% else %}{{ card.given_to }}{% endif %}
+          </td>
+          <td class="number">{{ '{:,}'.format(total.given) }}</td>
+          <td class="number">{{ '{:,}'.format(total.returned) }}{% if total.kept|default(0) %}<small>Kept: {{ total.kept }}</small>{% endif %}</td>
+          <td><span class="dash-balance {{ 'is-clear' if not total.pending }}">{{ '{:,}'.format(total.pending) }}</span></td>
+          <td><a class="dash-row-action" href="{{ url_for('job_retun', jobcard_id=card.id) }}">{{ 'Record return' if total.pending else 'View returns' }} →</a></td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="dash-empty">No job cards were issued during these dates. <a href="{{ url_for('manual_job_card') }}">Assign a job →</a></p>
+  {% endif %}
+</section>
 {% endblock %}
-{% block scripts %}<script defer src="{{ url_for('static',filename='js/dashboard-charts.js',v='20261108') }}"></script>{% endblock %}
+
+{% block scripts %}<script defer src="{{ url_for('static', filename='js/dashboard-charts.js', v='20261108') }}"></script>{% endblock %}

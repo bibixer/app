@@ -1,0 +1,117 @@
+.app-ui .cash-book {
+  --teal: #31599e;
+  --ink: #1a2842;
+  --muted: #53647b;
+  --line: #dce5f0;
+  color: var(--ink);
+}
+
+.app-ui .cash-book-header {
+  padding: clamp(20px, 4vw, 40px);
+  border-radius: 20px;
+  background: linear-gradient(120deg, #172c50, #31497d);
+  color: #fff;
+}
+
+.app-ui .cash-book-header :is(h1, .eyebrow, .lead) {
+  color: #fff;
+}
+
+.app-ui .cash-book-header .actions button {
+  background: #31599e;
+  border-color: #98b0d7;
+}
+
+.app-ui .cash-week-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  margin-top: 16px;
+  font-size: 14px;
+}
+
+.app-ui .cash-totals {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+
+.app-ui .cash-totals--flow { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+.app-ui .dashboard-account-tools {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.app-ui .cash-book > .cash-totals {
+  margin-bottom: 22px;
+}
+
+.app-ui .cash-book :is(#receive-advance, #recovery-history) {
+  scroll-margin-top: calc(var(--app-nav-height, 64px) + 16px);
+}
+
+.app-ui .cash-total {
+  padding: 14px 16px;
+  border: 1px solid #dce5f0;
+  border-radius: 12px;
+  background: #f5f8fc;
+  color: #243658;
+}
+
+.app-ui .cash-total dt {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.app-ui .cash-total dd {
+  margin: 6px 0 0;
+  font-size: clamp(17px, 2.5vw, 26px);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.app-ui .cash-total--credit { background: #eef8f3; border-color: #c8e6d6; color: #176044; }
+.app-ui .cash-total--debit { background: #fff5ed; border-color: #efd9c7; color: #8c4322; }
+.app-ui .cash-total--closing { background: #edf2ff; border-color: #d6e1ff; color: #1d3c83; }
+.app-ui .cash-ledger .cash-credit { color: #176044; }
+.app-ui .cash-ledger .cash-debit { color: #8c4322; }
+.app-ui .cash-ledger .table-wrap { max-height: 68vh; }
+.app-ui .cash-ledger thead th { position: sticky; top: 0; z-index: 1; }
+.app-ui .cash-ledger .cash-date { white-space: nowrap; }
+.app-ui .cash-balance-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+  cursor: pointer;
+  font-weight: 700;
+}
+.app-ui .cash-ledger:not(:has(.cash-balance-toggle input:checked)) .cash-running-balance {
+  display: none;
+}
+.app-ui .cash-ledger summary { cursor: pointer; color: #27487a; }
+.app-ui .cash-ledger small { display: block; margin-top: 4px; color: var(--muted); }
+.app-ui .cash-entry-details { padding: 8px 0 0 14px; overflow-wrap: anywhere; }
+.app-ui .cash-entry-details p { margin: 0 0 6px; }
+.app-ui .cash-ledger :is(tfoot, .cash-balance-row) { background: #f1f5fc; }
+.app-ui .cash-ledger .table-wrap:focus-visible { outline: 3px solid #7795cd; outline-offset: 2px; }
+
+@media (max-width: 680px) {
+  .app-ui .dashboard-account-tools { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .app-ui .cash-totals { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .app-ui .cash-total { padding: 12px; }
+  .app-ui .cash-book-filters .field { min-width: 135px; }
+}
+
+@media print {
+  .app-ui .cash-book-header { background: white; }
+  .app-ui .cash-book-header :is(h1, .eyebrow, .lead) { color: #1a2842; }
+  .app-ui .cash-ledger .table-wrap { max-height: none; overflow: visible; }
+  .app-ui .cash-ledger thead th { position: static; }
+  .app-ui .cash-ledger table { min-width: 0; }
+  .app-ui .cash-ledger tr { break-inside: avoid; }
+}

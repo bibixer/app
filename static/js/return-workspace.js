@@ -1,4 +1,15 @@
 (() => {
+  for (const frame of document.querySelectorAll('.return-job-frame')) {
+    const jobId = frame.closest('[data-job-id]').dataset.jobId;
+    window.AppUI?.drafts?.register({
+      label: `job #${jobId} return or kept pieces`,
+      dirty: () => [...(frame.contentDocument?.querySelectorAll(
+        '.return-input, .calc-pieces, .calc-count, .kept-product-form input:not([type=hidden])'
+      ) || [])].some(field => field.value.trim() !== '' || field.validity.badInput),
+      busy: () => Boolean(frame.contentDocument?.querySelector('.btn-submit.app-saving')),
+    });
+  }
+
   window.addEventListener('message', event => {
     if (event.origin !== location.origin || event.data?.type !== 'job-return-state') return;
     const section = [...document.querySelectorAll('[data-job-id]')].find(node =>

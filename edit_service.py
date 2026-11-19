@@ -12,10 +12,10 @@ from modes import (
     db, Bale_date, Lump, Bundle, Jobcard, Jobmovement, Cuter, Item_data, ItemAlias, OutworkerAlias,
     Outworker, Party, EditLog, RequestDedup, OutworkerPayrollJob, ReturnBreakdown,
 )
-from master_aliases import validate_master_aliases
+from master_aliases import validate_master_aliases, validate_worker_contact
 from item_aliases import normalize_name, parse_aliases, validate_names
 from entry_integrity import validate_update, validate_affected_jobs
-from validation import MAX_DATABASE_INTEGER, MAX_PIECES, record_id
+from validation import MAX_DATABASE_INTEGER, MAX_PIECES, record_id, mobile_number, identity_text
 from database_writes import begin_write
 
 
@@ -69,7 +69,7 @@ ENTITY_CONFIG = {
     },
     "outworker": {
         "model": Outworker, "title": "Outworker",
-        "fields": {"name": "text", "aliases": "aliases", "adders": "text", "number": "int"},
+        "fields": {"name": "text", "aliases": "aliases", "adders": "text", "number": "phone"},
     },
     "party": {"model": Party, "title": "Party", "fields": {"name": "text"}},
 }
@@ -84,7 +84,8 @@ def _json_value(value):
 def snapshot(obj, fields):
     return {
         field: ("\n".join(sorted(row.alias for row in obj.alias_rows))
-                if field == "aliases" else _json_value(getattr(obj, field)))
+                if field == "aliases" else obj.mobile if field == "number" and isinstance(obj, Outworker)
+                else _json_value(getattr(obj, field)))
         for field in fields
     }
 
@@ -368,7 +369,7 @@ def save_entry(entity_type, entity_id, form_data, expected_version, request_key,
         if entity_type in {"cutter", "product", "outworker", "party"} and "name" in updates:
             updates["name"] = normalize_name(updates["name"])
         non_negative = {"meters", "size", "pieces", "kg", "outflow", "inflow"}
-        positive = {"lot_number", "lot_count", "bale_number", "number_of_bundlie", "bale_id", "number", "s_no"}
+        positive = {"lot_number", "lot_count", "bale_number", "number_of_bundlie", "bale_id", "s_no"}
         if any(updates.get(field, 0) < 0 for field in non_negative & updates.keys()):
             raise ValueError("Quantity, weight, size, and meter values cannot be negative")
         if any(updates.get(field, 0) > MAX_PIECES for field in {'pieces', 'outflow', 'inflow'} & updates.keys()):
@@ -385,9 +386,22 @@ def save_entry(entity_type, entity_id, form_data, expected_version, request_key,
                 validate_names(updates["name"], aliases, obj.id)
             else:
                 validate_master_aliases(updates["name"], aliases, obj.id)
+                if updates["adders"] != old["adders"]:
+                    updates["adders"] = identity_text(" ".join(updates["adders"].split()), "Address")
+                    if len(updates["adders"]) > 50:
+                        raise ValueError("Enter an address of at most 50 characters.")
+                if updates["number"] != old["number"]:
+                    updates["number"] = mobile_number(updates["number"])
+                if any(updates[field] != old[field] for field in ("name", "adders", "number")):
+                    validate_worker_contact(updates["name"], updates["adders"], updates["number"], obj.id)
         validate_update(entity_type, obj, updates, old)
         for field, value in updates.items():
             if field == "aliases":
+                continue
+            if entity_type == "outworker" and field == "number":
+                if value != old["number"]:
+                    obj.contact_number = value
+                    obj.number = int(value)
                 continue
             setattr(obj, field, value)
         if entity_type in {"product", "outworker"}:
@@ -450,7 +464,7 @@ SEARCH_FIELDS = {
     "movement": ("jobcard", "bundle", "partculer", "product_name", "name_of_mater", "type_B", "flow_type", "date", "outflow", "inflow"),
     "cutter": ("name",),
     "product": ("name",),
-    "outworker": ("name", "adders", "number"),
+    "outworker": ("name", "adders", "number", "contact_number"),
     "party": ("name",),
 }
 
@@ -472,7 +486,7 @@ def _entry_preview(entity_type, row):
         return row.name, f"Aliases: {aliases}" if aliases else "No aliases"
     if entity_type == "outworker":
         aliases = ", ".join(sorted(alias.alias for alias in row.alias_rows))
-        details = f"{row.adders} · {row.number}"
+        details = f"{row.adders} · {row.mobile}"
         return row.name, f"{details} · Aliases: {aliases}" if aliases else details
     return row.name, ""
 

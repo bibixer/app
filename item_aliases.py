@@ -5,6 +5,7 @@ import re
 from sqlalchemy import func
 
 from modes import Item_data, ItemAlias
+from validation import identity_text
 
 
 def normalize_name(value):
@@ -14,7 +15,7 @@ def normalize_name(value):
 def parse_aliases(value):
     aliases = []
     for part in re.split(r"[,\n]", value or ""):
-        alias = normalize_name(part)
+        alias = identity_text(normalize_name(part), "Alias")
         if not alias or alias in aliases:
             continue
         if len(alias) > 50:
@@ -26,7 +27,7 @@ def parse_aliases(value):
 
 
 def validate_names(name, aliases, item_id=None):
-    name = normalize_name(name)
+    name = identity_text(normalize_name(name), "Product name")
     if not name or len(name) > 50:
         raise ValueError("Item name must be between 1 and 50 characters")
     if name in aliases:

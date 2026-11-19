@@ -7,10 +7,10 @@
     <tbody>{% for row in data.kept_entries %}<tr><td>{{ row.product }} · {{ row.type }}</td><td>{{ row.pieces }}</td><td>₹{{ row.unit_value_paise|money }}</td><td>₹{{ row.amount_paise|money }} · Advance #{{ row.advance_id }}</td><td>{{ row.date }} · {{ row.recorded_by }}</td></tr>{% endfor %}</tbody>
   </table></div>{% endif %}
   {% for option in kept_options %}{% set item=option.item %}{% set product=option.product %}{% if product %}
-  <details class="input-guide kept-item">
+  <details class="input-guide kept-item" open>
     <summary><span>{{ item.product_name }} <small>{{ item.colour }}</small></span><span>{{ item.issued }} remaining · ₹{{ product.product_value_paise|money }} / piece</span></summary>
     {% if product.product_value_paise > 0 %}
-    <form method="post" action="{{ url_for('jobcard_kept',jobcard_id=data.jobcard_id) }}" class="kept-product-form">
+    <form method="post" action="{{ url_for('jobcard_kept',jobcard_id=data.jobcard_id) }}" class="kept-product-form" data-return-item="{{ item.item_id }}">
       {{ kept_form.hidden_tag() }}
       {% if kept_only %}<input type="hidden" name="kept_only" value="1">{% endif %}
       <input type="hidden" name="product_id" value="{{ product.id }}">

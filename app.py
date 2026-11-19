@@ -2,7 +2,9 @@ from flask import Flask
 from flask_bootstrap import Bootstrap5
 from route import register_routes
 from modes import db
-from schema_updates import allow_job_payment_installments, ensure_user_active_column, ensure_security_schema, ensure_product_value, schema_transaction
+from schema_updates import (allow_job_payment_installments, ensure_user_active_column, ensure_security_schema,
+                            ensure_product_value, ensure_outworker_contact_number, ensure_payroll_receipt_archive,
+                            schema_transaction)
 from installation_secret import installation_secret
 from database_writes import configure_sqlite, sqlite_pool_options
 import logging
@@ -48,6 +50,8 @@ def create_app(test_config=None):
             with schema_transaction(engine) as connection:
                 db.metadatas[bind_key].create_all(bind=connection)
         ensure_product_value(db.engine)
+        ensure_outworker_contact_number(db.engine)
+        ensure_payroll_receipt_archive(db.engine)
         allow_job_payment_installments(db.engine)
         ensure_user_active_column(db.engines['users'])
         ensure_security_schema(db.engine, db.engines['users'])
